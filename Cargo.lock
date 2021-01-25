@@ -319,7 +319,6 @@ dependencies = [
  "strum",
  "strum_macros",
  "yew",
- "yew-services",
 ]
 
 [[package]]
@@ -442,21 +441,4 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "yew-services"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "gloo",
- "http",
- "js-sys",
- "serde",
- "serde_json",
- "thiserror",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "web-sys",
- "yew",
 ]
