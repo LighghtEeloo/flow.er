@@ -1,0 +1,15 @@
+[package]
+name = "tracer-yew"
+version = "0.1.0"
+authors = ["LighghtEeloo <eelooecho@163.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+strum = "0.20"
+strum_macros = "0.20"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+yew = { path = "/home/lighght/Yggdrasill/Hof/Repo/yew/packages/yew/" }
+yew-services = { path = "/home/lighght/Yggdrasill/Hof/Repo/yew/packages/yew-services/" }
