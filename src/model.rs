@@ -8,6 +8,9 @@ use yew::web_sys::HtmlInputElement as InputElement;
 use yew::web_sys::console;
 use yew::{classes, html, Component, ComponentLink, Html, InputData, NodeRef, ShouldRender};
 use yew::{events::KeyboardEvent, Classes};
+use yew_services::storage::{Area, StorageService};
+
+const KEY: &str = "yew.life.tracer.self";
 
 pub enum Msg {
     Add,
@@ -27,7 +30,7 @@ pub struct Model {
     link: ComponentLink<Self>,
     cube: Cube,
     focus_ref: NodeRef,
-    path: TracerPath,
+    storage: StorageService,
 }
 
 impl Component for Model {
@@ -35,21 +38,20 @@ impl Component for Model {
     type Properties = ();
 
     fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        // Note: default TracerPath.
-        let path = TracerPath::from("tracer.data/tr.json");
-        let cube = match Cube::load(&path) {
-            Ok(c) => c,
-            Err(e) => {
-                println!("{}", e);
+        let storage = StorageService::new(Area::Local).expect("storage was disabled by the user");
+        let cube = {
+            if let Json(Ok(restored_model)) = storage.restore(KEY) {
+                restored_model
+            } else {
                 Cube::new()
             }
-        }; 
+        };
         let focus_ref = NodeRef::default();
         Self {
             link,
             cube,
             focus_ref,
-            path
+            storage
         }
     }
 
@@ -57,13 +59,12 @@ impl Component for Model {
         match msg {
             _ => {}
         }
-        // Todo: dump
+        // Debug..
         let mut entry = Entry::new();
         let id = entry.id();
         entry.face().push_str(&*format!("Yeh. {}", id));
-
         self.cube.entries.insert(id, entry);
-        self.cube.dump(&self.path);
+        self.storage.store(KEY, Json(&self.cube));
         console::log_1(&"Just dumped.".into());
         true
     }
@@ -95,7 +96,7 @@ impl Component for Model {
                     </ul>
                 </section>
                 <footer class="info">
-                    <p>{ format!("Path: {:?}.", self.path) }</p>
+                <pre style="text-align: left; width: 120px">{ format!("{:#?}.", self.cube) }</pre>
                 </footer>
                 <footer class="info">
                     <p>{ "Double-click to edit a todo" }</p>

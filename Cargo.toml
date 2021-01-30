@@ -13,4 +13,5 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 #yew = "0.17.4"
 yew = { path = "/home/lighght/Yggdrasill/Hof/Repo/yew/packages/yew" }
+yew-services = { path = "/home/lighght/Yggdrasill/Hof/Repo/yew/packages/yew-services" }
 wasm-timer = "0.2.0"
