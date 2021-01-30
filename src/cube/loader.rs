@@ -2,6 +2,7 @@ use crate::cube::prelude::*;
 use std::fs::File;
 use std::path::Path;
 use std::io::{Read, Write};
+use yew::web_sys::console;
 
 pub trait Barge {
     fn from_json(json_str: String) -> Result<Cube>;
@@ -27,6 +28,7 @@ impl Barge for Cube {
 
     // json load
     fn load(path: &Path) -> Result<Cube> {
+        unimplemented!();
         match File::open(path) {
             Ok(mut f) => {
                 let mut json_str = String::new();
@@ -45,7 +47,10 @@ impl Barge for Cube {
     
     // json dump
     fn dump(&self, path: &Path) -> Result<()> {
-        let mut json_file = File::create(path)?;
+        unimplemented!();
+        // Debug..
+        console::log_1(&format!("Doing dump: {:?}", path).into());
+        let mut json_file = File::create("a.json")?;
         let json_str = self.export_json();
         match json_file.write_all(json_str.as_ref()) {
             Ok(_) => {

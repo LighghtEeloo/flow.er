@@ -5,6 +5,7 @@ use crate::prelude::*;
 
 use yew::format::Json;
 use yew::web_sys::HtmlInputElement as InputElement;
+use yew::web_sys::console;
 use yew::{classes, html, Component, ComponentLink, Html, InputData, NodeRef, ShouldRender};
 use yew::{events::KeyboardEvent, Classes};
 
@@ -26,6 +27,7 @@ pub struct Model {
     link: ComponentLink<Self>,
     cube: Cube,
     focus_ref: NodeRef,
+    path: TracerPath,
 }
 
 impl Component for Model {
@@ -33,13 +35,21 @@ impl Component for Model {
     type Properties = ();
 
     fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        // Todo: load
-        let cube = Cube {};
+        // Note: default TracerPath.
+        let path = TracerPath::from("tracer.data/tr.json");
+        let cube = match Cube::load(&path) {
+            Ok(c) => c,
+            Err(e) => {
+                println!("{}", e);
+                Cube::new()
+            }
+        }; 
         let focus_ref = NodeRef::default();
         Self {
             link,
             cube,
             focus_ref,
+            path
         }
     }
 
@@ -48,6 +58,13 @@ impl Component for Model {
             _ => {}
         }
         // Todo: dump
+        let mut entry = Entry::new();
+        let id = entry.id();
+        entry.face().push_str(&*format!("Yeh. {}", id));
+
+        self.cube.entries.insert(id, entry);
+        self.cube.dump(&self.path);
+        console::log_1(&"Just dumped.".into());
         true
     }
 
@@ -77,6 +94,9 @@ impl Component for Model {
                         { for list.iter().map(|e| html!(<div>{e}</div>)) }
                     </ul>
                 </section>
+                <footer class="info">
+                    <p>{ format!("Path: {:?}.", self.path) }</p>
+                </footer>
                 <footer class="info">
                     <p>{ "Double-click to edit a todo" }</p>
                     <p>{ "Written by " }<a href="https://github.com/LighghtEeloo/" target="_blank">{ "LighghtEeloo" }</a></p>

@@ -3,7 +3,7 @@ use crate::cube::prelude::*;
 use std::collections::HashMap;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
-use yew::web_sys;
+use wasm_timer::{SystemTime, UNIX_EPOCH};
 
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -110,36 +110,29 @@ impl EntryDry {
 pub type EntryId = String;
 
 pub trait TimeRep {
-    fn flatten(&self) -> f64 {
+    fn flatten(&self) -> SystemTime {
         unimplemented!()
-    }
-    fn hashable(time: f64) -> (u64, u32) {
-        (time.trunc() as u64, (time.fract() * 1e8) as u32)
     }
     fn stamping() -> (u64, u32) {
         // Using nano_secs as timestamp.
-        let time: f64 = web_sys::window()
-            .expect("should have a Window")
-            .performance()
-            .expect("should have a Performance")
-            .now();
-        // Debug..
-        web_sys::console::log_1(&time.to_string().into());
-        TimeRep::hashable(time)
+        let time = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("Time went backwards");
+        (time.as_secs(), time.subsec_nanos())
     }
 }
 impl TimeRep for (u64, u32) {
-    fn flatten(&self) -> f64 {
+    fn flatten(&self) -> SystemTime {
         let sec = self.0;
         let sub_nano = self.1;
-        sec as f64 + sub_nano as f64 / 1e-8
+        UNIX_EPOCH + Duration::from_nanos(sec*1e9 as u64 + sub_nano as u64)
     }
 }
 impl TimeRep for TimeStamp {
-    fn flatten(&self) -> f64 {
+    fn flatten(&self) -> SystemTime {
         let sec = self.data.0;
         let sub_nano = self.data.1;
-        sec as f64 + sub_nano as f64 / 1e-8
+        UNIX_EPOCH + Duration::from_nanos(sec*1e9 as u64 + sub_nano as u64)
     }
 }
 
@@ -148,8 +141,10 @@ pub trait IdentityHash {
 }
 impl IdentityHash for EntryId {
     fn from_time(v: &impl TimeRep) -> Self {
-        let time: f64 = v.flatten();
-        let time: (u64, u32) = TimeRep::hashable(time);
+        let time = v.flatten()
+            .duration_since(UNIX_EPOCH)
+            .expect("Time went backwards")
+            .as_nanos();
         let mut s = DefaultHasher::new();
         time.hash(&mut s);
         format!("{:x}", s.finish())
