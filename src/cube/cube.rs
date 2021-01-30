@@ -3,7 +3,6 @@ use crate::cube::prelude::*;
 use std::collections::HashMap;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
-use wasm_timer::{SystemTime, UNIX_EPOCH};
 
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
