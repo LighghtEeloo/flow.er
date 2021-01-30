@@ -1,18 +1,52 @@
 use crate::cube::prelude::*;
 
+use std::collections::HashMap;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 use std::time::{SystemTime, UNIX_EPOCH};
 
-pub struct Cube {
 
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct Cube {
+    pub entries: HashMap<EntryId, Entry>,
+    pub relation: RelationModel
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub enum RelationModel {
+    Linear(Vec<EntryId>),
+    Graph
+    // Todo: Garph RelationModel.
+}
+
+impl Cube {
+    pub fn new() -> Self {
+        Cube {
+            entries: HashMap::new(),
+            relation: RelationModel::Linear(Vec::new())
+        }
+    }
+    pub fn get() {
+        todo!()
+    }
+}
+
+
+
+
+
+
+#[derive(Debug)]
+pub enum Identifier {
+    Id(EntryId),
+    Index(usize)
 }
 
 // Entry Area
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Entry {
-    internal: EntryDry,
+    dry: EntryDry,
     timestamps: Vec<TimeStamp>
 }
 
@@ -29,19 +63,34 @@ impl Entry {
         let stamp = TimeStamp::created();
         let id = EntryId::from_time(&stamp.data);
         Entry {
-            internal: EntryDry::new(id),
+            dry: EntryDry::new(id),
             timestamps: vec!(stamp)
         }
     }
     pub fn strip(&self) -> EntryDry {
-        self.internal.clone()
+        self.dry.clone()
+    }
+    pub fn dry(&mut self) -> &mut EntryDry {
+        &mut self.dry
+    }
+    pub fn id(&self) -> EntryId {
+        self.dry.id.clone()
+    }
+    pub fn face(&mut self) -> &mut Face {
+        &mut self.dry.face
+    }
+    pub fn bubble(&mut self) -> &mut Bubble {
+        &mut self.dry.bubble
+    }
+    pub fn filter(&mut self) -> &mut Filter {
+        &mut self.dry.filter
     }
 }
 
 impl From<EntryDry> for Entry {
     fn from(v: EntryDry) -> Self {
         Entry {
-            internal: v,
+            dry: v,
             timestamps: vec!(TimeStamp::created())
         }
     }

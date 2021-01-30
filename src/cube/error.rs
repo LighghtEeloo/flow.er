@@ -63,7 +63,7 @@ impl Error {
     }
     pub fn arg_error(cmd: &str, arg: &str) -> Self {
         Error {
-            message: format!("Command: {}, invalid arg: {}.", cmd, arg),
+            message: format!("error: arg_error - command: {}, invalid arg: {}.", cmd, arg),
             kind: ErrorKind::ArgError,
             info: Some(vec![cmd.to_string(), arg.to_string()])
         }
