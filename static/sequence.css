@@ -20,6 +20,9 @@ body {
     --tabColor: rgba(216, 230, 236, 0.829);
     --emphasizeColor: rgba(238, 244, 247, 0.829);
     --dividerColor: rgba(10, 55, 77, 1);
+
+    --mainFont: cursive, 'Times New Roman', serif;
+    --assistiveFont: 'Times New Roman', Times, serif;
 }
 
 .frame {
@@ -28,6 +31,7 @@ body {
     margin: 0;
     padding: 0;
     position: relative;
+    font-family: var(--mainfont);
     /* height: 100vh; */
     /* display: block; */
 }
@@ -99,8 +103,31 @@ body {
     align-items: center;
     justify-content: center; */
 }
+
+.tooltip {
+    visibility: hidden;
+    width: auto;
+    background-color: grey;
+    color: #fff;
+    text-align: center;
+    padding: 3px 6px;
+    border-radius: 4px;
+
+    font-size: 10pt;
+   
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 1;
+    /* top: calc(50% - 6px); */
+    bottom: 0%;
+    left: 105%; 
+  }
+
 .tab .tab-content:hover {
     background-color: var(--emphasizeColor);
+}
+.tab .tab-content:hover .tooltip {
+    visibility: visible;
 }
 
 p {
