@@ -59,11 +59,11 @@ impl Component for Model {
         match msg {
             _ => {}
         }
-        // Debug..
-        let mut entry = Entry::new();
-        let id = entry.id();
-        entry.face().push_str(&*format!("Yeh. {}", id));
-        self.cube.entries.insert(id, entry);
+        // Test..
+        // let mut entry = Entry::new();
+        // let id = entry.id();
+        // entry.face().push_str(&*format!("Yeh. {}", id));
+        // self.cube.entries.insert(id, entry);
         self.storage.store(KEY, Json(&self.cube));
         console::log_1(&"Just dumped.".into());
         true
@@ -77,28 +77,31 @@ impl Component for Model {
         let list = vec!("a", "v");
         html! {
             <div class="app-wrapper">
-                <section class="sequence">
-                    <header class="header">
-                        <h1>{ "Sequence" }</h1>
-                    </header>
-                </section>
-                <section class="main">
-                    <input
-                        type="checkbox"
-                        class="toggle-all"
-                        id="toggle-all"
-                        checked=true
-                        onclick=self.link.callback(|_| Msg::ToggleAll)
-                    />
-                    <label for="toggle-all" />
-                    <ul class="todo-list">
-                        { for list.iter().map(|e| html!(<div>{e}</div>)) }
-                    </ul>
-                </section>
-                <footer class="info">
-                <pre style="text-align: left; width: 120px">{ format!("{:#?}.", self.cube) }</pre>
-                </footer>
-                <footer class="info">
+                <div class="frame" id="left-sidebar">
+                    <li class="tab"> <div class="tab-content">
+                        <img src="static/icons/hexagons.svg" alt="Workspace"/>
+                        <span class="tooltip">{"Workspace"}</span>
+                    </div> </li>
+                    <li class="tab"> <div class="tab-content">
+                        <img src="static/icons/branch.svg" alt="Projects"/>
+                        <span class="tooltip">{"Projects"}</span>
+                    </div> </li>
+                    <li class="tab"> <div class="tab-content">
+                        <img src="static/icons/history.svg" alt="History"/>
+                        <span class="tooltip">{"History"}</span>
+                    </div> </li>
+                    <li class="tab tab-bottom"> <div class="tab-content">
+                        <img src="static/icons/settings.svg" alt="Settings"/>
+                        <span class="tooltip">{"Settings"}</span>
+                    </div> </li>
+                </div>
+                <div class="frame" id="main-editor">
+                    <p>{"Lorem ipsum dolor sit amet consectetur, adipisicing elit. Earum et voluptates atque, neque sint iste possimus at rerum accusantium quidem. Quia laborum vitae ex sed alias quisquam quibusdam at cupiditate."}</p>
+                </div>
+                <div class="frame" id="status-bar">
+                    <p>{"Lorem ipsum dolor sit amet consectetur, adipisicing elit. Earum et voluptates atque, neque sint iste possimus at rerum accusantium quidem. Quia laborum vitae ex sed alias quisquam quibusdam at cupiditate."}</p>
+                </div>
+                <footer class="info" style="display: none">
                     <p>{ "Double-click to edit a todo" }</p>
                     <p>{ "Written by " }<a href="https://github.com/LighghtEeloo/" target="_blank">{ "LighghtEeloo" }</a></p>
                     <p>{ "Inspired by " }<a href="https://github.com/DenisKolodin/" target="_blank">{ "Denis Kolodin" }</a></p>
