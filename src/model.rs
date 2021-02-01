@@ -74,26 +74,29 @@ impl Component for Model {
     }
 
     fn view(&self) -> Html {
-        let list = vec!("a", "v");
-        html! {
+        let tab_meta: Vec<(String, String, bool)> = vec! {
+            ("static/icons/hexagons.svg".to_string(), "Workspace".to_string(), false),
+            ("static/icons/branch.svg".to_string(), "Projects".to_string(), false),
+            ("static/icons/history.svg".to_string(), "History".to_string(), false),
+            ("static/icons/settings.svg".to_string(), "Settings".to_string(), true),
+        };
+        let side_bar_tabs: Html = 
+            tab_meta.iter().map(
+                |(src, describe, bottom)| {
+                    html! {
+                        <li class={if !bottom {"tab"} else {"tab tab-bottom"}}>
+                            <div class="tab-content">
+                                <img src={&*src} alt={&*describe}/>
+                                <span class="tooltip">{&*describe}</span>
+                            </div>
+                        </li>
+                    }
+                }
+            ).collect();
+        let view = html! {
             <div class="app-wrapper">
                 <div class="frame" id="left-sidebar">
-                    <li class="tab"> <div class="tab-content">
-                        <img src="static/icons/hexagons.svg" alt="Workspace"/>
-                        <span class="tooltip">{"Workspace"}</span>
-                    </div> </li>
-                    <li class="tab"> <div class="tab-content">
-                        <img src="static/icons/branch.svg" alt="Projects"/>
-                        <span class="tooltip">{"Projects"}</span>
-                    </div> </li>
-                    <li class="tab"> <div class="tab-content">
-                        <img src="static/icons/history.svg" alt="History"/>
-                        <span class="tooltip">{"History"}</span>
-                    </div> </li>
-                    <li class="tab tab-bottom"> <div class="tab-content">
-                        <img src="static/icons/settings.svg" alt="Settings"/>
-                        <span class="tooltip">{"Settings"}</span>
-                    </div> </li>
+                    { side_bar_tabs }
                 </div>
                 <div class="frame" id="main-editor">
                     <p>{"Lorem ipsum dolor sit amet consectetur, adipisicing elit. Earum et voluptates atque, neque sint iste possimus at rerum accusantium quidem. Quia laborum vitae ex sed alias quisquam quibusdam at cupiditate."}</p>
@@ -107,6 +110,7 @@ impl Component for Model {
                     <p>{ "Inspired by " }<a href="https://github.com/DenisKolodin/" target="_blank">{ "Denis Kolodin" }</a></p>
                 </footer>
             </div>
-        }
+        };
+        view
     }
 }

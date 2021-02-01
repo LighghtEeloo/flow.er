@@ -44,7 +44,8 @@ body {
     width: var(--len-left-sidebar);
     left: 0;
     top: 0;
-    margin-right: -1px;
+    /* margin-right: -1px; */
+    border-right: none;
 }
 
 .frame#main-editor {
@@ -56,10 +57,11 @@ body {
 
 .frame#status-bar {
     height: var(--len-status-bar);
-    width: auto;
+    width: 100vw;
     bottom: 0;
     left: 0;
-    margin-top: -1px;
+    border-top: none;
+    /* margin-top: -1px; */
     background-color: var(--backColor);
 }
 
@@ -74,7 +76,7 @@ body {
 .tab {
     position: relative;
     background-color: var(--mainColor);
-    border-bottom: 3px solid var(--dividerColor);
+    border-bottom: 2px solid var(--dividerColor);
 }
 
 .tab.tab-bottom::before {
@@ -86,7 +88,7 @@ body {
 
 .tab.tab-bottom {
     border-bottom: none;
-    border-top: 3px solid var(--dividerColor);
+    border-top: 2px solid var(--dividerColor);
     position: absolute;
     bottom: 0;
     left: 0;
