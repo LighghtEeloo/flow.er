@@ -2,6 +2,8 @@ import os
 from os.path import isdir, join
 from shutil import copytree, rmtree
 
+os.system('clear')
+
 # sync = [
 #     'static',
 #     'tracer.data'
