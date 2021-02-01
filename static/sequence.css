@@ -1,0 +1,62 @@
+html,
+body {
+	margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.frame {
+    /* Test.. */
+	border: solid green 2px;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    height: 100vh;
+}
+
+.tab::before {
+    content: " ";
+    display: block;
+    background-color: rgb(235,235,255);
+    padding-top: 100%;
+}
+
+.tab {
+    position: relative;
+}
+
+.tab .tab-content {
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    /* width: auto; height: auto;
+    margin: auto; */
+}
+
+.tab .tab-content img {
+    width: 60%;
+    height: auto;
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    margin: auto;
+    /* display: flex;
+    align-items: center;
+    justify-content: center; */
+}
+
+p {
+    width: 80%;
+    height: fit-content;
+    margin: auto;
+    font-family: cursive;
+}
+
+#left-sidebar {
+    left: 0;
+    width: 60px;
+}
+
+#main-editor {
+    right: 0;
+    max-width: 100%;
+}
