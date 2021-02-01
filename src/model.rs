@@ -59,11 +59,7 @@ impl Component for Model {
         match msg {
             _ => {}
         }
-        // Test..
-        // let mut entry = Entry::new();
-        // let id = entry.id();
-        // entry.face().push_str(&*format!("Yeh. {}", id));
-        // self.cube.entries.insert(id, entry);
+        // Note: Only self.cube is saved.
         self.storage.store(KEY, Json(&self.cube));
         console::log_1(&"Just dumped.".into());
         true
@@ -74,32 +70,13 @@ impl Component for Model {
     }
 
     fn view(&self) -> Html {
-        let tab_meta: Vec<(String, String, bool)> = vec! {
-            ("static/icons/hexagons.svg".to_string(), "Workspace".to_string(), false),
-            ("static/icons/branch.svg".to_string(), "Projects".to_string(), false),
-            ("static/icons/history.svg".to_string(), "History".to_string(), false),
-            ("static/icons/settings.svg".to_string(), "Settings".to_string(), true),
-        };
-        let side_bar_tabs: Html = 
-            tab_meta.iter().map(
-                |(src, describe, bottom)| {
-                    html! {
-                        <li class={if !bottom {"tab"} else {"tab tab-bottom"}}>
-                            <div class="tab-content">
-                                <img src={&*src} alt={&*describe}/>
-                                <span class="tooltip">{&*describe}</span>
-                            </div>
-                        </li>
-                    }
-                }
-            ).collect();
         let view = html! {
             <div class="app-wrapper">
                 <div class="frame" id="left-sidebar">
-                    { side_bar_tabs }
+                    { Model::sidebar_tabs() }
                 </div>
                 <div class="frame" id="main-editor">
-                    <p>{"Lorem ipsum dolor sit amet consectetur, adipisicing elit. Earum et voluptates atque, neque sint iste possimus at rerum accusantium quidem. Quia laborum vitae ex sed alias quisquam quibusdam at cupiditate."}</p>
+                    { self.main_editor() }
                 </div>
                 <div class="frame" id="status-bar">
                     <p>{"Lorem ipsum dolor sit amet consectetur, adipisicing elit. Earum et voluptates atque, neque sint iste possimus at rerum accusantium quidem. Quia laborum vitae ex sed alias quisquam quibusdam at cupiditate."}</p>
@@ -112,5 +89,48 @@ impl Component for Model {
             </div>
         };
         view
+    }
+}
+
+
+
+impl Model {
+    fn sidebar_tabs() -> Html {
+        let tab_meta: Vec<(&str, &str, bool)> = vec! {
+            ("static/icons/hexagons.svg", "Workspace", false),
+            ("static/icons/branch.svg", "Projects", false),
+            ("static/icons/history.svg", "History", false),
+            ("static/icons/settings.svg", "Settings", true),
+        };
+        let sidebar_tabs: Html = 
+            tab_meta.iter().map(
+                |(src, describe, bottom)| {
+                    html! {
+                        <li class={if !bottom {"tab"} else {"tab tab-bottom"}}>
+                            <div class="tab-content">
+                                <img src={&*src} alt={&*describe}/>
+                                <span class="tooltip">{&*describe}</span>
+                            </div>
+                        </li>
+                    }
+                }
+            ).collect();
+        html! {
+            {sidebar_tabs}
+        }
+    }
+
+    fn main_editor(&self) -> Html {
+        let view_new = html! {
+            <div class="new-cube">
+
+            </div>
+        };
+        let view_main = html! {
+            <div class="cube">
+            </div>
+        };
+
+        if self.cube.empty() { view_new } else { view_main }
     }
 }

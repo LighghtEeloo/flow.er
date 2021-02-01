@@ -25,6 +25,9 @@ impl Cube {
             relation: RelationModel::Linear(Vec::new())
         }
     }
+    pub fn empty(&self) -> bool {
+        self.entries.len() == 0
+    }
     pub fn get() {
         todo!()
     }
