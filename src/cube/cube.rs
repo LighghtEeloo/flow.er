@@ -36,14 +36,6 @@ impl Cube {
 
 
 
-
-
-#[derive(Debug)]
-pub enum Identifier {
-    Id(EntryId),
-    Index(usize)
-}
-
 // Entry Area
 
 #[derive(Clone, Debug, Deserialize, Serialize)]

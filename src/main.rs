@@ -12,4 +12,6 @@ fn main() {
 pub mod prelude {
     pub use crate::*;
     pub use crate::cube::*;
+
+    pub use yew::web_sys::console::log_1 as LOG;
 }

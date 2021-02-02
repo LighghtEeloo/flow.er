@@ -1,0 +1,19 @@
+.cube,
+.cube-new {
+    padding: 0;
+    width: auto;
+    height: 100%;
+    background-color: aliceblue;
+}
+
+.cube-new input {
+    width: 400px;
+    height: 30px;
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    margin: auto;
+    padding: 0;
+    background-color: rgba(0,0,0,0);
+    text-align: center;
+    line-height: calc(30px / 2);
+}

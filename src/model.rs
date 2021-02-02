@@ -5,7 +5,6 @@ use crate::prelude::*;
 
 use yew::format::Json;
 use yew::web_sys::HtmlInputElement as InputElement;
-use yew::web_sys::console;
 use yew::{classes, html, Component, ComponentLink, Html, InputData, NodeRef, ShouldRender};
 use yew::{events::KeyboardEvent, Classes};
 use yew_services::storage::{Area, StorageService};
@@ -57,11 +56,16 @@ impl Component for Model {
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
+            Msg::Focus => {
+                if let Some(input) = self.focus_ref.cast::<InputElement>() {
+                    input.focus().unwrap();
+                }
+            }
             _ => {}
         }
         // Note: Only self.cube is saved.
         self.storage.store(KEY, Json(&self.cube));
-        console::log_1(&"Just dumped.".into());
+        LOG(&"Just dumped.".into());
         true
     }
 
@@ -121,16 +125,36 @@ impl Model {
     }
 
     fn main_editor(&self) -> Html {
+        LOG(&format!("{:?}", String::from("abs")).into());
         let view_new = html! {
-            <div class="new-cube">
-
+            <div class="cube-new">
+                <input
+                    type="text"
+                    placeholder="Enter your proj name."
+                    oninput=self.link.callback(|e: InputData| {
+                        LOG(&format!("{:?}", e).into());
+                        Msg::UpdateEdit(e.value)
+                    })
+                    // onblur=self.link.callback(move |_| Msg::Edit(idx))
+                    // onkeypress=self.link.batch_callback(move |e: KeyboardEvent| {
+                    //     if e.key() == "Enter" { Some(Msg::Edit(idx)) } else { None }
+                    // })
+                />
             </div>
         };
         let view_main = html! {
             <div class="cube">
+                { self.cube_view() }
             </div>
         };
 
-        if self.cube.empty() { view_new } else { view_main }
+        // Debug..
+        if !self.cube.empty() { view_new } else { view_main }
+    }
+
+    fn cube_view(&self) -> Html {
+        html! {
+            <div></div>
+        }
     }
 }
