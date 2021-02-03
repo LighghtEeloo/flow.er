@@ -2,34 +2,31 @@
 #[allow(unused)]
 
 use crate::prelude::*;
+use crate::cube::*;
 
 use yew::format::Json;
 use yew::web_sys::HtmlInputElement as InputElement;
-use yew::{classes, html, Component, ComponentLink, Html, InputData, NodeRef, ShouldRender};
-use yew::{events::KeyboardEvent, Classes};
+use yew::{html, Component, ComponentLink, Html, InputData, NodeRef, ShouldRender};
+use yew::{events::KeyboardEvent};
 use yew_services::storage::{Area, StorageService};
 
 const KEY: &str = "yew.life.tracer.self";
 
+#[derive(Debug)]
 pub enum Msg {
-    Add,
-    Edit(usize),
-    Update(String),
-    UpdateEdit(String),
-    Remove(usize),
-    SetFilter(Filter),
-    ToggleAll,
-    ToggleEdit(usize),
-    Toggle(usize),
-    ClearCompleted,
+    NewCube,
+    AddNode,
+    UpdateBuffer(String),
+    WriteBuffer(EntryId),
     Focus,
 }
 
 pub struct Model {
-    link: ComponentLink<Self>,
     cube: Cube,
+    buffer_str: String,
     focus_ref: NodeRef,
     storage: StorageService,
+    link: ComponentLink<Self>,
 }
 
 impl Component for Model {
@@ -47,16 +44,28 @@ impl Component for Model {
         };
         let focus_ref = NodeRef::default();
         Self {
-            link,
             cube,
+            buffer_str: String::new(),
             focus_ref,
-            storage
+            storage,
+            link,
         }
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
+        // Debug..
+        LOG(&format!("Updating with: {:?}", msg).into());
+        use Msg::*;
         match msg {
-            Msg::Focus => {
+            UpdateBuffer(val) => {
+                self.buffer_str = val;
+            }
+            NewCube => {
+                // Todo: Add new cube.
+                self.cube.name = self.buffer_str.clone();
+                self.buffer_str.clear();
+            }
+            Focus => {
                 if let Some(input) = self.focus_ref.cast::<InputElement>() {
                     input.focus().unwrap();
                 }
@@ -125,36 +134,64 @@ impl Model {
     }
 
     fn main_editor(&self) -> Html {
-        LOG(&format!("{:?}", String::from("abs")).into());
         let view_new = html! {
             <div class="cube-new">
                 <input
                     type="text"
-                    placeholder="Enter your proj name."
+                    placeholder="Enter new proj name."
                     oninput=self.link.callback(|e: InputData| {
-                        LOG(&format!("{:?}", e).into());
-                        Msg::UpdateEdit(e.value)
+                        LOG(&format!("Oninput - new: {:?}", e).into());
+                        Msg::UpdateBuffer(e.value)
                     })
-                    // onblur=self.link.callback(move |_| Msg::Edit(idx))
-                    // onkeypress=self.link.batch_callback(move |e: KeyboardEvent| {
-                    //     if e.key() == "Enter" { Some(Msg::Edit(idx)) } else { None }
-                    // })
+                    onkeypress=self.link.batch_callback(move |e: KeyboardEvent| {
+                        LOG(&format!("Onkeypress - new: {:?}", e).into());
+                        if e.key() == "Enter" { Some(Msg::NewCube) } else { None }
+                    })
                 />
+                <div class="dash-line"></div>
             </div>
         };
-        let view_main = html! {
-            <div class="cube">
-                { self.cube_view() }
-            </div>
-        };
+        let view_main = self.cube_view();
 
-        // Debug..
-        if !self.cube.empty() { view_new } else { view_main }
+        // Debug: cube - new?
+        if self.cube.empty() { view_new } else { view_main }
     }
 
     fn cube_view(&self) -> Html {
+        use RelationModel::*;
+        let relation = &self.cube.relation;
+        match relation {
+            Linear(vec) => {
+                html! {
+                    <div class="cube">
+                        { for vec.iter().map(|id| self.node_view(id))  }
+                    </div>
+                }
+                // vec.into_iter().map(|id: &EntryId| {
+                // }).collect()
+            }
+            _ => html! {}
+        }
+    }
+    
+    fn node_view(&self, id: &EntryId) -> Html {
+        let id = id.clone();
         html! {
-            <div></div>
+            <div class="node">
+                <input
+                    type="text"
+                    placeholder="..."
+                    oninput=self.link.callback(|e: InputData| {
+                        LOG(&format!("Oninput: {:?}", e).into());
+                        Msg::UpdateBuffer(e.value)
+                    })
+                    onblur=self.link.callback(move |_| Msg::WriteBuffer(id))
+                    onkeypress=self.link.batch_callback(move |e: KeyboardEvent| {
+                        LOG(&format!("Onkeypress: {:?}", e).into());
+                        if e.key() == "Enter" { Some(Msg::WriteBuffer(id)) } else { None }
+                    })
+                />
+            </div>
         }
     }
 }

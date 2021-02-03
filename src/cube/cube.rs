@@ -7,6 +7,7 @@ use std::hash::{Hash, Hasher};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Cube {
+    pub name: String,
     pub entries: HashMap<EntryId, Entry>,
     pub relation: RelationModel
 }
@@ -21,6 +22,7 @@ pub enum RelationModel {
 impl Cube {
     pub fn new() -> Self {
         Cube {
+            name: String::new(),
             entries: HashMap::new(),
             relation: RelationModel::Linear(Vec::new())
         }
@@ -41,7 +43,9 @@ impl Cube {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Entry {
     dry: EntryDry,
-    timestamps: Vec<TimeStamp>
+    timestamps: Vec<TimeStamp>,
+    // Todo: Add positional info.
+    // position: (f64, f64)
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
