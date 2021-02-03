@@ -25,6 +25,7 @@ pub enum Msg {
 pub struct Model {
     cube: Cube,
     buffer_str: String,
+    refs: HashMap<EntryId, NodeRef>,
     focus_ref: NodeRef,
     storage: StorageService,
     link: ComponentLink<Self>,
@@ -60,6 +61,8 @@ impl Component for Model {
         Self {
             cube,
             buffer_str: String::new(),
+            // Todo: load NodeRefs.
+            refs: HashMap::new(),
             focus_ref,
             storage,
             link,
@@ -77,8 +80,7 @@ impl Component for Model {
                 }
                 NewCube => {
                     // Todo: Add new cube.
-                    self.cube.name = self.buffer_str.clone();
-                    self.buffer_str.clear();
+                    self.cube.name = mem::take(&mut self.buffer_str);
                 }
                 AddNode(vec) => {
                     // Todo: change the semantics.
