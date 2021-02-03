@@ -30,8 +30,8 @@ impl Cube {
     pub fn empty(&self) -> bool {
         self.entries.len() == 0
     }
-    pub fn get() {
-        todo!()
+    pub fn get(&self, id: EntryId) -> &Entry {
+        self.entries.get(&id).unwrap()
     }
 }
 
@@ -51,9 +51,9 @@ pub struct Entry {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct EntryDry {
     id: EntryId,
-    face: Face,
-    bubble: Bubble,
-    filter: Filter,
+    pub face: Face,
+    pub bubble: Bubble,
+    pub filter: Filter,
 }
 
 impl Entry {
@@ -65,22 +65,31 @@ impl Entry {
             timestamps: vec!(stamp)
         }
     }
-    pub fn strip(&self) -> EntryDry {
+    pub fn dry(&self) -> EntryDry {
         self.dry.clone()
     }
-    pub fn dry(&mut self) -> &mut EntryDry {
-        &mut self.dry
+    pub fn strip(self) -> EntryDry {
+        self.dry
     }
     pub fn id(&self) -> EntryId {
         self.dry.id.clone()
     }
-    pub fn face(&mut self) -> &mut Face {
+    pub fn face(&self) -> &Face {
+        &self.dry.face
+    }
+    pub fn set_face(&mut self) -> &mut Face {
         &mut self.dry.face
     }
-    pub fn bubble(&mut self) -> &mut Bubble {
+    pub fn bubble(&self) -> &Bubble {
+        &self.dry.bubble
+    }
+    pub fn set_bubble(&mut self) -> &mut Bubble {
         &mut self.dry.bubble
     }
-    pub fn filter(&mut self) -> &mut Filter {
+    pub fn filter(&self) -> &Filter {
+        &self.dry.filter
+    }
+    pub fn set_filter(&mut self) -> &mut Filter {
         &mut self.dry.filter
     }
 }
@@ -207,7 +216,7 @@ impl TimeStamp {
 
     pub fn snapshot(entry: &Entry) -> Self {
         TimeStamp {
-            meta: TimeMeta::Snapshot(entry.strip()),
+            meta: TimeMeta::Snapshot(entry.dry()),
             data: TimeStamp::stamping()
         }
     }

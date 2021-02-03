@@ -1,4 +1,5 @@
 #[allow(dead_code)]
+#[allow(unused_assignments)]
 #[allow(unused)]
 
 use crate::prelude::*;
@@ -35,13 +36,21 @@ impl Component for Model {
 
     fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
         let storage = StorageService::new(Area::Local).expect("storage was disabled by the user");
-        let cube = {
+        let mut cube: Cube = {
             if let Json(Ok(restored_model)) = storage.restore(KEY) {
                 restored_model
             } else {
                 Cube::new()
             }
         };
+
+        // Debug..
+        cube = Cube::new();
+        if cube.entries.len() == 0 {
+            let entry = Entry::new();
+            cube.entries.insert(entry.id(), entry.clone());
+            cube.relation = RelationModel::Linear(vec!(entry.id()));
+        }
         LOG!("Loaded: {:?}", cube);
         let focus_ref = NodeRef::default();
         Self {
@@ -65,6 +74,10 @@ impl Component for Model {
                 // Todo: Add new cube.
                 self.cube.name = self.buffer_str.clone();
                 self.buffer_str.clear();
+            }
+            WriteBuffer(id) => {
+                let x: &Entry = self.cube.entries.get(&id).unwrap();
+                x.dry().face = mem::take(&mut self.buffer_str);
             }
             Focus => {
                 if let Some(input) = self.focus_ref.cast::<InputElement>() {
@@ -179,6 +192,7 @@ impl Model {
             <div class="node">
                 <input
                     type="text"
+                    value=self.cube.get(id).face()
                     placeholder="..."
                     oninput=self.link.callback(|e: InputData| {
                         LOG!("Oninput: {:?}", e);
