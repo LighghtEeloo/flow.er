@@ -49,7 +49,7 @@ impl Component for Model {
         // Test..
         cube = Cube::new();
         cube.name = format!("Ehaema!");
-        cube.locked = true;
+        // cube.locked = true;
         if cube.entries.len() == 0 {
             let mut entry = Entry::new();
             entry.set_face(format!("???"));
@@ -81,8 +81,12 @@ impl Component for Model {
                     self.cube.name = self.buffer_str.clone();
                     self.buffer_str.clear();
                 }
-                AddNode(_) => {
-                    // self.cube;
+                AddNode(vec) => {
+                    // Todo: change the semantics.
+                    for id in vec {
+                        let i = self.cube.grow();
+                        self.cube.chain(i, id)
+                    }
                 }
                 WriteFace(id) => {
                     LOG!("Buffer: {}", self.buffer_str);
@@ -191,6 +195,7 @@ impl Model {
             Linear(vec) => {
                 html! {
                     <div class="cube">
+                        <label>{ self.cube.name.clone() }</label>
                         { for vec.iter().map(|id| self.node_view(id))  }
                     </div>
                 }
@@ -222,6 +227,13 @@ impl Model {
                     })
                     readonly=if self.cube.locked { true } else { false }
                 />
+                <button
+                    title="New node"
+                    onclick=self.link.callback(move |_| {
+                        LOG!("OnClink.");
+                        [AddNode(vec!(id))]
+                    })
+                >{"+"}</button>
             </div>
         }
     }
