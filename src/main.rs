@@ -12,5 +12,13 @@ fn main() {
 pub mod prelude {
     pub use crate::*;
 
-    pub use yew::web_sys::console::log_1 as LOG;
+    // pub use yew::web_sys::console::log_1 as LOG;
+
+    #[macro_export]
+    macro_rules! LOG {
+        ($($arg:tt)*) => {{
+            let res = format!($($arg)*);
+            yew::web_sys::console::log_1(&res.into())
+        }}
+    }
 }

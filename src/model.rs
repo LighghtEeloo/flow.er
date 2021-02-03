@@ -42,7 +42,7 @@ impl Component for Model {
                 Cube::new()
             }
         };
-        LOG(&format!("Loaded: {:?}", cube).into());
+        LOG!("Loaded: {:?}", cube);
         let focus_ref = NodeRef::default();
         Self {
             cube,
@@ -55,7 +55,7 @@ impl Component for Model {
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         // Debug..
-        LOG(&format!("Updating with: {:?}", msg).into());
+        LOG!("Updating with: {:?}", msg);
         use Msg::*;
         match msg {
             UpdateBuffer(val) => {
@@ -75,7 +75,7 @@ impl Component for Model {
         }
         // Note: Only self.cube is saved.
         self.storage.store(KEY, Json(&self.cube));
-        LOG(&"Just dumped.".into());
+        LOG!("Just dumped.");
         true
     }
 
@@ -141,11 +141,11 @@ impl Model {
                     type="text"
                     placeholder="Enter new proj name."
                     oninput=self.link.callback(|e: InputData| {
-                        LOG(&format!("Oninput - new: {:?}", e).into());
+                        LOG!("Oninput - new: {:?}", e);
                         Msg::UpdateBuffer(e.value)
                     })
                     onkeypress=self.link.batch_callback(move |e: KeyboardEvent| {
-                        LOG(&format!("Onkeypress - new: {:?}", e).into());
+                        LOG!("Onkeypress - new: {:?}", e);
                         if e.key() == "Enter" { Some(Msg::NewCube) } else { None }
                     })
                 />
@@ -168,8 +168,6 @@ impl Model {
                         { for vec.iter().map(|id| self.node_view(id))  }
                     </div>
                 }
-                // vec.into_iter().map(|id: &EntryId| {
-                // }).collect()
             }
             _ => html! {}
         }
@@ -183,12 +181,12 @@ impl Model {
                     type="text"
                     placeholder="..."
                     oninput=self.link.callback(|e: InputData| {
-                        LOG(&format!("Oninput: {:?}", e).into());
+                        LOG!("Oninput: {:?}", e);
                         Msg::UpdateBuffer(e.value)
                     })
                     onblur=self.link.callback(move |_| Msg::WriteBuffer(id))
                     onkeypress=self.link.batch_callback(move |e: KeyboardEvent| {
-                        LOG(&format!("Onkeypress: {:?}", e).into());
+                        LOG!("Onkeypress: {:?}", e);
                         if e.key() == "Enter" { Some(Msg::WriteBuffer(id)) } else { None }
                     })
                 />
