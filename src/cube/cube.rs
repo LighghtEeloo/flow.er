@@ -33,7 +33,58 @@ impl Cube {
     pub fn get(&self, id: EntryId) -> &Entry {
         self.entries.get(&id).unwrap()
     }
+    pub fn beget(&mut self) {
+
+    }
 }
+
+/// Grow aims at any object that grows anonymously. 
+/// Chain can bundle the change to the RelationModel
+pub trait Grow<Id: IdentityHash> {
+    fn grow(&mut self) -> Id;
+}
+impl Grow<EntryId> for Cube {
+    fn grow(&mut self) -> EntryId {
+        let entry = Entry::new();
+        let id = entry.id();
+        self.entries.insert(id, entry);
+        id
+    }
+}
+
+/// Chain 
+/// 1. tiptoe: out-of-nothing growth.
+/// 2. chain: linked growth which transforms the RelationModel.
+pub trait Chain<Id: IdentityHash>: Grow<Id> {
+    fn tiptoe(&mut self, id: Id);
+    fn chain(&mut self, new_comer: Id, host: Id);
+}
+impl Chain<EntryId> for Cube {
+    fn tiptoe(&mut self, id: EntryId) {
+        use RelationModel::*;
+        match &mut self.relation {
+            Linear(vec) => {
+                vec.push(id)
+            }
+            _ => ()
+        }
+    }
+    fn chain(&mut self, new_comer: EntryId, host: EntryId) {
+        use RelationModel::*;
+        match &mut self.relation {
+            Linear(vec) => {
+                let pos = vec.into_iter().position(|x| x.clone() == host);
+                if let Some(p) = pos {
+                    vec.insert(p, new_comer)
+                } else {
+                    vec.push(new_comer)
+                }
+            }
+            _ => ()
+        }
+    }
+}
+
 
 
 
@@ -123,34 +174,7 @@ impl EntryDry {
 
 pub type EntryId = (u64, u32);
 
-pub trait TimeRep {
-    fn flatten(&self) -> SystemTime {
-        unimplemented!()
-    }
-    fn stamping() -> (u64, u32) {
-        // Using nano_secs as timestamp.
-        let time = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .expect("Time went backwards");
-        (time.as_secs(), time.subsec_nanos())
-    }
-}
-impl TimeRep for (u64, u32) {
-    fn flatten(&self) -> SystemTime {
-        let sec = self.0;
-        let sub_nano = self.1;
-        UNIX_EPOCH + Duration::from_nanos(sec*1e9 as u64 + sub_nano as u64)
-    }
-}
-impl TimeRep for TimeStamp {
-    fn flatten(&self) -> SystemTime {
-        let sec = self.data.0;
-        let sub_nano = self.data.1;
-        UNIX_EPOCH + Duration::from_nanos(sec*1e9 as u64 + sub_nano as u64)
-    }
-}
-
-pub trait IdentityHash {
+pub trait IdentityHash: Hash + Copy {
     fn from_time(v: &impl TimeRep) -> Self;
 }
 impl IdentityHash for EntryId {
@@ -168,6 +192,7 @@ impl IdentityHash for EntryId {
         (time.as_secs(), time.subsec_nanos())
     }
 }
+
 
 pub type Face = String;
 pub type Bubble = String;
@@ -199,6 +224,33 @@ impl Filter {
 }
 
 // Timestamp Area
+
+pub trait TimeRep {
+    fn flatten(&self) -> SystemTime {
+        unimplemented!()
+    }
+    fn stamping() -> (u64, u32) {
+        // Using nano_secs as timestamp.
+        let time = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("Time went backwards");
+        (time.as_secs(), time.subsec_nanos())
+    }
+}
+impl TimeRep for (u64, u32) {
+    fn flatten(&self) -> SystemTime {
+        let sec = self.0;
+        let sub_nano = self.1;
+        UNIX_EPOCH + Duration::from_nanos(sec*1e9 as u64 + sub_nano as u64)
+    }
+}
+impl TimeRep for TimeStamp {
+    fn flatten(&self) -> SystemTime {
+        let sec = self.data.0;
+        let sub_nano = self.data.1;
+        UNIX_EPOCH + Duration::from_nanos(sec*1e9 as u64 + sub_nano as u64)
+    }
+}
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct TimeStamp {
