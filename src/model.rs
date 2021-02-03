@@ -223,7 +223,10 @@ impl Model {
                     // })
                     onkeypress=self.link.callback(move |e: KeyboardEvent| {
                         LOG!("OnKeyPress: {:?}", e);
-                        if e.key() == "Enter" { vec![AddNode(vec!(id))] } else { vec![] }
+                        match e.key().as_str() { 
+                            "Enter" => vec![AddNode(vec!(id))], 
+                            _ => vec![] 
+                        }
                     })
                     readonly=if self.cube.locked { true } else { false }
                 />
