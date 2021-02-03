@@ -77,20 +77,20 @@ impl Entry {
     pub fn face(&self) -> &Face {
         &self.dry.face
     }
-    pub fn set_face(&mut self) -> &mut Face {
-        &mut self.dry.face
+    pub fn set_face(&mut self, face: Face) {
+        self.dry.face = face;
     }
     pub fn bubble(&self) -> &Bubble {
         &self.dry.bubble
     }
-    pub fn set_bubble(&mut self) -> &mut Bubble {
-        &mut self.dry.bubble
+    pub fn set_bubble(&mut self, bubble: Bubble) {
+        self.dry.bubble = bubble;
     }
     pub fn filter(&self) -> &Filter {
         &self.dry.filter
     }
-    pub fn set_filter(&mut self) -> &mut Filter {
-        &mut self.dry.filter
+    pub fn set_filter(&mut self, filter: Filter) {
+        self.dry.filter = filter;
     }
 }
 
@@ -101,6 +101,13 @@ impl From<EntryDry> for Entry {
             timestamps: vec!(TimeStamp::created())
         }
     }
+}
+
+impl Default for Entry {
+    fn default() -> Self { 
+        Entry::new()
+    }
+    
 }
 
 impl EntryDry {

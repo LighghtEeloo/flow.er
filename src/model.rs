@@ -18,7 +18,7 @@ pub enum Msg {
     NewCube,
     AddNode,
     UpdateBuffer(String),
-    WriteBuffer(EntryId),
+    WriteFace(EntryId),
     Focus,
 }
 
@@ -31,7 +31,7 @@ pub struct Model {
 }
 
 impl Component for Model {
-    type Message = Msg;
+    type Message = Vec<Msg>;
     type Properties = ();
 
     fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
@@ -47,11 +47,12 @@ impl Component for Model {
         // Debug..
         cube = Cube::new();
         if cube.entries.len() == 0 {
-            let entry = Entry::new();
+            let mut entry = Entry::new();
+            entry.set_face(format!("???"));
             cube.entries.insert(entry.id(), entry.clone());
             cube.relation = RelationModel::Linear(vec!(entry.id()));
         }
-        LOG!("Loaded: {:?}", cube);
+        LOG!("Loaded: {:#?}", cube);
         let focus_ref = NodeRef::default();
         Self {
             cube,
@@ -62,33 +63,37 @@ impl Component for Model {
         }
     }
 
-    fn update(&mut self, msg: Self::Message) -> ShouldRender {
+    fn update(&mut self, messages: Self::Message) -> ShouldRender {
         // Debug..
-        LOG!("Updating with: {:?}", msg);
+        LOG!("Updating with: {:?}", messages);
         use Msg::*;
-        match msg {
-            UpdateBuffer(val) => {
-                self.buffer_str = val;
-            }
-            NewCube => {
-                // Todo: Add new cube.
-                self.cube.name = self.buffer_str.clone();
-                self.buffer_str.clear();
-            }
-            WriteBuffer(id) => {
-                let x: &Entry = self.cube.entries.get(&id).unwrap();
-                x.dry().face = mem::take(&mut self.buffer_str);
-            }
-            Focus => {
-                if let Some(input) = self.focus_ref.cast::<InputElement>() {
-                    input.focus().unwrap();
+        for msg in messages {
+            match msg {
+                UpdateBuffer(val) => {
+                    self.buffer_str = val;
                 }
+                NewCube => {
+                    // Todo: Add new cube.
+                    self.cube.name = self.buffer_str.clone();
+                    self.buffer_str.clear();
+                }
+                WriteFace(id) => {
+                    LOG!("Buffer: {}", self.buffer_str);
+                    let x: &mut Entry = self.cube.entries.get_mut(&id).unwrap();
+                    x.set_face(mem::take(&mut self.buffer_str));
+                }
+                Focus => {
+                    if let Some(input) = self.focus_ref.cast::<InputElement>() {
+                        input.focus().unwrap();
+                    }
+                }
+                _ => {}
             }
-            _ => {}
         }
         // Note: Only self.cube is saved.
         self.storage.store(KEY, Json(&self.cube));
         LOG!("Just dumped.");
+        LOG!("With: {:#?}", self.cube);
         true
     }
 
@@ -148,18 +153,19 @@ impl Model {
     }
 
     fn main_editor(&self) -> Html {
+        use Msg::*;
         let view_new = html! {
             <div class="cube-new">
                 <input
                     type="text"
                     placeholder="Enter new proj name."
-                    oninput=self.link.callback(|e: InputData| {
-                        LOG!("Oninput - new: {:?}", e);
-                        Msg::UpdateBuffer(e.value)
+                    oninput=self.link.callback(move |e: InputData| {
+                        LOG!("OnInput - new: {:?}", e);
+                        [UpdateBuffer(e.value)]
                     })
-                    onkeypress=self.link.batch_callback(move |e: KeyboardEvent| {
-                        LOG!("Onkeypress - new: {:?}", e);
-                        if e.key() == "Enter" { Some(Msg::NewCube) } else { None }
+                    onkeypress=self.link.callback(move |e: KeyboardEvent| {
+                        LOG!("OnKeyPress: {:?}", e);
+                        if e.key() == "Enter" { vec![NewCube] } else { vec![] }
                     })
                 />
                 <div class="dash-line"></div>
@@ -187,6 +193,7 @@ impl Model {
     }
     
     fn node_view(&self, id: &EntryId) -> Html {
+        use Msg::*;
         let id = id.clone();
         html! {
             <div class="node">
@@ -194,14 +201,17 @@ impl Model {
                     type="text"
                     value=self.cube.get(id).face()
                     placeholder="..."
-                    oninput=self.link.callback(|e: InputData| {
-                        LOG!("Oninput: {:?}", e);
-                        Msg::UpdateBuffer(e.value)
+                    oninput=self.link.callback(move |e: InputData| {
+                        LOG!("OnInput: {:?}", e);
+                        [UpdateBuffer(e.value), WriteFace(id)]
                     })
-                    onblur=self.link.callback(move |_| Msg::WriteBuffer(id))
-                    onkeypress=self.link.batch_callback(move |e: KeyboardEvent| {
-                        LOG!("Onkeypress: {:?}", e);
-                        if e.key() == "Enter" { Some(Msg::WriteBuffer(id)) } else { None }
+                    onblur=self.link.callback(move |_| {
+                        LOG!("OnBlur.");
+                        []
+                    })
+                    onkeypress=self.link.callback(move |e: KeyboardEvent| {
+                        LOG!("OnKeyPress: {:?}", e);
+                        if e.key() == "Enter" { vec![WriteFace(id)] } else { vec![] }
                     })
                 />
             </div>
