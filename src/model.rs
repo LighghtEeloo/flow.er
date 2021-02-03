@@ -16,10 +16,11 @@ const KEY: &str = "yew.life.tracer.self";
 #[derive(Debug)]
 pub enum Msg {
     NewCube,
-    AddNode,
+    AddNode(Vec<EntryId>),
     UpdateBuffer(String),
     WriteFace(EntryId),
     Focus,
+    _Idle
 }
 
 pub struct Model {
@@ -31,6 +32,7 @@ pub struct Model {
 }
 
 impl Component for Model {
+    // Note: MsgStack.
     type Message = Vec<Msg>;
     type Properties = ();
 
@@ -44,8 +46,10 @@ impl Component for Model {
             }
         };
 
-        // Debug..
+        // Test..
         cube = Cube::new();
+        cube.name = format!("Ehaema!");
+        cube.locked = true;
         if cube.entries.len() == 0 {
             let mut entry = Entry::new();
             entry.set_face(format!("???"));
@@ -64,7 +68,7 @@ impl Component for Model {
     }
 
     fn update(&mut self, messages: Self::Message) -> ShouldRender {
-        // Debug..
+        // Test..
         LOG!("Updating with: {:?}", messages);
         use Msg::*;
         for msg in messages {
@@ -76,6 +80,9 @@ impl Component for Model {
                     // Todo: Add new cube.
                     self.cube.name = self.buffer_str.clone();
                     self.buffer_str.clear();
+                }
+                AddNode(_) => {
+                    // self.cube;
                 }
                 WriteFace(id) => {
                     LOG!("Buffer: {}", self.buffer_str);
@@ -173,7 +180,7 @@ impl Model {
         };
         let view_main = self.cube_view();
 
-        // Debug: cube - new?
+        // Test: cube - new?
         if self.cube.empty() { view_new } else { view_main }
     }
 
@@ -205,14 +212,15 @@ impl Model {
                         LOG!("OnInput: {:?}", e);
                         [UpdateBuffer(e.value), WriteFace(id)]
                     })
-                    onblur=self.link.callback(move |_| {
-                        LOG!("OnBlur.");
-                        []
-                    })
+                    // onblur=self.link.callback(move |_| {
+                    //     LOG!("OnBlur.");
+                    //     []
+                    // })
                     onkeypress=self.link.callback(move |e: KeyboardEvent| {
                         LOG!("OnKeyPress: {:?}", e);
-                        if e.key() == "Enter" { vec![WriteFace(id)] } else { vec![] }
+                        if e.key() == "Enter" { vec![AddNode(vec!(id))] } else { vec![] }
                     })
+                    readonly=if self.cube.locked { true } else { false }
                 />
             </div>
         }

@@ -8,8 +8,9 @@ use std::hash::{Hash, Hasher};
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Cube {
     pub name: String,
+    pub locked: bool,
     pub entries: HashMap<EntryId, Entry>,
-    pub relation: RelationModel
+    pub relation: RelationModel,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -23,6 +24,7 @@ impl Cube {
     pub fn new() -> Self {
         Cube {
             name: String::new(),
+            locked: false,
             entries: HashMap::new(),
             relation: RelationModel::Linear(Vec::new())
         }
@@ -75,7 +77,7 @@ impl Chain<EntryId> for Cube {
             Linear(vec) => {
                 let pos = vec.into_iter().position(|x| x.clone() == host);
                 if let Some(p) = pos {
-                    vec.insert(p, new_comer)
+                    vec.insert(p+1, new_comer)
                 } else {
                     vec.push(new_comer)
                 }
