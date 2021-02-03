@@ -57,7 +57,7 @@ body {
 
 .frame#status-bar {
     height: var(--len-status-bar);
-    width: 100vw;
+    width: 100%;
     bottom: 0;
     left: 0;
     border-top: none;

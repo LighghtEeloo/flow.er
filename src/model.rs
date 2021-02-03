@@ -42,6 +42,7 @@ impl Component for Model {
                 Cube::new()
             }
         };
+        LOG(&format!("Loaded: {:?}", cube).into());
         let focus_ref = NodeRef::default();
         Self {
             cube,

@@ -105,7 +105,7 @@ impl EntryDry {
     }
 }
 
-pub type EntryId = String;
+pub type EntryId = (u64, u32);
 
 pub trait TimeRep {
     fn flatten(&self) -> SystemTime {
@@ -139,13 +139,17 @@ pub trait IdentityHash {
 }
 impl IdentityHash for EntryId {
     fn from_time(v: &impl TimeRep) -> Self {
+        // let time = v.flatten()
+        //     .duration_since(UNIX_EPOCH)
+        //     .expect("Time went backwards")
+        //     .as_nanos();
+        // let mut s = DefaultHasher::new();
+        // time.hash(&mut s);
+        // format!("{:x}", s.finish())
         let time = v.flatten()
             .duration_since(UNIX_EPOCH)
-            .expect("Time went backwards")
-            .as_nanos();
-        let mut s = DefaultHasher::new();
-        time.hash(&mut s);
-        format!("{:x}", s.finish())
+            .expect("Time went backwards");
+        (time.as_secs(), time.subsec_nanos())
     }
 }
 
