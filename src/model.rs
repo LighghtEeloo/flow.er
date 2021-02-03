@@ -3,7 +3,6 @@
 #[allow(unused)]
 
 use crate::prelude::*;
-use crate::cube::*;
 
 use yew::format::Json;
 use yew::web_sys::HtmlInputElement as InputElement;
@@ -217,6 +216,8 @@ impl Model {
                         LOG!("OnInput: {:?}", e);
                         [UpdateBuffer(e.value), WriteFace(id)]
                     })
+                    ref=self.focus_ref.clone()
+                    // onmouseover=self.link.callback(|_| [Focus])
                     // onblur=self.link.callback(move |_| {
                     //     LOG!("OnBlur.");
                     //     []
@@ -224,7 +225,7 @@ impl Model {
                     onkeypress=self.link.callback(move |e: KeyboardEvent| {
                         LOG!("OnKeyPress: {:?}", e);
                         match e.key().as_str() { 
-                            "Enter" => vec![AddNode(vec!(id))], 
+                            "Enter" => vec![AddNode(vec!(id)), Focus], 
                             _ => vec![] 
                         }
                     })
@@ -234,7 +235,7 @@ impl Model {
                     title="New node"
                     onclick=self.link.callback(move |_| {
                         LOG!("OnClink.");
-                        [AddNode(vec!(id))]
+                        [AddNode(vec!(id)), Focus]
                     })
                 >{"+"}</button>
             </div>

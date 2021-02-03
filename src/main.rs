@@ -1,17 +1,20 @@
 #[allow(dead_code)]
 #[allow(unused)]
-mod cube;
-mod model;
+pub mod cube;
+pub mod model;
 
-use model::Model;
 
 fn main() {
+    use model::Model;
     yew::start_app::<Model>();
 }
 
 pub mod prelude {
-    pub use crate::*;
+    pub use crate::LOG;
+    pub use crate::cube::*;
     pub use std::mem;
+    pub use std::collections::HashMap;
+
 
     // pub use yew::web_sys::console::log_1 as LOG;
 
