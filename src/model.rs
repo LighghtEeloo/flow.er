@@ -51,15 +51,15 @@ impl Component for Model {
         };
 
         // Test..
-        cube = Cube::new();
-        cube.name = format!("Ehaema!");
-        // cube.locked = true;
-        if cube.entries.len() == 0 {
-            let mut entry = Entry::new();
-            entry.set_face(format!("???"));
-            cube.entries.insert(entry.id(), entry.clone());
-            cube.relation = RelationModel::Linear(vec!(entry.id()));
-        }
+        // if cube.name.is_empty() {
+        //     cube = Cube::new();
+        //     cube.name = format!("Ehaema!");
+        //     // cube.locked = true;
+        //     let mut entry = Entry::new();
+        //     entry.set_face(format!("???"));
+        //     cube.entries.insert(entry.id(), entry.clone());
+        //     cube.relation = RelationModel::Linear(vec!(entry.id()));
+        // }
         LOG!("Loaded: {:#?}", cube);
         
         let id_iter = cube.entries.keys().map(|x| (x.clone(),NodeRef::default()));
@@ -85,16 +85,25 @@ impl Component for Model {
                 }
                 NewCube => {
                     // Todo: Add new cube.
+                    LOG!("NewCube");
                     self.cube.name = mem::take(&mut self.buffer_str);
                 }
                 AddNode(vec) => {
-                    // Todo: change the semantics.
-                    for root_id in vec {
+                    if vec.len() == 0 {
                         let new_id = self.cube.grow();
-                        self.cube.chain(new_id, root_id);
+                        self.cube.tiptoe(new_id);
                         self.refs.insert(new_id, NodeRef::default());
                         self.focus_id = Some(new_id);
                         self.link.callback(move |_: Msg| [Focus] ).emit(_Idle);
+                    } else {
+                        // Todo: change the semantics.
+                        for root_id in vec {
+                            let new_id = self.cube.grow();
+                            self.cube.chain(new_id, root_id);
+                            self.refs.insert(new_id, NodeRef::default());
+                            self.focus_id = Some(new_id);
+                            self.link.callback(move |_: Msg| [Focus] ).emit(_Idle);
+                        }
                     }
                 }
                 WriteFace(id) => {
@@ -116,7 +125,17 @@ impl Component for Model {
         // Note: Only self.cube is saved.
         self.storage.store(KEY, Json(&self.cube));
         LOG!("Just dumped.");
-        // LOG!("With: {:#?}", self.cube);
+        LOG!("With {}: {:#?}", KEY, Json(&self.cube));
+
+        // Test..
+        // let cube: Option<Cube> = {
+        //     if let Json(Ok(restored_model)) = self.storage.restore(KEY) {
+        //         LOG!("Real: {:#?}", restored_model);
+        //         Some(restored_model)
+        //     } else {
+        //         None
+        //     }
+        // };
         true
     }
 
@@ -197,7 +216,7 @@ impl Model {
         let view_main = self.cube_view();
 
         // Test: cube - new?
-        if self.cube.empty() { view_new } else { view_main }
+        if self.cube.empty() && self.cube.name.is_empty() { view_new } else { view_main }
     }
 
     fn cube_view(&self) -> Html {
@@ -208,6 +227,7 @@ impl Model {
                 html! {
                     <div class="cube">
                         <label>{ self.cube.name.clone() }</label>
+                        { self.add_button_view(vec![]) }
                         { for vec.iter().map(|id| self.node_view(id))  }
                     </div>
                 }
@@ -244,14 +264,21 @@ impl Model {
                     })
                     readonly=if self.cube.locked { true } else { false }
                 />
-                <button
-                    title="New node"
-                    onclick=self.link.callback(move |_| {
-                        LOG!("OnClick.");
-                        [AddNode(vec!(id))]
-                    })
-                >{"+"}</button>
+                { self.add_button_view(vec![id]) }
             </div>
+        }
+    }
+
+    fn add_button_view(&self, id_vec: Vec<EntryId>) -> Html {
+        use Msg::*;
+        html! {
+            <button
+                title="New node"
+                onclick=self.link.callback(move |_| {
+                    LOG!("OnClick.");
+                    [AddNode(id_vec.clone())]
+                })
+            >{"+"}</button>
         }
     }
 }

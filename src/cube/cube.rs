@@ -34,9 +34,6 @@ impl Cube {
     pub fn get(&self, id: EntryId) -> &Entry {
         self.entries.get(&id).unwrap()
     }
-    pub fn beget(&mut self) {
-
-    }
 }
 
 /// Grow aims at any object that grows anonymously. 
@@ -65,7 +62,7 @@ impl Chain<EntryId> for Cube {
         use RelationModel::*;
         match &mut self.relation {
             Linear(vec) => {
-                vec.push(id)
+                vec.insert(0, id)
             }
             _ => ()
         }
