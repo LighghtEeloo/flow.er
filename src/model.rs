@@ -12,18 +12,21 @@ use yew::format::Json;
 use yew::web_sys::HtmlInputElement as InputElement;
 use yew::{html, Component, ComponentLink, Html, InputData, NodeRef, ShouldRender};
 use yew::{events::KeyboardEvent};
+// use yew::services::storage::{Area, StorageService};
 use yew_services::storage::{Area, StorageService};
 
 const KEY: &str = "yew.life.tracer.self";
 
 #[derive(Debug)]
 pub enum Msg {
-    NewCube,
-    AddNode(Vec<EntryId>),
     UpdateBuffer(String),
+    NewCube,
+    WriteCubeName,
+    NewNode(Vec<EntryId>),
     WriteFace(EntryId),
     Focus,
-    _Idle
+    _Idle,
+    _Debug(String)
 }
 
 pub struct Model {
@@ -42,7 +45,7 @@ impl Component for Model {
 
     fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
         let storage = StorageService::new(Area::Local).expect("storage was disabled by the user");
-        let mut cube: Cube = {
+        let cube: Cube = {
             if let Json(Ok(restored_model)) = storage.restore(KEY) {
                 restored_model
             } else {
@@ -51,15 +54,13 @@ impl Component for Model {
         };
 
         // Test..
-        // if cube.name.is_empty() {
-        //     cube = Cube::new();
-        //     cube.name = format!("Ehaema!");
-        //     // cube.locked = true;
-        //     let mut entry = Entry::new();
-        //     entry.set_face(format!("???"));
-        //     cube.entries.insert(entry.id(), entry.clone());
-        //     cube.relation = RelationModel::Linear(vec!(entry.id()));
-        // }
+        // let cube = Cube::new();
+        // cube.name = format!("Ehaema!");
+        // // cube.locked = true;
+        // let mut entry = Entry::new();
+        // entry.set_face(format!("???"));
+        // cube.entries.insert(entry.id(), entry.clone());
+        // cube.relation = RelationModel::Linear(vec!(entry.id()));
         LOG!("Loaded: {:#?}", cube);
         
         let id_iter = cube.entries.keys().map(|x| (x.clone(),NodeRef::default()));
@@ -88,7 +89,10 @@ impl Component for Model {
                     LOG!("NewCube");
                     self.cube.name = mem::take(&mut self.buffer_str);
                 }
-                AddNode(vec) => {
+                WriteCubeName => {
+                    self.cube.name = mem::take(&mut self.buffer_str);
+                }
+                NewNode(vec) => {
                     if vec.len() == 0 {
                         let new_id = self.cube.grow();
                         self.cube.tiptoe(new_id);
@@ -119,24 +123,39 @@ impl Component for Model {
                         }
                     }
                 }
+                _Debug(debug) => {
+                    // self.storage.store(KEY, debug);
+                }
                 _ => {}
             }
         }
         // Note: Only self.cube is saved.
         self.storage.store(KEY, Json(&self.cube));
         LOG!("Just dumped.");
-        LOG!("With {}: {:#?}", KEY, Json(&self.cube));
+        LOG!("With {}: {:#?}", KEY, &self.cube);
+
+        // Debug..
+        // let _cube: Option<Cube> = {
+        //     if let Json(Ok(restored_model)) = self.storage.restore(KEY) {
+        //         LOG!("Real: {:#?}", restored_model);
+        //         Some(restored_model)
+        //     } else {
+        //         LOG!("Failed.");
+        //         None
+        //     }
+        // };
 
         // Test..
-        let _cube: Option<Cube> = {
-            if let Json(Ok(restored_model)) = self.storage.restore(KEY) {
-                LOG!("Real: {:#?}", restored_model);
-                Some(restored_model)
-            } else {
-                LOG!("Failed.");
-                None
-            }
-        };
+        let mut cube = Cube::new();
+        cube.name = format!("Ehaema!");
+        // cube.locked = true;
+        let mut entry = Entry::new();
+        entry.set_face(format!("???"));
+        cube.entries.insert(entry.id(), entry.clone());
+        cube.relation = RelationModel::Linear(vec!(entry.id()));
+        self.storage.store(KEY, Json(&cube));
+
+
         true
     }
 
@@ -196,9 +215,21 @@ impl Model {
     }
 
     fn main_editor(&self) -> Html {
-        use Msg::*;
         let view_new = html! {
             <div class="cube-new">
+            { self.cube_new_input_view() }
+            </div>
+        };
+        let view_main = self.cube_view();
+
+        // Test: cube - new?
+        if self.cube.empty() && self.cube.name.is_empty() { view_new } else { view_main }
+    }
+
+    fn cube_new_input_view(&self) -> Html {
+        use Msg::*;
+        html! {
+            <div class="cube-input">
                 <input
                     type="text"
                     placeholder="Enter new proj name."
@@ -213,11 +244,7 @@ impl Model {
                 />
                 <div class="dash-line"></div>
             </div>
-        };
-        let view_main = self.cube_view();
-
-        // Test: cube - new?
-        if self.cube.empty() && self.cube.name.is_empty() { view_new } else { view_main }
+        }
     }
 
     fn cube_view(&self) -> Html {
@@ -227,7 +254,8 @@ impl Model {
             Linear(vec) => {
                 html! {
                     <div class="cube">
-                        <label>{ self.cube.name.clone() }</label>
+                        // <label>{ self.cube.name.clone() }</label>
+                        { self.cube_input_view() }
                         { self.add_button_view(vec![]) }
                         { for vec.iter().map(|id| self.node_view(id))  }
                     </div>
@@ -236,37 +264,57 @@ impl Model {
             _ => html! {}
         }
     }
+
+    fn cube_input_view(&self) -> Html {
+        use Msg::*;
+        html! {
+            <div class="cube-input">
+                <input
+                    type="text"
+                    placeholder="Enter new proj name."
+                    value=self.cube.name
+                    oninput=self.link.callback(move |e: InputData| {
+                        LOG!("OnInput: {:?}", e);
+                        [UpdateBuffer(e.value), WriteCubeName]
+                    })
+                />
+                <div class="dash-line"></div>
+            </div>
+        }
+    }
     
     fn node_view(&self, id: &EntryId) -> Html {
-        use Msg::*;
         let id = id.clone();
         html! {
             <div class="node">
-                <input
-                    type="text"
-                    value=self.cube.get(id).face()
-                    placeholder="..."
-                    oninput=self.link.callback(move |e: InputData| {
-                        LOG!("OnInput: {:?}", e);
-                        [UpdateBuffer(e.value), WriteFace(id)]
-                    })
-                    ref=self.refs.get(&id).unwrap().clone()
-                    // onmouseover=self.link.callback(|_| [Focus])
-                    // onblur=self.link.callback(move |_| {
-                    //     LOG!("OnBlur.");
-                    //     []
-                    // })
-                    onkeypress=self.link.callback(move |e: KeyboardEvent| {
-                        LOG!("OnKeyPress: {:?}", e);
-                        match e.key().as_str() { 
-                            "Enter" => vec![AddNode(vec!(id))], 
-                            _ => vec![] 
-                        }
-                    })
-                    readonly=if self.cube.locked { true } else { false }
-                />
+                { self.node_input_view(&id) }
                 { self.add_button_view(vec![id]) }
             </div>
+        }
+    }
+
+    fn node_input_view(&self, id: &EntryId) -> Html {
+        use Msg::*;
+        let id = id.clone();
+        html! {
+            <input
+                type="text"
+                value=self.cube.get(id).face()
+                placeholder="..."
+                oninput=self.link.callback(move |e: InputData| {
+                    LOG!("OnInput: {:?}", e);
+                    [UpdateBuffer(e.value), WriteFace(id)]
+                })
+                ref=self.refs.get(&id).unwrap().clone()
+                onkeypress=self.link.callback(move |e: KeyboardEvent| {
+                    LOG!("OnKeyPress: {:?}", e);
+                    match e.key().as_str() { 
+                        "Enter" => vec![NewNode(vec!(id))], 
+                        _ => vec![] 
+                    }
+                })
+                readonly=if self.cube.locked { true } else { false }
+            />
         }
     }
 
@@ -277,7 +325,7 @@ impl Model {
                 title="New node"
                 onclick=self.link.callback(move |_| {
                     LOG!("OnClick.");
-                    [AddNode(id_vec.clone())]
+                    [NewNode(id_vec.clone())]
                 })
             >{"+"}</button>
         }

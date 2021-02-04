@@ -13,6 +13,7 @@ pub struct Cube {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(EnumString, EnumVariantNames, EnumIter, EnumProperty, ToString)]
 pub enum RelationModel {
     Linear(Vec<EntryId>),
     Graph
@@ -231,6 +232,7 @@ impl Filter {
 // Timestamp Area
 
 pub type TimeTuple = (u64, u32);
+// pub type TimeTuple = EntryId;
 
 pub trait TimeRep {
     fn flatten(&self) -> SystemTime {

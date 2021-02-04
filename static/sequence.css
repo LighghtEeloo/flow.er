@@ -77,6 +77,7 @@ body {
     position: relative;
     background-color: var(--mainColor);
     border-bottom: 2px solid var(--dividerColor);
+    list-style-type: none;
 }
 
 .tab.tab-bottom::before {

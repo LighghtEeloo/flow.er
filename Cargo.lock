@@ -513,7 +513,7 @@ name = "tracer-yew"
 version = "0.1.0"
 dependencies = [
  "serde",
- "serde_json",
+ "serde_derive",
  "strum",
  "strum_macros",
  "wasm-timer",

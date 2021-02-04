@@ -107,8 +107,8 @@ impl From<std_fmt::Error> for Error {
     }
 }
 
-impl From<serde_json::Error> for Error {
-    fn from(e: serde_json::Error) -> Self {
-        Error::with_description(&*e.to_string(), ErrorKind::SerdeJson)
-    }
-}
+// impl From<serde_json::Error> for Error {
+//     fn from(e: serde_json::Error) -> Self {
+//         Error::with_description(&*e.to_string(), ErrorKind::SerdeJson)
+//     }
+// }
