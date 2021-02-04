@@ -128,14 +128,15 @@ impl Component for Model {
         LOG!("With {}: {:#?}", KEY, Json(&self.cube));
 
         // Test..
-        // let cube: Option<Cube> = {
-        //     if let Json(Ok(restored_model)) = self.storage.restore(KEY) {
-        //         LOG!("Real: {:#?}", restored_model);
-        //         Some(restored_model)
-        //     } else {
-        //         None
-        //     }
-        // };
+        let _cube: Option<Cube> = {
+            if let Json(Ok(restored_model)) = self.storage.restore(KEY) {
+                LOG!("Real: {:#?}", restored_model);
+                Some(restored_model)
+            } else {
+                LOG!("Failed.");
+                None
+            }
+        };
         true
     }
 
