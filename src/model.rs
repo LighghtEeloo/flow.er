@@ -94,6 +94,7 @@ impl Component for Model {
                         self.cube.chain(new_id, root_id);
                         self.refs.insert(new_id, NodeRef::default());
                         self.focus_id = Some(new_id);
+                        self.link.callback(move |_: Msg| [Focus] ).emit(_Idle);
                     }
                 }
                 WriteFace(id) => {
@@ -102,6 +103,7 @@ impl Component for Model {
                     x.set_face(mem::take(&mut self.buffer_str));
                 }
                 Focus => {
+                    LOG!("Focus.");
                     if let Some(focus_id) = self.focus_id {
                         if let Some(input) = self.refs.get(&focus_id).unwrap().cast::<InputElement>() {
                             input.focus().unwrap();
@@ -114,7 +116,7 @@ impl Component for Model {
         // Note: Only self.cube is saved.
         self.storage.store(KEY, Json(&self.cube));
         LOG!("Just dumped.");
-        LOG!("With: {:#?}", self.cube);
+        // LOG!("With: {:#?}", self.cube);
         true
     }
 
@@ -236,7 +238,7 @@ impl Model {
                     onkeypress=self.link.callback(move |e: KeyboardEvent| {
                         LOG!("OnKeyPress: {:?}", e);
                         match e.key().as_str() { 
-                            "Enter" => vec![AddNode(vec!(id)), Focus], 
+                            "Enter" => vec![AddNode(vec!(id))], 
                             _ => vec![] 
                         }
                     })
@@ -245,8 +247,8 @@ impl Model {
                 <button
                     title="New node"
                     onclick=self.link.callback(move |_| {
-                        LOG!("OnClink.");
-                        [AddNode(vec!(id)), Focus]
+                        LOG!("OnClick.");
+                        [AddNode(vec!(id))]
                     })
                 >{"+"}</button>
             </div>
