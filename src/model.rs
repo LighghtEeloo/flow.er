@@ -3,6 +3,8 @@
 #[allow(unused)]
 
 use crate::prelude::*;
+// Debug..
+use cube::{Cube, Entry, EntryId};
 
 use std::iter::FromIterator;
 
@@ -28,7 +30,7 @@ pub struct Model {
     cube: Cube,
     buffer_str: String,
     refs: HashMap<EntryId, NodeRef>,
-    focus_ref: NodeRef,
+    focus_id: Option<EntryId>,
     storage: StorageService,
     link: ComponentLink<Self>,
 }
@@ -62,13 +64,11 @@ impl Component for Model {
         
         let id_iter = cube.entries.keys().map(|x| (x.clone(),NodeRef::default()));
         let refs: HashMap<EntryId, NodeRef> = HashMap::from_iter(id_iter);
-        let focus_ref = NodeRef::default();
         Self {
             cube,
             buffer_str: String::new(),
-            // Todo: load NodeRefs.
             refs,
-            focus_ref,
+            focus_id: None,
             storage,
             link,
         }
@@ -93,7 +93,7 @@ impl Component for Model {
                         let new_id = self.cube.grow();
                         self.cube.chain(new_id, root_id);
                         self.refs.insert(new_id, NodeRef::default());
-                        self.focus_ref = self.refs.get(&new_id).unwrap().clone()
+                        self.focus_id = Some(new_id);
                     }
                 }
                 WriteFace(id) => {
@@ -102,8 +102,10 @@ impl Component for Model {
                     x.set_face(mem::take(&mut self.buffer_str));
                 }
                 Focus => {
-                    if let Some(input) = self.focus_ref.cast::<InputElement>() {
-                        input.focus().unwrap();
+                    if let Some(focus_id) = self.focus_id {
+                        if let Some(input) = self.refs.get(&focus_id).unwrap().cast::<InputElement>() {
+                            input.focus().unwrap();
+                        }
                     }
                 }
                 _ => {}
