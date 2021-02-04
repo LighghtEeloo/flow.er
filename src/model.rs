@@ -4,6 +4,8 @@
 
 use crate::prelude::*;
 
+use std::iter::FromIterator;
+
 use yew::format::Json;
 use yew::web_sys::HtmlInputElement as InputElement;
 use yew::{html, Component, ComponentLink, Html, InputData, NodeRef, ShouldRender};
@@ -57,12 +59,15 @@ impl Component for Model {
             cube.relation = RelationModel::Linear(vec!(entry.id()));
         }
         LOG!("Loaded: {:#?}", cube);
+        
+        let id_iter = cube.entries.keys().map(|x| (x.clone(),NodeRef::default()));
+        let refs: HashMap<EntryId, NodeRef> = HashMap::from_iter(id_iter);
         let focus_ref = NodeRef::default();
         Self {
             cube,
             buffer_str: String::new(),
             // Todo: load NodeRefs.
-            refs: HashMap::new(),
+            refs,
             focus_ref,
             storage,
             link,
@@ -84,9 +89,11 @@ impl Component for Model {
                 }
                 AddNode(vec) => {
                     // Todo: change the semantics.
-                    for id in vec {
-                        let i = self.cube.grow();
-                        self.cube.chain(i, id)
+                    for root_id in vec {
+                        let new_id = self.cube.grow();
+                        self.cube.chain(new_id, root_id);
+                        self.refs.insert(new_id, NodeRef::default());
+                        self.focus_ref = self.refs.get(&new_id).unwrap().clone()
                     }
                 }
                 WriteFace(id) => {
@@ -160,7 +167,7 @@ impl Model {
                 }
             ).collect();
         html! {
-            {sidebar_tabs}
+            { sidebar_tabs }
         }
     }
 
@@ -218,7 +225,7 @@ impl Model {
                         LOG!("OnInput: {:?}", e);
                         [UpdateBuffer(e.value), WriteFace(id)]
                     })
-                    ref=self.focus_ref.clone()
+                    ref=self.refs.get(&id).unwrap().clone()
                     // onmouseover=self.link.callback(|_| [Focus])
                     // onblur=self.link.callback(move |_| {
                     //     LOG!("OnBlur.");

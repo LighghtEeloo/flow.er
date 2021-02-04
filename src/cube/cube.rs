@@ -173,7 +173,8 @@ impl EntryDry {
     }
 }
 
-pub type EntryId = (u64, u32);
+#[derive(Clone, Copy, Hash, PartialEq, Eq, Deserialize, Serialize)]
+pub struct EntryId (u64, u32);
 
 pub trait IdentityHash: Hash + Copy {
     fn from_time(v: &impl TimeRep) -> Self;
@@ -190,7 +191,13 @@ impl IdentityHash for EntryId {
         let time = v.flatten()
             .duration_since(UNIX_EPOCH)
             .expect("Time went backwards");
-        (time.as_secs(), time.subsec_nanos())
+        EntryId (time.as_secs(), time.subsec_nanos())
+    }
+}
+
+impl std::fmt::Debug for EntryId {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> { 
+        write!(f, "[{}.{}]", self.0, self.1) 
     }
 }
 
@@ -226,11 +233,13 @@ impl Filter {
 
 // Timestamp Area
 
+pub type TimeTuple = (u64, u32);
+
 pub trait TimeRep {
     fn flatten(&self) -> SystemTime {
         unimplemented!()
     }
-    fn stamping() -> (u64, u32) {
+    fn stamping() -> TimeTuple {
         // Using nano_secs as timestamp.
         let time = SystemTime::now()
             .duration_since(UNIX_EPOCH)
@@ -238,7 +247,7 @@ pub trait TimeRep {
         (time.as_secs(), time.subsec_nanos())
     }
 }
-impl TimeRep for (u64, u32) {
+impl TimeRep for TimeTuple {
     fn flatten(&self) -> SystemTime {
         let sec = self.0;
         let sub_nano = self.1;
@@ -256,7 +265,7 @@ impl TimeRep for TimeStamp {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct TimeStamp {
     meta: TimeMeta,
-    data: (u64, u32)
+    data: TimeTuple
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
