@@ -12,8 +12,7 @@ pub struct Cube {
     pub relation: RelationModel,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[derive(EnumString, EnumVariantNames, EnumIter, EnumProperty, ToString)]
+#[derive(Clone, Debug, Deserialize, Serialize, EnumString, EnumVariantNames, EnumIter, EnumProperty, ToString)]
 pub enum RelationModel {
     Linear(Vec<EntryId>),
     Graph
@@ -211,7 +210,7 @@ pub struct Filter {
     tags: Vec<String>,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize, EnumString, EnumVariantNames, EnumIter, EnumProperty, ToString)]
 pub enum ProcessStatus {
     Done,
     Marching,
@@ -267,10 +266,10 @@ pub struct TimeStamp {
     data: TimeTuple
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize, EnumString, EnumVariantNames, EnumIter, EnumProperty, ToString)]
 pub enum TimeMeta {
     Created,
-    Snapshot(EntryDry)
+    // Snapshot(EntryDry)
     // Todo: Snapshot design.
 }
 
@@ -282,11 +281,11 @@ impl TimeStamp {
         }
     }
 
-    pub fn snapshot(entry: &Entry) -> Self {
-        TimeStamp {
-            meta: TimeMeta::Snapshot(entry.dry()),
-            data: TimeStamp::stamping()
-        }
-    }
+    // pub fn snapshot(entry: &Entry) -> Self {
+    //     TimeStamp {
+    //         meta: TimeMeta::Snapshot(entry.dry()),
+    //         data: TimeStamp::stamping()
+    //     }
+    // }
 }
 

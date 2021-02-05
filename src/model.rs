@@ -12,7 +12,6 @@ use yew::format::Json;
 use yew::web_sys::HtmlInputElement as InputElement;
 use yew::{html, Component, ComponentLink, Html, InputData, NodeRef, ShouldRender};
 use yew::{events::KeyboardEvent};
-// use yew::services::storage::{Area, StorageService};
 use yew_services::storage::{Area, StorageService};
 
 const KEY: &str = "yew.life.tracer.self";
@@ -144,17 +143,6 @@ impl Component for Model {
         //         None
         //     }
         // };
-
-        // Test..
-        let mut cube = Cube::new();
-        cube.name = format!("Ehaema!");
-        // cube.locked = true;
-        let mut entry = Entry::new();
-        entry.set_face(format!("???"));
-        cube.entries.insert(entry.id(), entry.clone());
-        cube.relation = RelationModel::Linear(vec!(entry.id()));
-        self.storage.store(KEY, Json(&cube));
-
 
         true
     }
