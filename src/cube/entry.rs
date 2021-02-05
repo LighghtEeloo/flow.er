@@ -16,7 +16,7 @@ pub struct Entry {
 }
 
 #[derive(Clone, Copy, Hash, PartialEq, Eq, Deserialize, Serialize)]
-pub struct EntryId (u64, u32);
+pub struct EntryId (u64);
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct EntryDry {
@@ -115,7 +115,8 @@ impl EntryDry {
 
 impl std::fmt::Debug for EntryId {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> { 
-        write!(f, "[{}.{}]", self.0, self.1) 
+        // write!(f, "[{}.{}]", self.0, self.1) 
+        write!(f, "[[{}]]", self.0) 
     }
 }
 
@@ -124,17 +125,18 @@ pub trait IdentityHash: Hash + Copy {
 }
 impl IdentityHash for EntryId {
     fn from_time(v: &impl TimeRep) -> Self {
-        // let time = v.flatten()
-        //     .duration_since(UNIX_EPOCH)
-        //     .expect("Time went backwards")
-        //     .as_nanos();
-        // let mut s = DefaultHasher::new();
-        // time.hash(&mut s);
-        // format!("{:x}", s.finish())
         let time = v.flatten()
             .duration_since(UNIX_EPOCH)
-            .expect("Time went backwards");
-        EntryId (time.as_secs(), time.subsec_nanos())
+            .expect("Time went backwards")
+            .as_nanos();
+        let mut s = DefaultHasher::new();
+        time.hash(&mut s);
+        // format!("{:x}", s.finish())
+        EntryId (s.finish())
+        // let time = v.flatten()
+        //     .duration_since(UNIX_EPOCH)
+        //     .expect("Time went backwards");
+        // EntryId (time.as_secs(), time.subsec_nanos())
     }
 }
 
