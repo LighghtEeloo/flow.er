@@ -24,24 +24,16 @@ impl Model {
     }
 
     pub fn cube_view(&self) -> Html {
-        use Msg::*;
         use RelationModel::*;
         let relation = &self.cube.relation;
         match relation {
             Linear(vec) => {
                 html! {
                     <div class="cube">
-                        // <label>{ self.cube.name.clone() }</label>
                         { self.cube_input_view() }
                         { self.add_button_view(vec![]) }
                         { for vec.iter().map(|id| self.node_view(id)) }
-                        <button
-                            title="Clear cube."
-                            ondblclick=self.link.callback(move |_| {
-                                LOG!("OnDoubleClick.");
-                                [ClearCube]
-                            })
-                        >{"Clear"}</button>
+                        { self.clearall_button_view() }
                     </div>
                 }
             }
@@ -93,7 +85,13 @@ impl Model {
                 onkeypress=self.link.callback(move |e: KeyboardEvent| {
                     LOG!("OnKeyPress: {:?}", e);
                     match e.key().as_str() { 
-                        "Enter" => vec![NewNode(vec!(id))], 
+                        "Enter" => vec![NewNode(vec!(id))],
+                        "Backspace" => vec![], 
+                        "Delete" => vec![], 
+                        "ArrowUp" => vec![], 
+                        "ArrowDown" => vec![], 
+                        "ArrowLeft" => vec![], 
+                        "ArrowRight" => vec![], 
                         _ => vec![] 
                     }
                 })
@@ -112,6 +110,19 @@ impl Model {
                     [NewNode(id_vec.clone())]
                 })
             >{"+"}</button>
+        }
+    }
+
+    fn clearall_button_view(&self) -> Html {
+        use Msg::*;
+        html! {
+            <button
+                title="Clear cube."
+                ondblclick=self.link.callback(move |_| {
+                    LOG!("OnDoubleClick.");
+                    [ClearCube]
+                })
+            >{"Clear"}</button>
         }
     }
 }
