@@ -30,7 +30,7 @@ impl Cube {
             name: String::new(),
             locked: false,
             entries: HashMap::new(),
-            relation: RelationModel::Linear(Vec::new())
+            relation: LinearModel::new()
         }
     }
     pub fn empty(&self) -> bool {
@@ -67,23 +67,28 @@ impl Chain<EntryId> for Cube {
         use RelationModel::*;
         match &mut self.relation {
             Linear(vec) => {
-                vec.insert(0, id)
+                vec.model.insert(0, id);
+                vec.idx = 0;
             }
-            _ => ()
+            Tree => (),
+            Graph => ()
         }
     }
     fn chain(&mut self, new_comer: EntryId, host: EntryId) {
         use RelationModel::*;
         match &mut self.relation {
             Linear(vec) => {
-                let pos = vec.into_iter().position(|x| x.clone() == host);
+                let pos = vec.model.into_iter().position(|x| x.clone() == host);
                 if let Some(p) = pos {
-                    vec.insert(p+1, new_comer)
+                    vec.model.insert(p+1, new_comer);
+                    vec.idx = p+1;
                 } else {
-                    vec.push(new_comer)
+                    vec.model.push(new_comer);
+                    vec.idx = vec.model.len() - 1;
                 }
             }
-            _ => ()
+            Tree => (),
+            Graph => ()
         }
     }
 }

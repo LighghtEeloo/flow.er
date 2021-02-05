@@ -27,7 +27,8 @@ impl Model {
         use RelationModel::*;
         let relation = &self.cube.relation;
         match relation {
-            Linear(vec) => {
+            Linear(linear) => {
+                let vec = linear.model;
                 html! {
                     <div class="cube">
                         { self.cube_input_view() }
