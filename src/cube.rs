@@ -1,4 +1,16 @@
+#[allow(dead_code)]
+#[allow(unused)]
+
 use crate::prelude::*;
+pub use std::collections::HashMap;
+pub use wasm_timer::{SystemTime, UNIX_EPOCH};
+pub use std::time::Duration;
+
+// pub use error::{Result, Error};
+
+pub mod prelude {
+    pub use crate::cube::*;
+}
 
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};

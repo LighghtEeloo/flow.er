@@ -3,8 +3,7 @@
 #[allow(unused)]
 
 use crate::prelude::*;
-// Debug..
-use cube::{Cube, Entry, EntryId};
+pub use crate::cube::prelude::*;
 
 use std::iter::FromIterator;
 
@@ -132,17 +131,6 @@ impl Component for Model {
         self.storage.store(KEY, Json(&self.cube));
         LOG!("Just dumped.");
         LOG!("With {}: {:#?}", KEY, &self.cube);
-
-        // Debug..
-        // let _cube: Option<Cube> = {
-        //     if let Json(Ok(restored_model)) = self.storage.restore(KEY) {
-        //         LOG!("Real: {:#?}", restored_model);
-        //         Some(restored_model)
-        //     } else {
-        //         LOG!("Failed.");
-        //         None
-        //     }
-        // };
 
         true
     }
