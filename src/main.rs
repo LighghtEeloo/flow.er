@@ -28,7 +28,16 @@ pub mod util {
 
     pub use std::mem;
     pub use std::collections::HashMap;
+    pub use std::iter::FromIterator;
 
     pub use serde::{Deserialize, Serialize};
     pub use strum_macros::*;
+}
+
+pub mod yew_util {
+    pub use yew::format::Json;
+    pub use yew::web_sys::HtmlInputElement as InputElement;
+    pub use yew::{html, Component, ComponentLink, Html, InputData, NodeRef, ShouldRender};
+    pub use yew::{events::KeyboardEvent};
+    pub use yew_services::storage::{Area, StorageService};
 }
