@@ -15,12 +15,12 @@ const KEY: &str = "yew.life.tracer.self";
 pub enum Msg {
     UpdateBuffer(String),
     NewCube,
+    ClearCube,
     WriteCubeName,
     NewNode(Vec<EntryId>),
     WriteFace(EntryId),
     Focus,
     _Idle,
-    _Debug(String)
 }
 
 pub struct Model {
@@ -47,14 +47,6 @@ impl Component for Model {
             }
         };
 
-        // Test..
-        // let cube = Cube::new();
-        // cube.name = format!("Ehaema!");
-        // // cube.locked = true;
-        // let mut entry = Entry::new();
-        // entry.set_face(format!("???"));
-        // cube.entries.insert(entry.id(), entry.clone());
-        // cube.relation = RelationModel::Linear(vec!(entry.id()));
         LOG!("Loaded: {:#?}", cube);
         
         let id_iter = cube.entries.keys().map(|x| (x.clone(),NodeRef::default()));
@@ -82,6 +74,10 @@ impl Component for Model {
                     // Todo: Add new cube.
                     LOG!("NewCube");
                     self.cube.name = mem::take(&mut self.buffer_str);
+                }
+                ClearCube => {
+                    self.cube.relation.clear();
+                    self.cube.entries.clear();
                 }
                 WriteCubeName => {
                     self.cube.name = mem::take(&mut self.buffer_str);
@@ -120,7 +116,7 @@ impl Component for Model {
                 // _Debug(debug) => {
                 //     self.storage.store(KEY, debug);
                 // }
-                _ => {}
+                _Idle => {}
             }
         }
         // Note: Only self.cube is saved.

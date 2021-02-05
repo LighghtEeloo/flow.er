@@ -24,6 +24,7 @@ impl Model {
     }
 
     pub fn cube_view(&self) -> Html {
+        use Msg::*;
         use RelationModel::*;
         let relation = &self.cube.relation;
         match relation {
@@ -33,7 +34,14 @@ impl Model {
                         // <label>{ self.cube.name.clone() }</label>
                         { self.cube_input_view() }
                         { self.add_button_view(vec![]) }
-                        { for vec.iter().map(|id| self.node_view(id))  }
+                        { for vec.iter().map(|id| self.node_view(id)) }
+                        <button
+                            title="Clear cube."
+                            ondblclick=self.link.callback(move |_| {
+                                LOG!("OnDoubleClick.");
+                                [ClearCube]
+                            })
+                        >{"Clear"}</button>
                     </div>
                 }
             }
@@ -98,7 +106,7 @@ impl Model {
         use Msg::*;
         html! {
             <button
-                title="New node"
+                title="New node."
                 onclick=self.link.callback(move |_| {
                     LOG!("OnClick.");
                     [NewNode(id_vec.clone())]
