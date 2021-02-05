@@ -42,7 +42,7 @@ impl RelationModel {
         }
     }
     pub fn clear(&mut self) {
-        let new_model = match self {
+        let mut new_model = match self {
             Linear(_) => {
                 LinearModel::new()
             }
@@ -69,7 +69,7 @@ impl RelationModel {
         }
     }
     pub fn up(&mut self) {
-        let new_nodel = match self {
+        let mut new_nodel = match self.clone() {
             Linear(mut linear) => {
                 if (linear.idx > 0) {
                     linear.idx -= 1;
@@ -85,10 +85,11 @@ impl RelationModel {
                 unimplemented!()
             }
         };
+        LOG!("Current model: {:?}", new_nodel);
         mem::swap(self, &mut new_nodel)
     }
     pub fn down(&mut self) {
-        let new_nodel = match self {
+        let mut new_nodel = match self.clone() {
             Linear(mut linear) => {
                 if (linear.idx < linear.model.len() - 1) {
                     linear.idx += 1;
@@ -104,12 +105,13 @@ impl RelationModel {
                 unimplemented!()
             }
         };
+        LOG!("Current model: {:?}", new_nodel);
         mem::swap(self, &mut new_nodel)
     }
 }
 
 impl Default for RelationModel {
     fn default() -> Self { 
-        Self::Linear(vec!())
+        LinearModel::new()
     }
 }

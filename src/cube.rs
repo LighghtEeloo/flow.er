@@ -76,9 +76,10 @@ impl Chain<EntryId> for Cube {
     }
     fn chain(&mut self, new_comer: EntryId, host: EntryId) {
         use RelationModel::*;
-        match &mut self.relation {
+        let mut new_model = match &mut self.relation.clone() {
             Linear(vec) => {
-                let pos = vec.model.into_iter().position(|x| x.clone() == host);
+                let mut vec = vec.clone();
+                let pos = vec.model.iter().position(|x| x.clone() == host);
                 if let Some(p) = pos {
                     vec.model.insert(p+1, new_comer);
                     vec.idx = p+1;
@@ -86,10 +87,12 @@ impl Chain<EntryId> for Cube {
                     vec.model.push(new_comer);
                     vec.idx = vec.model.len() - 1;
                 }
+                Linear(vec)
             }
-            Tree => (),
-            Graph => ()
-        }
+            Tree => unimplemented!(),
+            Graph => unimplemented!(),
+        };
+        mem::swap(&mut self.relation, &mut new_model)
     }
 }
 

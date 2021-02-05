@@ -28,7 +28,7 @@ impl Model {
         let relation = &self.cube.relation;
         match relation {
             Linear(linear) => {
-                let vec = linear.model;
+                let vec = linear.model.clone();
                 html! {
                     <div class="cube">
                         { self.cube_input_view() }
