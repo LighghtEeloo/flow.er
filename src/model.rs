@@ -113,9 +113,6 @@ impl Component for Model {
                         }
                     }
                 }
-                // _Debug(debug) => {
-                //     self.storage.store(KEY, debug);
-                // }
                 _Idle => {}
             }
         }
@@ -141,13 +138,8 @@ impl Component for Model {
                     { self.main_editor() }
                 </div>
                 <div class="frame" id="status-bar">
-                    <p>{"Lorem ipsum dolor sit amet consectetur, adipisicing elit. Earum et voluptates atque, neque sint iste possimus at rerum accusantium quidem. Quia laborum vitae ex sed alias quisquam quibusdam at cupiditate."}</p>
+                    <p>{"Lorem ipsum dolor sit amet consectetur, adipisicing elit. Earum et voluptates atque, neque sint iste possimus at rerum accusantium quidem."}</p>
                 </div>
-                <footer class="info" style="display: none">
-                    <p>{ "Double-click to edit a todo" }</p>
-                    <p>{ "Written by " }<a href="https://github.com/LighghtEeloo/" target="_blank">{ "LighghtEeloo" }</a></p>
-                    <p>{ "Inspired by " }<a href="https://github.com/DenisKolodin/" target="_blank">{ "Denis Kolodin" }</a></p>
-                </footer>
             </div>
         };
         view
