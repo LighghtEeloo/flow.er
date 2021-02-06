@@ -85,18 +85,17 @@
     display: inline-block; 
     outline: none;
     height: 24px;
-    width: calc(24px * 6);
-    margin-right: calc(-24px * 5);
+    /* width: calc(24px * 6);
+    margin-right: calc(-24px * 5); */
 } 
 
 .dropdown-content { 
     display: none; 
     position: absolute; 
     background-color: #f9f9f9; 
-    min-width: 12px; 
     box-shadow: 0px 8px 8px  
         0px rgba(0, 0, 0, 0.2); 
-    z-index: 1; 
+    z-index: 0; 
 } 
 
 .dropdown-content ul { 
@@ -121,6 +120,8 @@
 .dropdown:hover .dropdown-content { 
     /* display: block;  */
     display: inline-block; 
+    min-width: 12px; 
+    z-index: 1; 
 } 
 
 .dropdown:hover .dropbtn { 

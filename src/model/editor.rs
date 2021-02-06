@@ -86,6 +86,7 @@ impl Model {
             status_meta.into_iter().map(|(src, des)| {
                 html! {
                     <ul
+                        title={des.clone()}
                         onclick=self.link.callback(move |_| {
                             [UpdateBuffer(des.clone()), WriteProcess(id)]
                         })
@@ -93,7 +94,6 @@ impl Model {
                         <img 
                             src={src}
                         /> 
-                        // { describe }
                     </ul> 
                 }
             }).collect();
