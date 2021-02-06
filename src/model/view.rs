@@ -9,13 +9,13 @@ impl Model {
             ("static/icons/settings.svg", "Settings", true),
         };
         let sidebar_tabs: Html = 
-            tab_meta.iter().map(
+            tab_meta.into_iter().map(
                 |(src, describe, bottom)| {
                     html! {
                         <li class={if !bottom {"tab"} else {"tab tab-bottom"}}>
                             <div class="tab-content">
-                                <img src={&*src} alt={&*describe}/>
-                                <span class="tooltip">{&*describe}</span>
+                                <img src={src} alt={describe}/>
+                                <span class="tooltip">{describe}</span>
                             </div>
                         </li>
                     }

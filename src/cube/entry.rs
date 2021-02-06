@@ -82,6 +82,12 @@ impl Entry {
     pub fn set_filter(&mut self, filter: Filter) {
         self.dry.filter = filter;
     }
+    pub fn process(&self) -> &ProcessStatus {
+        &self.dry.filter.process
+    }
+    pub fn set_process(&mut self, process: ProcessStatus) {
+        self.dry.filter.process = process;
+    }
 }
 
 impl From<EntryDry> for Entry {
@@ -150,6 +156,30 @@ impl Filter {
         Filter {
             process: ProcessStatus::New,
             tags: Vec::new()
+        }
+    }
+}
+
+impl ProcessStatus {
+    pub fn type_str(&self) -> &str {
+        use ProcessStatus::*;
+        match self {
+            Done => "Done",
+            Marching => "Marching",
+            Pending => "Pending",
+            Planning => "Planning",
+            New => "New",
+        }
+    }
+    pub fn reflect(name: &str) -> Self {
+        use ProcessStatus::*;
+        match name {
+            "Done" => Done,
+            "Marching" => Marching,
+            "Pending" => Pending,
+            "Planning" => Planning,
+            "New" => New,
+            _ => New,
         }
     }
 }

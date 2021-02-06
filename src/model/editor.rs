@@ -64,9 +64,51 @@ impl Model {
         let id = id.clone();
         html! {
             <div class="node">
+                { self.node_status_view(&id) }
                 { self.node_input_view(&id) }
                 { self.add_button_view(vec![id]) }
             </div>
+        }
+    }
+
+    fn node_status_view(&self, id: &EntryId) -> Html {
+        let id = id.clone();
+        use Msg::*;
+        // Todo: Replace dummy.
+        let status_meta: Vec<(&str, &str)> = vec! {
+            ("static/icons/settings.svg", "New"),
+            ("static/icons/settings.svg", "Planning"),
+            ("static/icons/history.svg", "Pending"),
+            ("static/icons/branch.svg", "Marching"),
+            ("static/icons/hexagons.svg", "Done"),
+        };
+        let status_dropdown: Html = 
+            status_meta.into_iter().map(|(src, des)| {
+                html! {
+                    <a href="#"> 
+                        <img 
+                            src={src}
+                            onclick=self.link.callback(move |_| {
+                                [UpdateBuffer(String::from(des)), WriteProcess(id)]
+                            })
+                        /> 
+                        // { describe }
+                    </a> 
+                }
+            }).collect();
+        html! {
+            <div class="dropdown"> 
+                <button class="dropbtn"> 
+                    // {"Country Flags "}
+                    <img 
+                        src="static/icons/hexagons.svg"
+                    />
+                </button> 
+                
+                <div class="dropdown-content"> 
+                    { status_dropdown }
+                </div> 
+            </div> 
         }
     }
 

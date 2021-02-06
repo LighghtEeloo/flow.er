@@ -19,6 +19,7 @@ pub enum Msg {
     WriteCubeName,
     NewNode(Vec<EntryId>),
     WriteFace(EntryId),
+    WriteProcess(EntryId),
     Focus,
     _Idle,
 }
@@ -38,6 +39,7 @@ impl Component for Model {
     type Properties = ();
 
     fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
+        // Todo: Register ctrl.
         let storage = StorageService::new(Area::Local).expect("storage was disabled by the user");
         let cube: Cube = {
             if let Json(Ok(restored_model)) = storage.restore(KEY) {
@@ -63,7 +65,7 @@ impl Component for Model {
 
     fn update(&mut self, messages: Self::Message) -> ShouldRender {
         // Test..
-        LOG!("Updating with: {:?}", messages);
+        LOG!("Updating with: {:?}\nand buffer: {:?}", messages, self.buffer_str);
         use Msg::*;
         for msg in messages {
             match msg {
@@ -72,7 +74,6 @@ impl Component for Model {
                 }
                 NewCube => {
                     // Todo: Add new cube.
-                    LOG!("NewCube");
                     self.cube.name = mem::take(&mut self.buffer_str);
                 }
                 ClearCube => {
@@ -101,12 +102,14 @@ impl Component for Model {
                     }
                 }
                 WriteFace(id) => {
-                    LOG!("Buffer: {}", self.buffer_str);
                     let x: &mut Entry = self.cube.entries.get_mut(&id).unwrap();
                     x.set_face(mem::take(&mut self.buffer_str));
                 }
+                WriteProcess(id) => {
+                    let x: &mut Entry = self.cube.entries.get_mut(&id).unwrap();
+                    x.set_process(ProcessStatus::reflect(self.buffer_str.as_str()));
+                }
                 Focus => {
-                    LOG!("Focus.");
                     let id = 
                         if let Some(focus_id) = self.focus_id {
                             focus_id
