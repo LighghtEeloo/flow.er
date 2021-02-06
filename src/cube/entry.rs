@@ -161,7 +161,7 @@ impl Filter {
 }
 
 impl ProcessStatus {
-    pub fn type_str(&self) -> &str {
+    pub fn type_str(&self) -> String {
         use ProcessStatus::*;
         match self {
             Done => "Done",
@@ -169,7 +169,7 @@ impl ProcessStatus {
             Pending => "Pending",
             Planning => "Planning",
             New => "New",
-        }
+        }.to_string()
     }
     pub fn reflect(name: &str) -> Self {
         use ProcessStatus::*;
@@ -181,5 +181,20 @@ impl ProcessStatus {
             "New" => New,
             _ => New,
         }
+    }
+    pub fn vec_all() -> Vec<Self> {
+        use ProcessStatus::*;
+        vec! {
+            New,
+            Planning,
+            Pending,
+            Marching,
+            Done,
+        }
+    }
+    pub fn type_src(&self) -> String {
+        use ProcessStatus::*;
+        // Todo: Replace dummy.
+        format!("static/icons/Process/{}.svg", Self::type_str(self))
     }
 }

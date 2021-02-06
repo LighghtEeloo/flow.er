@@ -74,23 +74,24 @@ impl Model {
     fn node_status_view(&self, id: &EntryId) -> Html {
         let id = id.clone();
         use Msg::*;
-        // Todo: Replace dummy.
-        let status_meta: Vec<(&str, &str)> = vec! {
-            ("static/icons/settings.svg", "New"),
-            ("static/icons/settings.svg", "Planning"),
-            ("static/icons/history.svg", "Pending"),
-            ("static/icons/branch.svg", "Marching"),
-            ("static/icons/hexagons.svg", "Done"),
-        };
+        let vec = ProcessStatus::vec_all();
+        let status_meta: Vec<(String, String)> = 
+            vec.iter().map(
+                |x| (
+                    String::from(ProcessStatus::type_src(x)), 
+                    String::from(ProcessStatus::type_str(x))
+                ) 
+            ).collect();
         let status_dropdown: Html = 
             status_meta.into_iter().map(|(src, des)| {
                 html! {
-                    <ul> 
+                    <ul
+                        onclick=self.link.callback(move |_| {
+                            [UpdateBuffer(des.clone()), WriteProcess(id)]
+                        })
+                    > 
                         <img 
                             src={src}
-                            onclick=self.link.callback(move |_| {
-                                [UpdateBuffer(String::from(des)), WriteProcess(id)]
-                            })
                         /> 
                         // { describe }
                     </ul> 
@@ -98,10 +99,12 @@ impl Model {
             }).collect();
         html! {
             <div class="dropdown"> 
-                <button class="dropbtn"> 
-                    // {"Country Flags "}
+                <button 
+                    class="dropbtn"
+                    value=self.cube.get(id).process().type_str()
+                > 
                     <img 
-                        src="static/icons/hexagons.svg"
+                        src={self.cube.get(id).process().type_src()}
                     />
                 </button> 
                 
