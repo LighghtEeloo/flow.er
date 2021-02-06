@@ -70,8 +70,8 @@ impl Chain<EntryId> for Cube {
                 vec.model.insert(0, id);
                 vec.idx = 0;
             }
-            Tree => (),
-            Graph => ()
+            Tree => unimplemented!(),
+            Graph => unimplemented!(),
         }
     }
     fn chain(&mut self, new_comer: EntryId, host: EntryId) {
@@ -96,5 +96,24 @@ impl Chain<EntryId> for Cube {
     }
 }
 
+pub trait Erase<Id: IdentityHash>: Grow<Id> {
+    fn erase(&mut self, id: Id);
+}
 
-
+impl Erase<EntryId> for Cube {
+    fn erase(&mut self, id: EntryId) {
+        if let Some(entry) = self.entries.remove(&id) {
+            use RelationModel::*;
+            match &mut self.relation {
+                Linear(vec) => {
+                    vec.model.retain(|&x| x != id);
+                    if vec.idx >= vec.model.len() && vec.idx != 0 {
+                        vec.idx = vec.model.len() - 1;
+                    }
+                }
+                Tree => unimplemented!(),
+                Graph => unimplemented!(),
+            }
+        }
+    }
+}

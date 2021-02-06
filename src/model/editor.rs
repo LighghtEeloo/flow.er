@@ -67,6 +67,7 @@ impl Model {
                 { self.node_status_view(&id) }
                 { self.node_input_view(&id) }
                 { self.add_button_view(vec![id]) }
+                { self.erase_button_view(&id) }
             </div>
         }
     }
@@ -150,12 +151,28 @@ impl Model {
         use Msg::*;
         html! {
             <button
+                // style="width: 24px; height: 24px; line-height: 24px; display: inline; margin: 0;"
                 title="New node."
                 onclick=self.link.callback(move |_| {
                     LOG!("OnClick.");
                     [NewNode(id_vec.clone())]
                 })
             >{"+"}</button>
+        }
+    }
+
+    fn erase_button_view(&self, id: &EntryId) -> Html {
+        use Msg::*;
+        let id = id.clone();
+        html! {
+            <button
+                // style="width: 24px; height: 24px; line-height: 24px; display: inline; margin: 0;"
+                title="Erase node."
+                onclick=self.link.callback(move |_| {
+                    LOG!("OnClick.");
+                    [EraseNode(id)]
+                })
+            >{" - "}</button>
         }
     }
 

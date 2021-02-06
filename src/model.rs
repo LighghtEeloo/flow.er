@@ -20,6 +20,7 @@ pub enum Msg {
     NewNode(Vec<EntryId>),
     WriteFace(EntryId),
     WriteProcess(EntryId),
+    EraseNode(EntryId),
     Focus,
     _Idle,
 }
@@ -108,6 +109,9 @@ impl Component for Model {
                 WriteProcess(id) => {
                     let x: &mut Entry = self.cube.entries.get_mut(&id).unwrap();
                     x.set_process(ProcessStatus::reflect(self.buffer_str.as_str()));
+                }
+                EraseNode(id) => {
+                    self.cube.erase(id);
                 }
                 Focus => {
                     let id = 
