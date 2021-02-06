@@ -90,24 +90,28 @@
     z-index: 1; 
 } 
 
-.dropdown-content a { 
+.dropdown-content ul { 
     color: black; 
-    padding: 4px 6px; 
+    padding: 4px 6px;
+    margin: 0; 
     text-decoration: none; 
-    display: block; 
+    display: inline-flex; 
+    /* display: block;  */
+    outline: none;
 } 
 
-.dropdown-content a:hover { 
+.dropdown-content ul:hover { 
     background-color: #f1f1f1;
 } 
 
-.dropdown-content a img { 
+.dropdown-content ul img { 
     width: 12px;
     height: 12px;
 } 
 
 .dropdown:hover .dropdown-content { 
-    display: block; 
+    /* display: block;  */
+    display: inline; 
 } 
 
 .dropdown:hover .dropbtn { 

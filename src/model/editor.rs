@@ -85,7 +85,7 @@ impl Model {
         let status_dropdown: Html = 
             status_meta.into_iter().map(|(src, des)| {
                 html! {
-                    <a href="#"> 
+                    <ul> 
                         <img 
                             src={src}
                             onclick=self.link.callback(move |_| {
@@ -93,7 +93,7 @@ impl Model {
                             })
                         /> 
                         // { describe }
-                    </a> 
+                    </ul> 
                 }
             }).collect();
         html! {
