@@ -2,7 +2,7 @@ import os
 from os.path import isdir, join
 from shutil import copytree, rmtree
 
-os.system('clear')
+os.system('cls')
 
 # sync = [
 #     'static',

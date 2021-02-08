@@ -17,10 +17,8 @@ serde = "1"
 serde_derive = "1"
 
 
-# #yew = "0.17.4"
-# # yew = { git="https://github.com/yewstack/yew.git" }
-yew = { path = "/home/lighght/Yggdrasill/Hof/Repo/yew/packages/yew" }
-yew-services = { path = "/home/lighght/Yggdrasill/Hof/Repo/yew/packages/yew-services" }
+yew = { path = "C:\\Zix100\\Repo\\yew\\packages\\yew" }
+yew-services = { path = "C:\\Zix100\\Repo\\yew\\packages\\yew-services" }
 wasm-timer = "0.2.0"
 
 
