@@ -21,7 +21,8 @@ pub struct Cube {
     pub name: String,
     pub locked: bool,
     pub entries: HashMap<EntryId, Entry>,
-    pub relation: RelationModel,
+    // Todo: polymorphism
+    pub relation: LinearModel,
 }
 
 impl Cube {
@@ -64,35 +65,10 @@ pub trait Chain<Id: IdentityHash>: Grow<Id> {
 }
 impl Chain<EntryId> for Cube {
     fn tiptoe(&mut self, id: EntryId) {
-        use RelationModel::*;
-        match &mut self.relation {
-            Linear(vec) => {
-                vec.model.insert(0, id);
-                vec.idx = 0;
-            }
-            Tree => unimplemented!(),
-            Graph => unimplemented!(),
-        }
+        self.relation.add(id, None);
     }
     fn chain(&mut self, new_comer: EntryId, host: EntryId) {
-        use RelationModel::*;
-        let mut new_model = match &mut self.relation.clone() {
-            Linear(vec) => {
-                let mut vec = vec.clone();
-                let pos = vec.model.iter().position(|x| x.clone() == host);
-                if let Some(p) = pos {
-                    vec.model.insert(p+1, new_comer);
-                    vec.idx = p+1;
-                } else {
-                    vec.model.push(new_comer);
-                    vec.idx = vec.model.len() - 1;
-                }
-                Linear(vec)
-            }
-            Tree => unimplemented!(),
-            Graph => unimplemented!(),
-        };
-        mem::swap(&mut self.relation, &mut new_model)
+        self.relation.add(new_comer, Some(host))
     }
 }
 
@@ -102,18 +78,6 @@ pub trait Erase<Id: IdentityHash>: Grow<Id> {
 
 impl Erase<EntryId> for Cube {
     fn erase(&mut self, id: EntryId) {
-        if let Some(entry) = self.entries.remove(&id) {
-            use RelationModel::*;
-            match &mut self.relation {
-                Linear(vec) => {
-                    vec.model.retain(|&x| x != id);
-                    if vec.idx >= vec.model.len() && vec.idx != 0 {
-                        vec.idx = vec.model.len() - 1;
-                    }
-                }
-                Tree => unimplemented!(),
-                Graph => unimplemented!(),
-            }
-        }
+        self.relation.del(id);
     }
 }

@@ -115,13 +115,18 @@ impl Component for Model {
                 }
                 Focus => {
                     let id = 
-                        if let Some(focus_id) = self.focus_id {
-                            focus_id
-                        } else {
+                        if let None = self.focus_id {
                             self.cube.relation.current()
+                        } else {
+                            self.focus_id
                         };
-                    if let Some(input) = self.refs.get(&id).unwrap().cast::<InputElement>() {
-                        input.focus().unwrap();
+                    match id {
+                        Some(id) => {
+                            if let Some(input) = self.refs.get(&id).unwrap().cast::<InputElement>() {
+                                input.focus().unwrap();
+                            }
+                        }
+                        None => ()
                     }
                 }
                 _Idle => {}

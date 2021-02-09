@@ -24,21 +24,15 @@ impl Model {
     }
 
     pub fn cube_view(&self) -> Html {
-        use RelationModel::*;
         let relation = &self.cube.relation;
-        match relation {
-            Linear(linear) => {
-                let vec = linear.model.clone();
-                html! {
-                    <div class="cube">
-                        { self.cube_input_view() }
-                        { self.add_button_view(vec![]) }
-                        { for vec.iter().map(|id| self.node_view(id)) }
-                        { self.clearall_button_view() }
-                    </div>
-                }
-            }
-            _ => html! {}
+        let vec = &relation.data;
+        html! {
+            <div class="cube">
+                { self.cube_input_view() }
+                { self.add_button_view(vec![]) }
+                { for vec.iter().map(|id| self.node_view(id)) }
+                { self.clearall_button_view() }
+            </div>
         }
     }
 

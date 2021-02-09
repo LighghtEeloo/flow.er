@@ -1,117 +1,139 @@
-use crate::prelude::*;
+use crate::util::*;
 use crate::cube::*;
 
-#[derive(Clone, Debug, Deserialize, Serialize, EnumString, EnumVariantNames, EnumIter, EnumProperty, ToString)]
-pub enum RelationModel {
-    Linear(LinearModel),
-    Tree,
-    // Todo: Tree RelationModel.
-    Graph,
-    // Todo: Garph RelationModel.
+// #[derive(Clone, Debug, Deserialize, Serialize)]
+// pub enum RelationModelType {
+//     Linear,
+//     Tree,
+//     Graph,
+// }
+
+// impl RelationModelType {
+//     pub fn type_str(&self) -> &str {
+//         match self {
+//             Linear => "Linear",
+//             Tree => "Tree",
+//             Graph => "Graph",
+//         }
+//     }
+// }
+
+pub enum Direction {
+    Up,
+    Down,
 }
 
-use RelationModel::*;
+pub trait RelationModel: Clone + fmt::Debug + Deserialize<'static> + Serialize + Sized {
+    fn add(&mut self, target: EntryId, des: Option<EntryId>);
+    fn del(&mut self, target: EntryId);
+    fn focus(&mut self, target: EntryId);
+    fn current(&self) -> Option<EntryId>;
+    fn wander(&mut self, dir: Direction, fixed: bool);
+    fn clear(&mut self);
+}
+
+// Linear
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct LinearModel {
-    pub model: Vec<EntryId>,
-    pub idx: usize,
+    pub data: Vec<EntryId>,
+    pub pos: Option<usize>,
+    pub fix: Option<usize>,
 }
 
 impl LinearModel {
-    pub fn new() -> RelationModel {
-        Linear(LinearModel::default())
+    pub fn new() -> Self {
+        LinearModel::default()
+    }
+    fn locate(&self, target: EntryId) -> Option<usize> {
+        self.data.iter().position(|&x| target == x)
+    }
+}
+
+impl RelationModel for LinearModel {
+    fn add(&mut self, target: EntryId, des: Option<EntryId>) {
+        let pos = 
+            match des {
+                Some(des) => {
+                    if let Some(pos) = self.locate(des) {
+                        pos + 1
+                    } else {
+                        self.data.len()
+                    }
+                }
+                None => self.data.len()
+            };
+        self.data.insert(pos, target);
+        self.pos = Some(pos);
+        self.fix = None;
+    }
+    fn del(&mut self, target: EntryId) {
+        match self.locate(target) {
+            Some(pos) => {
+                self.data.remove(pos);
+                self.pos = None;
+            }
+            None => ()
+        };
+    }
+    fn current(&self) -> Option<EntryId> {
+        match self.pos {
+            Some(pos) => Some(self.data[pos]),
+            None => None
+        }
+    }
+    fn focus(&mut self, target: EntryId) {
+        self.pos = self.locate(target)
+    }
+    fn wander(&mut self, dir: Direction, fixed: bool) {
+        if self.data.len() == 0 { return }
+        let dir: isize = match dir {
+            Direction::Up => -1,
+            Direction::Down => 1
+        };
+        if fixed {
+            // Todo: around fix.
+            if let None = self.fix {
+                self.fix = self.pos;
+            }
+            if let Some(center) = self.fix {
+                self.pos = match self.data.len() {
+                    0 => None,
+                    _ => Some((center as isize + dir) as usize % self.data.len())
+                };
+                // let range: Vec<usize> = 
+                //     vec![center - 1, center, center + 1].into_iter()
+                //     .filter(|&x| x < self.data.len()).collect();
+            };
+        } else {
+            self.fix = None;
+            let pos = match self.pos {
+                Some(pos) => pos,
+                None => 0
+            };
+            self.pos = Some((pos as isize + dir) as usize % self.data.len());
+        }
+    }
+    fn clear(&mut self) {
+        mem::take(self);
     }
 }
 
 impl Default for LinearModel {
     fn default() -> Self {
         Self {
-            model: Vec::new(),
-            idx: 0
+            data: Vec::new(),
+            pos: None,
+            fix: None,
         }
     }
 }
 
-impl RelationModel {
-    pub fn type_str(&self) -> &str {
-        match self {
-            Linear(_) => "Linear",
-            Tree => "Tree",
-            Graph => "Graph",
-        }
-    }
-    pub fn clear(&mut self) {
-        let mut new_model = match self {
-            Linear(_) => {
-                LinearModel::new()
-            }
-            Tree => {
-                unimplemented!()
-            }
-            Graph => {
-                unimplemented!()
-            }
-        };
-        mem::swap(self, &mut new_model)
-    }
-    pub fn current(&self) -> EntryId {
-        match self {
-            Linear(linear) => {
-                linear.model[linear.idx]
-            }
-            Tree => {
-                unimplemented!()
-            }
-            Graph => {
-                unimplemented!()
-            }
-        }
-    }
-    pub fn up(&mut self) {
-        let mut new_nodel = match self.clone() {
-            Linear(mut linear) => {
-                if (linear.idx > 0) {
-                    linear.idx -= 1;
-                }
-                // Debug..
-                LOG!("Up: {:?}", linear);
-                Linear(linear)
-            }
-            Tree => {
-                unimplemented!()
-            }
-            Graph => {
-                unimplemented!()
-            }
-        };
-        LOG!("Current model: {:?}", new_nodel);
-        mem::swap(self, &mut new_nodel)
-    }
-    pub fn down(&mut self) {
-        let mut new_nodel = match self.clone() {
-            Linear(mut linear) => {
-                if (linear.idx < linear.model.len() - 1) {
-                    linear.idx += 1;
-                }
-                // Debug..
-                LOG!("Down: {:?}", linear);
-                Linear(linear)
-            }
-            Tree => {
-                unimplemented!()
-            }
-            Graph => {
-                unimplemented!()
-            }
-        };
-        LOG!("Current model: {:?}", new_nodel);
-        mem::swap(self, &mut new_nodel)
-    }
-}
+// make_model
 
-impl Default for RelationModel {
-    fn default() -> Self { 
-        LinearModel::new()
-    }
-}
+// fn make_model(model_type: RelationModelType) -> Box<RelationModel> {
+//     use RelationModelType::*;
+//     match model_type {
+//         Linear => Box::new(LinearModel::new())
+//     }
+// }

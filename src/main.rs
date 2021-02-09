@@ -27,6 +27,7 @@ pub mod util {
     pub use crate::LOG;
 
     pub use std::mem;
+    pub use std::fmt;
     pub use std::collections::HashMap;
     pub use std::iter::FromIterator;
 
