@@ -123,11 +123,18 @@ impl Model {
                 onfocus=self.link.callback(move |_| {
                     [SetFocus(id)]
                 })
-                oninput=self.link.callback(move |e: InputData| {
-                    LOG!("OnInput: {:?}", e);
-                    [UpdateBuffer(e.value), WriteFace(id)]
-                })
                 ref=self.refs.get(&id).unwrap().clone()
+                onkeydown=self.link.callback(move |e: KeyboardEvent| {
+                    let meta = (e.ctrl_key(), e.shift_key(), e.code());
+                    LOG!("OnKeyUp: {:?}", meta);
+                    match (meta.0, meta.1, meta.2.as_str()) { 
+                        (false, false, "ArrowUp") => vec![Wander(Direction::Up)], 
+                        (false, false, "ArrowDown") => vec![Wander(Direction::Down)], 
+                        (false, false, "ArrowLeft") => vec![], 
+                        (false, false, "ArrowRight") => vec![], 
+                        _ => vec![] 
+                    }
+                })
                 onkeyup=self.link.callback(move |e: KeyboardEvent| {
                     let meta = (e.ctrl_key(), e.shift_key(), e.code());
                     LOG!("OnKeyUp: {:?}", meta);
@@ -139,7 +146,7 @@ impl Model {
                         // Todo: Delay.
                         // backspace
                         (_, _, "Backspace") => {
-                            if is_empty { vec![EraseNode(id)] }
+                            if is_empty { vec![EraseNode(id),Wander(Direction::Up)] }
                             else { vec![] }
                         }
                         // delete
@@ -147,12 +154,12 @@ impl Model {
                             if is_empty { vec![EraseNode(id)] }
                             else { vec![] }
                         }
-                        (false, false, "ArrowUp") => vec![Wander(Direction::Up)], 
-                        (false, false, "ArrowDown") => vec![Wander(Direction::Down)], 
-                        (false, false, "ArrowLeft") => vec![], 
-                        (false, false, "ArrowRight") => vec![], 
                         _ => vec![] 
                     }
+                })
+                oninput=self.link.callback(move |e: InputData| {
+                    LOG!("OnInput: {:?}", e);
+                    [UpdateBuffer(e.value), WriteFace(id)]
                 })
                 readonly=if self.cube.locked { true } else { false }
             />
