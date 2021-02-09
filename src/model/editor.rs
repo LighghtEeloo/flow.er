@@ -1,5 +1,6 @@
 use crate::model::*;
 use crate::yew_util::*;
+use crate::cube::prelude::*;
 
 impl Model {
     pub fn cube_new_input_view(&self) -> Html {
@@ -132,8 +133,9 @@ impl Model {
                         "Enter" => vec![NewNode(vec!(id))],
                         "Backspace" => vec![], 
                         "Delete" => vec![], 
-                        "ArrowUp" => vec![], 
-                        "ArrowDown" => vec![], 
+                        // Todo: Remove keyblock.
+                        "ArrowUp" => vec![Wander(Direction::Up)], 
+                        "ArrowDown" => vec![Wander(Direction::Down)], 
                         "ArrowLeft" => vec![], 
                         "ArrowRight" => vec![], 
                         _ => vec![] 

@@ -116,7 +116,8 @@ impl Component for Model {
                 }
                 Wander(dir) => {
                     // Todo: register shift key.
-                    self.cube.relation.wander(dir, false)
+                    self.cube.relation.wander(dir, false);
+                    self.link.callback(move |_: Msg| [Focus] ).emit(_Idle);
                 }
                 Focus => {
                     let id = self.cube.relation.current();
