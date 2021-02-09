@@ -114,6 +114,7 @@ impl Model {
     fn node_input_view(&self, id: &EntryId) -> Html {
         use Msg::*;
         let id = id.clone();
+        let is_empty = self.cube.get(id).face().is_empty();
         html! {
             <input
                 type="text"
@@ -129,15 +130,26 @@ impl Model {
                 ref=self.refs.get(&id).unwrap().clone()
                 onkeypress=self.link.callback(move |e: KeyboardEvent| {
                     LOG!("OnKeyPress: {:?}", e);
-                    match e.key().as_str() { 
-                        "Enter" => vec![NewNode(vec!(id))],
-                        "Backspace" => vec![], 
-                        "Delete" => vec![], 
+                    match (e.ctrl_key(), e.shift_key(), e.key().as_str()) { 
+                        // enter
+                        (false, false, "Enter") => vec![NewNode(vec!(id))],
+                        // shift+enter
+                        (false, true, "Enter") => vec![],
+                        // backspace
+                        (_, _, "Backspace") => {
+                            if is_empty { vec![EraseNode(id)] }
+                            else { vec![] }
+                        }
+                        // delete
+                        (_, _, "Delete") => {
+                            if is_empty { vec![EraseNode(id)] }
+                            else { vec![] }
+                        }
                         // Todo: Remove keyblock.
-                        "ArrowUp" => vec![Wander(Direction::Up)], 
-                        "ArrowDown" => vec![Wander(Direction::Down)], 
-                        "ArrowLeft" => vec![], 
-                        "ArrowRight" => vec![], 
+                        (false, false, "ArrowUp") => vec![Wander(Direction::Up)], 
+                        (false, false, "ArrowDown") => vec![Wander(Direction::Down)], 
+                        (false, false, "ArrowLeft") => vec![], 
+                        (false, false, "ArrowRight") => vec![], 
                         _ => vec![] 
                     }
                 })
