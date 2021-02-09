@@ -128,13 +128,15 @@ impl Model {
                     [UpdateBuffer(e.value), WriteFace(id)]
                 })
                 ref=self.refs.get(&id).unwrap().clone()
-                onkeypress=self.link.callback(move |e: KeyboardEvent| {
-                    LOG!("OnKeyPress: {:?}", e);
-                    match (e.ctrl_key(), e.shift_key(), e.key().as_str()) { 
+                onkeyup=self.link.callback(move |e: KeyboardEvent| {
+                    let meta = (e.ctrl_key(), e.shift_key(), e.code());
+                    LOG!("OnKeyUp: {:?}", meta);
+                    match (meta.0, meta.1, meta.2.as_str()) { 
                         // enter
                         (false, false, "Enter") => vec![NewNode(vec!(id))],
                         // shift+enter
                         (false, true, "Enter") => vec![],
+                        // Todo: Delay.
                         // backspace
                         (_, _, "Backspace") => {
                             if is_empty { vec![EraseNode(id)] }
@@ -145,7 +147,6 @@ impl Model {
                             if is_empty { vec![EraseNode(id)] }
                             else { vec![] }
                         }
-                        // Todo: Remove keyblock.
                         (false, false, "ArrowUp") => vec![Wander(Direction::Up)], 
                         (false, false, "ArrowDown") => vec![Wander(Direction::Down)], 
                         (false, false, "ArrowLeft") => vec![], 

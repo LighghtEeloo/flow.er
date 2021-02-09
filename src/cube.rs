@@ -79,6 +79,8 @@ pub trait Erase<Id: IdentityHash>: Grow<Id> {
 
 impl Erase<EntryId> for Cube {
     fn erase(&mut self, id: EntryId) {
-        self.relation.del(id);
+        if let Some(_) = self.entries.remove(&id) {
+            self.relation.del(id);
+        }
     }
 }
