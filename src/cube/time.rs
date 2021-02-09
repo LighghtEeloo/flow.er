@@ -34,7 +34,7 @@ impl TimeRep for TimeStamp {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct TimeStamp {
     pub meta: TimeMeta,
     pub data: TimeTuple
@@ -61,5 +61,11 @@ impl TimeStamp {
     //         data: TimeStamp::stamping()
     //     }
     // }
+}
+
+impl fmt::Debug for TimeStamp {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> { 
+        write!(f, "{:?} - {:?}", self.meta, self.flatten())
+    }
 }
 
