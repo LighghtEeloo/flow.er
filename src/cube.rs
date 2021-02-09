@@ -12,6 +12,7 @@ pub use entry::*;
 
 pub mod prelude {
     pub use crate::cube::*;
+    pub use crate::cube::relation::*;
 }
 
 

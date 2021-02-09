@@ -1,5 +1,5 @@
 use crate::util::*;
-use crate::cube::*;
+use crate::cube::prelude::*;
 
 // #[derive(Clone, Debug, Deserialize, Serialize)]
 // pub enum RelationModelType {
@@ -18,6 +18,7 @@ use crate::cube::*;
 //     }
 // }
 
+#[derive(Debug)]
 pub enum Direction {
     Up,
     Down,

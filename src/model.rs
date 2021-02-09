@@ -22,6 +22,7 @@ pub enum Msg {
     WriteProcess(EntryId),
     EraseNode(EntryId),
     SetFocus(EntryId),
+    Wander(Direction),
     Focus,
     _Idle,
 }
@@ -112,6 +113,10 @@ impl Component for Model {
                 }
                 SetFocus(id) => {
                     self.cube.relation.focus(id);
+                }
+                Wander(dir) => {
+                    // Todo: register shift key.
+                    self.cube.relation.wander(dir, false)
                 }
                 Focus => {
                     let id = self.cube.relation.current();
