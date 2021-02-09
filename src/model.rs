@@ -29,7 +29,6 @@ pub struct Model {
     cube: Cube,
     buffer_str: String,
     refs: HashMap<EntryId, NodeRef>,
-    focus_id: Option<EntryId>,
     storage: StorageService,
     link: ComponentLink<Self>,
 }
@@ -58,7 +57,6 @@ impl Component for Model {
             cube,
             buffer_str: String::new(),
             refs,
-            focus_id: None,
             storage,
             link,
         }
@@ -89,7 +87,6 @@ impl Component for Model {
                         let new_id = self.cube.grow();
                         self.cube.tiptoe(new_id);
                         self.refs.insert(new_id, NodeRef::default());
-                        self.focus_id = Some(new_id);
                         self.link.callback(move |_: Msg| [Focus] ).emit(_Idle);
                     } else {
                         // Todo: change the semantics.
@@ -97,7 +94,6 @@ impl Component for Model {
                             let new_id = self.cube.grow();
                             self.cube.chain(new_id, root_id);
                             self.refs.insert(new_id, NodeRef::default());
-                            self.focus_id = Some(new_id);
                             self.link.callback(move |_: Msg| [Focus] ).emit(_Idle);
                         }
                     }
@@ -114,12 +110,7 @@ impl Component for Model {
                     self.cube.erase(id);
                 }
                 Focus => {
-                    let id = 
-                        if let None = self.focus_id {
-                            self.cube.relation.current()
-                        } else {
-                            self.focus_id
-                        };
+                    let id = self.cube.relation.current();
                     match id {
                         Some(id) => {
                             if let Some(input) = self.refs.get(&id).unwrap().cast::<InputElement>() {
