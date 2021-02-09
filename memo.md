@@ -1,4 +1,6 @@
-Relation-Model trait:
+# Memo
+
+## Relation-Model trait
 - store message with position
   - type_str
   - add (pos)
@@ -9,3 +11,7 @@ Relation-Model trait:
   - right: deepin
   - left: surface
   - up/down: wander
+
+## Todo-list
+- [ ] Support clipboard exporting / importing.
+- [ ] Support cube management.
