@@ -118,6 +118,9 @@ impl Model {
                 type="text"
                 value=self.cube.get(id).face()
                 placeholder="..."
+                onfocus=self.link.callback(move |_| {
+                    [SetFocus(id)]
+                })
                 oninput=self.link.callback(move |e: InputData| {
                     LOG!("OnInput: {:?}", e);
                     [UpdateBuffer(e.value), WriteFace(id)]

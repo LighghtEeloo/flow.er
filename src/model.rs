@@ -21,6 +21,7 @@ pub enum Msg {
     WriteFace(EntryId),
     WriteProcess(EntryId),
     EraseNode(EntryId),
+    SetFocus(EntryId),
     Focus,
     _Idle,
 }
@@ -108,6 +109,9 @@ impl Component for Model {
                 }
                 EraseNode(id) => {
                     self.cube.erase(id);
+                }
+                SetFocus(id) => {
+                    self.cube.relation.focus(id);
                 }
                 Focus => {
                     let id = self.cube.relation.current();
