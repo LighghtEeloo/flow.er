@@ -15,3 +15,6 @@
 ## Todo-list
 - [ ] Support clipboard exporting / importing.
 - [ ] Support cube management.
+- [ ] CSS.
+- [ ] Bubble details.
+
