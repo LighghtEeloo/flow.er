@@ -10,7 +10,7 @@ use std::hash::{Hash, Hasher};
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Entry {
     dry: EntryDry,
-    timestamps: Vec<TimeStamp>,
+    // timestamps: Vec<TimeStamp>,
     // Todo: Add positional info.
     // position: (f64, f64)
 }
@@ -52,7 +52,7 @@ impl Entry {
         let id = EntryId::from_time(&stamp.data);
         Entry {
             dry: EntryDry::new(id),
-            timestamps: vec!(stamp)
+            // timestamps: vec!(stamp)
         }
     }
     pub fn dry(&self) -> EntryDry {
@@ -94,7 +94,7 @@ impl From<EntryDry> for Entry {
     fn from(v: EntryDry) -> Self {
         Entry {
             dry: v,
-            timestamps: vec!(TimeStamp::created())
+            // timestamps: vec!(TimeStamp::created())
         }
     }
 }
