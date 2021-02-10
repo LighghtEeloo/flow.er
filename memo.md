@@ -12,9 +12,13 @@
   - left: surface
   - up/down: wander
 
-## Todo-list
+## Todo List
 - [ ] Support clipboard exporting / importing.
 - [ ] Support cube management.
-- [ ] CSS.
+- [x] CSS.
 - [ ] Bubble details.
 
+
+## Fix List
+- [ ] Better model which preserves the first node.
+- [ ] Or, caret-position-based new line.

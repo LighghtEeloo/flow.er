@@ -30,8 +30,10 @@ impl Model {
         html! {
             <div class="cube">
                 { self.cube_input_view() }
-                { self.add_button_view(vec![]) }
-                { for vec.iter().map(|id| self.node_view(id)) }
+                <div class="node-group">
+                    { self.add_button_view(vec![]) }
+                    { for vec.iter().map(|id| self.node_view(id)) }
+                </div>
                 { self.clearall_button_view() }
             </div>
         }
@@ -72,36 +74,28 @@ impl Model {
         use Msg::*;
         let vec = ProcessStatus::vec_all();
         let status_meta: Vec<(String, String)> = 
-            vec.iter().map(
-                |x| (
-                    String::from(ProcessStatus::type_src(x)), 
-                    String::from(ProcessStatus::type_str(x))
-                ) 
-            ).collect();
+            vec.iter().map( |x| (
+                String::from(ProcessStatus::type_src(x)), 
+                String::from(ProcessStatus::type_str(x))
+            ) ).collect();
         let status_dropdown: Html = 
             status_meta.into_iter().map(|(src, des)| {
                 html! {
-                    <ul
-                        title={des.clone()}
+                    <ul title={des.clone()}
                         onclick=self.link.callback(move |_| {
                             [UpdateBuffer(des.clone()), WriteProcess(id)]
                         })
                     > 
-                        <img 
-                            src={src}
-                        /> 
+                        <img src={src} /> 
                     </ul> 
                 }
             }).collect();
         html! {
             <div class="dropdown"> 
-                <button 
-                    class="dropbtn"
+                <button class="dropbtn"
                     value=self.cube.get(id).process().type_str()
                 > 
-                    <img 
-                        src={self.cube.get(id).process().type_src()}
-                    />
+                    <img src={self.cube.get(id).process().type_src()} />
                 </button> 
                 
                 <div class="dropdown-content"> 
@@ -121,17 +115,24 @@ impl Model {
                 value=self.cube.get(id).face()
                 placeholder="..."
                 onfocus=self.link.callback(move |_| {
-                    [SetFocus(id)]
+                    [SetFocusId(id)]
                 })
                 ref=self.refs.get(&id).unwrap().clone()
                 onkeydown=self.link.callback(move |e: KeyboardEvent| {
                     let meta = (e.ctrl_key(), e.shift_key(), e.code());
-                    LOG!("OnKeyUp: {:?}", meta);
+                    LOG!("OnKeyDown: {:?}", meta);
                     match (meta.0, meta.1, meta.2.as_str()) { 
                         (false, false, "ArrowUp") => vec![Wander(Direction::Up)], 
                         (false, false, "ArrowDown") => vec![Wander(Direction::Down)], 
                         (false, false, "ArrowLeft") => vec![], 
                         (false, false, "ArrowRight") => vec![], 
+                        _ => vec![] 
+                    }
+                })
+                onkeypress=self.link.callback(move |e: KeyboardEvent| {
+                    let meta = (e.ctrl_key(), e.shift_key(), e.code());
+                    LOG!("OnKeyPress: {:?}", meta);
+                    match (meta.0, meta.1, meta.2.as_str()) { 
                         _ => vec![] 
                     }
                 })
@@ -169,8 +170,7 @@ impl Model {
     fn add_button_view(&self, id_vec: Vec<EntryId>) -> Html {
         use Msg::*;
         html! {
-            <button
-                // style="width: 24px; height: 24px; line-height: 24px; display: inline; margin: 0;"
+            <button class="add-button"
                 title="New node."
                 onclick=self.link.callback(move |_| {
                     LOG!("OnClick.");
@@ -184,8 +184,7 @@ impl Model {
         use Msg::*;
         let id = id.clone();
         html! {
-            <button
-                // style="width: 24px; height: 24px; line-height: 24px; display: inline; margin: 0;"
+            <button class="del-button"
                 title="Erase node."
                 onclick=self.link.callback(move |_| {
                     LOG!("OnClick.");
@@ -198,7 +197,7 @@ impl Model {
     fn clearall_button_view(&self) -> Html {
         use Msg::*;
         html! {
-            <button
+            <button class="clear-button"
                 title="Clear cube."
                 ondblclick=self.link.callback(move |_| {
                     LOG!("OnDoubleClick.");
