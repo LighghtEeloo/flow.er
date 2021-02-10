@@ -62,13 +62,15 @@ impl RelationModel for LinearModel {
                         self.data.len()
                     }
                 }
-                None => self.data.len()
+                None => 0
             };
         self.data.insert(pos, target);
         self.pos = Some(pos);
         self.fix = None;
     }
     fn del(&mut self, target: EntryId) {
+        // Debug..
+        LOG!("Deleting: {:?}", self.pos);
         match self.locate(target) {
             Some(pos) => {
                 self.data.remove(pos);
@@ -88,7 +90,7 @@ impl RelationModel for LinearModel {
     }
     fn wander(&mut self, dir: Direction, fixed: bool) {
         if self.data.len() == 0 { return }
-        let dir: isize = match dir {
+        let delta: isize = match dir {
             Direction::Up => -1,
             Direction::Down => 1
         };
@@ -100,7 +102,7 @@ impl RelationModel for LinearModel {
             if let Some(center) = self.fix {
                 self.pos = match self.data.len() {
                     0 => None,
-                    _ => Some((center as isize + dir) as usize % self.data.len())
+                    _ => Some((center as isize + delta) as usize % self.data.len())
                 };
                 // let range: Vec<usize> = 
                 //     vec![center - 1, center, center + 1].into_iter()
@@ -108,12 +110,27 @@ impl RelationModel for LinearModel {
             };
         } else {
             self.fix = None;
-            let pos = match self.pos {
-                Some(pos) => pos,
-                None => 0
+            self.pos = match self.pos {
+                Some(pos) => {
+                    let pos = pos as isize + delta;
+                    if pos < 0 {
+                        None
+                    } else if pos < self.data.len() as isize {
+                        Some(pos as usize)
+                    } else {
+                        Some(self.data.len() - 1)
+                    }
+                }
+                None => {
+                    match dir {
+                        Direction::Up => None,
+                        Direction::Down => Some(0)
+                    }
+                }
             };
-            self.pos = Some((pos as isize + dir) as usize % self.data.len());
         }
+
+
     }
     fn clear(&mut self) {
         mem::take(self);

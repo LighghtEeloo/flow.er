@@ -21,7 +21,7 @@ pub enum Msg {
     WriteFace(EntryId),
     WriteProcess(EntryId),
     EraseNode(EntryId),
-    SetFocus(EntryId),
+    SetFocusId(Option<EntryId>),
     Wander(Direction),
     Focus,
     _Idle,
@@ -31,6 +31,7 @@ pub struct Model {
     cube: Cube,
     buffer_str: String,
     refs: HashMap<EntryId, NodeRef>,
+    ref_name: NodeRef,
     storage: StorageService,
     link: ComponentLink<Self>,
 }
@@ -59,6 +60,7 @@ impl Component for Model {
             cube,
             buffer_str: String::new(),
             refs,
+            ref_name: NodeRef::default(),
             storage,
             link,
         }
@@ -66,6 +68,7 @@ impl Component for Model {
 
     fn update(&mut self, messages: Self::Message) -> ShouldRender {
         // Test..
+        if messages.is_empty() { return true; }
         LOG!("Updating with: {:?}\nand buffer: {:?}", messages, self.buffer_str);
         use Msg::*;
         for msg in messages {
@@ -110,9 +113,13 @@ impl Component for Model {
                 }
                 EraseNode(id) => {
                     self.cube.erase(id);
+                    self.link.callback(move |_: Msg| [Focus] ).emit(_Idle);
                 }
-                SetFocus(id) => {
-                    self.cube.relation.focus(id);
+                SetFocusId(id) => {
+                    match id {
+                        Some(id) => self.cube.relation.focus(id),
+                        None => self.cube.relation.pos = None
+                    }
                 }
                 Wander(dir) => {
                     // Todo: register shift key.
@@ -121,13 +128,19 @@ impl Component for Model {
                 }
                 Focus => {
                     let id = self.cube.relation.current();
+                    // Debug..
+                    LOG!("Focusing: {:?}", id);
                     match id {
                         Some(id) => {
                             if let Some(input) = self.refs.get(&id).unwrap().cast::<InputElement>() {
                                 input.focus().unwrap();
                             }
                         }
-                        None => ()
+                        None => {
+                            if let Some(input) = self.ref_name.cast::<InputElement>() {
+                                input.focus().unwrap();
+                            }
+                        }
                     }
                 }
                 _Idle => {}
@@ -135,8 +148,10 @@ impl Component for Model {
         }
         // Note: Only self.cube is saved.
         self.storage.store(KEY, Json(&self.cube));
+        // Debug..
         LOG!("Just dumped.");
         LOG!("With {}: {:#?}", KEY, &self.cube);
+        // LOG!("Pos: {:?}", self.cube.relation.pos);
 
         true
     }

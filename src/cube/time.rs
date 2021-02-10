@@ -40,7 +40,7 @@ pub struct TimeStamp {
     pub data: TimeTuple
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, EnumString, EnumVariantNames, EnumIter, EnumProperty, ToString)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub enum TimeMeta {
     Created,
     // Snapshot(EntryDry)

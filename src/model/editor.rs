@@ -9,6 +9,7 @@ impl Model {
             <div class="cube-input">
                 <input
                     type="text"
+                    ref=self.ref_name.clone()
                     placeholder="Enter new proj name."
                     oninput=self.link.callback(move |e: InputData| {
                         LOG!("OnInput - new: {:?}", e);
@@ -45,11 +46,27 @@ impl Model {
             <div class="cube-input">
                 <input
                     type="text"
+                    ref=self.ref_name.clone()
                     placeholder="Enter new proj name."
                     value=self.cube.name
+                    onfocus=self.link.callback(move |_| {
+                        [SetFocusId(None)]
+                    })
                     oninput=self.link.callback(move |e: InputData| {
                         LOG!("OnInput: {:?}", e);
                         [UpdateBuffer(e.value), WriteCubeName]
+                    })
+                    onkeydown=self.link.callback(move |e: KeyboardEvent| {
+                        let meta = (e.ctrl_key(), e.shift_key(), e.code());
+                        LOG!("OnKeyDown: {:?}", meta);
+                        match (meta.0, meta.1, meta.2.as_str()) { 
+                            (false, false, "ArrowDown") => vec![Wander(Direction::Down)], 
+                            _ => vec![] 
+                        }
+                    })
+                    onkeyup=self.link.callback(move |e: KeyboardEvent| {
+                        LOG!("OnKeyUp: {:?}", e);
+                        if e.key() == "Enter" { vec![NewNode(vec![])] } else { vec![] }
                     })
                 />
                 <div class="dash-line"></div>
@@ -112,12 +129,12 @@ impl Model {
         html! {
             <input
                 type="text"
+                ref=self.refs.get(&id).unwrap().clone()
                 value=self.cube.get(id).face()
                 placeholder="..."
                 onfocus=self.link.callback(move |_| {
-                    [SetFocusId(id)]
+                    [SetFocusId(Some(id))]
                 })
-                ref=self.refs.get(&id).unwrap().clone()
                 onkeydown=self.link.callback(move |e: KeyboardEvent| {
                     let meta = (e.ctrl_key(), e.shift_key(), e.code());
                     LOG!("OnKeyDown: {:?}", meta);
@@ -147,7 +164,8 @@ impl Model {
                         // Todo: Delay.
                         // backspace
                         (_, _, "Backspace") => {
-                            if is_empty { vec![EraseNode(id),Wander(Direction::Up)] }
+                            if is_empty { vec![EraseNode(id)] }
+                            // if is_empty { vec![EraseNode(id),Wander(Direction::Up)] }
                             else { vec![] }
                         }
                         // delete
