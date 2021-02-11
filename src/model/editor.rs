@@ -175,6 +175,9 @@ impl Model {
                             if is_empty { vec![EraseNode(id)] }
                             else { vec![] }
                         }
+                        // ctrl released
+                        (true, _, "ControlLeft") => vec![Wander(Direction::Stay, false)],
+                        (true, _, "ControlRight") => vec![Wander(Direction::Stay, false)],
                         _ => vec![] 
                     }
                 })
