@@ -32,7 +32,6 @@ pub mod util {
     pub use std::iter::FromIterator;
 
     pub use serde::{Deserialize, Serialize};
-    pub use strum_macros::*;
 }
 
 pub mod yew_util {

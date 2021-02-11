@@ -36,7 +36,7 @@ pub struct Filter {
     tags: Vec<String>,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, EnumString, EnumVariantNames, EnumIter, EnumProperty, ToString)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub enum ProcessStatus {
     Done,
     Marching,
