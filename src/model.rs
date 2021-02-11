@@ -149,7 +149,7 @@ impl Component for Model {
         self.storage.store(KEY, Json(&self.cube));
         // Debug..
         LOG!("Dumped {}: {:#?}", KEY, &self.cube);
-        LOG!("{}", to_json(&self.cube));
+        // LOG!("{}", to_json(&self.cube));
         true
     }
 

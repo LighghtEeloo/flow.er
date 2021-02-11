@@ -7,18 +7,26 @@
   - del (pos)
 - record position (focus) in the network
   - data - positional ref
-- shift position in the network
-  - right: deepin
-  - left: surface
+- move around in the network
+  - shift-enter: deepin & surface
   - up/down: wander
+    - shift: fix
 
 ## Todo List
 - [ ] Support clipboard exporting / importing.
+  - [x] Support json.
+  - [ ] Interface.
+  - [ ] Msg Update.
 - [ ] Support cube management.
+  - [x] Generalized Id System.
+  - [ ] Cube Id & searching.
+  - [ ] Cube RelationModel.
+  - [ ] Cube storage.
 - [x] CSS.
 - [ ] Bubble details.
 
 
 ## Fix List
-- [ ] Better model which preserves the first node.
-- [ ] Or, caret-position-based new line.
+- [x] Better model which preserves the first node (title does the job).
+- [ ] Caret-position-based new line.
+- [ ] Queue-preserving deletion.
