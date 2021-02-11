@@ -42,7 +42,6 @@ impl Component for Model {
     type Properties = ();
 
     fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        // Todo: Register ctrl.
         let storage = StorageService::new(Area::Local).expect("storage was disabled by the user");
         let cube: Cube = {
             if let Json(Ok(restored_model)) = storage.restore(KEY) {
@@ -149,9 +148,7 @@ impl Component for Model {
         // Note: Only self.cube is saved.
         self.storage.store(KEY, Json(&self.cube));
         // Debug..
-        LOG!("Just dumped.");
-        LOG!("With {}: {:#?}", KEY, &self.cube);
-        // LOG!("Pos: {:?}", self.cube.relation.pos);
+        LOG!("Dumped {}: {:#?}", KEY, &self.cube);
 
         true
     }

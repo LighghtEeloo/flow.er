@@ -67,18 +67,6 @@ impl FixState {
     /// perform the self [shift]
     fn shift(&mut self, dir: Direction) {
         self.shift_delta(dir.translate());
-        // use FixState::*;
-        // let pos: isize = match self {
-        //     Relative(x) => x.clone(),
-        //     _ => 0
-        // };
-        // let delta = dir.translate();
-        // let mut pos_new = pos + delta;
-        // pos_new += 1;
-        // pos_new = ((pos_new % 3) + 3) % 3; // modulus
-        // pos_new -= 1;
-        // let mut next = Relative(pos_new);
-        // mem::swap(&mut next, self);
     }
     /// perform the self [shift] with delta
     fn shift_delta(&mut self, delta: isize) {
@@ -127,8 +115,6 @@ where Id: Identity
         self.fix = FixState::Deactivated;
     }
     fn del(&mut self, target: Id) {
-        // Debug..
-        LOG!("Deleting: {:?}", self.pos);
         match self.locate(target) {
             Some(pos) => {
                 self.data.remove(pos);
@@ -155,27 +141,10 @@ where Id: Identity
         }
         let delta = dir.translate();
         if fixed {
-            // Todo: around fix: use a state-style fix.
             self.fix.activate();
             let delta = self.fix.translate(dir);
-            // if self.try_move(delta) {
-            //     self.fix.shift(dir);
-            // }
             let delta = self.try_move(delta);
             self.fix.shift_delta(delta);
-            // let will_move = match self.pos {
-            //     Some(0) => Direction::Down == dir,
-            //     Some(x) => {
-            //         x != self.data.len() - 1 || Direction::Up == dir
-            //     }
-            //     None => false,
-            //     _ => true
-            // };
-            // if will_move {
-            //     let delta = self.fix.translate(dir);
-            //     self.try_move(delta);
-            // }
-
         } else {
             self.fix.deactivate();
             self.pos = match self.pos {
