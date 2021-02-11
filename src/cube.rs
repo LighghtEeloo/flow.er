@@ -23,7 +23,7 @@ pub struct Cube {
     pub locked: bool,
     pub entries: HashMap<EntryId, Entry>,
     // Todo: polymorphism
-    pub relation: LinearModel,
+    pub relation: LinearModel<EntryId>,
 }
 
 impl Cube {

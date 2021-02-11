@@ -4,17 +4,20 @@ use crate::cube::prelude::*;
 // Linear
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct LinearModel {
-    pub data: Vec<EntryId>,
+pub struct LinearModel<Id> 
+{
+    pub data: Vec<Id>,
     pub pos: Option<usize>,
     pub fix: FixState,
 }
 
-impl LinearModel {
+impl<Id> LinearModel<Id> 
+where Id: Identity
+{
     pub fn new() -> Self {
         LinearModel::default()
     }
-    fn locate(&self, target: EntryId) -> Option<usize> {
+    fn locate(&self, target: Id) -> Option<usize> {
         self.data.iter().position(|&x| target == x)
     }
     /// move according to number delta, and return true if moved
@@ -104,8 +107,10 @@ impl FixState {
     }
 }
 
-impl RelationModel for LinearModel {
-    fn add(&mut self, target: EntryId, des: Option<EntryId>) {
+impl<Id> RelationModel<Id> for LinearModel<Id> 
+where Id: Identity
+{
+    fn add(&mut self, target: Id, des: Option<Id>) {
         let pos = 
             match des {
                 Some(des) => {
@@ -121,7 +126,7 @@ impl RelationModel for LinearModel {
         self.pos = Some(pos);
         self.fix = FixState::Deactivated;
     }
-    fn del(&mut self, target: EntryId) {
+    fn del(&mut self, target: Id) {
         // Debug..
         LOG!("Deleting: {:?}", self.pos);
         match self.locate(target) {
@@ -132,13 +137,13 @@ impl RelationModel for LinearModel {
             None => ()
         };
     }
-    fn current(&self) -> Option<EntryId> {
+    fn current(&self) -> Option<Id> {
         match self.pos {
             Some(pos) => Some(self.data[pos]),
             None => None
         }
     }
-    fn focus(&mut self, target: EntryId) {
+    fn focus(&mut self, target: Id) {
         self.pos = self.locate(target)
     }
     fn wander(&mut self, dir: Direction, fixed: bool) {
@@ -200,7 +205,9 @@ impl RelationModel for LinearModel {
     }
 }
 
-impl Default for LinearModel {
+impl<Id> Default for LinearModel<Id> 
+where Id: Identity
+{
     fn default() -> Self {
         Self {
             data: Vec::new(),

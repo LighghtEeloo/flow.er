@@ -40,11 +40,11 @@ impl Direction {
     }
 }
 
-pub trait RelationModel: Clone + fmt::Debug + Deserialize<'static> + Serialize + Sized {
-    fn add(&mut self, target: EntryId, des: Option<EntryId>);
-    fn del(&mut self, target: EntryId);
-    fn focus(&mut self, target: EntryId);
-    fn current(&self) -> Option<EntryId>;
+pub trait RelationModel<Id>: Clone + fmt::Debug + Deserialize<'static> + Serialize + Sized {
+    fn add(&mut self, target: Id, des: Option<Id>);
+    fn del(&mut self, target: Id);
+    fn focus(&mut self, target: Id);
+    fn current(&self) -> Option<Id>;
     fn wander(&mut self, dir: Direction, fixed: bool);
     fn clear(&mut self);
 }

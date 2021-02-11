@@ -146,6 +146,9 @@ impl IdentityHash for EntryId {
     }
 }
 
+pub trait Identity: IdentityHash + PartialEq + Eq + Clone + fmt::Debug + Serialize + Deserialize<'static> {}
+
+impl Identity for EntryId {}
 
 
 // Filter impl.
