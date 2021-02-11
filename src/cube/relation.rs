@@ -23,10 +23,11 @@ pub use linear::LinearModel;
 //     }
 // }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Direction {
     Up,
     Down,
+    Stay
 }
 
 pub trait RelationModel: Clone + fmt::Debug + Deserialize<'static> + Serialize + Sized {

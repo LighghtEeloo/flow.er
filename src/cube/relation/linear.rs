@@ -7,7 +7,7 @@ use crate::cube::prelude::*;
 pub struct LinearModel {
     pub data: Vec<EntryId>,
     pub pos: Option<usize>,
-    pub fix: Option<usize>,
+    pub fix: Fix,
 }
 
 impl LinearModel {
@@ -16,6 +16,59 @@ impl LinearModel {
     }
     fn locate(&self, target: EntryId) -> Option<usize> {
         self.data.iter().position(|&x| target == x)
+    }
+    fn try_move(&mut self, delta: isize) {
+        match self.pos {
+            Some(pos) => {
+                let pos = pos as isize + delta;
+                let pos: usize = if pos < 0 { 0 } else if pos < self.data.len() as isize { pos as usize } else { self.data.len() - 1 };
+                self.pos = Some(pos);
+            }
+            None => ()
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub enum Fix {
+    Deactivated,
+    Above,
+    Mid,
+    Below,
+}
+
+impl Fix {
+    fn translate(&mut self, dir: Direction) -> isize {
+        use Fix::*;
+        use Direction::*;
+        let (mut next, i) = match self {
+            Above => match dir {
+                Up => (Below, 2),
+                Down => (Mid, 1),
+                _ => (Mid, 0)
+            }
+            Mid => match dir {
+                Up => (Above, -1),
+                Down => (Below, 1),
+                _ => (Mid, 0)
+            }
+            Below => match dir {
+                Up => (Mid, -1),
+                Down => (Above, -2),
+                _ => (Mid, 0)
+            }
+            _ => (Deactivated, 0)
+        };
+        mem::swap(&mut next, self);
+        i
+    }
+    fn activate(&mut self) {
+        use Fix::*;
+        let mut next = match self {
+            Deactivated => Mid,
+            _ => self.clone()
+        };
+        mem::swap(&mut next, self);
     }
 }
 
@@ -34,7 +87,7 @@ impl RelationModel for LinearModel {
             };
         self.data.insert(pos, target);
         self.pos = Some(pos);
-        self.fix = None;
+        self.fix = Fix::Deactivated;
     }
     fn del(&mut self, target: EntryId) {
         // Debug..
@@ -57,29 +110,31 @@ impl RelationModel for LinearModel {
         self.pos = self.locate(target)
     }
     fn wander(&mut self, dir: Direction, fixed: bool) {
+        use Fix::*;
         if self.data.len() == 0 { return }
         let delta: isize = match dir {
             Direction::Up => -1,
+            Direction::Stay => 0,
             Direction::Down => 1
         };
         if fixed {
             // Todo: around fix: use a state-style fix.
-            match self.fix {
-                None => {
-                    self.fix = self.pos;
+            self.fix.activate();
+            let will_move = match self.pos {
+                Some(0) => Direction::Down == dir,
+                Some(x) => {
+                    x != self.data.len() - 1 || Direction::Up == dir
                 }
-                Some(center) => {
-                    self.pos = match self.data.len() {
-                        0 => None,
-                        _ => Some((center as isize + delta) as usize % self.data.len())
-                    };
-                    // let range: Vec<usize> = 
-                    //     vec![center - 1, center, center + 1].into_iter()
-                    //     .filter(|&x| x < self.data.len()).collect();
-                }
+                None => false,
+                _ => true
+            };
+            if will_move {
+                let delta = self.fix.translate(dir);
+                self.try_move(delta);
             }
+
         } else {
-            self.fix = None;
+            self.fix = Deactivated;
             self.pos = match self.pos {
                 Some(pos) => {
                     let pos = pos as isize + delta;
@@ -94,6 +149,7 @@ impl RelationModel for LinearModel {
                 None => {
                     match dir {
                         Direction::Up => None,
+                        Direction::Stay => None,
                         Direction::Down => Some(0)
                     }
                 }
@@ -112,7 +168,7 @@ impl Default for LinearModel {
         Self {
             data: Vec::new(),
             pos: None,
-            fix: None,
+            fix: Fix::Deactivated,
         }
     }
 }

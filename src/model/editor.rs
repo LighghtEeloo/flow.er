@@ -60,7 +60,7 @@ impl Model {
                         let meta = (e.ctrl_key(), e.shift_key(), e.code());
                         LOG!("OnKeyDown: {:?}", meta);
                         match (meta.0, meta.1, meta.2.as_str()) { 
-                            (false, false, "ArrowDown") => vec![Wander(Direction::Down)], 
+                            (false, false, "ArrowDown") => vec![Wander(Direction::Down, false)], 
                             _ => vec![] 
                         }
                     })
@@ -139,8 +139,10 @@ impl Model {
                     let meta = (e.ctrl_key(), e.shift_key(), e.code());
                     LOG!("OnKeyDown: {:?}", meta);
                     match (meta.0, meta.1, meta.2.as_str()) { 
-                        (false, false, "ArrowUp") => vec![Wander(Direction::Up)], 
-                        (false, false, "ArrowDown") => vec![Wander(Direction::Down)], 
+                        (false, false, "ArrowUp") => vec![Wander(Direction::Up, false)], 
+                        (false, false, "ArrowDown") => vec![Wander(Direction::Down, false)], 
+                        (true, false, "ArrowUp") => vec![Wander(Direction::Up, true)], 
+                        (true, false, "ArrowDown") => vec![Wander(Direction::Down, true)], 
                         (false, false, "ArrowLeft") => vec![], 
                         (false, false, "ArrowRight") => vec![], 
                         _ => vec![] 

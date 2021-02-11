@@ -22,7 +22,7 @@ pub enum Msg {
     WriteProcess(EntryId),
     EraseNode(EntryId),
     SetFocusId(Option<EntryId>),
-    Wander(Direction),
+    Wander(Direction, bool),
     Focus,
     _Idle,
 }
@@ -121,9 +121,9 @@ impl Component for Model {
                         None => self.cube.relation.pos = None
                     }
                 }
-                Wander(dir) => {
+                Wander(dir, fixed) => {
                     // Todo: register shift key.
-                    self.cube.relation.wander(dir, false);
+                    self.cube.relation.wander(dir, fixed);
                     self.link.callback(move |_: Msg| [Focus] ).emit(_Idle);
                 }
                 Focus => {
