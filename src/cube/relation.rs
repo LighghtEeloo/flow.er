@@ -40,7 +40,7 @@ impl Direction {
     }
 }
 
-pub trait RelationModel<Id>: Clone + fmt::Debug + Deserialize<'static> + Serialize + Sized {
+pub trait RelationModel<Id>: Clone + Debug + Deserialize<'static> + Serialize {
     fn add(&mut self, target: Id, des: Option<Id>);
     fn del(&mut self, target: Id);
     fn focus(&mut self, target: Id);

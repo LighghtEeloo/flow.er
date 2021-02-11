@@ -63,8 +63,8 @@ impl TimeStamp {
     // }
 }
 
-impl fmt::Debug for TimeStamp {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> { 
+impl Debug for TimeStamp {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> std::result::Result<(), fmt::Error> { 
         write!(f, "{:?} - {:?}", self.meta, self.flatten())
     }
 }

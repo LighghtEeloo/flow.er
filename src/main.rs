@@ -28,6 +28,7 @@ pub mod util {
 
     pub use std::mem;
     pub use std::fmt;
+    pub use std::fmt::Debug;
     pub use std::collections::HashMap;
     pub use std::iter::FromIterator;
 

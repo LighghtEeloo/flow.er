@@ -119,8 +119,8 @@ impl EntryDry {
 
 // EntryId impl.
 
-impl std::fmt::Debug for EntryId {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> { 
+impl Debug for EntryId {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> { 
         // write!(f, "[{}.{}]", self.0, self.1) 
         write!(f, "[[{}]]", self.0) 
     }
@@ -146,7 +146,7 @@ impl IdentityHash for EntryId {
     }
 }
 
-pub trait Identity: IdentityHash + PartialEq + Eq + Clone + fmt::Debug + Serialize + Deserialize<'static> {}
+pub trait Identity: IdentityHash + PartialEq + Eq + Clone + Debug + Serialize + Deserialize<'static> {}
 
 impl Identity for EntryId {}
 
