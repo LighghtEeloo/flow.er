@@ -32,6 +32,14 @@ pub mod util {
     pub use std::iter::FromIterator;
 
     pub use serde::{Deserialize, Serialize};
+    pub use serde_json::from_str as from_json_str;
+    pub use serde_json::to_string as to_json_string;
+    pub fn from_json<'a, T: Deserialize<'a>>(s: &'a str) -> T {
+        from_json_str(s).expect("json deserialization failed.")
+    }
+    pub fn to_json<T: Serialize>(v: &T) -> String {
+        to_json_string(v).expect("json serialization failed.")
+    }
 }
 
 pub mod yew_util {
