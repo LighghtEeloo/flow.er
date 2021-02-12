@@ -10,6 +10,7 @@ pub struct FlowModel<Id>
 where Id: Eq + Hash
 {
     pub data: HashMap<Id, FlowNode<Id>>,
+    pub root: Option<Id>,
     pub pos: Option<Id>,
     pub fix: FixState<Id>,
 }
@@ -19,6 +20,12 @@ where Id: Identity
 {
     pub fn new() -> Self {
         FlowModel::default()
+    }
+    fn get(&self, id: &Id) -> &FlowNode<Id> {
+        self.data.get(id).expect("FlowNode of the same id not found.")
+    }
+    fn get_mut(&mut self, id: &Id) -> &mut FlowNode<Id> {
+        self.data.get_mut(id).expect("FlowNode of the same id not found.")
     }
     // fn locate(&self, target: Id) -> Option<usize> {
     //     self.data.iter().position(|&x| target == x)
@@ -43,6 +50,28 @@ where Id: Eq + Hash
 {
     pub descendant: Vec<Id>,
     pub direct_elderly: Option<Id>
+}
+
+impl<Id> FlowNode<Id> 
+where Id: Eq + Hash
+{
+    fn new(elderly: Option<Id>) -> Self {
+        Self {
+            descendant: Vec::new(),
+            direct_elderly: elderly
+        }
+    }
+}
+
+impl<Id> Default for FlowNode<Id> 
+where Id: Eq + Hash
+{
+    fn default() -> Self {
+        Self {
+            descendant: Vec::new(),
+            direct_elderly: None
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
@@ -95,21 +124,29 @@ where Id: PartialEq + Eq
 impl<Id> RelationModel<Id> for FlowModel<Id> 
 where Id: Identity
 {
+    /// des > self.pos. if None = des && None = self.pos, new root;
+    /// && if Some = self.root, descend the old root.
     fn add(&mut self, target: Id, des: Option<Id>) {
-        // let pos = 
-        //     match des {
-        //         Some(des) => {
-        //             if let Some(pos) = self.locate(des) {
-        //                 pos + 1
-        //             } else {
-        //                 self.data.len()
-        //             }
-        //         }
-        //         None => 0
-        //     };
-        // self.data.insert(pos, target);
-        // self.pos = Some(pos);
-        // self.fix = FixState::Deactivated;
+        let des = if let None = des {
+            self.pos
+        } else {
+            des
+        };
+        match des {
+            Some(id) => {
+                self.data.insert(target, FlowNode::new(Some(id)));
+                self.get_mut(&id).descendant.push(target);
+            }
+            None => {
+                // Always a new root if None = des && None = self.pos
+                self.data.insert(target, FlowNode::new(None));
+                if let Some(root_id) = self.root {
+                    // Replace root if needed
+                    self.get_mut(&target).descendant.push(root_id);
+                }
+                self.root = Some(target);
+            }
+        }
     }
     fn del(&mut self, target: Id) {
         // match self.locate(target) {
@@ -177,6 +214,7 @@ where Id: Identity
         Self {
             data: HashMap::new(),
             pos: None,
+            root: None,
             fix: FixState::Deactivated,
         }
     }
