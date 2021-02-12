@@ -74,10 +74,19 @@ input {
     /* border: solid 4px green; */
 }
 
-.cube .node-group .node input {
+.cube .node-group .node {
     position: relative;
+    /* top: 0; */
+    height: calc(var(--size-button) + 4px);
+    /* border: solid 1px green; */
+}
+
+.cube .node-group .node input {
+    display: inline;
+    position: absolute;
     top: 0;
-    margin: 0 2px;
+    right: 0;
+    margin: 1px 2px;
     width: calc(100% - var(--size-button) - 4px);
     height: calc(var(--size-button) - 1px);
     line-height: calc(var(--size-button) - 1px);
@@ -91,6 +100,20 @@ input {
 
 
 /* Dropdown */
+
+.dropdown { 
+    display: inline; 
+    position: absolute; 
+    top: 0;
+    left: 0;
+    outline: none;
+    height: var(--size-button);
+    width: var(--size-button);
+    margin: 1px 0;
+    /* border-radius: calc(var(--size-button) / 12); */
+    /* width: calc(24px * 6);
+    margin-right: calc(-24px * 5); */
+} 
 
 .dropbtn { 
     position: relative;
@@ -112,16 +135,6 @@ input {
     width:  calc(var(--size-button) * 0.6);
     height: calc(var(--size-button) * 0.6);
 }
-
-.dropdown { 
-    position: relative; 
-    display: inline-block; 
-    outline: none;
-    height: var(--size-button);
-    border-radius: calc(var(--size-button) / 12);
-    /* width: calc(24px * 6);
-    margin-right: calc(-24px * 5); */
-} 
 
 .dropdown-content { 
     display: none; 
