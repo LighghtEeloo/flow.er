@@ -1,8 +1,7 @@
 use crate::util::*;
 use crate::cube::time::*;
+use crate::cube::identity::*;
 
-use std::collections::hash_map::DefaultHasher;
-use std::hash::{Hash, Hasher};
 
 
 // Entry Area
@@ -15,8 +14,6 @@ pub struct Entry {
     // position: (f64, f64)
 }
 
-#[derive(Clone, Copy, Hash, PartialEq, Eq, Deserialize, Serialize)]
-pub struct EntryId (u64);
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct EntryDry {
@@ -116,39 +113,6 @@ impl EntryDry {
         }
     }
 }
-
-// EntryId impl.
-
-impl Debug for EntryId {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> { 
-        // write!(f, "[{}.{}]", self.0, self.1) 
-        write!(f, "[[{}]]", self.0) 
-    }
-}
-
-pub trait IdentityHash: Hash + Copy {
-    fn from_time(v: &impl TimeRep) -> Self;
-}
-impl IdentityHash for EntryId {
-    fn from_time(v: &impl TimeRep) -> Self {
-        let time = v.flatten()
-            .duration_since(UNIX_EPOCH)
-            .expect("Time went backwards")
-            .as_nanos();
-        let mut s = DefaultHasher::new();
-        time.hash(&mut s);
-        // format!("{:x}", s.finish())
-        EntryId (s.finish())
-        // let time = v.flatten()
-        //     .duration_since(UNIX_EPOCH)
-        //     .expect("Time went backwards");
-        // EntryId (time.as_secs(), time.subsec_nanos())
-    }
-}
-
-pub trait Identity: IdentityHash + PartialEq + Eq + Clone + Debug + Serialize + Deserialize<'static> {}
-
-impl Identity for EntryId {}
 
 
 // Filter impl.

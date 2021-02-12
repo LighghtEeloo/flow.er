@@ -1,20 +1,19 @@
-pub mod relation;
-pub mod entry;
-pub mod time;
 #[allow(dead_code)]
 #[allow(unused)]
-
-use crate::util::*;
-pub use relation::*;
-pub use entry::*;
-
-// pub use error::{Result, Error};
+pub mod identity;
+pub mod time;
+pub mod entry;
+pub mod relation;
 
 pub mod prelude {
     pub use crate::cube::*;
+    pub use crate::cube::identity::*;
+    pub use crate::cube::entry::*;
     pub use crate::cube::relation::*;
 }
 
+use crate::util::*;
+use crate::cube::prelude::*;
 
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
