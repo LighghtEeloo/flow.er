@@ -27,11 +27,7 @@ impl Model {
     }
 
     pub fn main_editor(&self) -> Html {
-        let view_new = html! {
-            <div class="cube-new">
-            { self.cube_new_input_view() }
-            </div>
-        };
+        let view_new = self.cube_new_view();
         let view_main = self.cube_view();
 
         // Test: cube - new?

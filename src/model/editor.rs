@@ -3,6 +3,13 @@ use crate::yew_util::*;
 use crate::cube::prelude::*;
 
 impl Model {
+    pub fn cube_new_view(&self) -> Html {
+        html! {
+            <div class="cube-new">
+            { self.cube_new_input_view() }
+            </div>
+        }
+    }
     pub fn cube_new_input_view(&self) -> Html {
         use Msg::*;
         html! {
