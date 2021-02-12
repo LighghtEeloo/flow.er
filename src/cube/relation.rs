@@ -2,8 +2,10 @@ use crate::util::*;
 use crate::cube::prelude::*;
 
 mod linear;
+mod tree;
 
 pub use linear::LinearModel;
+pub use tree::TreeModel;
 
 
 // #[derive(Clone, Debug, Deserialize, Serialize)]
