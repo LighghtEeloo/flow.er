@@ -22,6 +22,9 @@ macro_rules! LOG {
     }}
 }
 
+/// Cubey: Cube-y, create Message from an array of CubeMessage-s.  
+/// 
+/// "-y" for Message macros.
 #[macro_export]
 macro_rules! Cubey {
     () => (

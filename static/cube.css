@@ -194,10 +194,3 @@ input {
     resize: none;
 }
 
-
-/* Buttons */
-
-.cube .node-group .add-button,
-.cube .node-group .del-button {
-    display: none;
-}

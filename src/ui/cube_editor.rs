@@ -46,7 +46,6 @@ impl Model {
             <div class="cube">
                 { self.cube_input_view() }
                 <div class="node-group">
-                    { self.add_button_view(vec![]) }
                     { for vec.iter().map(|id| self.node_view(id)) }
                 </div>
                 { self.clearall_button_view() }
@@ -94,8 +93,6 @@ impl Model {
             <div class="node">
                 { self.node_status_view(&id) }
                 { self.node_input_view(&id) }
-                { self.add_button_view(vec![id]) }
-                { self.erase_button_view(&id) }
             </div>
         }
     }
@@ -175,7 +172,6 @@ impl Model {
                         (false, false, "Enter") => Cubey![NewNode(vec![id])],
                         // shift+enter
                         (false, true, "Enter") => Cubey![],
-                        // Todo: Delay.
                         // backspace
                         (_, _, "Backspace") => {
                             if is_empty { Cubey![EraseNode(id)] }
@@ -199,29 +195,6 @@ impl Model {
                 })
                 readonly=self.cube.locked
             />
-        }
-    }
-
-    fn add_button_view(&self, id_vec: Vec<EntryId>) -> Html {
-        html! {
-            <button class="add-button"
-                title="New node."
-                onclick=self.link.callback(move |_| {
-                    Cubey![NewNode(id_vec.clone())]
-                })
-            >{"+"}</button>
-        }
-    }
-
-    fn erase_button_view(&self, id: &EntryId) -> Html {
-        let id = id.clone();
-        html! {
-            <button class="del-button"
-                title="Erase node."
-                onclick=self.link.callback(move |_| {
-                    Cubey![EraseNode(id)]
-                })
-            >{" - "}</button>
         }
     }
 
