@@ -1,7 +1,7 @@
 #[allow(dead_code)]
 #[allow(unused)]
 pub mod cube;
-pub mod model;
+pub mod ui;
 
 
 fn main() {
@@ -10,7 +10,7 @@ fn main() {
 }
 
 pub mod prelude {
-    pub use crate::model::Model;
+    pub use crate::ui::Model;
 }
 
 

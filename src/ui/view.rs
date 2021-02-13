@@ -1,4 +1,4 @@
-use crate::model::*;
+use crate::ui::*;
 
 impl Model {
     pub fn sidebar_tabs() -> Html {

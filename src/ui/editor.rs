@@ -1,4 +1,4 @@
-use crate::model::*;
+use crate::ui::*;
 use crate::yew_util::*;
 use crate::cube::prelude::*;
 
