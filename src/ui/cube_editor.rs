@@ -207,7 +207,6 @@ impl Model {
             <button class="add-button"
                 title="New node."
                 onclick=self.link.callback(move |_| {
-                    LOG!("OnClick.");
                     Cubey![NewNode(id_vec.clone())]
                 })
             >{"+"}</button>
@@ -220,7 +219,6 @@ impl Model {
             <button class="del-button"
                 title="Erase node."
                 onclick=self.link.callback(move |_| {
-                    LOG!("OnClick.");
                     Cubey![EraseNode(id)]
                 })
             >{" - "}</button>

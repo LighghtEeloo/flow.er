@@ -128,13 +128,15 @@ impl Model {
                         };
                     if writing { self.src_view = src_view }
                 }
-                _LogCube => LOG!("{}", to_json(&self.cube)),
+                _LogCube => {
+                    // LOG!("{}", to_json(&self.cube));
+                    LOG!("Dumped {}: {:#?}", KEY, &self.cube);
+                },
             }
         }
         // Note: Only self.stockpile is saved.
         self.storage.store(KEY, Json(&self.cube));
         // Debug..
-        LOG!("Dumped {}: {:#?}", KEY, &self.cube);
         true
     }
 }

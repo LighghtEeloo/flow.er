@@ -15,8 +15,9 @@
 ## Todo List
 - [ ] Support clipboard exporting / importing.
   - [x] Support json.
-  - [ ] Interface.
+  - [x] Interface.
   - [x] Msg Update.
+  - [ ] Automatic.
 - [ ] Support cube management.
   - [x] Generalized Id System.
   - [ ] Cube Id & searching.
