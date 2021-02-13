@@ -127,9 +127,6 @@ impl Model {
                             }
                         };
                     if writing { self.src_view = src_view }
-                    // Debug..
-                    self.src_view = src_view;
-                    self.revisit( Cubey![_LogCube] );
                 }
                 _LogCube => LOG!("{}", to_json(&self.cube)),
             }
@@ -138,7 +135,6 @@ impl Model {
         self.storage.store(KEY, Json(&self.cube));
         // Debug..
         LOG!("Dumped {}: {:#?}", KEY, &self.cube);
-        // LOG!("{}", to_json(&self.cube));
         true
     }
 }

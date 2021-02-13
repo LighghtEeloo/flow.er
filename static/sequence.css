@@ -156,6 +156,7 @@ body {
     width: 112px;
     border: none;
     outline: none;
+	border-right: solid var(--dividerColor) 2px;
     background-color: var(--mainColor);
 }
 

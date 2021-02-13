@@ -248,11 +248,12 @@ impl Model {
             <div class="cube-src">
                 <textarea class="cube-src-input"
                     value=self.buffer_str
+                    type="text" 
                     oninput=self.link.callback(move |e: InputData| {
                         LOG!("OnInput: {:?}", e);
                         Cubey![UpdateBuffer(e.value)]
                     })
-                    rows=20
+                    spellcheck=false
                 />
                 // { self.src_view_button_view() }
             </div>
