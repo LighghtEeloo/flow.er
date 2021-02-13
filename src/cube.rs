@@ -60,7 +60,9 @@ impl Grow<EntryId> for Cube {
 /// 1. tiptoe: out-of-nothing growth.
 /// 2. chain: linked growth which transforms the RelationModel.
 pub trait Chain<Id: IdentityHash>: Grow<Id> {
+    /// tiptoe: out-of-nothing growth.
     fn tiptoe(&mut self, id: Id);
+    /// chain: linked growth which transforms the RelationModel.
     fn chain(&mut self, new_comer: Id, host: Id);
 }
 impl Chain<EntryId> for Cube {

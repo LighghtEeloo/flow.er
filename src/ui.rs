@@ -2,7 +2,7 @@
 #[allow(unused_assignments)]
 #[allow(unused)]
 mod view;
-mod editor;
+mod cube_editor;
 
 use crate::util::*;
 use crate::yew_util::*;
