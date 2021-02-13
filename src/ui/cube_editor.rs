@@ -146,7 +146,7 @@ impl Model {
                 })
                 onkeydown=self.link.callback(move |e: KeyboardEvent| {
                     let meta = (e.ctrl_key(), e.shift_key(), e.code());
-                    LOG!("OnKeyDown: {:?}", meta);
+                    // LOG!("OnKeyDown: {:?}", meta);
                     match (meta.0, meta.1, meta.2.as_str()) { 
                         (false, false, "ArrowUp") => Cubey![Wander(Direction::Ascend, false)], 
                         (false, false, "ArrowDown") => Cubey![Wander(Direction::Descend, false)], 
@@ -159,14 +159,14 @@ impl Model {
                 })
                 onkeypress=self.link.callback(move |e: KeyboardEvent| {
                     let meta = (e.ctrl_key(), e.shift_key(), e.code());
-                    LOG!("OnKeyPress: {:?}", meta);
+                    // LOG!("OnKeyPress: {:?}", meta);
                     match (meta.0, meta.1, meta.2.as_str()) { 
                         _ => Cubey![]
                     }
                 })
                 onkeyup=self.link.callback(move |e: KeyboardEvent| {
                     let meta = (e.ctrl_key(), e.shift_key(), e.code());
-                    LOG!("OnKeyUp: {:?}", meta);
+                    // LOG!("OnKeyUp: {:?}", meta);
                     match (meta.0, meta.1, meta.2.as_str()) { 
                         // enter
                         (false, false, "Enter") => Cubey![NewNode(vec![id])],
@@ -175,12 +175,11 @@ impl Model {
                         // backspace
                         (_, _, "Backspace") => {
                             if is_empty { Cubey![EraseNode(id)] }
-                            // if is_empty { vec![EraseNode(id),Wander(Direction::Ascend)] }
                             else { Cubey![] }
                         }
                         // delete
                         (_, _, "Delete") => {
-                            if is_empty { Cubey![EraseNode(id)] }
+                            if is_empty { Cubey![EraseNode(id), EraseNode(id), Wander(Direction::Descend, false)] }
                             else { Cubey![] }
                         }
                         // ctrl released
@@ -190,7 +189,7 @@ impl Model {
                     }
                 })
                 oninput=self.link.callback(move |e: InputData| {
-                    LOG!("OnInput: {:?}", e);
+                    // LOG!("OnInput: {:?}", e);
                     Cubey![UpdateBuffer(e.value), WriteFace(id)]
                 })
                 readonly=self.cube.locked

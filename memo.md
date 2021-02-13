@@ -36,5 +36,6 @@
 
 ## Fix List
 - [x] Better model which preserves the first node (title does the job).
-- [x] Delayed deletion (with safe-lock).
 - [x] Queue-preserving deletion.
+- [x] Delayed deletion (with safe-lock).
+- [ ] No double backspace && no force delete.
