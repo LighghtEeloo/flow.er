@@ -22,8 +22,25 @@ macro_rules! LOG {
     }}
 }
 
+#[macro_export]
+macro_rules! Cubey {
+    () => (
+        $crate::ui::Message::_Idle
+    );
+    ( $( $x:expr ),* ) => {
+        {
+            let mut temp_vec = Vec::new();
+            $(
+                temp_vec.push($x);
+            )*
+            $crate::ui::CubeMessage::multi(temp_vec)
+        }
+    };
+}
+
 pub mod util {
     pub use crate::LOG;
+    pub use crate::Cubey;
 
     pub use std::mem;
     pub use std::fmt;

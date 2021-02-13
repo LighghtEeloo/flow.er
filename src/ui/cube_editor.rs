@@ -61,7 +61,7 @@ impl Model {
                     })
                     oninput=self.link.callback(move |e: InputData| {
                         LOG!("OnInput: {:?}", e);
-                        CubeMessage::multi(vec![UpdateBuffer(e.value), WriteCubeName])
+                        CubeMessage::bi([UpdateBuffer(e.value), WriteCubeName])
                     })
                     onkeydown=self.link.callback(move |e: KeyboardEvent| {
                         let meta = (e.ctrl_key(), e.shift_key(), e.code());
@@ -107,7 +107,7 @@ impl Model {
                 html! {
                     <ul title={des.clone()}
                         onclick=self.link.callback(move |_| {
-                            CubeMessage::multi(vec![UpdateBuffer(des.clone()), WriteProcess(id)])
+                            CubeMessage::bi([UpdateBuffer(des.clone()), WriteProcess(id)])
                         })
                     > 
                         <img src={src} /> 
@@ -190,7 +190,7 @@ impl Model {
                 })
                 oninput=self.link.callback(move |e: InputData| {
                     LOG!("OnInput: {:?}", e);
-                    CubeMessage::multi(vec![UpdateBuffer(e.value), WriteFace(id)])
+                    CubeMessage::bi([UpdateBuffer(e.value), WriteFace(id)])
                 })
                 readonly=if self.cube.locked { true } else { false }
             />

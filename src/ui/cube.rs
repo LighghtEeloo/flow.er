@@ -32,6 +32,8 @@ impl CubeMessage {
 
 pub type CubeMessages = Vec<CubeMessage>;
 
+
+
 impl Model {
     pub fn cube_update(&mut self, messages: CubeMessages) -> ShouldRender {
         use CubeMessage::*;
