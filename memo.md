@@ -17,21 +17,24 @@
   - [x] Support json.
   - [x] Interface.
   - [x] Msg Update.
+  - [ ] Ctrl + /.
   - [ ] Automatic.
-- [ ] Support cube management.
+- [ ] Cube Management
   - [x] Generalized Id System.
   - [ ] Cube Id & searching.
   - [ ] Cube RelationModel.
   - [ ] Cube -> Stockpile/Branch.
   - [ ] Cube storage.
   - [x] Separate Cube Msg.
-- [x] Node CSS.
-- [ ] Bubble details.
+- [ ] Better Node
+  - [x] Node CSS.
+  - [ ] Move node with keyboard.
+  - [ ] Bubble details.
 - [ ] Filter.
+- [ ] Caret-position-based new line.
 
 
 ## Fix List
 - [x] Better model which preserves the first node (title does the job).
 - [ ] Delayed deletion (with safe-lock).
-- [ ] Caret-position-based new line.
 - [ ] Queue-preserving deletion.

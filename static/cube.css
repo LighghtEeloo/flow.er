@@ -11,6 +11,7 @@
     --size-button: 36px;
     --lightColor: rgba(248, 253, 255, 0.925);
     --borderColor: rgba(222, 229, 233, 0.925);
+    --dropdownColor: rgba(121, 191, 238, 0.431);
 }
 
 input {
@@ -122,7 +123,7 @@ input {
 .dropbtn { 
     position: relative;
     top: 0;
-    background-color: #79bfee6e; 
+    background-color: var(--dropdownColor); 
     color: white; 
     height: var(--size-button);
     width: var(--size-button);
@@ -172,7 +173,7 @@ input {
 } 
 
 .dropdown:hover .dropbtn { 
-    background-color: #79bfeec4; 
+    background-color: rgba(121, 191, 238, 0.769); 
 } 
 
 
