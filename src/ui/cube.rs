@@ -19,12 +19,12 @@ pub enum CubeMessage {
 }
 
 impl CubeMessage {
-    pub fn uni(a: CubeMessage) -> Message {
-        Message::Cube(vec![a])
-    }
-    pub fn bi(a: [CubeMessage; 2]) -> Message {
-        Message::Cube(Vec::from(a))
-    }
+    // pub fn uni(a: CubeMessage) -> Message {
+    //     Message::Cube(vec![a])
+    // }
+    // pub fn bi(a: [CubeMessage; 2]) -> Message {
+    //     Message::Cube(Vec::from(a))
+    // }
     pub fn multi(a: CubeMessages) -> Message {
         Message::Cube(a)
     }
@@ -61,14 +61,14 @@ impl Model {
                         let new_id = self.cube.grow();
                         self.cube.tiptoe(new_id);
                         self.refs.insert(new_id, NodeRef::default());
-                        self.link.callback(move |_: ()| CubeMessage::uni(Focus) ).emit(());
+                        self.link.callback(move |_: ()| Cubey![Focus] ).emit(());
                     } else {
                         // Todo: change the semantics.
                         for root_id in vec {
                             let new_id = self.cube.grow();
                             self.cube.chain(new_id, root_id);
                             self.refs.insert(new_id, NodeRef::default());
-                            self.link.callback(move |_: ()| CubeMessage::uni(Focus) ).emit(());
+                            self.link.callback(move |_: ()| Cubey![Focus] ).emit(());
                         }
                     }
                 }
@@ -82,7 +82,7 @@ impl Model {
                 }
                 EraseNode(id) => {
                     self.cube.erase(id);
-                    self.link.callback(move |_: ()| CubeMessage::uni(Focus) ).emit(());
+                    self.link.callback(move |_: ()| Cubey![Focus] ).emit(());
                 }
                 SetFocusId(id) => {
                     match id {
@@ -93,7 +93,7 @@ impl Model {
                 Wander(dir, fixed) => {
                     // Todo: register shift key.
                     self.cube.relation.wander(dir, fixed);
-                    self.link.callback(move |_: ()| CubeMessage::uni(Focus) ).emit(());
+                    self.link.callback(move |_: ()| Cubey![Focus] ).emit(());
                 }
                 Focus => {
                     let id = self.cube.relation.current();

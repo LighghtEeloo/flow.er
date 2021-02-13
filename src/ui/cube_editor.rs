@@ -20,11 +20,11 @@ impl Model {
                     placeholder="Enter new proj name."
                     oninput=self.link.callback(move |e: InputData| {
                         LOG!("OnInput - new: {:?}", e);
-                        CubeMessage::uni(UpdateBuffer(e.value))
+                        Cubey!(UpdateBuffer(e.value))
                     })
                     onkeypress=self.link.callback(move |e: KeyboardEvent| {
                         LOG!("OnKeyPress: {:?}", e);
-                        if e.key() == "Enter" { CubeMessage::uni(NewCube) } else { Message::_Idle }
+                        if e.key() == "Enter" { Cubey!(NewCube) } else { Cubey![] }
                     })
                 />
                 <div class="dash-line"></div>
@@ -57,23 +57,23 @@ impl Model {
                     placeholder="Enter new proj name."
                     value=self.cube.name
                     onfocus=self.link.callback(move |_| {
-                        CubeMessage::uni(SetFocusId(None))
+                        Cubey!(SetFocusId(None))
                     })
                     oninput=self.link.callback(move |e: InputData| {
                         LOG!("OnInput: {:?}", e);
-                        CubeMessage::bi([UpdateBuffer(e.value), WriteCubeName])
+                        Cubey![UpdateBuffer(e.value), WriteCubeName]
                     })
                     onkeydown=self.link.callback(move |e: KeyboardEvent| {
                         let meta = (e.ctrl_key(), e.shift_key(), e.code());
                         LOG!("OnKeyDown: {:?}", meta);
                         match (meta.0, meta.1, meta.2.as_str()) { 
-                            (false, false, "ArrowDown") => CubeMessage::uni(Wander(Direction::Descend, false)), 
-                            _ => Message::_Idle 
+                            (false, false, "ArrowDown") => Cubey!(Wander(Direction::Descend, false)), 
+                            _ => Cubey![] 
                         }
                     })
                     onkeyup=self.link.callback(move |e: KeyboardEvent| {
                         LOG!("OnKeyUp: {:?}", e);
-                        if e.key() == "Enter" { CubeMessage::uni(NewNode(vec![])) } else { Message::_Idle }
+                        if e.key() == "Enter" { Cubey!(NewNode(vec![])) } else { Cubey![] }
                     })
                 />
                 <div class="dash-line"></div>
@@ -107,7 +107,7 @@ impl Model {
                 html! {
                     <ul title={des.clone()}
                         onclick=self.link.callback(move |_| {
-                            CubeMessage::bi([UpdateBuffer(des.clone()), WriteProcess(id)])
+                            Cubey![UpdateBuffer(des.clone()), WriteProcess(id)]
                         })
                     > 
                         <img src={src} /> 
@@ -140,26 +140,26 @@ impl Model {
                 value=self.cube.get(id).face()
                 placeholder="..."
                 onfocus=self.link.callback(move |_| {
-                    CubeMessage::uni(SetFocusId(Some(id)))
+                    Cubey!(SetFocusId(Some(id)))
                 })
                 onkeydown=self.link.callback(move |e: KeyboardEvent| {
                     let meta = (e.ctrl_key(), e.shift_key(), e.code());
                     LOG!("OnKeyDown: {:?}", meta);
                     match (meta.0, meta.1, meta.2.as_str()) { 
-                        (false, false, "ArrowUp") => CubeMessage::uni(Wander(Direction::Ascend, false)), 
-                        (false, false, "ArrowDown") => CubeMessage::uni(Wander(Direction::Descend, false)), 
-                        (true, false, "ArrowUp") => CubeMessage::uni(Wander(Direction::Ascend, true)), 
-                        (true, false, "ArrowDown") => CubeMessage::uni(Wander(Direction::Descend, true)), 
-                        (false, false, "ArrowLeft") => Message::_Idle, 
-                        (false, false, "ArrowRight") => Message::_Idle, 
-                        _ => Message::_Idle
+                        (false, false, "ArrowUp") => Cubey!(Wander(Direction::Ascend, false)), 
+                        (false, false, "ArrowDown") => Cubey!(Wander(Direction::Descend, false)), 
+                        (true, false, "ArrowUp") => Cubey!(Wander(Direction::Ascend, true)), 
+                        (true, false, "ArrowDown") => Cubey!(Wander(Direction::Descend, true)), 
+                        (false, false, "ArrowLeft") => Cubey![], 
+                        (false, false, "ArrowRight") => Cubey![], 
+                        _ => Cubey![]
                     }
                 })
                 onkeypress=self.link.callback(move |e: KeyboardEvent| {
                     let meta = (e.ctrl_key(), e.shift_key(), e.code());
                     LOG!("OnKeyPress: {:?}", meta);
                     match (meta.0, meta.1, meta.2.as_str()) { 
-                        _ => Message::_Idle
+                        _ => Cubey![]
                     }
                 })
                 onkeyup=self.link.callback(move |e: KeyboardEvent| {
@@ -167,30 +167,30 @@ impl Model {
                     LOG!("OnKeyUp: {:?}", meta);
                     match (meta.0, meta.1, meta.2.as_str()) { 
                         // enter
-                        (false, false, "Enter") => CubeMessage::uni(NewNode(vec![id])),
+                        (false, false, "Enter") => Cubey!(NewNode(vec![id])),
                         // shift+enter
-                        (false, true, "Enter") => Message::_Idle,
+                        (false, true, "Enter") => Cubey![],
                         // Todo: Delay.
                         // backspace
                         (_, _, "Backspace") => {
-                            if is_empty { CubeMessage::uni(EraseNode(id)) }
+                            if is_empty { Cubey!(EraseNode(id)) }
                             // if is_empty { vec![EraseNode(id),Wander(Direction::Ascend)] }
-                            else { Message::_Idle }
+                            else { Cubey![] }
                         }
                         // delete
                         (_, _, "Delete") => {
-                            if is_empty { CubeMessage::uni(EraseNode(id)) }
-                            else { Message::_Idle }
+                            if is_empty { Cubey!(EraseNode(id)) }
+                            else { Cubey![] }
                         }
                         // ctrl released
-                        (true, _, "ControlLeft") => CubeMessage::uni(Wander(Direction::Stay, false)),
-                        (true, _, "ControlRight") => CubeMessage::uni(Wander(Direction::Stay, false)),
-                        _ => Message::_Idle 
+                        (true, _, "ControlLeft") => Cubey!(Wander(Direction::Stay, false)),
+                        (true, _, "ControlRight") => Cubey!(Wander(Direction::Stay, false)),
+                        _ => Cubey![] 
                     }
                 })
                 oninput=self.link.callback(move |e: InputData| {
                     LOG!("OnInput: {:?}", e);
-                    CubeMessage::bi([UpdateBuffer(e.value), WriteFace(id)])
+                    Cubey![UpdateBuffer(e.value), WriteFace(id)]
                 })
                 readonly=if self.cube.locked { true } else { false }
             />
@@ -204,7 +204,7 @@ impl Model {
                 title="New node."
                 onclick=self.link.callback(move |_| {
                     LOG!("OnClick.");
-                    CubeMessage::uni(NewNode(id_vec.clone()))
+                    Cubey!(NewNode(id_vec.clone()))
                 })
             >{"+"}</button>
         }
@@ -218,7 +218,7 @@ impl Model {
                 title="Erase node."
                 onclick=self.link.callback(move |_| {
                     LOG!("OnClick.");
-                    CubeMessage::uni(EraseNode(id))
+                    Cubey!(EraseNode(id))
                 })
             >{" - "}</button>
         }
@@ -231,7 +231,7 @@ impl Model {
                 title="Clear cube."
                 ondblclick=self.link.callback(move |_| {
                     LOG!("OnDoubleClick.");
-                    CubeMessage::uni(ClearCube)
+                    Cubey!(ClearCube)
                 })
             >{"Clear"}</button>
         }
