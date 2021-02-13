@@ -3,28 +3,22 @@
 #[allow(unused)]
 mod view;
 mod cube_editor;
+mod cube;
 
 use crate::util::*;
 use crate::yew_util::*;
 use crate::stockpile::prelude::*;
 
+pub use cube::{CubeMessage, CubeMessages};
 
 const KEY: &str = "yew.life.tracer.self";
 
 #[derive(Debug)]
-pub enum Msg {
-    UpdateBuffer(String),
-    NewCube,
-    ClearCube,
-    WriteCubeName,
-    NewNode(Vec<EntryId>),
-    WriteFace(EntryId),
-    WriteProcess(EntryId),
-    EraseNode(EntryId),
-    SetFocusId(Option<EntryId>),
-    Wander(Direction, bool),
-    Focus,
-    _Idle,
+pub enum Message {
+    Cube(cube::CubeMessages),
+    // Todo: Branch.
+    Branch,
+    _Idle
 }
 
 pub struct Model {
@@ -38,7 +32,7 @@ pub struct Model {
 
 impl Component for Model {
     // Note: MsgStack.
-    type Message = Vec<Msg>;
+    type Message = Message;
     type Properties = ();
 
     fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
@@ -66,91 +60,12 @@ impl Component for Model {
     }
 
     fn update(&mut self, messages: Self::Message) -> ShouldRender {
-        // Test..
-        if messages.is_empty() { return true; }
-        LOG!("Updating with: {:?}\nand buffer: {:?}", messages, self.buffer_str);
-        use Msg::*;
-        for msg in messages {
-            match msg {
-                UpdateBuffer(val) => {
-                    self.buffer_str = val;
-                }
-                NewCube => {
-                    // Todo: Add new stockpile.
-                    self.cube.name = mem::take(&mut self.buffer_str);
-                }
-                ClearCube => {
-                    self.cube.relation.clear();
-                    self.cube.entries.clear();
-                }
-                WriteCubeName => {
-                    self.cube.name = mem::take(&mut self.buffer_str);
-                }
-                NewNode(vec) => {
-                    if vec.len() == 0 {
-                        let new_id = self.cube.grow();
-                        self.cube.tiptoe(new_id);
-                        self.refs.insert(new_id, NodeRef::default());
-                        self.link.callback(move |_: Msg| [Focus] ).emit(_Idle);
-                    } else {
-                        // Todo: change the semantics.
-                        for root_id in vec {
-                            let new_id = self.cube.grow();
-                            self.cube.chain(new_id, root_id);
-                            self.refs.insert(new_id, NodeRef::default());
-                            self.link.callback(move |_: Msg| [Focus] ).emit(_Idle);
-                        }
-                    }
-                }
-                WriteFace(id) => {
-                    let x: &mut Entry = self.cube.entries.get_mut(&id).unwrap();
-                    x.set_face(mem::take(&mut self.buffer_str));
-                }
-                WriteProcess(id) => {
-                    let x: &mut Entry = self.cube.entries.get_mut(&id).unwrap();
-                    x.set_process(ProcessStatus::reflect(self.buffer_str.as_str()));
-                }
-                EraseNode(id) => {
-                    self.cube.erase(id);
-                    self.link.callback(move |_: Msg| [Focus] ).emit(_Idle);
-                }
-                SetFocusId(id) => {
-                    match id {
-                        Some(id) => self.cube.relation.focus(id),
-                        None => self.cube.relation.pos = None
-                    }
-                }
-                Wander(dir, fixed) => {
-                    // Todo: register shift key.
-                    self.cube.relation.wander(dir, fixed);
-                    self.link.callback(move |_: Msg| [Focus] ).emit(_Idle);
-                }
-                Focus => {
-                    let id = self.cube.relation.current();
-                    // Debug..
-                    LOG!("Focusing: {:?}", id);
-                    match id {
-                        Some(id) => {
-                            if let Some(input) = self.refs.get(&id).unwrap().cast::<InputElement>() {
-                                input.focus().unwrap();
-                            }
-                        }
-                        None => {
-                            if let Some(input) = self.ref_name.cast::<InputElement>() {
-                                input.focus().unwrap();
-                            }
-                        }
-                    }
-                }
-                _Idle => {}
-            }
+        use Message::*;
+        match messages {
+            Cube(msg) => self.cube_update(msg),
+            // Branch => true,
+            _ => true
         }
-        // Note: Only self.stockpile is saved.
-        self.storage.store(KEY, Json(&self.cube));
-        // Debug..
-        LOG!("Dumped {}: {:#?}", KEY, &self.cube);
-        // LOG!("{}", to_json(&self.stockpile));
-        true
     }
 
     fn change(&mut self, _: Self::Properties) -> ShouldRender {
