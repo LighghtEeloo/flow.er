@@ -22,6 +22,7 @@ pub enum Message {
 }
 
 pub struct Model {
+    src_view: bool,
     cube: Cube,
     buffer_str: String,
     refs: HashMap<EntryId, NodeRef>,
@@ -50,6 +51,7 @@ impl Component for Model {
         let id_iter = cube.entries.keys().map(|x| (x.clone(),NodeRef::default()));
         let refs: HashMap<EntryId, NodeRef> = HashMap::from_iter(id_iter);
         Self {
+            src_view: false,
             cube,
             buffer_str: String::new(),
             refs,

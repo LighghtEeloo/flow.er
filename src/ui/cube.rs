@@ -16,6 +16,7 @@ pub enum CubeMessage {
     SetFocusId(Option<EntryId>),
     Wander(Direction, bool),
     Focus,
+    SrcViewToggle(Option<bool>),
 }
 
 impl CubeMessage {
@@ -91,14 +92,11 @@ impl Model {
                     }
                 }
                 Wander(dir, fixed) => {
-                    // Todo: register shift key.
                     self.cube.relation.wander(dir, fixed);
                     self.link.callback(move |_: ()| Cubey![Focus] ).emit(());
                 }
                 Focus => {
                     let id = self.cube.relation.current();
-                    // Debug..
-                    LOG!("Focusing: {:?}", id);
                     match id {
                         Some(id) => {
                             if let Some(input) = self.refs.get(&id).unwrap().cast::<InputElement>() {
@@ -111,6 +109,12 @@ impl Model {
                             }
                         }
                     }
+                }
+                SrcViewToggle(x) => {
+                    self.src_view = match x {
+                        None => !self.src_view,
+                        Some(x) => x
+                    };
                 }
             }
         }

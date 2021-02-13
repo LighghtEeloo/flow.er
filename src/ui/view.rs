@@ -5,7 +5,7 @@ impl Model {
         html! {
             <div class="app-wrapper">
                 <div class="frame" id="left-sidebar">
-                    { Model::sidebar_tabs() }
+                    { self.sidebar_tabs() }
                 </div>
                 <div class="frame" id="main-editor">
                     { self.main_editor() }
@@ -17,7 +17,7 @@ impl Model {
         }
     }
 
-    pub fn sidebar_tabs() -> Html {
+    pub fn sidebar_tabs(&self) -> Html {
         let tab_meta: Vec<(&str, &str, bool)> = vec! {
             ("static/icons/hexagons.svg", "Workspace", false),
             ("static/icons/branch.svg", "Projects", false),

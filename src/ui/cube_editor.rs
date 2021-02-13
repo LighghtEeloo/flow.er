@@ -43,6 +43,7 @@ impl Model {
                     { for vec.iter().map(|id| self.node_view(id)) }
                 </div>
                 { self.clearall_button_view() }
+                { self.src_view_button_view() }
             </div>
         }
     }
@@ -230,10 +231,21 @@ impl Model {
             <button class="clear-button"
                 title="Clear cube."
                 ondblclick=self.link.callback(move |_| {
-                    LOG!("OnDoubleClick.");
                     Cubey![ClearCube]
                 })
             >{"Clear"}</button>
+        }
+    }
+
+    fn src_view_button_view(&self) -> Html {
+        use CubeMessage::*;
+        html! {
+            <button class="src-button"
+                title="The source code of the cube."
+                ondblclick=self.link.callback(move |_| {
+                    Cubey![SrcViewToggle(None)]
+                })
+            >{"Source Code View"}</button>
         }
     }
 }
