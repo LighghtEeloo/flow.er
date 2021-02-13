@@ -94,11 +94,13 @@ input {
     top: 0;
     right: 0;
     margin: 2px var(--horizontal-margin) 1px;
+    padding: 0 1%;
     width: calc(100% - var(--size-button) - var(--horizontal-margin) * 2);
     height: calc(var(--size-button) - 1px);
     line-height: calc(var(--size-button) - 1px);
     font-size: calc(var(--size-button) * 0.6);
     background-color: var(--lightColor);
+    border-style: solid;
     border-color: var(--borderColor);
     box-shadow: none;
 }

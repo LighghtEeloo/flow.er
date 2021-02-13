@@ -21,7 +21,7 @@ impl Model {
                         text-align: center;
                         font-size: 8pt;
                     ">
-                        {"Lorem ipsum dolor sit amet consectetur, adipisicing elit. Earum et voluptates atque, neque sint iste possimus at rerum accusantium quidem."}
+                        {"Lorem ipsum dolor sit amet consectetur, adipisicing elit."}
                     </p>
                 </div>
             </div>
