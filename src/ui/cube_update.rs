@@ -118,7 +118,7 @@ impl Model {
                     };
                     let writing = 
                         if src_view {
-                            self.buffer_str = to_json(&self.cube);
+                            self.buffer_str = export_json(&self.cube);
                             true 
                         } else { 
                             match from_json_str(&self.buffer_str) {

@@ -255,7 +255,6 @@ impl Model {
                     })
                     spellcheck=false
                 />
-                // { self.src_view_button_view() }
             </div>
         }
     }

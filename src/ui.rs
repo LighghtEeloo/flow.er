@@ -3,19 +3,19 @@
 #[allow(unused)]
 mod view;
 mod cube_editor;
-mod cube;
+mod cube_update;
 
 use crate::util::*;
 use crate::yew_util::*;
 use crate::stockpile::prelude::*;
 
-pub use cube::{CubeMessage, CubeMessages};
+pub use cube_update::{CubeMessage, CubeMessages};
 
 const KEY: &str = "yew.life.tracer.self";
 
 #[derive(Debug, Clone)]
 pub enum Message {
-    Cube(cube::CubeMessages),
+    Cube(CubeMessages),
     // Todo: Branch.
     Branch,
     _Idle
