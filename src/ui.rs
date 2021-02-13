@@ -6,7 +6,7 @@ mod cube_editor;
 
 use crate::util::*;
 use crate::yew_util::*;
-use crate::cube::prelude::*;
+use crate::stockpile::prelude::*;
 
 
 const KEY: &str = "yew.life.tracer.self";
@@ -76,7 +76,7 @@ impl Component for Model {
                     self.buffer_str = val;
                 }
                 NewCube => {
-                    // Todo: Add new cube.
+                    // Todo: Add new stockpile.
                     self.cube.name = mem::take(&mut self.buffer_str);
                 }
                 ClearCube => {
@@ -145,11 +145,11 @@ impl Component for Model {
                 _Idle => {}
             }
         }
-        // Note: Only self.cube is saved.
+        // Note: Only self.stockpile is saved.
         self.storage.store(KEY, Json(&self.cube));
         // Debug..
         LOG!("Dumped {}: {:#?}", KEY, &self.cube);
-        // LOG!("{}", to_json(&self.cube));
+        // LOG!("{}", to_json(&self.stockpile));
         true
     }
 

@@ -21,6 +21,7 @@
   - [x] Generalized Id System.
   - [ ] Cube Id & searching.
   - [ ] Cube RelationModel.
+  - [ ] Cube -> Stockpile/Branch.
   - [ ] Cube storage.
 - [x] CSS.
 - [ ] Bubble details.

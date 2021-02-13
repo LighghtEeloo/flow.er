@@ -1,6 +1,6 @@
 use crate::ui::*;
 use crate::yew_util::*;
-use crate::cube::prelude::*;
+use crate::stockpile::prelude::*;
 
 impl Model {
     pub fn cube_new_view(&self) -> Html {
