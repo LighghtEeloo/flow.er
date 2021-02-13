@@ -27,17 +27,17 @@ pub use flow::FlowModel;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Direction {
-    Up,
-    Down,
+    Ascend,
+    Descend,
     Stay
 }
 
 impl Direction {
     fn translate(&self) -> isize {
         match self {
-            Direction::Up => -1,
+            Direction::Ascend => -1,
             Direction::Stay => 0,
-            Direction::Down => 1
+            Direction::Descend => 1
         }
     }
 }

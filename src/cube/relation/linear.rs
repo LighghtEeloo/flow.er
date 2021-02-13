@@ -47,18 +47,18 @@ impl FixState {
         use Direction::*;
         match self {
             Relative(-1) => match dir {
-                Up => 2,
-                Down => 1,
+                Ascend => 2,
+                Descend => 1,
                 _ => 0
             }
             Relative(0) => match dir {
-                Up => -1,
-                Down => 1,
+                Ascend => -1,
+                Descend => 1,
                 _ => 0
             }
             Relative(1) => match dir {
-                Up => -1,
-                Down => -2,
+                Ascend => -1,
+                Descend => -2,
                 _ => 0
             }
             _ => 0
@@ -160,7 +160,7 @@ where Id: Identity
                 }
                 None => {
                     match dir {
-                        Direction::Down => Some(0),
+                        Direction::Descend => Some(0),
                         _ => None,
                     }
                 }

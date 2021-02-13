@@ -208,7 +208,7 @@ where Id: Identity
         //         }
         //         None => {
         //             match dir {
-        //                 Direction::Down => Some(0),
+        //                 Direction::Descend => Some(0),
         //                 _ => None,
         //             }
         //         }

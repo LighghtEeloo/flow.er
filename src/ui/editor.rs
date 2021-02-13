@@ -67,7 +67,7 @@ impl Model {
                         let meta = (e.ctrl_key(), e.shift_key(), e.code());
                         LOG!("OnKeyDown: {:?}", meta);
                         match (meta.0, meta.1, meta.2.as_str()) { 
-                            (false, false, "ArrowDown") => vec![Wander(Direction::Down, false)], 
+                            (false, false, "ArrowDown") => vec![Wander(Direction::Descend, false)], 
                             _ => vec![] 
                         }
                     })
@@ -146,10 +146,10 @@ impl Model {
                     let meta = (e.ctrl_key(), e.shift_key(), e.code());
                     LOG!("OnKeyDown: {:?}", meta);
                     match (meta.0, meta.1, meta.2.as_str()) { 
-                        (false, false, "ArrowUp") => vec![Wander(Direction::Up, false)], 
-                        (false, false, "ArrowDown") => vec![Wander(Direction::Down, false)], 
-                        (true, false, "ArrowUp") => vec![Wander(Direction::Up, true)], 
-                        (true, false, "ArrowDown") => vec![Wander(Direction::Down, true)], 
+                        (false, false, "ArrowUp") => vec![Wander(Direction::Ascend, false)], 
+                        (false, false, "ArrowDown") => vec![Wander(Direction::Descend, false)], 
+                        (true, false, "ArrowUp") => vec![Wander(Direction::Ascend, true)], 
+                        (true, false, "ArrowDown") => vec![Wander(Direction::Descend, true)], 
                         (false, false, "ArrowLeft") => vec![], 
                         (false, false, "ArrowRight") => vec![], 
                         _ => vec![] 
@@ -174,7 +174,7 @@ impl Model {
                         // backspace
                         (_, _, "Backspace") => {
                             if is_empty { vec![EraseNode(id)] }
-                            // if is_empty { vec![EraseNode(id),Wander(Direction::Up)] }
+                            // if is_empty { vec![EraseNode(id),Wander(Direction::Ascend)] }
                             else { vec![] }
                         }
                         // delete
