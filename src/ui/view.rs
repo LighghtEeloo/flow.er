@@ -98,7 +98,7 @@ impl Model {
         html! {
             <button class="status-bar-button" id="export-button"
                 title="Copy src to clipboard."
-                data-clipboard-text="Just because you can doesn't mean you should — clipboard.js"
+                data-clipboard-text={ export_json(&self.cube) }
             >
                 <img src="static/icons/StatusBar/code-download.svg" alt="Code_pic"/>
                 <span>{"  To Clipboard  "}</span>

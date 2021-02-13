@@ -18,7 +18,7 @@
   - [x] Interface.
   - [x] Msg Update.
   - [ ] Ctrl + /.
-  - [ ] Automatic.
+  - [x] Automatic.
 - [ ] Cube Management
   - [x] Generalized Id System.
   - [ ] Cube Id & searching.
