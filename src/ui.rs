@@ -47,6 +47,7 @@ impl Component for Model {
         };
 
         LOG!("Loaded: {:#?}", cube);
+        LOG!("{}", to_json(&cube));
         
         let id_iter = cube.entries.keys().map(|x| (x.clone(),NodeRef::default()));
         let refs: HashMap<EntryId, NodeRef> = HashMap::from_iter(id_iter);
