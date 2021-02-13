@@ -43,9 +43,9 @@ impl Direction {
 }
 
 pub trait RelationModel<Id>: Clone + Debug + Deserialize<'static> + Serialize {
-    fn add(&mut self, target: Id, des: Option<Id>);
-    fn del(&mut self, target: Id);
-    fn focus(&mut self, target: Id);
+    fn add(&mut self, obj: Id, des: Option<Id>);
+    fn del(&mut self, obj: Id);
+    fn focus(&mut self, obj: Id);
     fn current(&self) -> Option<Id>;
     fn wander(&mut self, dir: Direction, fixed: bool);
     fn clear(&mut self);

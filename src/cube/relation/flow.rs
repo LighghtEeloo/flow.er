@@ -27,8 +27,8 @@ where Id: Identity
     fn get_mut(&mut self, id: &Id) -> &mut FlowNode<Id> {
         self.data.get_mut(id).expect("FlowNode of the same id not found.")
     }
-    // fn locate(&self, target: Id) -> Option<usize> {
-    //     self.data.iter().position(|&x| target == x)
+    // fn locate(&self, obj: Id) -> Option<usize> {
+    //     self.data.iter().position(|&x| obj == x)
     // }
     // /// move according to number delta, and return true if moved
     // fn try_move(&mut self, delta: isize) -> isize {
@@ -78,7 +78,7 @@ where Id: Eq + Hash
 pub enum FixState<Id> {
     Deactivated,
     Descendant(Vec<Id>, usize),
-    Elder(Vec<Id>, usize),
+    Elderly(Vec<Id>, usize),
 }
 
 impl<Id> FixState<Id> 
@@ -116,17 +116,17 @@ where Id: PartialEq + Eq
     //     };
     //     mem::swap(&mut next, self);
     // }
-    // fn deactivate(&mut self) {
-    //     mem::swap(&mut FixState::Deactivated, self);
-    // }
+    fn deactivate(&mut self) {
+        mem::swap(&mut FixState::Deactivated, self);
+    }
 }
 
 impl<Id> RelationModel<Id> for FlowModel<Id> 
 where Id: Identity
 {
-    /// des > self.pos. if None = des && None = self.pos, new root;
-    /// && if Some = self.root, descend the old root.
-    fn add(&mut self, target: Id, des: Option<Id>) {
+    /// Add location: des > self.pos. if None is presented, create new root;
+    /// and then if Some = self.root, descend the old root.
+    fn add(&mut self, obj: Id, des: Option<Id>) {
         let des = if let None = des {
             self.pos
         } else {
@@ -134,53 +134,66 @@ where Id: Identity
         };
         match des {
             Some(id) => {
-                self.data.insert(target, FlowNode::new(Some(id)));
-                self.get_mut(&id).descendant.push(target);
+                self.data.insert(obj, FlowNode::new(Some(id)));
+                self.get_mut(&id).descendant.push(obj);
             }
             None => {
                 // Always a new root if None = des && None = self.pos
-                self.data.insert(target, FlowNode::new(None));
+                self.data.insert(obj, FlowNode::new(None));
                 if let Some(root_id) = self.root {
                     // Replace root if needed
-                    self.get_mut(&target).descendant.push(root_id);
+                    self.get_mut(&obj).descendant.push(root_id);
                 }
-                self.root = Some(target);
+                self.root = Some(obj);
             }
         }
+        self.focus(obj);
     }
-    fn del(&mut self, target: Id) {
-        // match self.locate(target) {
-        //     Some(pos) => {
-        //         self.data.remove(pos);
-        //         self.pos = None;
-        //     }
-        //     None => ()
-        // };
+    /// Recursively delete the node and all its descendants. 
+    /// self.pos = direct_elderly
+    fn del(&mut self, obj: Id) {
+        let node = self.data.remove(&obj).unwrap_or(FlowNode::default());
+        let mut descendant = node.descendant;
+        // recursively del
+        loop {
+            let mut collector = vec![];
+            mem::swap(&mut collector, &mut descendant);
+            for x in collector {
+                let descendant_ = 
+                    self.data.remove(&x).map(|n| n.descendant).unwrap_or(vec![]);
+                descendant.extend(descendant_);
+            }
+            if descendant.is_empty() { break }
+        }
+        self.pos = node.direct_elderly;
     }
+    /// Return the current pos in FlowModel.
     fn current(&self) -> Option<Id> {
-        // match self.pos {
-        //     Some(pos) => Some(self.data[pos]),
-        //     None => None
-        // }
-        None
+        match self.pos {
+            Some(obj) => Some(obj),
+            None => None
+        }
     }
-    fn focus(&mut self, target: Id) {
-        // self.pos = self.locate(target)
+    fn focus(&mut self, obj: Id) {
+        // validate obj.
+        if let Some(_) = self.data.get(&obj) {
+            self.pos = Some(obj)
+        }
     }
     fn wander(&mut self, dir: Direction, fixed: bool) {
         use FixState::*;
-        // if self.data.len() == 0 { return }
-        // if Direction::Stay == dir && fixed == false {
-        //     self.fix.deactivate();
-        //     return
-        // }
+        if self.data.len() == 0 { return }
+        if Direction::Stay == dir && fixed == false {
+            self.fix.deactivate();
+            return
+        }
         // let delta = dir.translate();
-        // if fixed {
+        if fixed {
         //     self.fix.activate();
         //     let delta = self.fix.translate(dir);
         //     let delta = self.try_move(delta);
         //     self.fix.shift_delta(delta);
-        // } else {
+        } else {
         //     self.fix.deactivate();
         //     self.pos = match self.pos {
         //         Some(pos) => {
@@ -200,7 +213,7 @@ where Id: Identity
         //             }
         //         }
         //     };
-        // }
+        }
     }
     fn clear(&mut self) {
         mem::take(self);

@@ -17,8 +17,8 @@ where Id: Identity
     pub fn new() -> Self {
         LinearModel::default()
     }
-    fn locate(&self, target: Id) -> Option<usize> {
-        self.data.iter().position(|&x| target == x)
+    fn locate(&self, obj: Id) -> Option<usize> {
+        self.data.iter().position(|&x| obj == x)
     }
     /// move according to number delta, and return true if moved
     fn try_move(&mut self, delta: isize) -> isize {
@@ -98,7 +98,7 @@ impl FixState {
 impl<Id> RelationModel<Id> for LinearModel<Id> 
 where Id: Identity
 {
-    fn add(&mut self, target: Id, des: Option<Id>) {
+    fn add(&mut self, obj: Id, des: Option<Id>) {
         let pos = 
             match des {
                 Some(des) => {
@@ -110,12 +110,12 @@ where Id: Identity
                 }
                 None => 0
             };
-        self.data.insert(pos, target);
+        self.data.insert(pos, obj);
         self.pos = Some(pos);
         self.fix = FixState::Deactivated;
     }
-    fn del(&mut self, target: Id) {
-        match self.locate(target) {
+    fn del(&mut self, obj: Id) {
+        match self.locate(obj) {
             Some(pos) => {
                 self.data.remove(pos);
                 self.pos = None;
@@ -129,8 +129,8 @@ where Id: Identity
             None => None
         }
     }
-    fn focus(&mut self, target: Id) {
-        self.pos = self.locate(target)
+    fn focus(&mut self, obj: Id) {
+        self.pos = self.locate(obj)
     }
     fn wander(&mut self, dir: Direction, fixed: bool) {
         use FixState::*;
