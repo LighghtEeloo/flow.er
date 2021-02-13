@@ -20,7 +20,7 @@ body {
 
     --mainColor: rgba(216, 230, 236, 0.829);
     --backColor: rgba(217, 229, 235, 0.541);
-    --tabColor: rgba(216, 230, 236, 0.829);
+    /* --tabColor: rgba(216, 230, 236, 0.829); */
     --emphasizeColor: rgba(238, 244, 247, 0.829);
     --dividerColor: rgba(10, 55, 77, 1);
 
@@ -142,21 +142,8 @@ body {
     visibility: visible;
 }
 
-p {
-    width: 80%;
-    margin: auto;
-    font-family: cursive;
-}
 
-#status-bar p {
-    /* position: absolute; */
-    /* top: 0; right: 0; bottom: 0; left: 0; */
-    text-align: center;
-    font-size: 8pt;
-}
-
-
-/* Buttons */
+/* Src Button */
 
 #status-bar .src-button
 {
@@ -164,9 +151,12 @@ p {
     bottom: 0;
     left: 0;
     margin: 0;
-    padding: 1px 6px;
+    padding: 1px;
     height: calc(var(--len-status-bar) - 2px);
-    width: 110px;
+    width: 112px;
+    border: none;
+    outline: none;
+    background-color: var(--mainColor);
 }
 
 #status-bar .src-button span {
@@ -177,6 +167,11 @@ p {
 #status-bar .src-button img
 {
     position: relative;
+    top: 1px;
     margin: 0;
-    height: calc(var(--len-status-bar) * 0.6);
+    height: calc(var(--len-status-bar) * 0.7);
+}
+
+#status-bar .src-button:hover {
+    background-color: var(--emphasizeColor);
 }

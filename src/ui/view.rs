@@ -14,7 +14,15 @@ impl Model {
                 </div>
                 <div class="frame" id="status-bar">
                     { self.src_view_button_view() }
-                    <p>{"Lorem ipsum dolor sit amet consectetur, adipisicing elit. Earum et voluptates atque, neque sint iste possimus at rerum accusantium quidem."}</p>
+                    <p style="
+                        width: 80%;
+                        margin: auto;
+                        font-family: cursive;
+                        text-align: center;
+                        font-size: 8pt;
+                    ">
+                        {"Lorem ipsum dolor sit amet consectetur, adipisicing elit. Earum et voluptates atque, neque sint iste possimus at rerum accusantium quidem."}
+                    </p>
                 </div>
             </div>
         }
