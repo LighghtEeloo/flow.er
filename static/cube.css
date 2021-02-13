@@ -1,9 +1,9 @@
 .cube,
 .cube-new {
     padding: 0;
-    width: auto;
+    width: 100%;
     height: 100%;
-    position: relative;
+    position: absolute;
     background-color: aliceblue;
 }
 
@@ -67,9 +67,9 @@ input {
 .cube .node-group {
     position: relative;
     top: 0; right: 0; bottom: 0; left: 0;
-    margin: auto;
+    margin: 5px auto;
     /* margin: 60px auto; */
-    height: 80%;
+    height: auto;
     width: 60%;
     /* border: solid 4px green; */
 }

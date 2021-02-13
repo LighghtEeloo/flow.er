@@ -61,6 +61,7 @@ body {
     bottom: 0;
     left: 0;
     border-top: none;
+	/* border-left: solid var(--dividerColor) 2px; */
     /* margin-top: -1px; */
     background-color: var(--backColor);
 }
@@ -162,7 +163,20 @@ p {
     position: absolute;
     bottom: 0;
     left: 0;
-    margin: 0 -2px;
-    padding: 0 4px;
+    margin: 0;
+    padding: 1px 6px;
     height: calc(var(--len-status-bar) - 2px);
+    width: 110px;
+}
+
+#status-bar .src-button span {
+    position: relative;
+    top: -1px;
+}
+
+#status-bar .src-button img
+{
+    position: relative;
+    margin: 0;
+    height: calc(var(--len-status-bar) * 0.6);
 }

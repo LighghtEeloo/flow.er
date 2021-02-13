@@ -67,7 +67,10 @@ impl Model {
                 onclick=self.link.callback(move |_| {
                     Cubey![SrcViewToggle(None)]
                 })
-            >{"Source Code View"}</button>
+            >
+                <img src="static/icons/StatusBar/src-code.svg" alt="Code_pic"/>
+                <span>{"  Source Code  "}</span>
+            </button>
         }
     }
 }
