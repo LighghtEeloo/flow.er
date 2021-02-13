@@ -20,11 +20,11 @@ impl Model {
                     placeholder="Enter new proj name."
                     oninput=self.link.callback(move |e: InputData| {
                         LOG!("OnInput - new: {:?}", e);
-                        Cubey!(UpdateBuffer(e.value))
+                        Cubey![UpdateBuffer(e.value)]
                     })
                     onkeypress=self.link.callback(move |e: KeyboardEvent| {
                         LOG!("OnKeyPress: {:?}", e);
-                        if e.key() == "Enter" { Cubey!(NewCube) } else { Cubey![] }
+                        if e.key() == "Enter" { Cubey![NewCube] } else { Cubey![] }
                     })
                 />
                 <div class="dash-line"></div>
@@ -57,7 +57,7 @@ impl Model {
                     placeholder="Enter new proj name."
                     value=self.cube.name
                     onfocus=self.link.callback(move |_| {
-                        Cubey!(SetFocusId(None))
+                        Cubey![SetFocusId(None)]
                     })
                     oninput=self.link.callback(move |e: InputData| {
                         LOG!("OnInput: {:?}", e);
@@ -67,13 +67,13 @@ impl Model {
                         let meta = (e.ctrl_key(), e.shift_key(), e.code());
                         LOG!("OnKeyDown: {:?}", meta);
                         match (meta.0, meta.1, meta.2.as_str()) { 
-                            (false, false, "ArrowDown") => Cubey!(Wander(Direction::Descend, false)), 
+                            (false, false, "ArrowDown") => Cubey![Wander(Direction::Descend, false)], 
                             _ => Cubey![] 
                         }
                     })
                     onkeyup=self.link.callback(move |e: KeyboardEvent| {
                         LOG!("OnKeyUp: {:?}", e);
-                        if e.key() == "Enter" { Cubey!(NewNode(vec![])) } else { Cubey![] }
+                        if e.key() == "Enter" { Cubey![NewNode(vec![])] } else { Cubey![] }
                     })
                 />
                 <div class="dash-line"></div>
@@ -140,16 +140,16 @@ impl Model {
                 value=self.cube.get(id).face()
                 placeholder="..."
                 onfocus=self.link.callback(move |_| {
-                    Cubey!(SetFocusId(Some(id)))
+                    Cubey![SetFocusId(Some(id))]
                 })
                 onkeydown=self.link.callback(move |e: KeyboardEvent| {
                     let meta = (e.ctrl_key(), e.shift_key(), e.code());
                     LOG!("OnKeyDown: {:?}", meta);
                     match (meta.0, meta.1, meta.2.as_str()) { 
-                        (false, false, "ArrowUp") => Cubey!(Wander(Direction::Ascend, false)), 
-                        (false, false, "ArrowDown") => Cubey!(Wander(Direction::Descend, false)), 
-                        (true, false, "ArrowUp") => Cubey!(Wander(Direction::Ascend, true)), 
-                        (true, false, "ArrowDown") => Cubey!(Wander(Direction::Descend, true)), 
+                        (false, false, "ArrowUp") => Cubey![Wander(Direction::Ascend, false)], 
+                        (false, false, "ArrowDown") => Cubey![Wander(Direction::Descend, false)], 
+                        (true, false, "ArrowUp") => Cubey![Wander(Direction::Ascend, true)], 
+                        (true, false, "ArrowDown") => Cubey![Wander(Direction::Descend, true)], 
                         (false, false, "ArrowLeft") => Cubey![], 
                         (false, false, "ArrowRight") => Cubey![], 
                         _ => Cubey![]
@@ -167,24 +167,24 @@ impl Model {
                     LOG!("OnKeyUp: {:?}", meta);
                     match (meta.0, meta.1, meta.2.as_str()) { 
                         // enter
-                        (false, false, "Enter") => Cubey!(NewNode(vec![id])),
+                        (false, false, "Enter") => Cubey![NewNode(vec![id])],
                         // shift+enter
                         (false, true, "Enter") => Cubey![],
                         // Todo: Delay.
                         // backspace
                         (_, _, "Backspace") => {
-                            if is_empty { Cubey!(EraseNode(id)) }
+                            if is_empty { Cubey![EraseNode(id)] }
                             // if is_empty { vec![EraseNode(id),Wander(Direction::Ascend)] }
                             else { Cubey![] }
                         }
                         // delete
                         (_, _, "Delete") => {
-                            if is_empty { Cubey!(EraseNode(id)) }
+                            if is_empty { Cubey![EraseNode(id)] }
                             else { Cubey![] }
                         }
                         // ctrl released
-                        (true, _, "ControlLeft") => Cubey!(Wander(Direction::Stay, false)),
-                        (true, _, "ControlRight") => Cubey!(Wander(Direction::Stay, false)),
+                        (true, _, "ControlLeft") => Cubey![Wander(Direction::Stay, false)],
+                        (true, _, "ControlRight") => Cubey![Wander(Direction::Stay, false)],
                         _ => Cubey![] 
                     }
                 })
@@ -204,7 +204,7 @@ impl Model {
                 title="New node."
                 onclick=self.link.callback(move |_| {
                     LOG!("OnClick.");
-                    Cubey!(NewNode(id_vec.clone()))
+                    Cubey![NewNode(id_vec.clone())]
                 })
             >{"+"}</button>
         }
@@ -218,7 +218,7 @@ impl Model {
                 title="Erase node."
                 onclick=self.link.callback(move |_| {
                     LOG!("OnClick.");
-                    Cubey!(EraseNode(id))
+                    Cubey![EraseNode(id)]
                 })
             >{" - "}</button>
         }
@@ -231,7 +231,7 @@ impl Model {
                 title="Clear cube."
                 ondblclick=self.link.callback(move |_| {
                     LOG!("OnDoubleClick.");
-                    Cubey!(ClearCube)
+                    Cubey![ClearCube]
                 })
             >{"Clear"}</button>
         }
