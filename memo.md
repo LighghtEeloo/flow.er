@@ -36,5 +36,5 @@
 
 ## Fix List
 - [x] Better model which preserves the first node (title does the job).
-- [ ] Delayed deletion (with safe-lock).
+- [x] Delayed deletion (with safe-lock).
 - [ ] Queue-preserving deletion.

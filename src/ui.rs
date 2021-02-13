@@ -22,7 +22,10 @@ pub enum Message {
 }
 
 pub struct Model {
+    // src_view. true if src-code-view, false if cube view.
     src_view: bool,
+    // erase_lock. true if locked, false if to-erase.
+    erase_lock: bool,
     cube: Cube,
     buffer_str: String,
     refs: HashMap<EntryId, NodeRef>,
@@ -53,6 +56,7 @@ impl Component for Model {
         let refs: HashMap<EntryId, NodeRef> = HashMap::from_iter(id_iter);
         Self {
             src_view: false,
+            erase_lock: true,
             cube,
             buffer_str: String::new(),
             refs,

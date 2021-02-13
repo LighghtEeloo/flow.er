@@ -47,6 +47,7 @@ impl Model {
         // Test..
         if messages.is_empty() { return true; }
         LOG!("Updating with: {:?}\nand buffer: {:?}", messages, self.buffer_str);
+        let old_erase_lock = self.erase_lock;
         for msg in messages {
             match msg {
                 UpdateBuffer(val) => {
@@ -88,8 +89,13 @@ impl Model {
                     x.set_process(ProcessStatus::reflect(self.buffer_str.as_str()));
                 }
                 EraseNode(id) => {
-                    self.cube.erase(id);
-                    self.revisit( Cubey![Focus] );
+                    if self.erase_lock {
+                        self.erase_lock = false;
+                    } else {
+                        self.cube.erase(id);
+                        self.revisit( Cubey![Focus] );
+                        self.erase_lock = true;
+                    }
                 }
                 SetFocusId(id) => {
                     match id {
@@ -133,6 +139,10 @@ impl Model {
                     LOG!("Dumped {}: {:#?}", KEY, &self.cube);
                 },
             }
+        }
+        if old_erase_lock == false {
+            // Restore lock.
+            self.erase_lock = true;
         }
         // Note: Only self.stockpile is saved.
         self.storage.store(KEY, Json(&self.cube));
