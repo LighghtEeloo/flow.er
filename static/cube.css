@@ -93,11 +93,6 @@ input {
     font-size: calc(var(--size-button) * 0.6);
 }
 
-.cube .node-group .add-button,
-.cube .node-group .del-button {
-    display: none;
-}
-
 
 /* Dropdown */
 
@@ -170,3 +165,25 @@ input {
 .dropdown:hover .dropbtn { 
     background-color: #79bfeec4; 
 } 
+
+
+/* Src-button */
+
+.cube-src {
+    height: 100%
+}
+
+.cube-src textarea.cube-src-input {
+    display: block;
+    width: 100%;
+    height: 100%;
+    resize: none;
+}
+
+
+/* Buttons */
+
+.cube .node-group .add-button,
+.cube .node-group .del-button {
+    display: none;
+}

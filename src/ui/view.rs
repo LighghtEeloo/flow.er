@@ -1,5 +1,7 @@
 use crate::ui::*;
 
+use CubeMessage::*;
+
 impl Model {
     pub fn main_view(&self) -> Html {
         html! {
@@ -11,6 +13,7 @@ impl Model {
                     { self.main_editor() }
                 </div>
                 <div class="frame" id="status-bar">
+                    { self.src_view_button_view() }
                     <p>{"Lorem ipsum dolor sit amet consectetur, adipisicing elit. Earum et voluptates atque, neque sint iste possimus at rerum accusantium quidem."}</p>
                 </div>
             </div>
@@ -43,10 +46,28 @@ impl Model {
     }
 
     pub fn main_editor(&self) -> Html {
-        let view_new = self.cube_new_view();
-        let view_main = self.cube_view();
-        // Test: cube - new?
-        if self.cube.empty() && self.cube.name.is_empty() { view_new } else { view_main }
+        // Fixme: cube - new?
+        if self.cube.empty() && self.cube.name.is_empty() { 
+            self.cube_new_view() 
+        } else if self.src_view { 
+            self.cube_src_view()
+        } else { 
+            self.cube_view() 
+        }
     }
 
+}
+
+
+impl Model {
+    pub fn src_view_button_view(&self) -> Html {
+        html! {
+            <button class="src-button"
+                title="The source code of the cube."
+                ondblclick=self.link.callback(move |_| {
+                    Cubey![SrcViewToggle(None)]
+                })
+            >{"Source Code View"}</button>
+        }
+    }
 }

@@ -116,13 +116,19 @@ impl Model {
                         None => !self.src_view,
                         Some(x) => x
                     };
-                    let writing = if !src_view {
-                        match from_json_str(&self.buffer_str) {
-                            Ok(cube) => { self.cube = cube; true }
-                            _ => false
-                        }
-                    } else { true };
+                    let writing = 
+                        if src_view {
+                            self.buffer_str = to_json(&self.cube);
+                            true 
+                        } else { 
+                            match from_json_str(&self.buffer_str) {
+                                Ok(cube) => { self.cube = cube; true }
+                                _ => false
+                            }
+                        };
                     if writing { self.src_view = src_view }
+                    // Debug..
+                    self.src_view = src_view;
                     self.revisit( Cubey![_LogCube] );
                 }
                 _LogCube => LOG!("{}", to_json(&self.cube)),

@@ -118,6 +118,7 @@ where Id: Identity
         match self.locate(obj) {
             Some(pos) => {
                 self.data.remove(pos);
+                // Fixme: preserve query position.
                 self.pos = None;
             }
             None => ()

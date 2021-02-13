@@ -16,15 +16,15 @@
 - [ ] Support clipboard exporting / importing.
   - [x] Support json.
   - [ ] Interface.
-  - [ ] Msg Update.
+  - [x] Msg Update.
 - [ ] Support cube management.
   - [x] Generalized Id System.
   - [ ] Cube Id & searching.
   - [ ] Cube RelationModel.
   - [ ] Cube -> Stockpile/Branch.
   - [ ] Cube storage.
-- [ ] Cube Msg.
-- [x] CSS.
+  - [x] Separate Cube Msg.
+- [x] Node CSS.
 - [ ] Bubble details.
 - [ ] Filter.
 

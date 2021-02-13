@@ -2,6 +2,10 @@ use crate::yew_util::*;
 use crate::stockpile::prelude::*;
 use crate::ui::*;
 
+use CubeMessage::*;
+
+// Cube_new_view
+
 impl Model {
     pub fn cube_new_view(&self) -> Html {
         html! {
@@ -11,7 +15,6 @@ impl Model {
         }
     }
     pub fn cube_new_input_view(&self) -> Html {
-        use CubeMessage::*;
         html! {
             <div class="cube-input">
                 <input
@@ -31,7 +34,11 @@ impl Model {
             </div>
         }
     }
+}
 
+// Cube_view
+
+impl Model {
     pub fn cube_view(&self) -> Html {
         let relation = &self.cube.relation;
         let vec = &relation.data;
@@ -43,13 +50,12 @@ impl Model {
                     { for vec.iter().map(|id| self.node_view(id)) }
                 </div>
                 { self.clearall_button_view() }
-                { self.src_view_button_view() }
+                // { self.src_view_button_view() }
             </div>
         }
     }
 
     fn cube_input_view(&self) -> Html {
-        use CubeMessage::*;
         html! {
             <div class="cube-input">
                 <input
@@ -96,7 +102,6 @@ impl Model {
 
     fn node_status_view(&self, id: &EntryId) -> Html {
         let id = id.clone();
-        use CubeMessage::*;
         let vec = ProcessStatus::vec_all();
         let status_meta: Vec<(String, String)> = 
             vec.iter().map( |x| (
@@ -131,7 +136,6 @@ impl Model {
     }
 
     fn node_input_view(&self, id: &EntryId) -> Html {
-        use CubeMessage::*;
         let id = id.clone();
         let is_empty = self.cube.get(id).face().is_empty();
         html! {
@@ -193,13 +197,12 @@ impl Model {
                     LOG!("OnInput: {:?}", e);
                     Cubey![UpdateBuffer(e.value), WriteFace(id)]
                 })
-                readonly=if self.cube.locked { true } else { false }
+                readonly=self.cube.locked
             />
         }
     }
 
     fn add_button_view(&self, id_vec: Vec<EntryId>) -> Html {
-        use CubeMessage::*;
         html! {
             <button class="add-button"
                 title="New node."
@@ -212,7 +215,6 @@ impl Model {
     }
 
     fn erase_button_view(&self, id: &EntryId) -> Html {
-        use CubeMessage::*;
         let id = id.clone();
         html! {
             <button class="del-button"
@@ -226,7 +228,6 @@ impl Model {
     }
 
     fn clearall_button_view(&self) -> Html {
-        use CubeMessage::*;
         html! {
             <button class="clear-button"
                 title="Clear cube."
@@ -237,15 +238,24 @@ impl Model {
         }
     }
 
-    fn src_view_button_view(&self) -> Html {
-        use CubeMessage::*;
+}
+
+// Cube_src_view
+
+impl Model {
+    pub fn cube_src_view(&self) -> Html {
         html! {
-            <button class="src-button"
-                title="The source code of the cube."
-                ondblclick=self.link.callback(move |_| {
-                    Cubey![SrcViewToggle(None)]
-                })
-            >{"Source Code View"}</button>
+            <div class="cube-src">
+                <textarea class="cube-src-input"
+                    value=self.buffer_str
+                    oninput=self.link.callback(move |e: InputData| {
+                        LOG!("OnInput: {:?}", e);
+                        Cubey![UpdateBuffer(e.value)]
+                    })
+                    rows=20
+                />
+                // { self.src_view_button_view() }
+            </div>
         }
     }
 }
