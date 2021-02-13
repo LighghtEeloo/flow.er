@@ -20,12 +20,13 @@ where Id: Identity
     fn locate(&self, obj: Id) -> Option<usize> {
         self.data.iter().position(|&x| obj == x)
     }
-    /// move according to number delta, and return true if moved
+    /// move according to number delta, and return real delta if moved
     fn try_move(&mut self, delta: isize) -> isize {
         match self.pos {
             Some(pos) => {
                 let pos_ = pos as isize + delta;
-                let pos_: usize = if pos_ < 0 { 0 } else if pos_ < self.data.len() as isize { pos_ as usize } else { self.data.len() - 1 };
+                let pos_: usize = 
+                    if pos_ < 0 { 0 } else if pos_ < self.data.len() as isize { pos_ as usize } else { self.data.len() - 1 };
                 self.pos = Some(pos_);
                 pos_ as isize - pos as isize
             }
@@ -118,8 +119,7 @@ where Id: Identity
         match self.locate(obj) {
             Some(pos) => {
                 self.data.remove(pos);
-                // Fixme: preserve query position.
-                self.pos = None;
+                self.try_move(-1);
             }
             None => ()
         };
