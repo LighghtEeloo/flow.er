@@ -3,20 +3,26 @@ use crate::yew_util::*;
 use crate::stockpile::prelude::*;
 use crate::ui::{KEY, Model, Message};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum CubeMessage {
     UpdateBuffer(String),
+
     NewCube,
     ClearCube,
     WriteCubeName,
+
     NewNode(Vec<EntryId>),
     WriteFace(EntryId),
     WriteProcess(EntryId),
     EraseNode(EntryId),
+
     SetFocusId(Option<EntryId>),
     Wander(Direction, bool),
     Focus,
+
     SrcViewToggle(Option<bool>),
+    // Debug..
+    _LogCube,
 }
 
 impl CubeMessage {
@@ -62,14 +68,14 @@ impl Model {
                         let new_id = self.cube.grow();
                         self.cube.tiptoe(new_id);
                         self.refs.insert(new_id, NodeRef::default());
-                        self.link.callback(move |_: ()| Cubey![Focus] ).emit(());
+                        self.revisit( Cubey![Focus] );
                     } else {
                         // Todo: change the semantics.
                         for root_id in vec {
                             let new_id = self.cube.grow();
                             self.cube.chain(new_id, root_id);
                             self.refs.insert(new_id, NodeRef::default());
-                            self.link.callback(move |_: ()| Cubey![Focus] ).emit(());
+                            self.revisit( Cubey![Focus] );
                         }
                     }
                 }
@@ -83,7 +89,7 @@ impl Model {
                 }
                 EraseNode(id) => {
                     self.cube.erase(id);
-                    self.link.callback(move |_: ()| Cubey![Focus] ).emit(());
+                    self.revisit( Cubey![Focus] );
                 }
                 SetFocusId(id) => {
                     match id {
@@ -93,29 +99,33 @@ impl Model {
                 }
                 Wander(dir, fixed) => {
                     self.cube.relation.wander(dir, fixed);
-                    self.link.callback(move |_: ()| Cubey![Focus] ).emit(());
+                    self.revisit( Cubey![Focus] );
                 }
                 Focus => {
                     let id = self.cube.relation.current();
-                    match id {
-                        Some(id) => {
-                            if let Some(input) = self.refs.get(&id).unwrap().cast::<InputElement>() {
-                                input.focus().unwrap();
-                            }
-                        }
-                        None => {
-                            if let Some(input) = self.ref_cube_name.cast::<InputElement>() {
-                                input.focus().unwrap();
-                            }
-                        }
+                    let ref_obj = match id {
+                        Some(id) => self.refs.get(&id).unwrap(),
+                        None => &self.ref_cube_name,
+                    };
+                    if let Some(input) = ref_obj.cast::<InputElement>() {
+                        input.focus().unwrap();
                     }
                 }
                 SrcViewToggle(x) => {
-                    self.src_view = match x {
+                    let src_view = match x {
                         None => !self.src_view,
                         Some(x) => x
                     };
+                    let writing = if !src_view {
+                        match from_json_str(&self.buffer_str) {
+                            Ok(cube) => { self.cube = cube; true }
+                            _ => false
+                        }
+                    } else { true };
+                    if writing { self.src_view = src_view }
+                    self.revisit( Cubey![_LogCube] );
                 }
+                _LogCube => LOG!("{}", to_json(&self.cube)),
             }
         }
         // Note: Only self.stockpile is saved.

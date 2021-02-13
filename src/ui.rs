@@ -13,7 +13,7 @@ pub use cube::{CubeMessage, CubeMessages};
 
 const KEY: &str = "yew.life.tracer.self";
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Message {
     Cube(cube::CubeMessages),
     // Todo: Branch.
@@ -80,4 +80,9 @@ impl Component for Model {
     }
 }
 
+impl Model {
+    pub fn revisit(&mut self, msg: Message) {
+        self.link.callback(move |_: ()| msg.clone() ).emit(());
+    }
+}
 
