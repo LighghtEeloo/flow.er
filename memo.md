@@ -23,11 +23,14 @@
   - [ ] Cube RelationModel.
   - [ ] Cube -> Stockpile/Branch.
   - [ ] Cube storage.
+- [ ] Cube Msg.
 - [x] CSS.
 - [ ] Bubble details.
+- [ ] Filter.
 
 
 ## Fix List
 - [x] Better model which preserves the first node (title does the job).
+- [ ] Delayed deletion (with safe-lock).
 - [ ] Caret-position-based new line.
 - [ ] Queue-preserving deletion.
