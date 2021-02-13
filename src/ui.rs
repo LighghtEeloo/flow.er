@@ -25,7 +25,7 @@ pub struct Model {
     cube: Cube,
     buffer_str: String,
     refs: HashMap<EntryId, NodeRef>,
-    ref_name: NodeRef,
+    ref_cube_name: NodeRef,
     storage: StorageService,
     link: ComponentLink<Self>,
 }
@@ -53,7 +53,7 @@ impl Component for Model {
             cube,
             buffer_str: String::new(),
             refs,
-            ref_name: NodeRef::default(),
+            ref_cube_name: NodeRef::default(),
             storage,
             link,
         }
@@ -73,20 +73,7 @@ impl Component for Model {
     }
 
     fn view(&self) -> Html {
-        let view = html! {
-            <div class="app-wrapper">
-                <div class="frame" id="left-sidebar">
-                    { Model::sidebar_tabs() }
-                </div>
-                <div class="frame" id="main-editor">
-                    { self.main_editor() }
-                </div>
-                <div class="frame" id="status-bar">
-                    <p>{"Lorem ipsum dolor sit amet consectetur, adipisicing elit. Earum et voluptates atque, neque sint iste possimus at rerum accusantium quidem."}</p>
-                </div>
-            </div>
-        };
-        view
+        self.main_view()
     }
 }
 

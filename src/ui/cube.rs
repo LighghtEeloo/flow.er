@@ -106,7 +106,7 @@ impl Model {
                             }
                         }
                         None => {
-                            if let Some(input) = self.ref_name.cast::<InputElement>() {
+                            if let Some(input) = self.ref_cube_name.cast::<InputElement>() {
                                 input.focus().unwrap();
                             }
                         }

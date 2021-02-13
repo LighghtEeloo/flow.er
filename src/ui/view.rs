@@ -1,6 +1,22 @@
 use crate::ui::*;
 
 impl Model {
+    pub fn main_view(&self) -> Html {
+        html! {
+            <div class="app-wrapper">
+                <div class="frame" id="left-sidebar">
+                    { Model::sidebar_tabs() }
+                </div>
+                <div class="frame" id="main-editor">
+                    { self.main_editor() }
+                </div>
+                <div class="frame" id="status-bar">
+                    <p>{"Lorem ipsum dolor sit amet consectetur, adipisicing elit. Earum et voluptates atque, neque sint iste possimus at rerum accusantium quidem."}</p>
+                </div>
+            </div>
+        }
+    }
+
     pub fn sidebar_tabs() -> Html {
         let tab_meta: Vec<(&str, &str, bool)> = vec! {
             ("static/icons/hexagons.svg", "Workspace", false),
@@ -29,7 +45,6 @@ impl Model {
     pub fn main_editor(&self) -> Html {
         let view_new = self.cube_new_view();
         let view_main = self.cube_view();
-
         // Test: cube - new?
         if self.cube.empty() && self.cube.name.is_empty() { view_new } else { view_main }
     }

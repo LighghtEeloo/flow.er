@@ -16,7 +16,7 @@ impl Model {
             <div class="cube-input">
                 <input
                     type="text"
-                    ref=self.ref_name.clone()
+                    ref=self.ref_cube_name.clone()
                     placeholder="Enter new proj name."
                     oninput=self.link.callback(move |e: InputData| {
                         LOG!("OnInput - new: {:?}", e);
@@ -53,7 +53,7 @@ impl Model {
             <div class="cube-input">
                 <input
                     type="text"
-                    ref=self.ref_name.clone()
+                    ref=self.ref_cube_name.clone()
                     placeholder="Enter new proj name."
                     value=self.cube.name
                     onfocus=self.link.callback(move |_| {
