@@ -145,9 +145,9 @@ body {
 
 /* Src Button */
 
-#status-bar .src-button
+#status-bar .status-bar-button
 {
-    position: absolute;
+    position: relative;
     bottom: 0;
     left: 0;
     margin: 0;
@@ -160,12 +160,12 @@ body {
     background-color: var(--mainColor);
 }
 
-#status-bar .src-button span {
+#status-bar .status-bar-button span {
     position: relative;
     top: -1px;
 }
 
-#status-bar .src-button img
+#status-bar .status-bar-button img
 {
     position: relative;
     top: 1px;
@@ -173,6 +173,6 @@ body {
     height: calc(var(--len-status-bar) * 0.7);
 }
 
-#status-bar .src-button:hover {
+#status-bar .status-bar-button:hover {
     background-color: var(--emphasizeColor);
 }

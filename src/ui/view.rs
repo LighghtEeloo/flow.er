@@ -14,8 +14,12 @@ impl Model {
                 </div>
                 <div class="frame" id="status-bar">
                     { self.src_view_button_view() }
+                    { self.export_button_view() }
                     <p style="
-                        width: 80%;
+                        position: absolute;
+                        top: 0; bottom: 0; left: 0; right: 0;
+                        height: 100%;
+                        width: 60%;
                         margin: auto;
                         font-family: cursive;
                         text-align: center;
@@ -24,6 +28,7 @@ impl Model {
                         {"Lorem ipsum dolor sit amet consectetur, adipisicing elit."}
                     </p>
                 </div>
+                <script src="static/third/clip.js"/>
             </div>
         }
     }
@@ -70,7 +75,7 @@ impl Model {
 impl Model {
     pub fn src_view_button_view(&self) -> Html {
         html! {
-            <button class="src-button"
+            <button class="status-bar-button" id="src-button"
                 title="The source code of the cube."
                 onclick=self.link.callback(move |_| {
                     Cubey![SrcViewToggle(None)]
@@ -78,6 +83,17 @@ impl Model {
             >
                 <img src="static/icons/StatusBar/src-code.svg" alt="Code_pic"/>
                 <span>{"  Source Code  "}</span>
+            </button>
+        }
+    }
+    pub fn export_button_view(&self) -> Html {
+        html! {
+            <button class="status-bar-button" id="export-button"
+                title="Copy src to clipboard."
+                data-clipboard-text="Just because you can doesn't mean you should — clipboard.js"
+            >
+                <img src="static/icons/StatusBar/code-download.svg" alt="Code_pic"/>
+                <span>{"  To Clipboard  "}</span>
             </button>
         }
     }
