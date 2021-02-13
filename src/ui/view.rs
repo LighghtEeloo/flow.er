@@ -64,7 +64,7 @@ impl Model {
         html! {
             <button class="src-button"
                 title="The source code of the cube."
-                ondblclick=self.link.callback(move |_| {
+                onclick=self.link.callback(move |_| {
                     Cubey![SrcViewToggle(None)]
                 })
             >{"Source Code View"}</button>
