@@ -68,8 +68,8 @@ impl CubeModel {
         if messages.is_empty() { return true; }
         LOG!("|--- buffer: {:?}", self.buffer_str);
         let old_erase_lock = self.erase_lock;
-        for msg in messages {
-            match msg {
+        for message in messages {
+            match message {
                 UpdateBuffer(val) => {
                     self.buffer_str = val;
                 }

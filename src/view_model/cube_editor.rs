@@ -28,7 +28,7 @@ impl CubeModel {
                     })
                     onkeypress=self.link.callback(move |e: KeyboardEvent| {
                         LOG!("OnKeyPress: {:?}", e);
-                        if e.key() == "Enter" { Cubey![NewCube] } else { Cubey![] }
+                        if e.key() == "Enter" { Cubey![WriteCubeName] } else { Cubey![] }
                     })
                 />
                 <div class="dash-line"></div>

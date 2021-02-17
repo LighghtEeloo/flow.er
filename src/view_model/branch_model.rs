@@ -15,8 +15,30 @@ pub struct BranchModel {
     pub link: ComponentLink<Model>
 }
 
+impl BranchModel {
+    pub fn revisit(&mut self, msg: Message) {
+        self.link.callback(move |_: ()| msg.clone() ).emit(());
+    }
+}
+
 #[derive(Debug, Clone)]
 pub enum BranchMessage {
+    UpdateBuffer(String),
+
+    ClearBranch,
+
+    NewCube(Option<CubeId>),
+    WriteName(CubeId),
+    EraseCube(CubeId),
+
+    SetFocusId(Option<CubeId>),
+    Wander(Direction, bool),
+    Focus,
+
+    /// None if bare toggle; Some if force turn on / off.
+    SrcViewToggle(Option<bool>),
+    // Debug..
+    _LogBranch,
 
 }
 
@@ -36,8 +58,85 @@ impl BranchModel {
         }
     }
     pub fn branch_update(&mut self, messages: BranchMessages) -> ShouldRender {
-        match messages {
-            _ => ()
+        use BranchMessage::*;
+        for message in messages {
+            match message {
+                UpdateBuffer(val) => {
+                    self.buffer_str = val;
+                }
+                ClearBranch => {
+                    self.branch.flow.clear();
+                    self.branch.cubes.clear();
+                }
+
+                NewCube(des) => {
+                    let id = self.branch.grow();
+                    self.branch.chain(id, des);
+                    self.refs.insert(id, NodeRef::default());
+                }
+                WriteName(id) => {
+                    self.branch.get_mut(id).name = mem::take(&mut self.buffer_str);
+                }
+                EraseCube(id) => {
+                    if self.erase_lock {
+                        self.erase_lock = false;
+                    } else {
+                        self.branch.erase(id);
+                        self.revisit( Cubey![Focus] );
+                        self.erase_lock = true;
+                    }
+                }
+                SetFocusId(id) => {
+                    match id {
+                        Some(id) => self.branch.flow.focus(id),
+                        None => self.branch.flow.pos = None
+                    }
+                }
+                Wander(dir, fixed) => {
+                    self.branch.flow.wander(dir, fixed);
+                    self.revisit( Branchy![Focus] );
+                }
+                Focus => {
+                    let id = self.branch.flow.current()
+                        .or(self.branch.flow.root)
+                        .or(self.branch.flow.orphans.get(0).cloned());
+                    // Note: if Some, focus(); None then do nothing.
+                    if let Some(id) = id {
+                        let ref_obj = self.refs.get(&id).unwrap();
+                        if let Some(input) = ref_obj.cast::<InputElement>() {
+                            input.focus().unwrap();
+                        }
+                    }
+                }
+                SrcViewToggle(x) => {
+                    let src_view = match x {
+                        None => !self.src_view,
+                        Some(x) => x
+                    };
+                    let writing = 
+                        if src_view {
+                            self.buffer_str = export_json(&self.branch);
+                            true 
+                        } else { 
+                            match from_json_str(&self.buffer_str) {
+                                Ok(branch) => { 
+                                    self.branch = branch;
+                                    self.refs.clear();
+                                    self.refs.extend(
+                                        self.branch.cubes.keys().map(|&k| (k, NodeRef::default()) )
+                                    );
+                                    true 
+                                }
+                                _ => false
+                            }
+                        };
+                    if writing { self.src_view = src_view }
+                }
+                _LogBranch => {
+                    // LOG!("{}", to_json(&self.cube));
+                    LOG!("Dumped: {:#?}", &self.branch);
+                },
+            }
         }
         true
     }
