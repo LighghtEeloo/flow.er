@@ -1,7 +1,7 @@
 use crate::util::*;
 use crate::yew_util::*;
 use crate::stockpile::prelude::*;
-use crate::ui::{KEY, Model, Message};
+use crate::ui::{KEY, CubeModel, Message};
 
 #[derive(Debug, Clone)]
 pub enum CubeMessage {
@@ -26,12 +26,6 @@ pub enum CubeMessage {
 }
 
 impl CubeMessage {
-    // pub fn uni(a: CubeMessage) -> Message {
-    //     Message::Cube(vec![a])
-    // }
-    // pub fn bi(a: [CubeMessage; 2]) -> Message {
-    //     Message::Cube(Vec::from(a))
-    // }
     pub fn multi(a: CubeMessages) -> Message {
         Message::Cube(a)
     }
@@ -41,7 +35,7 @@ pub type CubeMessages = Vec<CubeMessage>;
 
 
 
-impl Model {
+impl CubeModel {
     pub fn cube_update(&mut self, messages: CubeMessages) -> ShouldRender {
         use CubeMessage::*;
         // Test..
@@ -140,13 +134,13 @@ impl Model {
                 },
             }
         }
+
+        // Note: Restore lock.
         if old_erase_lock == false {
-            // Restore lock.
             self.erase_lock = true;
         }
-        // Note: Only self.stockpile is saved.
-        self.storage.store(KEY, Json(&self.cube));
-        // Debug..
+
+
         true
     }
 }

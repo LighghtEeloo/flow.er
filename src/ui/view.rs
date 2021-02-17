@@ -44,14 +44,21 @@ impl Model {
     }
 
     fn main_editor(&self) -> Html {
+        let cube_model = &self.cube_model;
         // Fixme: cube - new?
-        let editor = if self.cube.empty() && self.cube.name.is_empty() { 
-            self.cube_new_view() 
-        } else if self.src_view { 
-            self.cube_src_view()
-        } else { 
-            self.cube_view() 
-        };
+        let editor = 
+            match self.router {
+                Router::Cube => {
+                    if cube_model.cube.empty() && cube_model.cube.name.is_empty() { 
+                        cube_model.cube_new_view() 
+                    } else if cube_model.src_view { 
+                        cube_model.cube_src_view()
+                    } else { 
+                        cube_model.cube_view() 
+                    }
+                }
+                _ => html! {}
+            };
         html! {
             <div class="frame" id="main-editor">
                 { editor }
@@ -100,7 +107,7 @@ impl Model {
         html! {
             <button class="status-bar-button" id="export-button"
                 title="Copy src to clipboard."
-                data-clipboard-text={ export_json(&self.cube) }
+                data-clipboard-text={ export_json(&self.cube_model.cube) }
             >
                 <img src="static/icons/StatusBar/code-download.svg" alt="Code_pic"/>
                 <span>{"  To Clipboard  "}</span>

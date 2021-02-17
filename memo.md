@@ -21,10 +21,11 @@
   - [x] Automatic.
 - [ ] Cube Management
   - [x] Generalized Id System.
-  - [ ] Cube Id & searching.
+  - [x] Cube Id & searching.
   - [ ] Cube RelationModel.
-  - [ ] Cube -> Stockpile/Branch.
-  - [ ] Cube storage.
+  - [x] Cube -> Stockpile/Branch.
+  - [x] Cube storage.
+  - [ ] Use &mut Cube instead of clone().
   - [x] Separate Cube Msg.
 - [ ] Better Node
   - [x] Node CSS.

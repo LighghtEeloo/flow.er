@@ -6,7 +6,7 @@ use CubeMessage::*;
 
 // Cube_new_view
 
-impl Model {
+impl CubeModel {
     pub fn cube_new_view(&self) -> Html {
         html! {
             <div class="cube-new">
@@ -38,7 +38,7 @@ impl Model {
 
 // Cube_view
 
-impl Model {
+impl CubeModel {
     pub fn cube_view(&self) -> Html {
         let relation = &self.cube.relation;
         let vec = &relation.data;
@@ -212,7 +212,7 @@ impl Model {
 
 // Cube_src_view
 
-impl Model {
+impl CubeModel {
     pub fn cube_src_view(&self) -> Html {
         html! {
             <div class="cube-src">

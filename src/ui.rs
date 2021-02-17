@@ -2,14 +2,16 @@
 #[allow(unused_assignments)]
 #[allow(unused)]
 mod view;
-mod cube_editor;
+mod cube_model;
 mod cube_update;
+mod cube_editor;
 
 use crate::util::*;
 use crate::yew_util::*;
 use crate::stockpile::prelude::*;
 
 pub use cube_update::{CubeMessage, CubeMessages};
+pub use cube_model::CubeModel;
 
 const KEY: &str = "yew.life.tracer.self";
 
@@ -20,6 +22,15 @@ pub enum Router {
     History,
     Settings,
 }
+
+pub struct Model {
+    router: Router,
+    cube_model: CubeModel,
+    stockpile: Branch,
+    storage: StorageService,
+    link: ComponentLink<Self>,
+}
+
 
 #[derive(Debug, Clone)]
 pub enum Message {
@@ -39,20 +50,6 @@ pub enum GlobalMessage {
 }
 pub type GlobalMessages = Vec<GlobalMessage>;
 
-pub struct Model {
-    router: Router,
-    // src_view. true if src-code-view, false if cube view.
-    src_view: bool,
-    // erase_lock. true if locked, false if to-erase.
-    erase_lock: bool,
-    cube: Cube,
-    buffer_str: String,
-    refs: HashMap<EntryId, NodeRef>,
-    ref_cube_name: NodeRef,
-    storage: StorageService,
-    link: ComponentLink<Self>,
-}
-
 impl Component for Model {
     // Note: MsgStack.
     type Message = Message;
@@ -60,27 +57,38 @@ impl Component for Model {
 
     fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
         let storage = StorageService::new(Area::Local).expect("storage was disabled by the user");
-        let cube: Cube = {
+        let stockpile: Stockpile = {
             if let Json(Ok(restored_model)) = storage.restore(KEY) {
                 restored_model
             } else {
-                Cube::new()
+                Stockpile::new()
             }
         };
-
+        let cube: Cube =  match stockpile.flow.current() {
+            Some(id) => {
+                stockpile.get(id).clone()
+            }
+            None => Cube::new()
+        };
         // Debug..
-        LOG!("Loaded: {:#?}", cube);
-        
+        LOG!("Loaded: {:#?}", stockpile);
         let id_iter = cube.entries.keys().map(|x| (x.clone(),NodeRef::default()));
         let refs: HashMap<EntryId, NodeRef> = HashMap::from_iter(id_iter);
-        Self {
-            router: Router::Cube,
+        let cube_model = CubeModel {
             src_view: false,
             erase_lock: true,
             cube,
             buffer_str: String::new(),
             refs,
             ref_cube_name: NodeRef::default(),
+            link: link.clone()
+        };
+
+        
+        Self {
+            router: Router::Cube,
+            cube_model,
+            stockpile,
             storage,
             link,
         }
@@ -89,12 +97,19 @@ impl Component for Model {
     fn update(&mut self, messages: Self::Message) -> ShouldRender {
         use Message::*;
         LOG!("Updating: {:#?}.", messages);
-        match messages {
-            Cube(msg) => self.cube_update(msg),
+        let res = match messages {
+            Cube(msg) => {
+                let res = self.cube_model.cube_update(msg);
+                self.sync();
+                res
+            }
             // Branch => true,
             Global(msg) => self.global_update(msg),
             _ => true
-        }
+        };
+        // Note: Only self.stockpile is saved.
+        self.storage.store(KEY, Json(&self.stockpile));
+        res
     }
 
     fn change(&mut self, _: Self::Properties) -> ShouldRender {
@@ -107,6 +122,11 @@ impl Component for Model {
 }
 
 impl Model {
+    pub fn sync(&mut self) {
+        let cube_id = self.cube_model.cube.id();
+        let cube: &mut Cube = self.stockpile.get_mut(cube_id);
+        *cube = self.cube_model.cube.clone();
+    }
     pub fn revisit(&mut self, msg: Message) {
         self.link.callback(move |_: ()| msg.clone() ).emit(());
     }
