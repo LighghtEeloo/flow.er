@@ -47,7 +47,7 @@ impl BranchModel {
     //                         Branchy![UpdateBuffer(des.clone()), WriteProcess(id)]
     //                     })
     //                 > 
-    //                     <img src={src} /> 
+    //                     <img src={src} alt="process" /> 
     //                 </ul> 
     //             }
     //         }).collect();
@@ -56,7 +56,7 @@ impl BranchModel {
     //             <button class="dropbtn"
     //                 value=self.cube.get(id).process().type_str()
     //             > 
-    //                 <img src={self.cube.get(id).process().type_src()} />
+    //                 <img src={self.cube.get(id).process().type_src()} alt="process" />
     //             </button> 
                 
     //             <div class="dropdown-content"> 

@@ -110,7 +110,7 @@ impl Model {
                     Message::Global(vec![GlobalMessage::SrcHit])
                 })
             >
-                <img src="static/icons/StatusBar/src-code.svg" alt="Code_pic"/>
+                <img src="static/icons/StatusBar/src-code.svg" alt="code_pic"/>
                 <span>{"  Source Code  "}</span>
             </button>
         }
@@ -121,7 +121,7 @@ impl Model {
                 title="Copy src to clipboard."
                 data-clipboard-text={ export_json(&self.cube_model.cube) }
             >
-                <img src="static/icons/StatusBar/code-download.svg" alt="Code_pic"/>
+                <img src="static/icons/StatusBar/code-download.svg" alt="code_pic"/>
                 <span>{"  To Clipboard  "}</span>
             </button>
         }
