@@ -11,8 +11,7 @@ document.addEventListener('keydown', event => {
 
 // "Autofocus" src-input.
 src_view_button.addEventListener('click', _ => {
-    console.log("status:", src_view_button.view_status)
-    if (src_view_button.view_status === true) {
+    if (src_view_button.getAttribute("view_status") === true) {
         let src_input = document.querySelector('.src textarea.src-input');
         src_input.focus()
     }
