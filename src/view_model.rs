@@ -116,7 +116,7 @@ impl Component for Model {
         let res = match messages {
             Cube(msg) => {
                 let res = self.cube_model.cube_update(msg);
-                self.sync();
+                self.cube_write();
                 res
             }
             Branch(msg) => {
@@ -140,17 +140,11 @@ impl Component for Model {
 }
 
 impl Model {
-    pub fn sync(&mut self) {
+    pub fn cube_write(&mut self) {
         let cube_id = self.cube_model.cube.id();
-        let cube: &mut Cube = match self.stockpile.cubes.get_mut(&cube_id) {
-            Some(cube) => cube,
-            None => {
-                let id = self.stockpile.grow();
-                self.stockpile.tiptoe(id);
-                self.stockpile.get_mut(id)
-            }
-        };
-        *cube = self.cube_model.cube.clone();
+        self.stockpile.cubes.insert(cube_id, self.cube_model.cube.clone());
+        // Todo: FlowModel with orphan.
+        // Todo: Deal with FlowModel.
     }
     pub fn revisit(&mut self, msg: Message) {
         self.link.callback(move |_: ()| msg.clone() ).emit(());
