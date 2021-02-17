@@ -22,7 +22,7 @@ impl Branch {
         let found = self.cubes.get(&id).is_some();
         if !found {
             // Debug..
-            LOG!("Error: branch with {:?} not found.", id);
+            LOG!("Error: cube with id {:?} not found.", id);
             self.cubes.insert(id, Cube::with_id(id));
         }
         self.cubes.get(&id).unwrap()

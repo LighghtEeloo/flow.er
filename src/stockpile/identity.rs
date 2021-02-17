@@ -9,7 +9,12 @@ pub trait IdentityHash: Hash + Copy {
     fn from_time(v: &impl TimeRep) -> Self;
 }
 
-pub trait Identity: IdentityHash + PartialEq + Eq + Clone + Debug + Serialize + Deserialize<'static> {}
+pub trait Identity: IdentityHash + PartialEq + Eq + Clone + Debug + Serialize + Deserialize<'static> {
+    fn new() -> Self {
+        let stamp = TimeStamp::created();
+        Self::from_time(&stamp.data)
+    }
+}
 
 const LEN: usize = 6;
 

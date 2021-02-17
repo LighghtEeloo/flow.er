@@ -74,11 +74,15 @@ impl Component for Model {
     fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
         let storage = StorageService::new(Area::Local).expect("storage was disabled by the user");
         let mut stockpile: Stockpile = {
-            if let Json(Ok(restored_model)) = storage.restore(KEY) {
+            let stockpile = if let Json(Ok(restored_model)) = storage.restore(KEY) {
                 restored_model
             } else {
                 Stockpile::new()
-            }
+            };
+            // Debug..
+            // let mut stockpile = Stockpile::new();
+            // stockpile.editor_info = EditorInfo::new_some(CubeId::new());
+            stockpile
         };
         // Note: clean only on startup.
         stockpile.branch.clean();
@@ -139,7 +143,7 @@ impl Component for Model {
 
 impl Model {
     pub fn cube_read(&mut self) {
-        // Note: editor_info > cube_model.cube.id()
+        // Note: editor_info > cube_model.cube.id(), see _impl.
         self.cube_model.cube = Model::cube_read_impl(&mut self.stockpile).clone();
     }
     pub fn cube_write(&mut self) {
@@ -148,10 +152,7 @@ impl Model {
         self.stockpile.branch.cubes
             .insert(cube_id, self.cube_model.cube.clone());
             // .expect("failed to write cube");
-        self.stockpile.editor_info = Some( EditorInfo {
-            cube_id: Some(cube_id),
-            entry_id: self.cube_model.cube.relation.current()
-        });
+        self.stockpile.editor_info = EditorInfo::new_some(cube_id);
     }
     pub fn branch_read(&mut self) {
         self.branch_model.branch = self.stockpile.branch.clone();
@@ -163,7 +164,8 @@ impl Model {
     // impl
 
     fn cube_read_impl(stockpile: &mut Stockpile) -> &Cube {
-        match stockpile.editor_info.clone().map(|x| x.cube_id).flatten()
+        match None 
+        .or(stockpile.editor_info.cube_id)
         .or(stockpile.branch.flow.current())
         .or(stockpile.branch.flow.root)
         .or(stockpile.branch.flow.orphans.get(0).cloned()) {
@@ -222,7 +224,7 @@ impl Model {
                     self.revisit(router.refresh_message())
                 }
                 ClearEditorInfo => {
-                    self.stockpile.editor_info = None;
+                    self.stockpile.editor_info = EditorInfo::new_none();
                 }
             }
         }
