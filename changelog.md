@@ -20,3 +20,16 @@
 - fix: Hard backspace, easy delete.
 - todo: perfect keypress delete with individual buffer.
 - abort: dyn.
+
+## Ver 0.2.1
+- done: Router (partially).
+- impl: global src-view & ctrl+/.
+- rapid: branch_model.rs
+- misc: global message system.
+- done: seperate model with clone, read & write.
+- reframe: general.css
+- reframe: assassin.js
+- fix: most web issues.
+- todo: present branch view.
+- todo: perfect keypress delete with individual buffer.
+- todo: config & settings.
