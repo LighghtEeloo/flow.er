@@ -49,7 +49,6 @@ impl Entry {
         let id = EntryId::from_time(&stamp.data);
         Entry {
             dry: EntryDry::new(id),
-            // timestamps: vec!(stamp)
         }
     }
     pub fn dry(&self) -> EntryDry {

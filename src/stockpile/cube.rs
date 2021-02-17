@@ -1,9 +1,11 @@
 use crate::util::*;
+use crate::stockpile::time::*;
 use crate::stockpile::prelude::*;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Cube {
     pub name: String,
+    pub id: CubeId,
     pub locked: bool,
     pub entries: HashMap<EntryId, Entry>,
     // Todo: polymorphism
@@ -12,18 +14,27 @@ pub struct Cube {
 
 impl Cube {
     pub fn new() -> Self {
+        let stamp = TimeStamp::created();
+        let id = CubeId::from_time(&stamp.data);
         Cube {
             name: String::new(),
+            id,
             locked: false,
             entries: HashMap::new(),
             relation: LinearModel::new()
         }
+    }
+    pub fn id(&self) -> CubeId {
+        self.id.clone()
     }
     pub fn empty(&self) -> bool {
         self.entries.len() == 0
     }
     pub fn get(&self, id: EntryId) -> &Entry {
         self.entries.get(&id).unwrap()
+    }
+    pub fn get_mut(&mut self, id: EntryId) -> &mut Entry {
+        self.entries.get_mut(&id).unwrap()
     }
 }
 

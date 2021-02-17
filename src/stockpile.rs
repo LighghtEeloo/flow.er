@@ -21,6 +21,8 @@ use identity::IdentityHash;
 use crate::util::*;
 use prelude::*;
 
+pub type Stockpile = Branch;
+
 /// Grow describes any object that grows anonymously. 
 /// 
 /// Chain can bundle the change to the RelationModel
