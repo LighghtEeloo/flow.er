@@ -8,7 +8,7 @@ impl Model {
             <div class="app-wrapper"
                 onkeydown=self.link.callback(move |_e: KeyboardEvent| Message::_Debug(format!("Global!")))
             >
-                { self.sidebar_tabs() }
+                { self.sidebar_routers() }
                 { self.main_editor() }
                 { self.status_bar() }
                 <script src="static/third/clip.js"/>
@@ -16,20 +16,20 @@ impl Model {
         }
     }
 
-    fn sidebar_tabs(&self) -> Html {
+    fn sidebar_routers(&self) -> Html {
         use Router::*;
-        let tab_meta: Vec<(&str, Router, &str, bool)> = vec! {
+        let router_meta: Vec<(&str, Router, &str, bool)> = vec! {
             ("static/icons/hexagons.svg", Cube, "Workspace", false),
             ("static/icons/branch.svg", Branch, "Projects", false),
             ("static/icons/history.svg", History, "History", false),
             ("static/icons/settings.svg", Settings, "Settings", true),
         };
-        let sidebar_tabs: Html = 
-            tab_meta.into_iter().map(
+        let sidebar_routers: Html = 
+            router_meta.into_iter().map(
                 |(src, router, describe, bottom)| {
                     html! {
-                        <div class={if !bottom {"tab"} else {"tab tab-bottom"}}>
-                            <div class="tab-content"
+                        <div class={if !bottom {"router"} else {"router router-bottom"}}>
+                            <div class="router-content"
                                 onclick=self.link.callback(move |_| {
                                     Globaly!(GlobalMessage::SwitchRouter(router))
                                 })
@@ -43,7 +43,7 @@ impl Model {
             ).collect();
         html! {
             <div class="frame" id="left-sidebar">
-                { sidebar_tabs }
+                { sidebar_routers }
             </div>
         }
     }

@@ -20,7 +20,7 @@ body {
 
     --mainColor: rgba(216, 230, 236, 0.829);
     --backColor: rgba(217, 229, 235, 0.541);
-    /* --tabColor: rgba(216, 230, 236, 0.829); */
+    /* --routerColor: rgba(216, 230, 236, 0.829); */
     --emphasizeColor: rgba(238, 244, 247, 0.829);
     --dividerColor: rgba(10, 55, 77, 1);
 
@@ -91,27 +91,27 @@ body {
 
 
 
-.tab::before {
+.router::before {
     content: " ";
     display: block;
     padding-top: 100%;
 }
 
-.tab {
+.router {
     position: relative;
     background-color: var(--mainColor);
     border-bottom: 2px solid var(--dividerColor);
     list-style-type: none;
 }
 
-.tab.tab-bottom::before {
+.router.router-bottom::before {
     content: " ";
     display: block;
     padding-top: 0;
     padding-bottom: 100%;
 }
 
-.tab.tab-bottom {
+.router.router-bottom {
     border-bottom: none;
     border-top: 2px solid var(--dividerColor);
     position: absolute;
@@ -121,14 +121,14 @@ body {
     width: auto
 }
 
-.tab .tab-content {
+.router .router-content {
     position: absolute;
     top: 0; right: 0; bottom: 0; left: 0;
     /* width: auto; height: auto;
     margin: auto; */
 }
 
-.tab .tab-content img {
+.router .router-content img {
     width: 48%;
     height: auto;
     position: absolute;
@@ -158,10 +158,10 @@ body {
     left: 105%; 
   }
 
-.tab .tab-content:hover {
+.router .router-content:hover {
     background-color: var(--emphasizeColor);
 }
-.tab .tab-content:hover .tooltip {
+.router .router-content:hover .tooltip {
     visibility: visible;
 }
 
