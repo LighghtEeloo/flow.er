@@ -49,10 +49,10 @@ impl Model {
         let editor = 
             match self.router {
                 Router::Cube => {
-                    if cube_model.cube.empty() && cube_model.cube.name.is_empty() { 
-                        cube_model.cube_new_view() 
-                    } else if cube_model.src_view { 
+                    if cube_model.src_view { 
                         cube_model.cube_src_view()
+                    } else if cube_model.cube.empty() && cube_model.cube.name.is_empty() { 
+                        cube_model.cube_new_view() 
                     } else { 
                         cube_model.cube_view() 
                     }
