@@ -41,7 +41,7 @@ where Id: Identity
             }
         }
         // orphan
-        self.orphans.iter_mut().filter(|x| exist.get(&x).is_some());
+        self.orphans = self.orphans.iter().cloned().filter(|x| exist.get(&x).is_some()).collect();
         // Todo: trim data -> descendant.
     }
     // /// move according to number delta, and return true if moved

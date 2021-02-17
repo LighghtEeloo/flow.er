@@ -8,8 +8,9 @@ use BranchMessage::*;
 
 impl BranchModel {
     pub fn branch_view(&self) -> Html {
-        let relation = &self.branch.flow;
-        let map = &relation.data;
+        // Todo: deal with flow.
+        let flow = &self.branch.flow;
+        let map = &flow.data;
         html! {
             <div class="branch">
                 <div class="cube-group">

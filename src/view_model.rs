@@ -66,9 +66,11 @@ impl Component for Model {
                 Stockpile::new()
             }
         };
-        // Debug..
-        LOG!("Loaded: {:#?}", stockpile);
-
+        // Note: clean only on startup.
+        stockpile.branch.clean();
+        // Test..
+        LOG!("Loaded & Cleaned: {:#?}", stockpile);
+        
         // Todo: Use RefCell.
         let cube: &Cube =  
             match stockpile.editor_info.clone().map(|x| x.cube_id).flatten()
@@ -147,8 +149,8 @@ impl Model {
         // Note: update editor_info with cube_model.cube.id()
         let cube_id = self.cube_model.cube.id();
         self.stockpile.branch.cubes
-            .insert(cube_id, self.cube_model.cube.clone())
-            .expect("failed to write cube");
+            .insert(cube_id, self.cube_model.cube.clone());
+            // .expect("failed to write cube");
         self.stockpile.editor_info = Some( EditorInfo {
             cube_id: Some(cube_id),
             entry_id: self.cube_model.cube.relation.current()

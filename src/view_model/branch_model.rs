@@ -59,6 +59,10 @@ impl BranchModel {
     }
     pub fn branch_update(&mut self, messages: BranchMessages) -> ShouldRender {
         use BranchMessage::*;
+        if messages.is_empty() { return true; }
+        // Test..
+        LOG!("|--- buffer: {:?}", self.buffer_str);
+        let old_erase_lock = self.erase_lock;
         for message in messages {
             match message {
                 UpdateBuffer(val) => {
@@ -138,6 +142,13 @@ impl BranchModel {
                 },
             }
         }
+
+        // Note: Restore lock.
+        if old_erase_lock == false {
+            self.erase_lock = true;
+        }
+
+
         true
     }
 }

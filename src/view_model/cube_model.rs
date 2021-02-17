@@ -64,8 +64,8 @@ impl CubeModel {
     }
     pub fn cube_update(&mut self, messages: CubeMessages) -> ShouldRender {
         use CubeMessage::*;
-        // Test..
         if messages.is_empty() { return true; }
+        // Test..
         LOG!("|--- buffer: {:?}", self.buffer_str);
         let old_erase_lock = self.erase_lock;
         for message in messages {

@@ -49,7 +49,7 @@ pub struct CubeId (u64);
 
 impl Debug for CubeId {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> { 
-        write!(f, "{{{}}}", self.0) 
+        write!(f, "{{{{{}}}}}", self.0) 
     }
 }
 

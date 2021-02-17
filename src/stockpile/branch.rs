@@ -24,6 +24,7 @@ impl Branch {
     pub fn get_mut(&mut self, id: CubeId) -> &mut Cube {
         self.cubes.get_mut(&id).unwrap()
     }
+    /// Remove all is_empty() cubes.
     pub fn clean(&mut self) {
         let kill_list: Vec<CubeId> = self.cubes.iter()
             .map(|(&key, cube)| {

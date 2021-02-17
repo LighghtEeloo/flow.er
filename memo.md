@@ -37,16 +37,14 @@
 ## Todo List
 
 - [ ] Router.
-  - [ ] Buttons.
-- [ ] Better FlowModel.
+  - [x] Router buttons.
+  - [x] Src view.
+  - [ ] History.
+  - [ ] Settings.
+- [ ] Better FlowModel -> Branch.
   - [ ] How to manage / show cubes.
   - [ ] How to present.
-- [ ] Support clipboard exporting / importing.
-  - [x] Support json.
-  - [x] Interface.
-  - [x] Msg Update.
-  - [ ] Ctrl + /.
-  - [x] Automatic.
+  - [ ] How to operate on UI.
 - [ ] Cube Management
   - [x] Generalized Id System.
   - [x] Cube Id & searching.
@@ -56,7 +54,13 @@
   - [x] Cube -> Stockpile/Branch.
   - [x] Cube storage.
   - [x] Separate Cube Msg.
-  - [ ] Use &mut Cube instead of clone().
+  - [ ] ~~Use &mut Cube instead of clone().~~
+- [ ] Support clipboard exporting / importing.
+  - [x] Support json.
+  - [x] Interface.
+  - [x] Msg Update.
+  - [ ] Ctrl + /.
+  - [x] Automatic.
 - [ ] Better Node
   - [x] Node CSS.
   - [ ] Move node with keyboard.
