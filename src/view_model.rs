@@ -57,7 +57,7 @@ impl Component for Model {
 
     fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
         let storage = StorageService::new(Area::Local).expect("storage was disabled by the user");
-        let stockpile: Stockpile = {
+        let mut stockpile: Stockpile = {
             if let Json(Ok(restored_model)) = storage.restore(KEY) {
                 restored_model
             } else {
@@ -67,38 +67,22 @@ impl Component for Model {
         // Debug..
         LOG!("Loaded: {:#?}", stockpile);
 
-        // Todo: Use Arc.
-        let cube: Cube =  match stockpile.branch.flow.current() {
+        // Todo: Use RefCell.
+        let cube: &Cube =  match stockpile.branch.flow.current() {
             Some(id) => {
-                stockpile.branch.get(id).clone()
+                stockpile.branch.get(id)
             }
-            None => Cube::new()
+            None => {
+                let cube_id = stockpile.branch.grow();
+                stockpile.branch.tiptoe(cube_id);
+                stockpile.branch.get(cube_id)
+            }
         };
+        let cube_model = CubeModel::cube_create(cube, &link);
 
-        let entry_id_iter = cube.entries.keys().map(|x| (x.clone(),NodeRef::default()));
-        let entry_ref = HashMap::from_iter(entry_id_iter);
-        let cube_model = CubeModel {
-            src_view: false,
-            erase_lock: true,
-            cube,
-            buffer_str: String::new(),
-            refs: entry_ref,
-            ref_cube_name: NodeRef::default(),
-            link: link.clone()
-        };
         
-        // Todo: Use Ref.
-        let branch: Branch = stockpile.branch.clone();
-        let cube_id_iter = branch.cubes.keys().map(|x| (x.clone(),NodeRef::default()));
-        let cube_ref = HashMap::from_iter(cube_id_iter);
-        let branch_model = BranchModel {
-            src_view: false,
-            erase_lock: true,
-            branch,
-            buffer_str: String::new(),
-            refs: cube_ref,
-            link: link.clone()
-        };
+        // Todo: Use RefCell.
+        let branch_model = BranchModel::branch_create(&stockpile.branch, &link);
 
         Self {
             router: Router::Cube,

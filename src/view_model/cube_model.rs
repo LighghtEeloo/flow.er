@@ -55,6 +55,19 @@ impl CubeMessage {
 pub type CubeMessages = Vec<CubeMessage>;
 
 impl CubeModel {
+    pub fn cube_create(cube: &Cube, link: &ComponentLink<Model>) -> CubeModel {
+        let entry_id_iter = cube.entries.keys().map(|x| (x.clone(),NodeRef::default()));
+        let entry_ref = HashMap::from_iter(entry_id_iter);
+        CubeModel {
+            src_view: false,
+            erase_lock: true,
+            cube: cube.clone(),
+            buffer_str: String::new(),
+            refs: entry_ref,
+            ref_cube_name: NodeRef::default(),
+            link: link.clone()
+        }
+    }
     pub fn cube_update(&mut self, messages: CubeMessages) -> ShouldRender {
         use CubeMessage::*;
         // Test..
