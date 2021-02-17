@@ -56,12 +56,6 @@
   - [x] Cube storage.
   - [x] Separate Cube Msg.
   - [ ] ~~Use &mut Cube instead of clone().~~
-- [ ] Support clipboard exporting / importing.
-  - [x] Support json.
-  - [x] Interface.
-  - [x] Msg Update.
-  - [ ] Ctrl + /.
-  - [x] Automatic.
 - [ ] Better Node
   - [x] Node CSS.
   - [ ] Move node with keyboard.
@@ -78,3 +72,14 @@
 - [x] New cube as root / orphan. What to show on startup? 
 - [x] NodeRef should be updated if node altered.
 - [ ] Refresh CubeModel if changed outside.
+
+
+
+## Done List
+- [x] Support clipboard exporting / importing.
+  - [x] Support json.
+  - [x] Interface.
+  - [x] Msg Update.
+  - [x] Ctrl + /.
+  - [x] Automatic.
+

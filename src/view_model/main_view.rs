@@ -9,7 +9,7 @@ impl Model {
                 { self.sidebar_routers() }
                 { self.main_editor() }
                 { self.status_bar() }
-                <script src="static/third/clip.js"/>
+                <script src="static/third/assassin.js"/>
             </div>
         }
     }
@@ -105,6 +105,7 @@ impl Model {
         html! {
             <button class="status-bar-button" id="src-button"
                 title="The source code of the cube."
+                view_status=self.src_view_status()
                 onclick=self.link.callback(move |_| {
                     Message::Global(vec![GlobalMessage::SrcHit])
                 })

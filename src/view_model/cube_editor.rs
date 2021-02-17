@@ -219,7 +219,7 @@ impl CubeModel {
         html! {
             <div class="src">
                 <textarea class="src-input"
-                    value=self.buffer_str
+                    value=if self.src_view { self.buffer_str.clone() } else { String::new() }
                     type="text" 
                     oninput=self.link.callback(move |e: InputData| {
                         LOG!("OnInput: {:?}", e);

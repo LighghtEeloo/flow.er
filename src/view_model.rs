@@ -178,7 +178,16 @@ impl Model {
         }
     }
 
+    pub fn src_view_status(&self) -> bool {
+        match self.router {
+            Router::Cube => self.cube_model.src_view,
+            Router::Branch => self.branch_model.src_view,
+            _ => false
+        }
+    }
+}
 
+impl Model {
     pub fn revisit(&mut self, msg: Message) {
         self.link.callback(move |_: ()| msg.clone() ).emit(());
     }
