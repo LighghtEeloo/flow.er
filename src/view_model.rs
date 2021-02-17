@@ -26,6 +26,7 @@ pub enum Router {
 
 impl Router {
     fn refresh_message(&self) -> Message {
+        // Note: This refreshes and syncs the specific model.
         use Router::*;
         match self {
             Cube => Cubey![CubeMessage::_LogCube],

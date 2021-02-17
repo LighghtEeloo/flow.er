@@ -11,15 +11,15 @@ pub trait IdentityHash: Hash + Copy {
 
 pub trait Identity: IdentityHash + PartialEq + Eq + Clone + Debug + Serialize + Deserialize<'static> {}
 
-
+const LEN: usize = 6;
 
 #[derive(Clone, Copy, Hash, PartialEq, Eq, Deserialize, Serialize)]
 pub struct EntryId (u64);
 
 impl Debug for EntryId {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> { 
-        // write!(f, "[{}.{}]", self.0, self.1) 
-        write!(f, "[[{}]]", self.0) 
+        let hash = &format!("{:x}", self.0)[..LEN];
+        write!(f, "[[{}]]", hash) 
     }
 }
 
@@ -49,7 +49,8 @@ pub struct CubeId (u64);
 
 impl Debug for CubeId {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> { 
-        write!(f, "{{{{{}}}}}", self.0) 
+        let hash = &format!("{:x}", self.0)[..LEN];
+        write!(f, "{{{{{}}}}}", hash)
     }
 }
 
