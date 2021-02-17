@@ -28,7 +28,6 @@ impl CubeModel {
 pub enum CubeMessage {
     UpdateBuffer(String),
 
-    NewCube,
     ClearCube,
     WriteCubeName,
 
@@ -73,10 +72,6 @@ impl CubeModel {
             match msg {
                 UpdateBuffer(val) => {
                     self.buffer_str = val;
-                }
-                NewCube => {
-                    // Todo: Add new cube to stockpile.
-                    self.cube.name = mem::take(&mut self.buffer_str);
                 }
                 ClearCube => {
                     self.cube.relation.clear();
@@ -148,7 +143,14 @@ impl CubeModel {
                             true 
                         } else { 
                             match from_json_str(&self.buffer_str) {
-                                Ok(cube) => { self.cube = cube; true }
+                                Ok(cube) => { 
+                                    self.cube = cube;
+                                    self.refs.clear();
+                                    self.refs.extend(
+                                        self.cube.entries.keys().map(|&k| (k, NodeRef::default()) )
+                                    );
+                                    true 
+                                }
                                 _ => false
                             }
                         };
