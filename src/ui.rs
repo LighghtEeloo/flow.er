@@ -14,14 +14,33 @@ pub use cube_update::{CubeMessage, CubeMessages};
 const KEY: &str = "yew.life.tracer.self";
 
 #[derive(Debug, Clone)]
+pub enum Router {
+    Cube,
+    Branch,
+    History,
+    Settings,
+}
+
+#[derive(Debug, Clone)]
 pub enum Message {
     Cube(CubeMessages),
     // Todo: Branch.
     Branch,
+    // Todo: History.
+    History,
+    Global(GlobalMessages),
+    _Debug(String),
     _Idle
 }
 
+#[derive(Debug, Clone)]
+pub enum GlobalMessage {
+    SrcHit,
+}
+pub type GlobalMessages = Vec<GlobalMessage>;
+
 pub struct Model {
+    router: Router,
     // src_view. true if src-code-view, false if cube view.
     src_view: bool,
     // erase_lock. true if locked, false if to-erase.
@@ -55,6 +74,7 @@ impl Component for Model {
         let id_iter = cube.entries.keys().map(|x| (x.clone(),NodeRef::default()));
         let refs: HashMap<EntryId, NodeRef> = HashMap::from_iter(id_iter);
         Self {
+            router: Router::Cube,
             src_view: false,
             erase_lock: true,
             cube,
@@ -68,9 +88,11 @@ impl Component for Model {
 
     fn update(&mut self, messages: Self::Message) -> ShouldRender {
         use Message::*;
+        LOG!("Updating: {:#?}.", messages);
         match messages {
             Cube(msg) => self.cube_update(msg),
             // Branch => true,
+            Global(msg) => self.global_update(msg),
             _ => true
         }
     }
@@ -87,6 +109,19 @@ impl Component for Model {
 impl Model {
     pub fn revisit(&mut self, msg: Message) {
         self.link.callback(move |_: ()| msg.clone() ).emit(());
+    }
+    pub fn global_update(&mut self, msgs: GlobalMessages) -> ShouldRender {
+        for msg in msgs {
+            match msg {
+                GlobalMessage::SrcHit => {
+                    match self.router {
+                        // Todo..
+                        _ => ()
+                    }
+                }
+            }
+        }
+        true
     }
 }
 

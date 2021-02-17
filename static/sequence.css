@@ -46,6 +46,10 @@ body {
     background-color: #c2c2c2;  /* color of the scroll thumb */
 }
 
+.app-wrapper {
+    height: 100%;
+    width: 100%;
+}
 
 .frame {
 	border: solid var(--dividerColor) 2px;

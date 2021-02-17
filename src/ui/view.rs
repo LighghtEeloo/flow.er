@@ -5,7 +5,9 @@ use CubeMessage::*;
 impl Model {
     pub fn main_view(&self) -> Html {
         html! {
-            <div class="app-wrapper">
+            <div class="app-wrapper"
+                onkeydown=self.link.callback(move |_e: KeyboardEvent| Message::_Debug(format!("Global!")))
+            >
                 { self.sidebar_tabs() }
                 { self.main_editor() }
                 { self.status_bar() }

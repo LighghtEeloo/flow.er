@@ -46,7 +46,7 @@ impl Model {
         use CubeMessage::*;
         // Test..
         if messages.is_empty() { return true; }
-        LOG!("Updating with: {:?}\nand buffer: {:?}", messages, self.buffer_str);
+        LOG!("|--- buffer: {:?}", self.buffer_str);
         let old_erase_lock = self.erase_lock;
         for msg in messages {
             match msg {
