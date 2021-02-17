@@ -151,6 +151,10 @@ impl Model {
             match msg {
                 GlobalMessage::SrcHit => {
                     match self.router {
+                        Router::Cube => {
+                            use CubeMessage::*;
+                            self.revisit(Cubey![SrcViewToggle(None)])
+                        }
                         // Todo..
                         _ => ()
                     }

@@ -41,15 +41,10 @@ pub enum CubeMessage {
     Wander(Direction, bool),
     Focus,
 
+    /// None if bare toggle; Some if force turn on / off.
     SrcViewToggle(Option<bool>),
     // Debug..
     _LogCube,
-}
-
-impl CubeMessage {
-    pub fn multi(a: CubeMessages) -> Message {
-        Message::Cube(a)
-    }
 }
 
 pub type CubeMessages = Vec<CubeMessage>;

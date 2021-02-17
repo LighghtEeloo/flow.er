@@ -20,12 +20,6 @@ pub enum BranchMessage {
 
 }
 
-impl BranchMessage {
-    pub fn multi(a: BranchMessages) -> Message {
-        Message::Branch(a)
-    }
-}
-
 pub type BranchMessages = Vec<BranchMessage>;
 
 impl BranchModel {

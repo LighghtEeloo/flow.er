@@ -36,7 +36,7 @@ macro_rules! Cubey {
             $(
                 temp_vec.push($x);
             )*
-            $crate::view_model::CubeMessage::multi(temp_vec)
+            $crate::view_model::Message::Cube(temp_vec)
         }
     };
 }
@@ -55,7 +55,26 @@ macro_rules! Branchy {
             $(
                 temp_vec.push($x);
             )*
-            $crate::view_model::BranchMessage::multi(temp_vec)
+            $crate::view_model::Message::Branch(temp_vec)
+        }
+    };
+}
+
+/// Globaly: Global-y, create Message from an array of GlobalMessage-s.  
+/// 
+/// "-y" for Message macros.
+#[macro_export]
+macro_rules! Globaly {
+    () => (
+        $crate::view_model::Message::_Idle
+    );
+    ( $( $x:expr ),* ) => {
+        {
+            let mut temp_vec = Vec::new();
+            $(
+                temp_vec.push($x);
+            )*
+            $crate::view_model::Message::Global(temp_vec)
         }
     };
 }
@@ -64,7 +83,8 @@ pub mod util {
     pub use crate::{
         LOG,
         Cubey,
-        Branchy
+        Branchy,
+        Globaly
     };
 
     pub use std::mem;

@@ -95,7 +95,7 @@ impl Model {
             <button class="status-bar-button" id="src-button"
                 title="The source code of the cube."
                 onclick=self.link.callback(move |_| {
-                    Cubey![SrcViewToggle(None)]
+                    Message::Global(vec![GlobalMessage::SrcHit])
                 })
             >
                 <img src="static/icons/StatusBar/src-code.svg" alt="Code_pic"/>
