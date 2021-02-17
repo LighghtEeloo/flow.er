@@ -1,7 +1,7 @@
 #[allow(dead_code)]
 #[allow(unused)]
 pub mod stockpile;
-pub mod ui;
+pub mod view_model;
 
 
 fn main() {
@@ -10,7 +10,7 @@ fn main() {
 }
 
 pub mod prelude {
-    pub use crate::ui::Model;
+    pub use crate::view_model::Model;
 }
 
 
@@ -28,7 +28,7 @@ macro_rules! LOG {
 #[macro_export]
 macro_rules! Cubey {
     () => (
-        $crate::ui::Message::_Idle
+        $crate::view_model::Message::_Idle
     );
     ( $( $x:expr ),* ) => {
         {
@@ -36,7 +36,7 @@ macro_rules! Cubey {
             $(
                 temp_vec.push($x);
             )*
-            $crate::ui::CubeMessage::multi(temp_vec)
+            $crate::view_model::CubeMessage::multi(temp_vec)
         }
     };
 }
@@ -47,7 +47,7 @@ macro_rules! Cubey {
 #[macro_export]
 macro_rules! Branchy {
     () => (
-        $crate::ui::Message::_Idle
+        $crate::view_model::Message::_Idle
     );
     ( $( $x:expr ),* ) => {
         {
@@ -55,7 +55,7 @@ macro_rules! Branchy {
             $(
                 temp_vec.push($x);
             )*
-            $crate::ui::BranchMessage::multi(temp_vec)
+            $crate::view_model::BranchMessage::multi(temp_vec)
         }
     };
 }

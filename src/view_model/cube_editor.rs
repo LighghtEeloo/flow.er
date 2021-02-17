@@ -1,6 +1,6 @@
 use crate::yew_util::*;
 use crate::stockpile::prelude::*;
-use crate::ui::*;
+use crate::view_model::*;
 
 use CubeMessage::*;
 

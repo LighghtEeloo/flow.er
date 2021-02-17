@@ -1,4 +1,4 @@
-use crate::ui::*;
+use crate::view_model::*;
 
 use CubeMessage::*;
 

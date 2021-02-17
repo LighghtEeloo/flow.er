@@ -1,7 +1,7 @@
 use crate::util::*;
 use crate::yew_util::*;
 use crate::stockpile::prelude::*;
-use crate::ui::{Model, Message};
+use crate::view_model::{Model, Message};
 
 #[derive(Debug, Clone)]
 pub struct BranchModel {
