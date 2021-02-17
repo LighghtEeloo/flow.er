@@ -41,9 +41,31 @@ macro_rules! Cubey {
     };
 }
 
+/// Branchy: Branch-y, create Message from an array of BranchMessage-s.  
+/// 
+/// "-y" for Message macros.
+#[macro_export]
+macro_rules! Branchy {
+    () => (
+        $crate::ui::Message::_Idle
+    );
+    ( $( $x:expr ),* ) => {
+        {
+            let mut temp_vec = Vec::new();
+            $(
+                temp_vec.push($x);
+            )*
+            $crate::ui::BranchMessage::multi(temp_vec)
+        }
+    };
+}
+
 pub mod util {
-    pub use crate::LOG;
-    pub use crate::Cubey;
+    pub use crate::{
+        LOG,
+        Cubey,
+        Branchy
+    };
 
     pub use std::mem;
     pub use std::fmt;

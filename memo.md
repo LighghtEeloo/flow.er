@@ -23,10 +23,12 @@
   - [x] Generalized Id System.
   - [x] Cube Id & searching.
   - [ ] Cube RelationModel.
+    - [x] General.
+    - [ ] Wander.
   - [x] Cube -> Stockpile/Branch.
   - [x] Cube storage.
-  - [ ] Use &mut Cube instead of clone().
   - [x] Separate Cube Msg.
+  - [ ] Use &mut Cube instead of clone().
 - [ ] Better Node
   - [x] Node CSS.
   - [ ] Move node with keyboard.
