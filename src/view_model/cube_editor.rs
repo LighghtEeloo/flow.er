@@ -21,6 +21,7 @@ impl CubeModel {
                     type="text"
                     ref=self.ref_cube_name.clone()
                     placeholder="Enter new proj name."
+                    aria-label="New Project Name"
                     oninput=self.link.callback(move |e: InputData| {
                         LOG!("OnInput - new: {:?}", e);
                         Cubey![UpdateBuffer(e.value)]
@@ -61,6 +62,7 @@ impl CubeModel {
                     type="text"
                     ref=self.ref_cube_name.clone()
                     placeholder="Enter new proj name."
+                    aria-label="New Project Name"
                     value=self.cube.name
                     onfocus=self.link.callback(move |_| {
                         Cubey![SetFocusId(None)]
@@ -141,6 +143,7 @@ impl CubeModel {
                 ref=self.refs.get(&id).unwrap().clone()
                 value=self.cube.get(id).face()
                 placeholder="..."
+                aria-label="Item"
                 onfocus=self.link.callback(move |_| {
                     Cubey![SetFocusId(Some(id))]
                 })

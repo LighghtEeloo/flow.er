@@ -28,7 +28,7 @@ impl Model {
             tab_meta.into_iter().map(
                 |(src, router, describe, bottom)| {
                     html! {
-                        <li class={if !bottom {"tab"} else {"tab tab-bottom"}}>
+                        <div class={if !bottom {"tab"} else {"tab tab-bottom"}}>
                             <div class="tab-content"
                                 onclick=self.link.callback(move |_| {
                                     Globaly!(GlobalMessage::SwitchRouter(router))
@@ -37,7 +37,7 @@ impl Model {
                                 <img src={src} alt={describe}/>
                                 <span class="tooltip">{describe}</span>
                             </div>
-                        </li>
+                        </div>
                     }
                 }
             ).collect();
