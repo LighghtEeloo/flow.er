@@ -17,8 +17,8 @@ impl Model {
     fn sidebar_routers(&self) -> Html {
         use Router::*;
         let router_meta: Vec<(&str, Router, &str, bool)> = vec! {
-            ("static/icons/hexagons.svg", Cube, "Workspace", false),
-            ("static/icons/branch.svg", Branch, "Projects", false),
+            ("static/icons/hexagons.svg", Cube, "Cube", false),
+            ("static/icons/branch.svg", Branch, "Branch", false),
             ("static/icons/history.svg", History, "History", false),
             ("static/icons/settings.svg", Settings, "Settings", true),
         };

@@ -1,7 +1,7 @@
 #[allow(dead_code)]
 #[allow(unused_assignments)]
 #[allow(unused)]
-mod view;
+mod main_view;
 mod cube_model;
 mod cube_editor;
 mod branch_model;
