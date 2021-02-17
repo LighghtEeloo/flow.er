@@ -42,12 +42,11 @@ impl Grow<CubeId> for Branch {
 }
 
 impl Chain<CubeId> for Branch {
-    fn tiptoe(&mut self, id: CubeId) {
-        self.flow.add_orphan(id);
+    fn tiptoe(&mut self, obj: CubeId) {
+        self.flow.add_orphan(obj);
     }
-    fn chain(&mut self, new_comer: CubeId, host: CubeId) {
-        // Todo: what if you want to replace root?
-        self.flow.add(new_comer, Some(host))
+    fn chain(&mut self, obj: CubeId, des: Option<CubeId>) {
+        self.flow.add(obj, des)
     }
 }
 

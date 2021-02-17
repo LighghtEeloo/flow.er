@@ -80,14 +80,14 @@ impl CubeModel {
                 NewNode(vec) => {
                     if vec.len() == 0 {
                         let new_id = self.cube.grow();
-                        self.cube.tiptoe(new_id);
+                        self.cube.chain(new_id, None);
                         self.refs.insert(new_id, NodeRef::default());
                         self.revisit( Cubey![Focus] );
                     } else {
                         // Note: 0 or 1.
                         let root_id = vec[0];
                         let new_id = self.cube.grow();
-                        self.cube.chain(new_id, root_id);
+                        self.cube.chain(new_id, Some(root_id));
                         self.refs.insert(new_id, NodeRef::default());
                         self.revisit( Cubey![Focus] );
                     }

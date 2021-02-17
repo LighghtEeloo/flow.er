@@ -34,16 +34,18 @@ where Id: IdentityHash
 
 /// Chain has two member methods.  
 /// 
-/// a. tiptoe: out-of-nothing growth.  
+/// a. tiptoe: out-of-nothing growth, like orphan.  
 /// 
-/// b. chain: linked growth which transforms the RelationModel.
+/// b. chain: linked growth which transforms the RelationModel; 
+/// des is None if replacing root, Some(id) if following node.
 pub trait Chain<Id>: Grow<Id> 
 where Id: IdentityHash
 {
-    /// tiptoe: out-of-nothing growth.
-    fn tiptoe(&mut self, id: Id);
-    /// chain: linked growth which transforms the RelationModel.
-    fn chain(&mut self, new_comer: Id, host: Id);
+    /// tiptoe: out-of-nothing growth, like orphan.
+    fn tiptoe(&mut self, obj: Id);
+    /// chain: linked growth which transforms the RelationModel; 
+    /// des is None if replacing root, Some(id) if following node.
+    fn chain(&mut self, obj: Id, des: Option<Id>);
 }
 
 /// Erase removes by id.

@@ -48,11 +48,13 @@ impl Grow<EntryId> for Cube {
 }
 
 impl Chain<EntryId> for Cube {
-    fn tiptoe(&mut self, id: EntryId) {
-        self.relation.add(id, None);
+    fn tiptoe(&mut self, obj: EntryId) {
+        // Note: shouldn't be used, just fallback.
+        self.relation.add(obj, None);
+        panic!()
     }
-    fn chain(&mut self, new_comer: EntryId, host: EntryId) {
-        self.relation.add(new_comer, Some(host))
+    fn chain(&mut self, obj: EntryId, des: Option<EntryId>) {
+        self.relation.add(obj, des)
     }
 }
 
