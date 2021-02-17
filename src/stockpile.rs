@@ -23,15 +23,23 @@ use prelude::*;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Stockpile {
-    pub branch: Branch
+    pub branch: Branch,
+    pub editor_info: Option<EditorInfo>,
 }
 
 impl Stockpile {
     pub fn new() -> Self {
         Self {
-            branch: Branch::new()
+            branch: Branch::new(),
+            editor_info: None
         }
     }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct EditorInfo {
+    pub cube_id: Option<CubeId>,
+    pub entry_id: Option<EntryId>
 }
 
 /// Grow describes any object that grows anonymously. 

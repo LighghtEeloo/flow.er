@@ -70,4 +70,5 @@
 - [x] Queue-preserving deletion.
 - [x] Delayed deletion (with safe-lock).
 - [ ] No double backspace && no force delete.
-- [ ] New cube as root / orphan. What to show on startup? 
+- [x] New cube as root / orphan. What to show on startup? 
+- [ ] NodeRef should be updated if node altered.

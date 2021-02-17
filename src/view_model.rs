@@ -69,16 +69,20 @@ impl Component for Model {
         LOG!("Loaded: {:#?}", stockpile);
 
         // Todo: Use RefCell.
-        let cube: &Cube =  match stockpile.branch.flow.current() {
-            Some(id) => {
-                stockpile.branch.get(id)
-            }
-            None => {
-                let cube_id = stockpile.branch.grow();
-                stockpile.branch.tiptoe(cube_id);
-                stockpile.branch.get(cube_id)
-            }
-        };
+        let cube: &Cube =  
+            match stockpile.editor_info.clone().map(|x| x.cube_id).flatten()
+            .or(stockpile.branch.flow.current())
+            .or(stockpile.branch.flow.root)
+            .or(stockpile.branch.flow.orphans.get(0).cloned()) {
+                Some(id) => {
+                    stockpile.branch.get(id)
+                }
+                None => {
+                    let cube_id = stockpile.branch.grow();
+                    stockpile.branch.tiptoe(cube_id);
+                    stockpile.branch.get(cube_id)
+                }
+            };
         let cube_model = CubeModel::cube_create(cube, &link);
 
         
@@ -131,12 +135,23 @@ impl Component for Model {
 
 impl Model {
     pub fn cube_read(&mut self) {
-        let cube_id = self.cube_model.cube.id();
+        // Note: editor_info > cube_model.cube.id()
+        let cube_id = 
+            self.stockpile.editor_info.clone().map(|x| x.cube_id).flatten()
+            .or(Some(self.cube_model.cube.id()))
+            .expect("fallback cube_model.cube.id() failed");
         self.cube_model.cube = self.stockpile.branch.cubes.get(&cube_id).expect("failed to read cube").clone();
     }
     pub fn cube_write(&mut self) {
+        // Note: update editor_info with cube_model.cube.id()
         let cube_id = self.cube_model.cube.id();
-        self.stockpile.branch.cubes.insert(cube_id, self.cube_model.cube.clone()).expect("failed to write cube");
+        self.stockpile.branch.cubes
+            .insert(cube_id, self.cube_model.cube.clone())
+            .expect("failed to write cube");
+        self.stockpile.editor_info = Some( EditorInfo {
+            cube_id: Some(cube_id),
+            entry_id: self.cube_model.cube.relation.current()
+        });
     }
     pub fn branch_read(&mut self) {
         self.branch_model.branch = self.stockpile.branch.clone();
