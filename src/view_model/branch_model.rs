@@ -82,7 +82,7 @@ impl BranchModel {
                         self.erase_lock = false;
                     } else {
                         self.branch.erase(id);
-                        self.revisit( Cubey![Focus] );
+                        self.revisit( Branchy![Focus] );
                         self.erase_lock = true;
                     }
                 }

@@ -1,7 +1,5 @@
 use crate::view_model::*;
 
-use CubeMessage::*;
-
 impl Model {
     pub fn main_view(&self) -> Html {
         html! {
@@ -49,17 +47,25 @@ impl Model {
     }
 
     fn main_editor(&self) -> Html {
-        let cube_model = &self.cube_model;
         // Todo: Router.
         let editor = 
             match self.router {
                 Router::Cube => {
+                    let cube_model = &self.cube_model;
                     if cube_model.src_view { 
-                        cube_model.cube_src_view()
+                        cube_model.src_view()
                     } else if cube_model.cube.is_empty() { 
                         cube_model.cube_new_view() 
                     } else { 
                         cube_model.cube_view() 
+                    }
+                }
+                Router::Branch => {
+                    let branch_model = &self.branch_model;
+                    if branch_model.src_view { 
+                        branch_model.src_view()
+                    } else { 
+                        branch_model.branch_view() 
                     }
                 }
                 _ => html! {}

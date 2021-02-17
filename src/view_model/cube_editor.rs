@@ -50,7 +50,6 @@ impl CubeModel {
                     { for vec.iter().map(|id| self.node_view(id)) }
                 </div>
                 { self.clearall_button_view() }
-                // { self.src_view_button_view() }
             </div>
         }
     }
@@ -216,10 +215,10 @@ impl CubeModel {
 // Cube_src_view
 
 impl CubeModel {
-    pub fn cube_src_view(&self) -> Html {
+    pub fn src_view(&self) -> Html {
         html! {
-            <div class="cube-src">
-                <textarea class="cube-src-input"
+            <div class="src">
+                <textarea class="src-input"
                     value=self.buffer_str
                     type="text" 
                     oninput=self.link.callback(move |e: InputData| {

@@ -5,6 +5,7 @@ mod view;
 mod cube_model;
 mod cube_editor;
 mod branch_model;
+mod branch_editor;
 
 use crate::util::*;
 use crate::yew_util::*;
@@ -171,6 +172,10 @@ impl Model {
                         Router::Cube => {
                             use CubeMessage::*;
                             self.revisit(Cubey![SrcViewToggle(None)])
+                        }
+                        Router::Branch => {
+                            use BranchMessage::*;
+                            self.revisit(Branchy![SrcViewToggle(None)])
                         }
                         // Todo: other src-view toggles.
                         _ => ()
