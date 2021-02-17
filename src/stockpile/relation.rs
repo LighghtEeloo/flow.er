@@ -8,23 +8,6 @@ pub use linear::LinearModel;
 pub use flow::FlowModel;
 
 
-// #[derive(Clone, Debug, Deserialize, Serialize)]
-// pub enum RelationModelType {
-//     Linear,
-//     Tree,
-//     Graph,
-// }
-
-// impl RelationModelType {
-//     pub fn type_str(&self) -> &str {
-//         match self {
-//             Linear => "Linear",
-//             Tree => "Tree",
-//             Graph => "Graph",
-//         }
-//     }
-// }
-
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Direction {
     Ascend,

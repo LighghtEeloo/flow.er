@@ -18,6 +18,12 @@ impl Branch {
     pub fn empty(&self) -> bool {
         self.cubes.len() == 0
     }
+    // pub fn list_orphan(&self) -> Vec<CubeId> {
+    //     self.cubes
+    //         .keys().cloned()
+    //         .filter(|x| if let None = self.flow.data.get(x) {true} else {false} )
+    //         .collect()
+    // }
     pub fn get(&self, id: CubeId) -> &Cube {
         self.cubes.get(&id).unwrap()
     }
@@ -37,9 +43,10 @@ impl Grow<CubeId> for Branch {
 
 impl Chain<CubeId> for Branch {
     fn tiptoe(&mut self, id: CubeId) {
-        self.flow.add(id, None);
+        self.flow.add_orphan(id);
     }
     fn chain(&mut self, new_comer: CubeId, host: CubeId) {
+        // Todo: what if you want to replace root?
         self.flow.add(new_comer, Some(host))
     }
 }

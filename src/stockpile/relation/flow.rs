@@ -11,6 +11,7 @@ where Id: Eq + Hash
 {
     pub data: HashMap<Id, FlowNode<Id>>,
     pub root: Option<Id>,
+    pub orphan: Vec<Id>,
     pub pos: Option<Id>,
     pub fix: FixState<Id>,
 }
@@ -27,9 +28,22 @@ where Id: Identity
     fn get_mut(&mut self, id: &Id) -> &mut FlowNode<Id> {
         self.data.get_mut(id).expect("FlowNode of the same id not found.")
     }
-    // fn locate(&self, obj: Id) -> Option<usize> {
-    //     self.data.iter().position(|&x| obj == x)
-    // }
+    pub fn add_orphan(&mut self, obj: Id) {
+        self.data.insert(obj, FlowNode::new(None));
+        self.orphan.push(obj);
+    }
+    fn trim(&mut self) {
+        let exist: HashSet<Id> = self.data.keys().cloned().collect();
+        // root
+        if let Some(id) = self.root {
+            if exist.get(&id).is_none() {
+                self.root = None;
+            }
+        }
+        // orphan
+        self.orphan.iter_mut().filter(|x| exist.get(&x).is_some());
+        // Todo: trim data -> descendant.
+    }
     // /// move according to number delta, and return true if moved
     // fn try_move(&mut self, delta: isize) -> isize {
     //     match self.pos {
@@ -49,6 +63,9 @@ pub struct FlowNode<Id>
 where Id: Eq + Hash
 {
     pub descendant: Vec<Id>,
+    /// direct_elderly:  
+    /// Some(id) if there is an elderly;  
+    /// None if root or orphan.
     pub direct_elderly: Option<Id>
 }
 
@@ -165,6 +182,8 @@ where Id: Identity
             }
             if descendant.is_empty() { break }
         }
+        // trim to be valid.
+        self.trim();
         self.pos = node.direct_elderly;
     }
     /// Return the current pos in FlowModel.
@@ -228,6 +247,7 @@ where Id: Identity
             data: HashMap::new(),
             pos: None,
             root: None,
+            orphan: Vec::new(),
             fix: FixState::Deactivated,
         }
     }
