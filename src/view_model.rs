@@ -82,7 +82,8 @@ impl Component for Model {
 
         
         // Todo: Use RefCell.
-        let branch_model = BranchModel::branch_create(&stockpile.branch, &link);
+        let branch: &Branch = &stockpile.branch;
+        let branch_model = BranchModel::branch_create(branch, &link);
 
         Self {
             router: Router::Cube,
@@ -99,12 +100,16 @@ impl Component for Model {
         LOG!("Updating: {:#?}.", messages);
         let res = match messages {
             Cube(msg) => {
+                self.cube_read();
                 let res = self.cube_model.cube_update(msg);
                 self.cube_write();
                 res
             }
             Branch(msg) => {
-                self.branch_model.branch_update(msg)
+                self.branch_read();
+                let res = self.branch_model.branch_update(msg);
+                self.branch_write();
+                res
             }
             Global(msg) => self.global_update(msg),
             _ => true
@@ -124,16 +129,16 @@ impl Component for Model {
 }
 
 impl Model {
-    // pub fn cube_read(&mut self) {
-    //     let cube_id = self.cube_model.cube.id();
-    //     self.stockpile.branch.cubes.insert(cube_id, self.cube_model.cube.clone());
-    //     // Todo: cube_read.
-    // }
+    pub fn cube_read(&mut self) {
+        let cube_id = self.cube_model.cube.id();
+        self.cube_model.cube = self.stockpile.branch.cubes.get(&cube_id).expect("failed to read cube").clone();
+    }
     pub fn cube_write(&mut self) {
         let cube_id = self.cube_model.cube.id();
-        self.stockpile.branch.cubes.insert(cube_id, self.cube_model.cube.clone());
-        // Todo: FlowModel with orphan.
-        // Todo: Deal with FlowModel.
+        self.stockpile.branch.cubes.insert(cube_id, self.cube_model.cube.clone()).expect("failed to write cube");
+    }
+    pub fn branch_read(&mut self) {
+        self.branch_model.branch = self.stockpile.branch.clone();
     }
     pub fn branch_write(&mut self) {
         self.stockpile.branch = self.branch_model.branch.clone();

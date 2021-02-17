@@ -18,12 +18,6 @@ impl Branch {
     pub fn is_empty(&self) -> bool {
         self.cubes.len() == 0
     }
-    // pub fn list_orphan(&self) -> Vec<CubeId> {
-    //     self.cubes
-    //         .keys().cloned()
-    //         .filter(|x| if let None = self.flow.data.get(x) {true} else {false} )
-    //         .collect()
-    // }
     pub fn get(&self, id: CubeId) -> &Cube {
         self.cubes.get(&id).unwrap()
     }
