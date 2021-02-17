@@ -16,6 +16,9 @@ impl Cube {
     pub fn new() -> Self {
         let stamp = TimeStamp::created();
         let id = CubeId::from_time(&stamp.data);
+        Cube::with_id(id)
+    }
+    pub fn with_id(id: CubeId) -> Self {
         Cube {
             name: String::new(),
             id,

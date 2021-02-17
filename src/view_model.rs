@@ -187,6 +187,8 @@ impl Model {
     }
 }
 
+// global_update
+
 impl Model {
     pub fn revisit(&mut self, msg: Message) {
         self.link.callback(move |_: ()| msg.clone() ).emit(());
@@ -199,11 +201,17 @@ impl Model {
                     match self.router {
                         Router::Cube => {
                             use CubeMessage::*;
-                            self.revisit(Cubey![SrcViewToggle(None)])
+                            self.revisit(Cubey![SrcViewToggle(None)]);
+                            if self.branch_model.src_view {
+                                self.revisit(Branchy![BranchMessage::SrcViewToggle(Some(true))]);
+                            }
                         }
                         Router::Branch => {
                             use BranchMessage::*;
-                            self.revisit(Branchy![SrcViewToggle(None)])
+                            self.revisit(Branchy![SrcViewToggle(None)]);
+                            if self.branch_model.src_view {
+                                self.revisit(Cubey![CubeMessage::SrcViewToggle(Some(true))]);
+                            }
                         }
                         // Todo: other src-view toggles.
                         _ => ()
