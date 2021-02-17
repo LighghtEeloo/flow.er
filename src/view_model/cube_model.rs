@@ -17,13 +17,6 @@ pub struct CubeModel {
     pub link: ComponentLink<Model>
 }
 
-impl CubeModel {
-    pub fn revisit(&mut self, msg: Message) {
-        self.link.callback(move |_: ()| msg.clone() ).emit(());
-    }
-}
-
-
 #[derive(Debug, Clone)]
 pub enum CubeMessage {
     UpdateBuffer(String),
@@ -42,7 +35,7 @@ pub enum CubeMessage {
 
     /// None if bare toggle; Some if force turn on / off.
     SrcViewToggle(Option<bool>),
-    // Debug..
+    // Todo: _LogCube -> Refresh.
     _LogCube,
 }
 
@@ -61,6 +54,9 @@ impl CubeModel {
             ref_cube_name: NodeRef::default(),
             link: link.clone()
         }
+    }
+    pub fn revisit(&mut self, msg: Message) {
+        self.link.callback(move |_: ()| msg.clone() ).emit(());
     }
     pub fn cube_update(&mut self, messages: CubeMessages) -> ShouldRender {
         use CubeMessage::*;
@@ -157,8 +153,7 @@ impl CubeModel {
                     if writing { self.src_view = src_view }
                 }
                 _LogCube => {
-                    // LOG!("{}", to_json(&self.cube));
-                    LOG!("Dumped: {:#?}", &self.cube);
+                    LOG!("{:#?}", &self.cube);
                 },
             }
         }

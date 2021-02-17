@@ -15,12 +15,6 @@ pub struct BranchModel {
     pub link: ComponentLink<Model>
 }
 
-impl BranchModel {
-    pub fn revisit(&mut self, msg: Message) {
-        self.link.callback(move |_: ()| msg.clone() ).emit(());
-    }
-}
-
 #[derive(Debug, Clone)]
 pub enum BranchMessage {
     UpdateBuffer(String),
@@ -56,6 +50,9 @@ impl BranchModel {
             refs: cube_ref,
             link: link.clone()
         }
+    }
+    pub fn revisit(&mut self, msg: Message) {
+        self.link.callback(move |_: ()| msg.clone() ).emit(());
     }
     pub fn branch_update(&mut self, messages: BranchMessages) -> ShouldRender {
         use BranchMessage::*;
@@ -138,8 +135,7 @@ impl BranchModel {
                     if writing { self.src_view = src_view }
                 }
                 _LogBranch => {
-                    // LOG!("{}", to_json(&self.cube));
-                    LOG!("Dumped: {:#?}", &self.branch);
+                    LOG!("{:#?}", &self.branch);
                 },
             }
         }

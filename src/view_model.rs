@@ -24,6 +24,18 @@ pub enum Router {
     Settings,
 }
 
+impl Router {
+    fn refresh_message(&self) -> Message {
+        use Router::*;
+        match self {
+            Cube => Cubey![CubeMessage::_LogCube],
+            Branch => Branchy![BranchMessage::_LogBranch],
+            // Todo: History
+            _ => Message::_Idle
+        }
+    }
+}
+
 pub struct Model {
     router: Router,
     cube_model: CubeModel,
@@ -73,20 +85,7 @@ impl Component for Model {
         LOG!("Loaded & Cleaned: {:#?}", stockpile);
         
         // Todo: Use RefCell.
-        let cube: &Cube =  
-            match stockpile.editor_info.clone().map(|x| x.cube_id).flatten()
-            .or(stockpile.branch.flow.current())
-            .or(stockpile.branch.flow.root)
-            .or(stockpile.branch.flow.orphans.get(0).cloned()) {
-                Some(id) => {
-                    stockpile.branch.get(id)
-                }
-                None => {
-                    let cube_id = stockpile.branch.grow();
-                    stockpile.branch.tiptoe(cube_id);
-                    stockpile.branch.get(cube_id)
-                }
-            };
+        let cube: &Cube = Model::cube_read_impl(&mut stockpile);
         let cube_model = CubeModel::cube_create(cube, &link);
 
         
@@ -140,11 +139,7 @@ impl Component for Model {
 impl Model {
     pub fn cube_read(&mut self) {
         // Note: editor_info > cube_model.cube.id()
-        let cube_id = 
-            self.stockpile.editor_info.clone().map(|x| x.cube_id).flatten()
-            .or(Some(self.cube_model.cube.id()))
-            .expect("fallback cube_model.cube.id() failed");
-        self.cube_model.cube = self.stockpile.branch.cubes.get(&cube_id).expect("failed to read cube").clone();
+        self.cube_model.cube = Model::cube_read_impl(&mut self.stockpile).clone();
     }
     pub fn cube_write(&mut self) {
         // Note: update editor_info with cube_model.cube.id()
@@ -163,6 +158,26 @@ impl Model {
     pub fn branch_write(&mut self) {
         self.stockpile.branch = self.branch_model.branch.clone();
     }
+
+    // impl
+
+    fn cube_read_impl(stockpile: &mut Stockpile) -> &Cube {
+        match stockpile.editor_info.clone().map(|x| x.cube_id).flatten()
+        .or(stockpile.branch.flow.current())
+        .or(stockpile.branch.flow.root)
+        .or(stockpile.branch.flow.orphans.get(0).cloned()) {
+            Some(id) => {
+                stockpile.branch.get(id)
+            }
+            None => {
+                let cube_id = stockpile.branch.grow();
+                stockpile.branch.tiptoe(cube_id);
+                stockpile.branch.get(cube_id)
+            }
+        }
+    }
+
+
     pub fn revisit(&mut self, msg: Message) {
         self.link.callback(move |_: ()| msg.clone() ).emit(());
     }
@@ -185,10 +200,11 @@ impl Model {
                     }
                 }
                 SwitchRouter(router) => {
-                    self.router = router
+                    self.router = router;
+                    self.revisit(router.refresh_message())
                 }
                 ClearEditorInfo => {
-                    self.stockpile.editor_info = None
+                    self.stockpile.editor_info = None;
                 }
             }
         }

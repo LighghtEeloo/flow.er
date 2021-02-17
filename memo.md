@@ -76,4 +76,5 @@
 - [x] Delayed deletion (with safe-lock).
 - [ ] No double backspace && no force delete.
 - [x] New cube as root / orphan. What to show on startup? 
-- [ ] NodeRef should be updated if node altered.
+- [x] NodeRef should be updated if node altered.
+- [ ] Refresh CubeModel if changed outside.
