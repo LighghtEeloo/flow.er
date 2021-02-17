@@ -160,6 +160,7 @@ body {
 
 .router .router-content:hover {
     background-color: var(--emphasizeColor);
+    cursor: pointer;
 }
 .router .router-content:hover .tooltip {
     visibility: visible;
