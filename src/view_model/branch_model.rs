@@ -1,7 +1,7 @@
 use crate::util::*;
 use crate::yew_util::*;
 use crate::stockpile::prelude::*;
-use crate::view_model::{Model, Message};
+use crate::view_model::{Model, Message, GlobalMessage};
 
 #[derive(Debug, Clone)]
 pub struct BranchModel {
@@ -71,6 +71,7 @@ impl BranchModel {
                 ClearBranch => {
                     self.branch.flow.clear();
                     self.branch.cubes.clear();
+                    self.revisit(Globaly![GlobalMessage::ClearEditorInfo])
                 }
 
                 NewCube(des) => {

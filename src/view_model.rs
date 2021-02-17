@@ -48,7 +48,8 @@ pub enum Message {
 #[derive(Debug, Clone)]
 pub enum GlobalMessage {
     SrcHit,
-    SwitchRouter(Router)
+    SwitchRouter(Router),
+    ClearEditorInfo,
 }
 pub type GlobalMessages = Vec<GlobalMessage>;
 
@@ -185,6 +186,9 @@ impl Model {
                 }
                 SwitchRouter(router) => {
                     self.router = router
+                }
+                ClearEditorInfo => {
+                    self.stockpile.editor_info = None
                 }
             }
         }

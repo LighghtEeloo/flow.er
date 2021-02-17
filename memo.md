@@ -51,6 +51,7 @@
   - [ ] Cube RelationModel.
     - [x] General.
     - [ ] Wander.
+    - [ ] Link.
   - [x] Cube -> Stockpile/Branch.
   - [x] Cube storage.
   - [x] Separate Cube Msg.
