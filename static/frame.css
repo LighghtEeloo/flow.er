@@ -1,3 +1,5 @@
+@import "general.css";
+
 * {
     box-sizing: border-box;
 }
@@ -10,41 +12,8 @@ body {
 
 body {
     height: 100vh;
-    /* display: grid;
-    grid-template-columns: 50px auto;
-    grid-template-rows: 1fr 20px;
-    grid-gap: 0; */
-
-    --len-left-sidebar: 50px;
-    --len-status-bar: 20px;
-
-    --mainColor: rgba(216, 230, 236, 0.829);
-    --backColor: rgba(217, 229, 235, 0.541);
-    /* --routerColor: rgba(216, 230, 236, 0.829); */
-    --emphasizeColor: rgba(238, 244, 247, 0.829);
-    --dividerColor: rgba(10, 55, 77, 1);
-
-    --mainFont: cursive, 'Times New Roman', serif;
-    --assistiveFont: 'Times New Roman', Times, serif;
 }
 
-/* Scroll Bar */
-::-webkit-scrollbar {
-    width: 12px;                /* width of the entire scrollbar */
-}
-
-::-webkit-scrollbar-track {
-    background: #f1f1f1;        /* color of the tracking area */
-}
-
-::-webkit-scrollbar-thumb {
-    background-color: #a8a8a8;  /* color of the scroll thumb */
-    border-radius: 20px;        /* roundness of the scroll thumb */
-    border: 3px solid #f1f1f1;  /* creates padding around scroll thumb */
-}
-::-webkit-scrollbar-thumb:hover {
-    background-color: #c2c2c2;  /* color of the scroll thumb */
-}
 
 .app-wrapper {
     height: 100%;

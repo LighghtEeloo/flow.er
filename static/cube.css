@@ -1,3 +1,5 @@
+@import "general.css";
+
 .cube,
 .cube-new {
     padding: 0;
@@ -7,16 +9,6 @@
     background-color: aliceblue;
 }
 
-.node-group {
-    --size-button: 36px;
-    --lightColor: rgba(248, 253, 255, 0.925);
-    --borderColor: rgba(222, 229, 233, 0.925);
-    --dropdownColor: rgba(121, 191, 238, 0.431);
-}
-
-input {
-    font-family: Garamond, monospace, cursive, Helvetica, "Courier New", Courier;
-}
 
 .cube-new .cube-input input {
     width: 400px;
