@@ -35,6 +35,12 @@
 
 
 ## Todo List
+
+- [ ] Router.
+  - [ ] Buttons.
+- [ ] Better FlowModel.
+  - [ ] How to manage / show cubes.
+  - [ ] How to present.
 - [ ] Support clipboard exporting / importing.
   - [x] Support json.
   - [x] Interface.
@@ -64,3 +70,4 @@
 - [x] Queue-preserving deletion.
 - [x] Delayed deletion (with safe-lock).
 - [ ] No double backspace && no force delete.
+- [ ] New cube as root / orphan. What to show on startup? 

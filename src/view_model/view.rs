@@ -17,18 +17,23 @@ impl Model {
     }
 
     fn sidebar_tabs(&self) -> Html {
-        let tab_meta: Vec<(&str, &str, bool)> = vec! {
-            ("static/icons/hexagons.svg", "Workspace", false),
-            ("static/icons/branch.svg", "Projects", false),
-            ("static/icons/history.svg", "History", false),
-            ("static/icons/settings.svg", "Settings", true),
+        use Router::*;
+        let tab_meta: Vec<(&str, Router, &str, bool)> = vec! {
+            ("static/icons/hexagons.svg", Cube, "Workspace", false),
+            ("static/icons/branch.svg", Branch, "Projects", false),
+            ("static/icons/history.svg", History, "History", false),
+            ("static/icons/settings.svg", Settings, "Settings", true),
         };
         let sidebar_tabs: Html = 
             tab_meta.into_iter().map(
-                |(src, describe, bottom)| {
+                |(src, router, describe, bottom)| {
                     html! {
                         <li class={if !bottom {"tab"} else {"tab tab-bottom"}}>
-                            <div class="tab-content">
+                            <div class="tab-content"
+                                onclick=self.link.callback(move |_| {
+                                    Globaly!(GlobalMessage::SwitchRouter(router))
+                                })
+                            >
                                 <img src={src} alt={describe}/>
                                 <span class="tooltip">{describe}</span>
                             </div>

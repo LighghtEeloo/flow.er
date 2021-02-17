@@ -15,7 +15,7 @@ pub use branch_model::{BranchModel, BranchMessage, BranchMessages};
 
 const KEY: &str = "yew.life.tracer.self";
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub enum Router {
     Cube,
     Branch,
@@ -47,6 +47,7 @@ pub enum Message {
 #[derive(Debug, Clone)]
 pub enum GlobalMessage {
     SrcHit,
+    SwitchRouter(Router)
 }
 pub type GlobalMessages = Vec<GlobalMessage>;
 
@@ -147,17 +148,21 @@ impl Model {
         self.link.callback(move |_: ()| msg.clone() ).emit(());
     }
     pub fn global_update(&mut self, msgs: GlobalMessages) -> ShouldRender {
+        use GlobalMessage::*;
         for msg in msgs {
             match msg {
-                GlobalMessage::SrcHit => {
+                SrcHit => {
                     match self.router {
                         Router::Cube => {
                             use CubeMessage::*;
                             self.revisit(Cubey![SrcViewToggle(None)])
                         }
-                        // Todo..
+                        // Todo: other src-view toggles.
                         _ => ()
                     }
+                }
+                SwitchRouter(router) => {
+                    self.router = router
                 }
             }
         }
