@@ -11,7 +11,7 @@ where Id: Eq + Hash
 {
     pub data: HashMap<Id, FlowNode<Id>>,
     pub root: Option<Id>,
-    pub orphan: Vec<Id>,
+    pub orphans: Vec<Id>,
     pub pos: Option<Id>,
     pub fix: FixState<Id>,
 }
@@ -30,7 +30,7 @@ where Id: Identity
     }
     pub fn add_orphan(&mut self, obj: Id) {
         self.data.insert(obj, FlowNode::new(None));
-        self.orphan.push(obj);
+        self.orphans.push(obj);
     }
     fn trim(&mut self) {
         let exist: HashSet<Id> = self.data.keys().cloned().collect();
@@ -41,7 +41,7 @@ where Id: Identity
             }
         }
         // orphan
-        self.orphan.iter_mut().filter(|x| exist.get(&x).is_some());
+        self.orphans.iter_mut().filter(|x| exist.get(&x).is_some());
         // Todo: trim data -> descendant.
     }
     // /// move according to number delta, and return true if moved
@@ -247,7 +247,7 @@ where Id: Identity
             data: HashMap::new(),
             pos: None,
             root: None,
-            orphan: Vec::new(),
+            orphans: Vec::new(),
             fix: FixState::Deactivated,
         }
     }

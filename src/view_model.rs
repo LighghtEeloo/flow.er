@@ -68,9 +68,9 @@ impl Component for Model {
         LOG!("Loaded: {:#?}", stockpile);
 
         // Todo: Use Arc.
-        let cube: Cube =  match stockpile.flow.current() {
+        let cube: Cube =  match stockpile.branch.flow.current() {
             Some(id) => {
-                stockpile.get(id).clone()
+                stockpile.branch.get(id).clone()
             }
             None => Cube::new()
         };
@@ -88,7 +88,7 @@ impl Component for Model {
         };
         
         // Todo: Use Ref.
-        let branch: Branch = stockpile.clone();
+        let branch: Branch = stockpile.branch.clone();
         let cube_id_iter = branch.cubes.keys().map(|x| (x.clone(),NodeRef::default()));
         let cube_ref = HashMap::from_iter(cube_id_iter);
         let branch_model = BranchModel {
@@ -142,7 +142,7 @@ impl Component for Model {
 impl Model {
     pub fn cube_write(&mut self) {
         let cube_id = self.cube_model.cube.id();
-        self.stockpile.cubes.insert(cube_id, self.cube_model.cube.clone());
+        self.stockpile.branch.cubes.insert(cube_id, self.cube_model.cube.clone());
         // Todo: FlowModel with orphan.
         // Todo: Deal with FlowModel.
     }

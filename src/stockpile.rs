@@ -21,7 +21,18 @@ use identity::IdentityHash;
 use crate::util::*;
 use prelude::*;
 
-pub type Stockpile = Branch;
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct Stockpile {
+    pub branch: Branch
+}
+
+impl Stockpile {
+    pub fn new() -> Self {
+        Self {
+            branch: Branch::new()
+        }
+    }
+}
 
 /// Grow describes any object that grows anonymously. 
 /// 
