@@ -1,16 +1,38 @@
 # Memo
 
-## Relation-Model trait
-- store message with position
-  - type_str
-  - add (pos)
-  - del (pos)
-- record position (focus) in the network
-  - data - positional ref
-- move around in the network
-  - shift-enter: deepin & surface
-  - up/down: wander
-    - shift: fix
+## Model Draft (v0.3.0)
+### Data Model for Storage
+
+#### Key Concepts
+
+1. Collection = HashMap + RelationModel
+   - HashMap acts as a handy data bucket. All it cares is Id => Value.
+   - RelationModel handles the relational info. Only Ids are operated so that it's fast and flexible.
+     - `LinearModel`.
+     - `FlowModel`: A tree-like model with ...
+       - node: records descendants (children) and at most one elderly (parent).
+       - root: maybe an Id of the root node.
+       - orphans: no elderly and not root.
+
+2. Id = Hash + Eq + TimeRep (+ Clone + Copy)
+   - Ids should be able to yield from a given time (`TimeRep`).
+
+#### Big Picture
+
+- `Stockpile`
+  - branch: `Branch`
+    - cubes: `HashMap<CubeId, Cube>` where `Cube`:
+      - name: `String`
+      - id: `CubeId`
+      - locked: `bool`
+      - entries: `HashMap<EntryId, Entry>` where `Entry`:
+        - ...
+      - relation: `LinearModel<EntryId>`
+    - flow: `FlowModel<CubeId>`
+  - ...
+
+
+
 
 ## Todo List
 - [ ] Support clipboard exporting / importing.
