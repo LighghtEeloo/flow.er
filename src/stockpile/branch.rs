@@ -15,7 +15,7 @@ impl Branch {
             flow: FlowModel::new()
         }
     }
-    pub fn empty(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         self.cubes.len() == 0
     }
     // pub fn list_orphan(&self) -> Vec<CubeId> {
@@ -33,7 +33,7 @@ impl Branch {
     pub fn clean(&mut self) {
         let kill_list: Vec<CubeId> = self.cubes.iter()
             .map(|(&key, cube)| {
-                if cube.name.is_empty() { Some(key) }
+                if cube.is_empty() { Some(key) }
                 else { None }
             })
             .filter(|key| key.is_some())

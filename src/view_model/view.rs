@@ -45,13 +45,13 @@ impl Model {
 
     fn main_editor(&self) -> Html {
         let cube_model = &self.cube_model;
-        // Fixme: cube - new?
+        // Todo: Router.
         let editor = 
             match self.router {
                 Router::Cube => {
                     if cube_model.src_view { 
                         cube_model.cube_src_view()
-                    } else if cube_model.cube.empty() && cube_model.cube.name.is_empty() { 
+                    } else if cube_model.cube.is_empty() { 
                         cube_model.cube_new_view() 
                     } else { 
                         cube_model.cube_view() 

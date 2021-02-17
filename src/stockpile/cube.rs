@@ -27,8 +27,8 @@ impl Cube {
     pub fn id(&self) -> CubeId {
         self.id.clone()
     }
-    pub fn empty(&self) -> bool {
-        self.entries.len() == 0
+    pub fn is_empty(&self) -> bool {
+        self.entries.len() == 0 && self.name.is_empty()
     }
     pub fn get(&self, id: EntryId) -> &Entry {
         self.entries.get(&id).unwrap()
