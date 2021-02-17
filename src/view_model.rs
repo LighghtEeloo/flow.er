@@ -124,11 +124,19 @@ impl Component for Model {
 }
 
 impl Model {
+    // pub fn cube_read(&mut self) {
+    //     let cube_id = self.cube_model.cube.id();
+    //     self.stockpile.branch.cubes.insert(cube_id, self.cube_model.cube.clone());
+    //     // Todo: cube_read.
+    // }
     pub fn cube_write(&mut self) {
         let cube_id = self.cube_model.cube.id();
         self.stockpile.branch.cubes.insert(cube_id, self.cube_model.cube.clone());
         // Todo: FlowModel with orphan.
         // Todo: Deal with FlowModel.
+    }
+    pub fn branch_write(&mut self) {
+        self.stockpile.branch = self.branch_model.branch.clone();
     }
     pub fn revisit(&mut self, msg: Message) {
         self.link.callback(move |_: ()| msg.clone() ).emit(());
