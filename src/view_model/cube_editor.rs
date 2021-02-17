@@ -109,13 +109,13 @@ impl CubeModel {
         let status_dropdown: Html = 
             status_meta.into_iter().map(|(src, des)| {
                 html! {
-                    <ul title={des.clone()}
+                    <div title={des.clone()}
                         onclick=self.link.callback(move |_| {
                             Cubey![UpdateBuffer(des.clone()), WriteProcess(id)]
                         })
                     > 
                         <img src={src} alt="process" /> 
-                    </ul> 
+                    </div> 
                 }
             }).collect();
         html! {

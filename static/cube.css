@@ -130,7 +130,7 @@
 } 
 
 .dropbtn img,
-.dropdown-content ul img {
+.dropdown-content div img {
     width:  calc(var(--size-button) * 0.6);
     height: calc(var(--size-button) * 0.6);
 }
@@ -144,7 +144,7 @@
     z-index: 0; 
 } 
 
-.dropdown-content ul { 
+.dropdown-content div { 
     color: black; 
     padding: calc(var(--size-button) / 6) calc(var(--size-button) / 4);
     margin: 0; 
@@ -154,7 +154,7 @@
     outline: none;
 } 
 
-.dropdown-content ul:hover { 
+.dropdown-content div:hover { 
     background-color: var(--optionHoverColor);
 } 
 
