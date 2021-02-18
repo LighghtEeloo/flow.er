@@ -10,7 +10,7 @@ pub trait IdentityHash: Hash + Copy {
 }
 
 pub trait Identity: IdentityHash + PartialEq + Eq + Clone + Debug + Serialize + Deserialize<'static> {
-    fn new() -> Self {
+    fn new_stamped() -> Self {
         let stamp = TimeStamp::created();
         Self::from_time(&stamp.data)
     }
@@ -24,7 +24,6 @@ pub struct EntryId (u64);
 impl Debug for EntryId {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> { 
         let hash: String = format!("{:x}", self.0).as_str().chars().take(LEN).collect();
-        // let hash = &format!("{:x}", self.0)[..LEN];
         write!(f, "[[{}]]", hash) 
     }
 }
@@ -37,12 +36,7 @@ impl IdentityHash for EntryId {
             .as_nanos();
         let mut s = DefaultHasher::new();
         time.hash(&mut s);
-        // format!("{:x}", s.finish())
         EntryId (s.finish())
-        // let time = v.flatten()
-        //     .duration_since(UNIX_EPOCH)
-        //     .expect("Time went backwards");
-        // EntryId (time.as_secs(), time.subsec_nanos())
     }
 }
 
@@ -56,7 +50,6 @@ pub struct CubeId (u64);
 impl Debug for CubeId {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> { 
         let hash: String = format!("{:x}", self.0).as_str().chars().take(LEN).collect();
-        // let hash = &format!("{:x}", self.0)[..LEN];
         write!(f, "{{{{{}}}}}", hash)
     }
 }

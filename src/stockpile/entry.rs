@@ -45,10 +45,8 @@ pub enum ProcessStatus {
 
 impl Entry {
     pub fn new() -> Self {
-        let stamp = TimeStamp::created();
-        let id = EntryId::from_time(&stamp.data);
         Entry {
-            dry: EntryDry::new(id),
+            dry: EntryDry::new(EntryId::new_stamped()),
         }
     }
     pub fn dry(&self) -> EntryDry {

@@ -14,9 +14,7 @@ pub struct Cube {
 
 impl Cube {
     pub fn new() -> Self {
-        let stamp = TimeStamp::created();
-        let id = CubeId::from_time(&stamp.data);
-        Cube::with_id(id)
+        Cube::with_id(CubeId::new_stamped())
     }
     pub fn with_id(id: CubeId) -> Self {
         Cube {

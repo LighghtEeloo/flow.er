@@ -18,7 +18,10 @@ impl Branch {
     pub fn is_empty(&self) -> bool {
         self.cubes.len() == 0
     }
-    pub fn get(&mut self, id: CubeId) -> &Cube {
+    pub fn get(&self, id: CubeId) -> &Cube {
+        self.cubes.get(&id).unwrap()
+    }
+    pub fn get_update(&mut self, id: CubeId) -> &Cube {
         let found = self.cubes.get(&id).is_some();
         if !found {
             // Debug..

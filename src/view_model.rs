@@ -170,12 +170,12 @@ impl Model {
         .or(stockpile.branch.flow.root)
         .or(stockpile.branch.flow.orphans.get(0).cloned()) {
             Some(id) => {
-                stockpile.branch.get(id)
+                stockpile.branch.get_update(id)
             }
             None => {
                 let cube_id = stockpile.branch.grow();
                 stockpile.branch.tiptoe(cube_id);
-                stockpile.branch.get(cube_id)
+                stockpile.branch.get_update(cube_id)
             }
         }
     }

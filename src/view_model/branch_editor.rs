@@ -1,3 +1,4 @@
+use crate::util::*;
 use crate::yew_util::*;
 use crate::stockpile::prelude::*;
 use crate::view_model::*;
@@ -13,8 +14,10 @@ impl BranchModel {
         let map = &flow.data;
         html! {
             <div class="branch">
-                <div class="cube-group">
-                    { for map.keys().map(|id| self.node_view(id)) }
+                <div class="branch-group">
+                    { for map.iter().map(|(id, _)| self.node_view(id)) }
+                    // Debug..
+                    <p>{export_json(&map.keys().cloned().collect::<Vec<CubeId>>())}</p>
                 </div>
                 { self.clearall_button_view() }
             </div>
@@ -26,12 +29,12 @@ impl BranchModel {
         html! {
             <div class="node">
                 // { self.node_status_view(&id) }
-                // { self.node_input_view(&id) }
+                { self.node_input_view(&id) }
             </div>
         }
     }
 
-    // fn node_status_view(&self, id: &EntryId) -> Html {
+    // fn node_status_view(&self, id: &CubeId) -> Html {
     //     let id = id.clone();
     //     let vec = ProcessStatus::vec_all();
     //     let status_meta: Vec<(String, String)> = 
@@ -54,9 +57,9 @@ impl BranchModel {
     //     html! {
     //         <div class="dropdown"> 
     //             <button class="dropbtn"
-    //                 value=self.cube.get(id).process().type_str()
+    //                 value=self.branch.get(id).process().type_str()
     //             > 
-    //                 <img src={self.cube.get(id).process().type_src()} alt="process" />
+    //                 <img src={self.branch.get(id).process().type_src()} alt="process" />
     //             </button> 
                 
     //             <div class="dropdown-content"> 
@@ -66,71 +69,71 @@ impl BranchModel {
     //     }
     // }
 
-    // fn node_input_view(&self, id: &EntryId) -> Html {
-    //     let id = id.clone();
-    //     let is_empty = self.cube.get(id).face().is_empty();
-    //     html! {
-    //         <input
-    //             type="text"
-    //             ref=self.refs.get(&id).unwrap().clone()
-    //             value=self.cube.get(id).face()
-    //             placeholder="..."
-    //             aria-label="Item"
-    //             onfocus=self.link.callback(move |_| {
-    //                 Branchy![SetFocusId(Some(id))]
-    //             })
-    //             onkeydown=self.link.callback(move |e: KeyboardEvent| {
-    //                 let meta = (e.ctrl_key(), e.shift_key(), e.code());
-    //                 // LOG!("OnKeyDown: {:?}", meta);
-    //                 match (meta.0, meta.1, meta.2.as_str()) { 
-    //                     (false, false, "ArrowUp") => Branchy![Wander(Direction::Ascend, false)], 
-    //                     (false, false, "ArrowDown") => Branchy![Wander(Direction::Descend, false)], 
-    //                     (true, false, "ArrowUp") => Branchy![Wander(Direction::Ascend, true)], 
-    //                     (true, false, "ArrowDown") => Branchy![Wander(Direction::Descend, true)], 
-    //                     (false, false, "ArrowLeft") => Branchy![], 
-    //                     (false, false, "ArrowRight") => Branchy![], 
-    //                     _ => Branchy![]
-    //                 }
-    //             })
-    //             onkeypress=self.link.callback(move |e: KeyboardEvent| {
-    //                 let meta = (e.ctrl_key(), e.shift_key(), e.code());
-    //                 // LOG!("OnKeyPress: {:?}", meta);
-    //                 match (meta.0, meta.1, meta.2.as_str()) { 
-    //                     _ => Branchy![]
-    //                 }
-    //             })
-    //             onkeyup=self.link.callback(move |e: KeyboardEvent| {
-    //                 let meta = (e.ctrl_key(), e.shift_key(), e.code());
-    //                 // LOG!("OnKeyUp: {:?}", meta);
-    //                 match (meta.0, meta.1, meta.2.as_str()) { 
-    //                     // enter
-    //                     (false, false, "Enter") => Branchy![NewNode(vec![id])],
-    //                     // shift+enter
-    //                     (false, true, "Enter") => Branchy![],
-    //                     // backspace
-    //                     (_, _, "Backspace") => {
-    //                         if is_empty { Branchy![EraseNode(id)] }
-    //                         else { Branchy![] }
-    //                     }
-    //                     // delete
-    //                     (_, _, "Delete") => {
-    //                         if is_empty { Branchy![EraseNode(id), EraseNode(id), Wander(Direction::Descend, false)] }
-    //                         else { Branchy![] }
-    //                     }
-    //                     // ctrl released
-    //                     (true, _, "ControlLeft") => Branchy![Wander(Direction::Stay, false)],
-    //                     (true, _, "ControlRight") => Branchy![Wander(Direction::Stay, false)],
-    //                     _ => Branchy![] 
-    //                 }
-    //             })
-    //             oninput=self.link.callback(move |e: InputData| {
-    //                 // LOG!("OnInput: {:?}", e);
-    //                 Branchy![UpdateBuffer(e.value), WriteFace(id)]
-    //             })
-    //             readonly=self.cube.locked
-    //         />
-    //     }
-    // }
+    fn node_input_view(&self, id: &CubeId) -> Html {
+        let id = id.clone();
+        let is_empty = self.branch.get(id).name.is_empty();
+        html! {
+            <input
+                type="text"
+                ref=self.refs.get(&id).unwrap().clone()
+                value=self.branch.get(id).name
+                placeholder="..."
+                aria-label="Item"
+                onfocus=self.link.callback(move |_| {
+                    Branchy![SetFocusId(Some(id))]
+                })
+                onkeydown=self.link.callback(move |e: KeyboardEvent| {
+                    let meta = (e.ctrl_key(), e.shift_key(), e.code());
+                    // LOG!("OnKeyDown: {:?}", meta);
+                    match (meta.0, meta.1, meta.2.as_str()) { 
+                        (false, false, "ArrowUp") => Branchy![Wander(Direction::Ascend, false)], 
+                        (false, false, "ArrowDown") => Branchy![Wander(Direction::Descend, false)], 
+                        (true, false, "ArrowUp") => Branchy![Wander(Direction::Ascend, true)], 
+                        (true, false, "ArrowDown") => Branchy![Wander(Direction::Descend, true)], 
+                        (false, false, "ArrowLeft") => Branchy![], 
+                        (false, false, "ArrowRight") => Branchy![], 
+                        _ => Branchy![]
+                    }
+                })
+                onkeypress=self.link.callback(move |e: KeyboardEvent| {
+                    let meta = (e.ctrl_key(), e.shift_key(), e.code());
+                    // LOG!("OnKeyPress: {:?}", meta);
+                    match (meta.0, meta.1, meta.2.as_str()) { 
+                        _ => Branchy![]
+                    }
+                })
+                onkeyup=self.link.callback(move |e: KeyboardEvent| {
+                    let meta = (e.ctrl_key(), e.shift_key(), e.code());
+                    // LOG!("OnKeyUp: {:?}", meta);
+                    match (meta.0, meta.1, meta.2.as_str()) { 
+                        // enter
+                        (false, false, "Enter") => Branchy![NewCube(Some(id))],
+                        // shift+enter
+                        (false, true, "Enter") => Branchy![],
+                        // backspace
+                        (_, _, "Backspace") => {
+                            if is_empty { Branchy![EraseCube(id)] }
+                            else { Branchy![] }
+                        }
+                        // delete
+                        (_, _, "Delete") => {
+                            if is_empty { Branchy![EraseCube(id), EraseCube(id), Wander(Direction::Descend, false)] }
+                            else { Branchy![] }
+                        }
+                        // ctrl released
+                        (true, _, "ControlLeft") => Branchy![Wander(Direction::Stay, false)],
+                        (true, _, "ControlRight") => Branchy![Wander(Direction::Stay, false)],
+                        _ => Branchy![] 
+                    }
+                })
+                oninput=self.link.callback(move |e: InputData| {
+                    // LOG!("OnInput: {:?}", e);
+                    Branchy![UpdateBuffer(e.value), WriteName(id)]
+                })
+                // readonly=self.branch.locked
+            />
+        }
+    }
 
     fn clearall_button_view(&self) -> Html {
         html! {
