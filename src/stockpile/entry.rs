@@ -22,7 +22,7 @@ pub type Bubble = String;
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Filter {
     process: ProcessStatus,
-    tags: Vec<String>,
+    tags: Vec<Tag>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -34,12 +34,10 @@ pub enum ProcessStatus {
     New,
 }
 
+pub type Tag = String;
 
-impl Entry {
-    pub fn new() -> Self {
-        Entry::with_id(EntryId::new_stamped())
-    }
-    pub fn with_id(id: EntryId) -> Self {
+impl IdentityProduct<EntryId> for Entry {
+    fn with_id(id: EntryId) -> Self {
         Self {
             id,
             face: Face::new(),
@@ -47,9 +45,18 @@ impl Entry {
             filter: Filter::new()
         }
     }
-    pub fn id(&self) -> EntryId {
+    fn id(&self) -> EntryId {
         self.id.clone()
     }
+}
+
+impl Default for Entry {
+    fn default() -> Self { 
+        Entry::new()
+    }
+}
+
+impl Entry {
     pub fn face(&self) -> &Face {
         &self.face
     }
@@ -76,12 +83,6 @@ impl Entry {
     }
 }
 
-impl Default for Entry {
-    fn default() -> Self { 
-        Entry::new()
-    }
-    
-}
 
 
 // Filter impl.
@@ -96,9 +97,9 @@ impl Filter {
     }
 }
 
+use ProcessStatus::*;
 impl ProcessStatus {
     pub fn type_str(&self) -> String {
-        use ProcessStatus::*;
         match self {
             Done => "Done",
             Marching => "Marching",
@@ -108,7 +109,6 @@ impl ProcessStatus {
         }.to_string()
     }
     pub fn reflect(name: &str) -> Self {
-        use ProcessStatus::*;
         match name {
             "Done" => Done,
             "Marching" => Marching,
@@ -119,7 +119,6 @@ impl ProcessStatus {
         }
     }
     pub fn vec_all() -> Vec<Self> {
-        use ProcessStatus::*;
         vec! {
             New,
             Planning,
@@ -129,8 +128,6 @@ impl ProcessStatus {
         }
     }
     pub fn type_src(&self) -> String {
-        use ProcessStatus::*;
-        // Todo: Replace dummy.
         format!("static/icons/Process/{}.svg", Self::type_str(self))
     }
 }

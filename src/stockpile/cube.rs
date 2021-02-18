@@ -12,12 +12,10 @@ pub struct Cube {
     pub relation: LinearModel<EntryId>,
 }
 
-impl Cube {
-    pub fn new() -> Self {
-        Cube::with_id(CubeId::new_stamped())
-    }
-    pub fn with_id(id: CubeId) -> Self {
-        Cube {
+
+impl IdentityProduct<CubeId> for Cube {
+    fn with_id(id: CubeId) -> Self {
+        Self {
             name: String::new(),
             id,
             locked: false,
@@ -25,9 +23,18 @@ impl Cube {
             relation: LinearModel::new()
         }
     }
-    pub fn id(&self) -> CubeId {
+    fn id(&self) -> CubeId {
         self.id.clone()
     }
+}
+
+impl Default for Cube {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Cube {
     pub fn is_empty(&self) -> bool {
         self.entries.len() == 0 && self.name.is_empty()
     }

@@ -16,6 +16,14 @@ pub trait Identity: IdentityHash + PartialEq + Eq + Clone + Debug + Serialize + 
     }
 }
 
+pub trait IdentityProduct<Id: Identity>: Default {
+    fn new() -> Self {
+        Self::with_id(Id::new_stamped())
+    }
+    fn with_id(id: Id) -> Self;
+    fn id(&self) -> Id;
+}
+
 const LEN: usize = 6;
 
 #[derive(Clone, Copy, Hash, PartialEq, Eq, Deserialize, Serialize)]
