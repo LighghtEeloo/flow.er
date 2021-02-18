@@ -31,7 +31,7 @@ pub enum BranchMessage {
 
     /// None if bare toggle; Some if force turn on / off.
     SrcViewToggle(Option<bool>),
-    // Debug..
+    // Todo: _LogBranch -> Refresh.
     _LogBranch,
 
 }
@@ -104,6 +104,9 @@ impl BranchModel {
                         .or(self.branch.flow.orphans.get(0).cloned());
                     // Note: if Some, focus(); None then do nothing.
                     if let Some(id) = id {
+                        if self.refs.get(&id).is_none() {
+                            self.refs.insert(id, NodeRef::default());
+                        }
                         let ref_obj = self.refs.get(&id).unwrap();
                         if let Some(input) = ref_obj.cast::<InputElement>() {
                             input.focus().unwrap();

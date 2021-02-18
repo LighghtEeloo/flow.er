@@ -121,7 +121,12 @@ impl CubeModel {
                 Focus => {
                     let id = self.cube.relation.current();
                     let ref_obj = match id {
-                        Some(id) => self.refs.get(&id).unwrap(),
+                        Some(id) => {
+                            if self.refs.get(&id).is_none() {
+                                self.refs.insert(id, NodeRef::default());
+                            }
+                            self.refs.get(&id).unwrap()
+                        }
                         None => &self.ref_cube_name,
                     };
                     if let Some(input) = ref_obj.cast::<InputElement>() {
