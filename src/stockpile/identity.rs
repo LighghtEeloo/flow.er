@@ -23,7 +23,8 @@ pub struct EntryId (u64);
 
 impl Debug for EntryId {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> { 
-        let hash = &format!("{:x}", self.0)[..LEN];
+        let hash: String = format!("{:x}", self.0).as_str().chars().take(LEN).collect();
+        // let hash = &format!("{:x}", self.0)[..LEN];
         write!(f, "[[{}]]", hash) 
     }
 }
@@ -54,7 +55,8 @@ pub struct CubeId (u64);
 
 impl Debug for CubeId {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> { 
-        let hash = &format!("{:x}", self.0)[..LEN];
+        let hash: String = format!("{:x}", self.0).as_str().chars().take(LEN).collect();
+        // let hash = &format!("{:x}", self.0)[..LEN];
         write!(f, "{{{{{}}}}}", hash)
     }
 }
