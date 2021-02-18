@@ -1,9 +1,12 @@
 # Memo
 
-## Model Draft (v0.3.0)
+## Model Draft (v0.2.1)
+
+**Note: This model is no longer representitive after v0.2.2, because v0.3.0 schedules a better model reframe.**
+
 ### Data Model for Storage
 
-#### Key Concepts
+**Key Concepts**
 
 1. Collection = HashMap + RelationModel
    - HashMap acts as a handy data bucket. All it cares is Id => Value.
@@ -17,7 +20,7 @@
 2. Id = Hash + Eq + TimeRep (+ Clone + Copy)
    - Ids should be able to yield from a given time (`TimeRep`).
 
-#### Big Picture
+**Big Picture**
 
 - `Stockpile`
   - branch: `Branch`

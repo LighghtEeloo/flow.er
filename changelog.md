@@ -33,3 +33,7 @@
 - todo: present branch view.
 - todo: perfect keypress delete with individual buffer.
 - todo: config & settings.
+
+## Ver 0.2.2
+- fix: identity.
+- todo! reframe all.
