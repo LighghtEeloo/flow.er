@@ -37,3 +37,9 @@
 ## Ver 0.2.2
 - fix: identity.
 - todo! reframe all.
+
+## Ver 0.2.3
+- reframe! Identity, Entry, Cube, Branch & Stockpile.
+- impl: TagSet.
+- todo! FlowModel.
+- todo: reframe view_model.

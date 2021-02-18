@@ -64,6 +64,7 @@
   - [ ] Move node with keyboard.
   - [ ] Bubble details.
 - [ ] Filter.
+- [ ] Tag.
 - [ ] Caret-position-based new line.
 
 
