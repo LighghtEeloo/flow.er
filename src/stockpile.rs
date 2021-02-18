@@ -49,7 +49,6 @@ impl Stockpile {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct EditorInfo {
     pub cube_id: Option<CubeId>,
-    // pub entry_id: Option<EntryId>
 }
 
 impl EditorInfo {

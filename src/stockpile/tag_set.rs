@@ -39,19 +39,4 @@ impl TagSet {
         self.data.retain(|x| x.clone() != tag);
         removing
     }
-
-
-    // pub fn iter(&self) -> Iter {
-    //     Iter(self.data.clone().into_iter().rev().collect())
-    // }
 }
-
-// /// Iter: 
-// pub struct Iter(Vec<Tag>);
-
-// impl Iterator for Iter {
-//     type Item = Tag;
-//     fn next(&mut self) -> Option<<Self as Iterator>::Item> { 
-//         self.0.pop()
-//     }
-// }
