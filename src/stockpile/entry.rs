@@ -8,20 +8,12 @@ use crate::stockpile::identity::*;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Entry {
-    dry: EntryDry,
-    // timestamps: Vec<TimeStamp>,
-    // Todo: Add positional info.
-    // position: (f64, f64)
-}
-
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct EntryDry {
     id: EntryId,
     pub face: Face,
     pub bubble: Bubble,
     pub filter: Filter,
 }
+
 
 pub type Face = String;
 pub type Bubble = String;
@@ -45,51 +37,42 @@ pub enum ProcessStatus {
 
 impl Entry {
     pub fn new() -> Self {
-        Entry {
-            dry: EntryDry::new(EntryId::new_stamped()),
+        Entry::with_id(EntryId::new_stamped())
+    }
+    pub fn with_id(id: EntryId) -> Self {
+        Self {
+            id,
+            face: Face::new(),
+            bubble: Bubble::new(),
+            filter: Filter::new()
         }
-    }
-    pub fn dry(&self) -> EntryDry {
-        self.dry.clone()
-    }
-    pub fn strip(self) -> EntryDry {
-        self.dry
     }
     pub fn id(&self) -> EntryId {
-        self.dry.id.clone()
+        self.id.clone()
     }
     pub fn face(&self) -> &Face {
-        &self.dry.face
+        &self.face
     }
     pub fn set_face(&mut self, face: Face) {
-        self.dry.face = face;
+        self.face = face;
     }
     pub fn bubble(&self) -> &Bubble {
-        &self.dry.bubble
+        &self.bubble
     }
     pub fn set_bubble(&mut self, bubble: Bubble) {
-        self.dry.bubble = bubble;
+        self.bubble = bubble;
     }
     pub fn filter(&self) -> &Filter {
-        &self.dry.filter
+        &self.filter
     }
     pub fn set_filter(&mut self, filter: Filter) {
-        self.dry.filter = filter;
+        self.filter = filter;
     }
     pub fn process(&self) -> &ProcessStatus {
-        &self.dry.filter.process
+        &self.filter.process
     }
     pub fn set_process(&mut self, process: ProcessStatus) {
-        self.dry.filter.process = process;
-    }
-}
-
-impl From<EntryDry> for Entry {
-    fn from(v: EntryDry) -> Self {
-        Entry {
-            dry: v,
-            // timestamps: vec!(TimeStamp::created())
-        }
+        self.filter.process = process;
     }
 }
 
@@ -98,17 +81,6 @@ impl Default for Entry {
         Entry::new()
     }
     
-}
-
-impl EntryDry {
-    pub fn new(id: EntryId) -> Self {
-        EntryDry {
-            id,
-            face: Face::new(),
-            bubble: Bubble::new(),
-            filter: Filter::new()
-        }
-    }
 }
 
 
