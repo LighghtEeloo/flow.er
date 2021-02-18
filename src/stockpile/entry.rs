@@ -1,6 +1,7 @@
 use crate::util::*;
 use crate::stockpile::time::*;
 use crate::stockpile::identity::*;
+use crate::stockpile::tag_set::*;
 
 
 
@@ -14,6 +15,12 @@ pub struct Entry {
     pub filter: Filter,
 }
 
+impl Default for Entry {
+    fn default() -> Self { 
+        Entry::new()
+    }
+}
+
 
 pub type Face = String;
 pub type Bubble = String;
@@ -22,7 +29,7 @@ pub type Bubble = String;
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Filter {
     process: ProcessStatus,
-    tags: Vec<Tag>,
+    tags: TagSet,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -34,7 +41,6 @@ pub enum ProcessStatus {
     New,
 }
 
-pub type Tag = String;
 
 impl IdentityProduct<EntryId> for Entry {
     fn with_id(id: EntryId) -> Self {
@@ -47,12 +53,6 @@ impl IdentityProduct<EntryId> for Entry {
     }
     fn id(&self) -> EntryId {
         self.id.clone()
-    }
-}
-
-impl Default for Entry {
-    fn default() -> Self { 
-        Entry::new()
     }
 }
 
@@ -92,7 +92,7 @@ impl Filter {
     pub fn new() -> Self {
         Filter {
             process: ProcessStatus::New,
-            tags: Vec::new()
+            tags: TagSet::new()
         }
     }
 }

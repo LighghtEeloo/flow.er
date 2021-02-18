@@ -4,33 +4,35 @@ use crate::stockpile::prelude::*;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Cube {
-    pub name: String,
     pub id: CubeId,
     pub locked: bool,
+    pub name: String,
+    pub tags: TagSet,
     pub entries: HashMap<EntryId, Entry>,
     // Todo: polymorphism
     pub relation: LinearModel<EntryId>,
+}
+
+impl Default for Cube {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 
 impl IdentityProduct<CubeId> for Cube {
     fn with_id(id: CubeId) -> Self {
         Self {
-            name: String::new(),
             id,
             locked: false,
+            name: String::new(),
+            tags: TagSet::new(),
             entries: HashMap::new(),
             relation: LinearModel::new()
         }
     }
     fn id(&self) -> CubeId {
         self.id.clone()
-    }
-}
-
-impl Default for Cube {
-    fn default() -> Self {
-        Self::new()
     }
 }
 

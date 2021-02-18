@@ -2,18 +2,20 @@
 #[allow(unused)]
 pub mod identity;
 pub mod time;
+pub mod tag_set;
 pub mod relation;
 pub mod entry;
 pub mod cube;
 pub mod branch;
 
 pub mod prelude {
-    pub use crate::stockpile::*;
-    pub use crate::stockpile::identity::*;
-    pub use crate::stockpile::relation::*;
-    pub use crate::stockpile::entry::*;
-    pub use crate::stockpile::cube::*;
-    pub use crate::stockpile::branch::*;
+    pub use super::*;
+    pub use super::identity::*;
+    pub use super::tag_set::*;
+    pub use super::relation::*;
+    pub use super::entry::*;
+    pub use super::cube::*;
+    pub use super::branch::*;
 }
 
 
@@ -24,15 +26,23 @@ use prelude::*;
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Stockpile {
     pub branch: Branch,
+    pub tags: TagSet,
     pub editor_info: EditorInfo,
+}
+
+impl Default for Stockpile {
+    fn default() -> Self {
+        Self {
+            branch: Branch::new(),
+            tags: TagSet::default(),
+            editor_info: EditorInfo::new_none()
+        }
+    }
 }
 
 impl Stockpile {
     pub fn new() -> Self {
-        Self {
-            branch: Branch::new(),
-            editor_info: EditorInfo::new_none()
-        }
+        Self::default()
     }
 }
 

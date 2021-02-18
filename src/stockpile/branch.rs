@@ -2,18 +2,16 @@ use crate::util::*;
 use crate::stockpile::prelude::*;
 
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Default, Clone, Debug, Deserialize, Serialize)]
 pub struct Branch {
     pub cubes: HashMap<CubeId, Cube>,
     pub flow: FlowModel<CubeId>,
 }
 
+
 impl Branch {
     pub fn new() -> Self {
-        Branch {
-            cubes: HashMap::new(),
-            flow: FlowModel::new()
-        }
+        Self::default()
     }
     /// Remove all is_empty() cubes.
     pub fn clean(&mut self) {
