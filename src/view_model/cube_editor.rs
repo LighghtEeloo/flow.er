@@ -121,9 +121,9 @@ impl CubeModel {
         html! {
             <div class="dropdown"> 
                 <button class="dropbtn"
-                    value=self.cube.get(id).process().type_str()
+                    value=self.cube.get_cloned(id).process().type_str()
                 > 
-                    <img src={self.cube.get(id).process().type_src()} alt="process" />
+                    <img src={self.cube.get_cloned(id).process().type_src()} alt="process" />
                 </button> 
                 
                 <div class="dropdown-content"> 
@@ -135,12 +135,12 @@ impl CubeModel {
 
     fn node_input_view(&self, id: &EntryId) -> Html {
         let id = id.clone();
-        let is_empty = self.cube.get(id).face().is_empty();
+        let is_empty = self.cube.get_cloned(id).face().is_empty();
         html! {
             <input
                 type="text"
                 ref=self.refs.get(&id).unwrap().clone()
-                value=self.cube.get(id).face()
+                value=self.cube.get_cloned(id).face()
                 placeholder="..."
                 aria-label="Item"
                 onfocus=self.link.callback(move |_| {

@@ -15,24 +15,6 @@ impl Branch {
             flow: FlowModel::new()
         }
     }
-    pub fn is_empty(&self) -> bool {
-        self.cubes.len() == 0
-    }
-    pub fn get(&self, id: CubeId) -> &Cube {
-        self.cubes.get(&id).unwrap()
-    }
-    pub fn get_update(&mut self, id: CubeId) -> &Cube {
-        let found = self.cubes.get(&id).is_some();
-        if !found {
-            // Debug..
-            LOG!("Error: cube with id {:?} not found.", id);
-            self.cubes.insert(id, Cube::with_id(id));
-        }
-        self.cubes.get(&id).unwrap()
-    }
-    pub fn get_mut(&mut self, id: CubeId) -> &mut Cube {
-        self.cubes.get_mut(&id).unwrap()
-    }
     /// Remove all is_empty() cubes.
     pub fn clean(&mut self) {
         let kill_list: Vec<CubeId> = self.cubes.iter()
@@ -45,6 +27,46 @@ impl Branch {
             .collect();
         for x in kill_list {
             self.erase(x);
+        }
+    }
+}
+
+impl IdentityMap<CubeId, Cube> for Branch {
+    fn is_empty(&self) -> bool {
+        self.cubes.len() == 0
+    }
+    fn get_cloned(&self, id: CubeId) -> Cube {
+        self.cubes.get(&id).cloned().unwrap_or_default()
+    }
+
+    fn get_update(&mut self, id: CubeId) -> &Cube {
+        if !self.cubes.contains_key(&id) {
+            LOG!("Error: cube with id {:?} not found.", id);
+            let no_data = self.cubes.insert(id, Cube::with_id(id)).is_none();
+            // Note: should be None;
+            assert!(no_data)
+        }
+        self.cubes.get(&id).unwrap()
+    }
+
+    fn get_mut(&mut self, id: CubeId) -> &mut Cube {
+        if !self.cubes.contains_key(&id) {
+            LOG!("Error: cube with id {:?} not found.", id);
+            let no_data = self.cubes.insert(id, Cube::with_id(id)).is_none();
+            // Note: should be None;
+            assert!(no_data)
+        }
+        self.cubes.get_mut(&id).unwrap()
+    }
+
+    fn set(&mut self, id: CubeId, value: Cube) -> Result<(), (CubeId, Cube)> {
+        if self.cubes.contains_key(&id) {
+            let has_data = self.cubes.insert(id, Cube::with_id(id)).is_some();
+            // Note: should be Some;
+            assert!(has_data);
+            Ok(())
+        } else {
+            Err((id, value))
         }
     }
 }

@@ -71,12 +71,12 @@ impl BranchModel {
 
     fn node_input_view(&self, id: &CubeId) -> Html {
         let id = id.clone();
-        let is_empty = self.branch.get(id).name.is_empty();
+        let is_empty = self.branch.get_cloned(id).name.is_empty();
         html! {
             <input
                 type="text"
                 ref=self.refs.get(&id).unwrap().clone()
-                value=self.branch.get(id).name
+                value=self.branch.get_cloned(id).name
                 placeholder="..."
                 aria-label="Item"
                 onfocus=self.link.callback(move |_| {

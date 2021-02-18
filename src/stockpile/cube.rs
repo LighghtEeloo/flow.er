@@ -34,15 +34,43 @@ impl Default for Cube {
     }
 }
 
-impl Cube {
-    pub fn is_empty(&self) -> bool {
+impl IdentityMap<EntryId, Entry> for Cube {
+    fn is_empty(&self) -> bool {
         self.entries.len() == 0 && self.name.is_empty()
     }
-    pub fn get(&self, id: EntryId) -> &Entry {
+    fn get_cloned(&self, id: EntryId) -> Entry {
+        self.entries.get(&id).cloned().unwrap_or_default()
+    }
+
+    fn get_update(&mut self, id: EntryId) -> &Entry {
+        if !self.entries.contains_key(&id) {
+            LOG!("Error: entry with id {:?} not found.", id);
+            let no_data = self.entries.insert(id, Entry::with_id(id)).is_none();
+            // Note: should be None;
+            assert!(no_data)
+        }
         self.entries.get(&id).unwrap()
     }
-    pub fn get_mut(&mut self, id: EntryId) -> &mut Entry {
+
+    fn get_mut(&mut self, id: EntryId) -> &mut Entry {
+        if !self.entries.contains_key(&id) {
+            LOG!("Error: entry with id {:?} not found.", id);
+            let no_data = self.entries.insert(id, Entry::with_id(id)).is_none();
+            // Note: should be None;
+            assert!(no_data)
+        }
         self.entries.get_mut(&id).unwrap()
+    }
+
+    fn set(&mut self, id: EntryId, value: Entry) -> Result<(), (EntryId, Entry)> {
+        if self.entries.contains_key(&id) {
+            let has_data = self.entries.insert(id, Entry::with_id(id)).is_some();
+            // Note: should be Some;
+            assert!(has_data);
+            Ok(())
+        } else {
+            Err((id, value))
+        }
     }
 }
 
