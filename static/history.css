@@ -1,0 +1,76 @@
+@import "general.css";
+
+.history {
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background-color: aliceblue;
+}
+
+
+.history .snapshot-button {
+}
+
+
+.history .node-group {
+    position: relative;
+    top: 0; right: 0; bottom: 0; left: 0;
+    margin: 0 auto;
+    /* margin: 60px auto; */
+    height: auto;
+    width: 60%;
+    /* border: solid 4px green; */
+}
+
+.history .node-group .node {
+    --horizontal-margin: 3px;
+    position: relative;
+    /* top: 0; */
+    height: calc(var(--size-button) + 4px);
+    /* border: solid 1px green; */
+}
+
+.history .node-group .node span {
+    display: inline;
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 2px var(--horizontal-margin) 1px;
+    padding: 0 1%;
+    width: calc(100% - var(--size-button) * 2 - var(--horizontal-margin) * 3);
+    height: calc(var(--size-button) - 1px);
+    line-height: calc(var(--size-button) - 1px);
+    font-size: calc(var(--size-button) * 0.6);
+    text-align: center;
+    background-color: var(--lightColor);
+    border-style: solid;
+    border-color: var(--borderColor);
+    box-shadow: none;
+}
+
+
+.history .node-group .node .visit-button { 
+    display: inline; 
+    position: absolute; 
+    top: 0;
+    right: calc(var(--size-button) + var(--horizontal-margin));
+    outline: none;
+    height: var(--size-button);
+    width: var(--size-button);
+    margin: 1px 0 var(--horizontal-margin);
+    /* border-radius: calc(var(--size-button) / 12); */
+    /* width: calc(24px * 6);
+    margin-right: calc(-24px * 5); */
+} 
+
+.history .node-group .node .delete-button { 
+    display: inline; 
+    position: absolute; 
+    top: 0;
+    right: 0;
+    outline: none;
+    height: var(--size-button);
+    width: var(--size-button);
+    margin: 1px 0 var(--horizontal-margin);
+} 

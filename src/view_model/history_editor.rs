@@ -14,8 +14,9 @@ impl HistoryModel {
             <div class="history">
                 { self.snapshot_capture_button() }
                 <div class="node-group">
-                    { for vec.into_iter().enumerate().map(|(index, _)| self.node_view(index)) }
+                    { for vec.iter().enumerate().rev().map(|(index, _)| self.node_view(index)) }
                 </div>
+                <link rel="stylesheet" href="static/history.css" />
             </div>
         }
     }
@@ -29,7 +30,7 @@ impl HistoryModel {
                     Historyly![NewShot, _LogHistory]
                 })
             >
-                // <img src="static/icons/StatusBar/src-code.svg" alt="code_pic"/>
+                <img src="static/icons/History/create.svg" alt="code_pic"/>
                 <span>{"Create Snapshot"}</span>
             </button>
         }
@@ -72,8 +73,8 @@ impl HistoryModel {
                     Historyly![VisitShot(time)]
                 })
             >
-                // <img src="static/icons/StatusBar/src-code.svg" alt="code_pic"/>
-                <span>{"Visit Snapshot"}</span>
+                <img src="static/icons/History/visit.svg" alt="code_pic"/>
+                // <span>{"Visit Snapshot"}</span>
             </button>
         }
     }
@@ -89,8 +90,8 @@ impl HistoryModel {
                     Historyly![EraseShot(time)]
                 })
             >
-                // <img src="static/icons/StatusBar/src-code.svg" alt="code_pic"/>
-                <span>{"Delete Snapshot"}</span>
+                <img src="static/icons/History/delete.svg" alt="code_pic"/>
+                // <span>{"Delete Snapshot"}</span>
             </button>
         }
     }
