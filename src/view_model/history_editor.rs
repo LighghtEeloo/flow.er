@@ -1,5 +1,5 @@
 use crate::yew_util::*;
-use crate::stockpile::prelude::*;
+// use crate::stockpile::prelude::*;
 use crate::view_model::*;
 
 use HistoryMessage::*;
@@ -50,14 +50,14 @@ impl HistoryModel {
 
     fn node_span_view(&self, index: usize) -> Html {
         let time = self.stockpile.history[index].time;
-        let sys_time = self.stockpile.history[index].universal();
+        let sys_time = &self.stockpile.history[index];
         html! {
             <span
                 type="text"
                 ref=self.refs.get(&time).unwrap().clone()
                 aria-label="TimeShot"
             > 
-                { format!("{:?}", sys_time) }
+                { format!("{}", sys_time) }
             </span>
         }
     }
