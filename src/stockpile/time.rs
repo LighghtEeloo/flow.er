@@ -1,7 +1,9 @@
 use crate::util::*;
 
-pub use wasm_timer::{SystemTime, UNIX_EPOCH};
-pub use std::time::Duration;
+use wasm_timer;
+use std::time;
+use std::time::Duration;
+use chrono::prelude::*;
 
 pub type TimeTuple = (u64, u32);
 
@@ -39,7 +41,18 @@ impl<T> Debug for TimeStamp<T>
 where T: Clone + Debug
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> { 
-        write!(f, "{:?} - {:?}", self.time, self.universal())
+        write!(f, "{:?} ...", self.time)
+    }
+}
+
+impl<T> fmt::Display for TimeStamp<T> 
+where T: Clone + Debug
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> { 
+        let duration = self.universal().duration_since(wasm_timer::UNIX_EPOCH).expect("time went backwards");
+        let dt: DateTime<Local> = (time::UNIX_EPOCH + duration).into();
+        // Todo: Use arg controlled timezone / js -> html element.
+        write!(f, "{}", dt.with_timezone(&FixedOffset::east(8*3600)).format("%Y-%m-%d %a %H:%M:%S").to_string())
     }
 }
 
@@ -59,7 +72,7 @@ impl<T> Eq for TimeStamp<T> where T: Clone + Debug {}
 pub trait TimeRep {
     fn new() -> Self;
     /// To SystemTime.
-    fn universal(&self) -> SystemTime;
+    fn universal(&self) -> wasm_timer::SystemTime;
     /// To u128.
     fn flatten(&self) -> u128 {
         to_duration(self.universal()).as_nanos()
@@ -73,20 +86,20 @@ pub trait TimeRep {
     }
 }
 
-fn to_duration(sys_time: SystemTime) -> Duration {
-    sys_time.duration_since(UNIX_EPOCH).expect("Time went backwards")
+fn to_duration(sys_time: wasm_timer::SystemTime) -> Duration {
+    sys_time.duration_since(wasm_timer::UNIX_EPOCH).expect("Time went backwards")
 }
 
 impl TimeRep for TimeTuple {
     fn new() -> Self {
         // Using nano_secs as timestamp.
-        let time = to_duration(SystemTime::now());
+        let time = to_duration(wasm_timer::SystemTime::now());
         (time.as_secs(), time.subsec_nanos())
     }
-    fn universal(&self) -> SystemTime {
+    fn universal(&self) -> wasm_timer::SystemTime {
         let sec = self.0;
         let sub_nano = self.1;
-        UNIX_EPOCH + Duration::from_nanos(sec*1e9 as u64 + sub_nano as u64)
+        wasm_timer::UNIX_EPOCH + Duration::from_nanos(sec*1e9 as u64 + sub_nano as u64)
     }
 }
 
@@ -99,7 +112,7 @@ where T: Clone + Debug
             data: TimeMeta::<T>::Created,
         }
     }
-    fn universal(&self) -> SystemTime {
+    fn universal(&self) -> wasm_timer::SystemTime {
         self.time.universal()
     }
 }

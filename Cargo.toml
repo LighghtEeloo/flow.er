@@ -10,12 +10,11 @@ edition = "2018"
 # strum = "0.20"
 # strum_macros = "0.20"
 serde = "1"
-serde_derive = "1"
 serde_json = "1"
 
 
 yew = { path = "C:\\Zix100\\Repo\\yew\\packages\\yew" }
 yew-services = { path = "C:\\Zix100\\Repo\\yew\\packages\\yew-services" }
 wasm-timer = "0.2.0"
-
+chrono = { version = "0.4", features = ["unstable-locales"] }
 
