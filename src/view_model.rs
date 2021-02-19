@@ -6,6 +6,8 @@ mod cube_model;
 mod cube_editor;
 mod branch_model;
 mod branch_editor;
+mod history_model;
+mod history_editor;
 
 use crate::util::*;
 use crate::yew_util::*;
@@ -13,6 +15,7 @@ use crate::stockpile::prelude::*;
 
 pub use cube_model::{CubeModel, CubeMessage, CubeMessages};
 pub use branch_model::{BranchModel, BranchMessage, BranchMessages};
+pub use history_model::{HistoryModel, HistoryMessage, HistoryMessages};
 
 const KEY: &str = "yew.life.tracer.self";
 
@@ -31,7 +34,8 @@ impl Router {
         match self {
             Cube => Cubey![CubeMessage::_LogCube],
             Branch => Branchy![BranchMessage::_LogBranch],
-            // Todo: History
+            History => Historyly![HistoryMessage::_LogHistory],
+            // Todo: Settings.
             _ => Message::_Idle
         }
     }
@@ -41,6 +45,7 @@ pub struct Model {
     router: Router,
     cube_model: CubeModel,
     branch_model: BranchModel,
+    history_model: HistoryModel,
     stockpile: Stockpile,
     storage: StorageService,
     link: ComponentLink<Self>,
@@ -51,8 +56,9 @@ pub struct Model {
 pub enum Message {
     Cube(CubeMessages),
     Branch(BranchMessages),
-    // Todo: History.
-    History,
+    History(HistoryMessages),
+    // Todo: Settings.
+    Settings,
     Global(GlobalMessages),
     _Debug(String),
     _Idle
@@ -98,10 +104,16 @@ impl Component for Model {
         let branch: &Branch = &stockpile.branch;
         let branch_model = BranchModel::branch_create(branch, &link);
 
+        
+        // Todo: Use RefCell.
+        let history_stockpile: &Stockpile = &stockpile;
+        let history_model = HistoryModel::history_create(history_stockpile, &link);
+
         Self {
             router: Router::Cube,
             cube_model,
             branch_model,
+            history_model,
             stockpile,
             storage,
             link,
@@ -122,6 +134,12 @@ impl Component for Model {
                 self.branch_read();
                 let res = self.branch_model.branch_update(msg);
                 self.branch_write();
+                res
+            }
+            History(msg) => {
+                self.stockpile_read();
+                let res = self.history_model.history_update(msg);
+                self.stockpile_write();
                 res
             }
             Global(msg) => self.global_update(msg),
@@ -159,6 +177,12 @@ impl Model {
     }
     pub fn branch_write(&mut self) {
         self.stockpile.branch = self.branch_model.branch.clone();
+    }
+    pub fn stockpile_read(&mut self) {
+        self.history_model.stockpile = self.stockpile.clone();
+    }
+    pub fn stockpile_write(&mut self) {
+        self.stockpile = self.history_model.stockpile.clone();
     }
 
     // impl

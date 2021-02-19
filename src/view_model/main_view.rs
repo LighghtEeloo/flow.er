@@ -68,6 +68,14 @@ impl Model {
                         branch_model.branch_view() 
                     }
                 }
+                Router::History => {
+                    let history_model = &self.history_model;
+                    if history_model.src_view { 
+                        history_model.src_view()
+                    } else { 
+                        history_model.history_view() 
+                    }
+                }
                 _ => html! {}
             };
         html! {

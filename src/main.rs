@@ -60,6 +60,25 @@ macro_rules! Branchy {
     };
 }
 
+/// Historyly: History-ly, create Message from an array of HistoryMessage-s.  
+/// 
+/// "-y" for Message macros.
+#[macro_export]
+macro_rules! Historyly {
+    () => (
+        $crate::view_model::Message::_Idle
+    );
+    ( $( $x:expr ),* ) => {
+        {
+            let mut temp_vec = Vec::new();
+            $(
+                temp_vec.push($x);
+            )*
+            $crate::view_model::Message::History(temp_vec)
+        }
+    };
+}
+
 /// Globaly: Global-y, create Message from an array of GlobalMessage-s.  
 /// 
 /// "-y" for Message macros.
@@ -84,6 +103,7 @@ pub mod util {
         LOG,
         Cubey,
         Branchy,
+        Historyly,
         Globaly
     };
 
