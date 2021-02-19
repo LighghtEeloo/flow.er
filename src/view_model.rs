@@ -19,7 +19,7 @@ pub use history_model::{HistoryModel, HistoryMessage, HistoryMessages};
 
 const KEY: &str = "yew.life.tracer.self";
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Router {
     Cube,
     Branch,
@@ -228,20 +228,19 @@ impl Model {
                         Router::Cube => {
                             use CubeMessage::*;
                             self.revisit(Cubey![SrcViewToggle(None)]);
-                            if self.branch_model.src_view {
-                                self.revisit(Branchy![BranchMessage::SrcViewToggle(Some(true))]);
-                            }
                         }
                         Router::Branch => {
                             use BranchMessage::*;
                             self.revisit(Branchy![SrcViewToggle(None)]);
-                            if self.branch_model.src_view {
-                                self.revisit(Cubey![CubeMessage::SrcViewToggle(Some(true))]);
-                            }
+                        }
+                        Router::History => {
+                            use HistoryMessage::*;
+                            self.revisit(Historyly![SrcViewToggle(None)]);
                         }
                         // Todo: other src-view toggles.
                         _ => ()
                     }
+                    self.src_all_close(self.router);
                 }
                 SwitchRouter(router) => {
                     self.router = router;
@@ -253,6 +252,18 @@ impl Model {
             }
         }
         true
+    }
+    fn src_all_close(&mut self, keeping_router: Router) {
+        if keeping_router != Router::Cube {
+            self.revisit(Cubey![CubeMessage::SrcViewToggle(Some(false))]);
+        }
+        if keeping_router != Router::Branch {
+            self.revisit(Branchy![BranchMessage::SrcViewToggle(Some(false))]);
+        }
+        if keeping_router != Router::History {
+            self.revisit(Historyly![HistoryMessage::SrcViewToggle(Some(false))]);
+        }
+
     }
 }
 
