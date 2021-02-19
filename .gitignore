@@ -2,4 +2,4 @@
 /dist
 /.idea
 /.vscode
-_tmp.txt
+_*.txt
