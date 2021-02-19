@@ -19,6 +19,7 @@ pub enum HistoryMessage {
     UpdateBuffer(String),
     
     NewShot,
+    VisitShot(TimeTuple),
     EraseShot(TimeTuple),
 
     FocusTime(TimeTuple),
@@ -61,6 +62,14 @@ impl HistoryModel {
                     let time_tuple = self.stockpile.history.last().unwrap().time;
                     self.refs.insert(time_tuple, NodeRef::default());
                     self.revisit( Historyly![FocusTime(time_tuple)] );
+                }
+                VisitShot(time_tuple) => {
+                    let index = self.stockpile.history.iter().position(|x| x.flatten_tuple() == time_tuple).unwrap();
+                    let branch = match self.stockpile.history[index].data.clone() {
+                        TimeMeta::Snapshot(x) => x,
+                        _ => unreachable!()
+                    };
+                    self.stockpile.branch = branch;
                 }
                 EraseShot(time_tuple) => {
                     let index = self.stockpile.history.iter().position(|x| x.flatten_tuple() == time_tuple).unwrap();

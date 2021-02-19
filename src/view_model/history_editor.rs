@@ -40,6 +40,8 @@ impl HistoryModel {
         html! {
             <div class="node">
                 { self.node_span_view(index) }
+                { self.node_visit_button_view(index) }
+                { self.node_erase_button_view(index) }
             </div>
         }
     }
@@ -56,6 +58,40 @@ impl HistoryModel {
             > 
                 { format!("{:?}", sys_time) }
             </span>
+        }
+    }
+
+
+    fn node_visit_button_view(&self, index: usize) -> Html {
+        let time = self.stockpile.history[index].time;
+        // let sys_time = self.stockpile.history[index].universal();
+        html! {
+            <button class="visit-button"
+                title="Visit Snapshot."
+                onclick=self.link.callback(move |_| {
+                    Historyly![VisitShot(time)]
+                })
+            >
+                // <img src="static/icons/StatusBar/src-code.svg" alt="code_pic"/>
+                <span>{"Visit Snapshot"}</span>
+            </button>
+        }
+    }
+
+
+    fn node_erase_button_view(&self, index: usize) -> Html {
+        let time = self.stockpile.history[index].time;
+        // let sys_time = self.stockpile.history[index].universal();
+        html! {
+            <button class="delete-button"
+                title="Delete Snapshot."
+                ondblclick=self.link.callback(move |_| {
+                    Historyly![EraseShot(time)]
+                })
+            >
+                // <img src="static/icons/StatusBar/src-code.svg" alt="code_pic"/>
+                <span>{"Delete Snapshot"}</span>
+            </button>
         }
     }
 
