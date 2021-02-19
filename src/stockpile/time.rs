@@ -2,7 +2,6 @@ use crate::util::*;
 
 pub use wasm_timer::{SystemTime, UNIX_EPOCH};
 pub use std::time::Duration;
-// Timestamp Area
 
 pub type TimeTuple = (u64, u32);
 
@@ -28,13 +27,12 @@ where T: Clone + Debug
 impl<T> TimeStamp<T> 
 where T: Clone + Debug
 {
-
-    // pub fn snapshot(entry: &Entry) -> Self {
-    //     TimeStamp {
-    //         meta: TimeMeta::Snapshot(entry.dry()),
-    //         data: TimeStamp::stamping()
-    //     }
-    // }
+    pub fn new_snapshot(v: &T) -> Self {
+        Self {
+            time: TimeTuple::new(),
+            data: TimeMeta::Snapshot(v.clone()),
+        }
+    }
 }
 
 impl<T> Debug for TimeStamp<T> 
@@ -45,6 +43,16 @@ where T: Clone + Debug
     }
 }
 
+impl<T> PartialEq for TimeStamp<T>
+where T: Clone + Debug
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.time_eq(other)
+    }
+}
+
+impl<T> Eq for TimeStamp<T> where T: Clone + Debug {}
+
 
 // TimeRep trait
 
@@ -54,20 +62,25 @@ pub trait TimeRep {
     fn universal(&self) -> SystemTime;
     /// To u128.
     fn flatten(&self) -> u128 {
-        let time = self.universal()
-            .duration_since(UNIX_EPOCH)
-            .expect("Time went backwards")
-            .as_nanos();
-        time
+        to_duration(self.universal()).as_nanos()
     }
+    fn flatten_tuple(&self) -> TimeTuple {
+        let time = to_duration(self.universal());
+        (time.as_secs(), time.subsec_nanos())
+    }
+    fn time_eq(&self, other: &impl TimeRep) -> bool {
+        self.flatten() == other.flatten()
+    }
+}
+
+fn to_duration(sys_time: SystemTime) -> Duration {
+    sys_time.duration_since(UNIX_EPOCH).expect("Time went backwards")
 }
 
 impl TimeRep for TimeTuple {
     fn new() -> Self {
         // Using nano_secs as timestamp.
-        let time = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .expect("Time went backwards");
+        let time = to_duration(SystemTime::now());
         (time.as_secs(), time.subsec_nanos())
     }
     fn universal(&self) -> SystemTime {
