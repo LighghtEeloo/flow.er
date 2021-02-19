@@ -8,13 +8,14 @@ body {
     --emphasizeColor: rgba(238, 244, 247, 0.829);
     --dividerColor: rgba(10, 55, 77, 1);
 
-    --mainFont: cursive, 'Times New Roman', serif;
+    --mainFont: Garamond, monospace, cursive, Helvetica, "Courier New", Courier;
+    --adviceFont: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     --assistiveFont: 'Times New Roman', Times, serif;
+    --size-button: 36px;
 }
 
 
 .node-group {
-    --size-button: 36px;
     --lightColor: rgba(248, 253, 255, 0.925);
     --borderColor: rgba(222, 229, 233, 0.925);
     --dropdownColor: rgba(121, 191, 238, 0.431);
@@ -24,7 +25,7 @@ body {
 }
 
 input {
-    font-family: Garamond, monospace, cursive, Helvetica, "Courier New", Courier;
+    font-family: var(--assistiveFont);
 }
 
 

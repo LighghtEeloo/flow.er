@@ -8,10 +8,53 @@
     background-color: aliceblue;
 }
 
+/* SnapShot */
 
-.history .snapshot-button {
+.history .snapshot-button
+{
+    --size-border: 2px;
+    --ratio-button: 2.7;
+    --width: calc(var(--size-button) * 16);
+
+    position: relative;
+    top: 0; 
+    left: calc(50% - var(--width) / 2);
+    height: calc(var(--size-button) * var(--ratio-button) - var(--size-border) * 2 * var(--ratio-button));
+    width: var(--width);
+    margin: calc(1% + 10px) auto;
+    padding: 1px;
+
+    outline: none;
+	border: solid var(--dividerColor) var(--size-border);
+    border-radius: calc(var(--size-border) * 7);
+    background-color: var(--mainColor);
 }
 
+.history .snapshot-button span {
+    --history-span-height: calc(var(--size-button) * 0.5 * var(--ratio-button));
+    position: relative;
+    top: calc(var(--history-span-height) * -0.25);
+    height: var(--history-span-height);
+    font-size: var(--history-span-height);
+    font-family: var(--adviceFont);
+    line-height: var(--history-span-height);
+}
+
+.history .snapshot-button img
+{
+    --history-img-height: calc(var(--size-button) * 0.7 * var(--ratio-button));
+    position: relative;
+    top: calc(50% - var(--history-img-height) * 0.55);
+    height: var(--history-img-height);
+    width: var(--history-img-height);
+    margin: 0;
+}
+
+.history .snapshot-button:hover {
+    background-color: var(--emphasizeColor);
+}
+
+/* Node */
 
 .history .node-group {
     position: relative;
@@ -50,27 +93,38 @@
 }
 
 
-.history .node-group .node .visit-button { 
+.history .node-group .node button { 
     display: inline; 
     position: absolute; 
     top: 0;
-    right: calc(var(--size-button) + var(--horizontal-margin));
+    border: none;
     outline: none;
+    margin: 0;
+    border-radius: calc(var(--size-button) / 12);
+    cursor: pointer; 
+    padding: calc(var(--size-button) * 0.2); 
     height: var(--size-button);
     width: var(--size-button);
     margin: 1px 0 var(--horizontal-margin);
+    background-color: var(--dropdownColor);
+} 
+
+.history .node-group .node button:hover {
+    background-color: var(--dropdownHoverColor);
+}
+
+.history .node-group .node button img { 
+    width:  calc(var(--size-button) * 0.6);
+    height: calc(var(--size-button) * 0.6);
+} 
+
+.history .node-group .node .visit-button { 
+    right: calc(var(--size-button) + var(--horizontal-margin));
     /* border-radius: calc(var(--size-button) / 12); */
     /* width: calc(24px * 6);
     margin-right: calc(-24px * 5); */
 } 
 
 .history .node-group .node .delete-button { 
-    display: inline; 
-    position: absolute; 
-    top: 0;
     right: 0;
-    outline: none;
-    height: var(--size-button);
-    width: var(--size-button);
-    margin: 1px 0 var(--horizontal-margin);
 } 

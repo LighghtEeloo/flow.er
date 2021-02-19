@@ -96,7 +96,6 @@ impl Model {
                     height: 100%;
                     width: 60%;
                     margin: auto;
-                    font-family: cursive;
                     text-align: center;
                     font-size: 8pt;
                 ">

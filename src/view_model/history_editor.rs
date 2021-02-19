@@ -31,7 +31,7 @@ impl HistoryModel {
                 })
             >
                 <img src="static/icons/History/create.svg" alt="code_pic"/>
-                <span>{"Create Snapshot"}</span>
+                <span>{"   Create Snapshot   "}</span>
             </button>
         }
     }

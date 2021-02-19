@@ -26,7 +26,6 @@ body {
     margin: 0;
     padding: 0;
     position: absolute;
-    font-family: var(--mainfont);
     display: block;
 }
 
@@ -187,3 +186,7 @@ body {
     resize: none;
 }
 
+
+.frame p {
+    font-family: cursive, 'Times New Roman', serif;
+}
