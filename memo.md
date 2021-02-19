@@ -2,7 +2,14 @@
 
 ## Model Draft (v0.2.1)
 
-**Note: This model is no longer representitive after v0.2.2, because v0.3.0 schedules a better model reframe.**
+**Note: This model is no longer representitive after v0.2.2,** because...
+
+Proposing a new app called *flow-er* with ...
+  - a flattened Entity data collection with EntityId
+  - a powerful FlowModel
+  - related keyword prompt
+  - better data operation (copy / move)
+  - better UI
 
 ### Data Model for Storage
 

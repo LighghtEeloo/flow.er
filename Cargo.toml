@@ -1,6 +1,6 @@
 [package]
 name = "tracer-yew"
-version = "0.2.3"
+version = "0.2.4"
 authors = ["LighghtEeloo <eelooecho@163.com>"]
 edition = "2018"
 

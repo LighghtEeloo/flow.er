@@ -43,3 +43,14 @@
 - impl: TagSet.
 - todo! FlowModel.
 - todo: reframe view_model.
+
+## Ver 0.2.4
+- impl! History.
+- impl: TagSet.
+- todo! FlowModel.
+- proposal! *flow-er* with ...
+  - a flattened Entity data collection with EntityId
+  - a powerful FlowModel
+  - related keyword prompt
+  - better data operation (copy / move)
+  - better UI
