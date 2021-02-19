@@ -10,6 +10,7 @@ pub mod branch;
 
 pub mod prelude {
     pub use super::*;
+    pub use super::time::*;
     pub use super::identity::*;
     pub use super::tag_set::*;
     pub use super::relation::*;
@@ -26,7 +27,7 @@ use prelude::*;
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Stockpile {
     pub branch: Branch,
-    pub tags: TagSet,
+    pub history: Vec<TimeStamp<Branch>>,
     pub editor_info: EditorInfo,
 }
 
@@ -34,8 +35,8 @@ impl Default for Stockpile {
     fn default() -> Self {
         Self {
             branch: Branch::new(),
-            tags: TagSet::default(),
-            editor_info: EditorInfo::new_none()
+            history: Vec::new(),
+            editor_info: EditorInfo::new_none(),
         }
     }
 }

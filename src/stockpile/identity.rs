@@ -8,14 +8,19 @@ use std::hash::{Hash, Hasher};
 const LEN: usize = 6;
 
 pub trait IdentityHash: Hash + Copy {
-    fn from_time(v: &impl TimeRep) -> Self;
+    fn from_u64(v: u64) -> Self;
+    fn from_time(v: &impl TimeRep) -> Self {
+        let mut s = DefaultHasher::new();
+        v.flatten().hash(&mut s);
+        Self::from_u64(s.finish())
+    }
 }
 
 /// For id.
 pub trait Identity: IdentityHash + PartialEq + Eq + Clone + Debug + Serialize + Deserialize<'static> {
     fn new_stamped() -> Self {
-        let stamp = TimeStamp::created();
-        Self::from_time(&stamp.data)
+        let stamp = TimeStamp::<()>::new();
+        Self::from_time(&stamp)
     }
 }
 
@@ -57,17 +62,10 @@ impl Debug for EntryId {
 }
 
 impl IdentityHash for EntryId {
-    fn from_time(v: &impl TimeRep) -> Self {
-        let time = v.flatten()
-            .duration_since(UNIX_EPOCH)
-            .expect("Time went backwards")
-            .as_nanos();
-        let mut s = DefaultHasher::new();
-        time.hash(&mut s);
-        EntryId (s.finish())
+    fn from_u64(v: u64) -> Self {
+        EntryId (v)
     }
 }
-
 impl Identity for EntryId {}
 
 
@@ -83,15 +81,8 @@ impl Debug for CubeId {
 }
 
 impl IdentityHash for CubeId {
-    fn from_time(v: &impl TimeRep) -> Self {
-        let time = v.flatten()
-            .duration_since(UNIX_EPOCH)
-            .expect("Time went backwards")
-            .as_nanos();
-        let mut s = DefaultHasher::new();
-        time.hash(&mut s);
-        CubeId (s.finish())
+    fn from_u64(v: u64) -> Self {
+        CubeId (v)
     }
 }
-
 impl Identity for CubeId {}
