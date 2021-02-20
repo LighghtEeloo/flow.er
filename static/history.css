@@ -13,20 +13,20 @@
 .history .snapshot-button
 {
     --size-border: 2px;
-    --ratio-button: 2.7;
+    --ratio-button: 1.5;
     --width: calc(var(--size-button) * 16);
 
     position: relative;
     top: 0; 
     left: calc(50% - var(--width) / 2);
-    height: calc(var(--size-button) * var(--ratio-button) - var(--size-border) * 2 * var(--ratio-button));
+    height: calc(var(--size-button) * var(--ratio-button) * 1.6);
     width: var(--width);
     margin: calc(1% + 10px) auto;
     padding: 1px;
 
     outline: none;
 	border: solid var(--dividerColor) var(--size-border);
-    border-radius: calc(var(--size-border) * 7);
+    border-radius: calc(var(--size-border) * 4);
     background-color: var(--mainColor);
 }
 
@@ -44,10 +44,11 @@
 {
     --history-img-height: calc(var(--size-button) * 0.7 * var(--ratio-button));
     position: relative;
-    top: calc(50% - var(--history-img-height) * 0.55);
+    top: calc(var(--history-img-height) * 0.1);
     height: var(--history-img-height);
     width: var(--history-img-height);
     margin: 0;
+    margin-right: calc(var(--size-button) * var(--ratio-button) * 0.1);
 }
 
 .history .snapshot-button:hover {
