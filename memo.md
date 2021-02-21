@@ -13,6 +13,7 @@ Some "next generation" feature requests.
    4. Calendar
 4. CLI style integration
 5. Safer file / cloud storage
+6. Dry export
 
 ## Model Draft (v0.2.1)
 

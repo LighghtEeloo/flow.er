@@ -26,7 +26,7 @@ where Id: Identity
     ///          target.owner = obj       and target in obj.descendants;
     /// _: Descend target.
     /// if None is presented, create new root.
-    fn add(&mut self, obj: Id, target: Option<Id>, dir: Direction) {
+    pub fn add(&mut self, obj: Id, target: Option<Id>, dir: Direction) {
         let owner: Option<Id> = target.map(|x| match dir {
             Direction::Ascend => self.map.get(&x).map(|x| x.owner).flatten(),
             _ => target
@@ -36,14 +36,14 @@ where Id: Identity
         match owner {
             Some(id) => {
                 self.map.insert(obj, FlowNode::new(Some(id)));
-                self.map.get_mut(&id).expect("no owner found").descendant.push(obj);
+                self.get_mut(&id, "no owner found").descendant.push(obj);
                 match dir {
                     Direction::Ascend => {
-                        let obj_node = self.map.get_mut(&obj).expect("failed insert obj");
+                        let obj_node = self.get_mut(&obj, "failed insert obj");
                         let des = target.expect("Ascend when None as des");
                         obj_node.descendant.push(des);
                         for x in obj_node.descendant.clone() {
-                            self.map.get_mut(&x).expect("Ascend when des is not found").owner = Some(obj);
+                            self.get_mut(&x, "Ascend when des is not found").owner = Some(obj);
                         }
                     }
                     _ => ()
@@ -59,7 +59,7 @@ where Id: Identity
     }
     /// Recursively delete the node and all its descendants. 
     /// self.pos = owner
-    fn del_recursive(&mut self, obj: Id) {
+    pub fn del_recursive(&mut self, obj: Id) {
         let node = self.map.remove(&obj).unwrap_or(FlowNode::default());
         let mut descendant = node.descendant;
         // recursively del
@@ -75,17 +75,31 @@ where Id: Identity
         }
         // trim to be valid.
         self.trim();
-        self.pos = node.owner;
+        self.pos = node.owner.map(|x| self.check(&x).ok()).flatten();
+        self.fix = FixState::Deactivated;
     }
-    // fn get(&self, id: &Id) -> &FlowNode<Id> {
-    //     self.map.get(id).expect("FlowNode of the required id not found.")
-    // }
-    // fn get_mut(&mut self, id: &Id) -> &mut FlowNode<Id> {
-    //     self.map.get_mut(id).expect("FlowNode of the required id not found.")
-    // }
+    pub fn check(&self, obj: &Id) -> Result<Id, FlowNodeNotFoundError> {
+        if self.map.contains_key(obj) { Ok(*obj) } else { Err(FlowNodeNotFoundError) }
+    }
+    fn get(&self, id: &Id, expect: &'static str) -> &FlowNode<Id> {
+        self.map.get(id).expect(expect)
+    }
+    fn get_mut(&mut self, id: &Id, expect: &'static str) -> &mut FlowNode<Id> {
+        self.map.get_mut(id).expect(expect)
+    }
+    /// for id, returns [owner] if id in owner.descendant;
+    /// returns self.roots if id is root.
+    /// note that the current impl is expensive.
+    fn get_owners(&self, id: &Id) -> Vec<Id> {
+        match self.get(id, "invalid pos").owner {
+            None => self.roots.clone(),
+            _ => {
+                self.map.clone().into_iter().filter_map(|(tar, node)| { node.descendant.into_iter().find(|x| x == id).map(|_| tar) }).collect()
+            }
+        }
+    }
     fn trim(&mut self) {
-        let exist: HashSet<Id> = self.map.keys().cloned().collect();
-        self.roots = self.roots.iter().cloned().filter(|x| exist.get(&x).is_some()).collect();
+        self.roots = self.roots.iter().cloned().filter(|x| self.check(&x).is_ok()).collect();
         // Todo: trim map -> descendant.
     }
     // /// move according to number delta, and return true if moved
@@ -100,8 +114,21 @@ where Id: Identity
     //         None => 0
     //     }
     // }
-    fn clear(&mut self) {
+    pub fn clear(&mut self) {
         mem::take(self);
+    }
+}
+
+impl<Id> Default for Flow<Id> 
+where Id: Identity
+{
+    fn default() -> Self {
+        Self {
+            map: HashMap::new(),
+            pos: None,
+            roots: Vec::new(),
+            fix: FixState::Deactivated,
+        }
     }
 }
 
@@ -135,11 +162,14 @@ where Id: Identity
     }
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct FlowNodeNotFoundError;
+
+// Dancer
 
 impl<Id> Dancer<Id> for Flow<Id> 
 where Id: Identity
 {
-    /// Return the current pos in Flow.
     fn current(&self) -> Option<Id> {
         match self.pos {
             Some(obj) => Some(obj),
@@ -148,56 +178,86 @@ where Id: Identity
     }
     fn focus(&mut self, obj: Id) {
         // validate obj.
-        if let Some(_) = self.map.get(&obj) {
-            self.pos = Some(obj)
-        }
+        self.check(&obj).expect("trying to focus none");
+        self.pos = Some(obj)
     }
+    /// (Direction::Stay, false) -> exit fix;
+    /// (_, false) -> move;
+    /// (_, true) -> 
+    ///     last: Deactivated -> to_fix and move;
+    ///     last: Descendant(_) -> roll
+    ///     last: Owner(_) -> roll
     fn wander(&mut self, dir: Direction, fixed: bool) {
-        use FixState::*;
+        // use FixState::*;
         if self.map.len() == 0 { return }
         if Direction::Stay == dir && fixed == false {
             self.fix.deactivate();
             return
         }
-        // let delta = dir.translate();
         if fixed {
-        //     self.fix.activate();
-        //     let delta = self.fix.translate(dir);
-        //     let delta = self.try_move(delta);
-        //     self.fix.shift_delta(delta);
+            self.activate_fix(dir);
+            self.pos = self.fix.to_id().or(self.roots.get(0).cloned());
         } else {
-        //     self.fix.deactivate();
-        //     self.pos = match self.pos {
-        //         Some(pos) => {
-        //             let pos = pos as isize + delta;
-        //             if pos < 0 {
-        //                 None
-        //             } else if pos < self.map.len() as isize {
-        //                 Some(pos as usize)
-        //             } else {
-        //                 Some(self.map.len() - 1)
-        //             }
-        //         }
-        //         None => {
-        //             match dir {
-        //                 Direction::Descend => Some(0),
-        //                 _ => None,
-        //             }
-        //         }
-        //     };
+            self.fix.deactivate();
+            self.pos = match self.pos {
+                Some(pos) => {
+                    self.check(&pos).expect("invalid pos");
+                    self.shift_dir_unfixed(dir, pos)
+                }
+                None => {
+                    match dir {
+                        Direction::Descend => self.roots.get(0).cloned(),
+                        _ => None,
+                    }
+                }
+            };
         }
     }
 }
 
-impl<Id> Default for Flow<Id> 
+
+
+impl<Id> Flow<Id> 
 where Id: Identity
 {
-    fn default() -> Self {
-        Self {
-            map: HashMap::new(),
-            pos: None,
-            roots: Vec::new(),
-            fix: FixState::Deactivated,
+    fn activate_fix(&mut self, dir: Direction) {
+        use FixState::*;
+        self.fix = match self.fix.clone() {
+            Deactivated => {
+                self.translate_dir_fixed(dir)
+            }
+            Owner(vec, idx) => {
+                let len = vec.len();
+                Owner(vec, (idx + dir.translate()).modulo(len as isize))
+            }
+            Descendant(vec, idx) => {
+                let len = vec.len();
+                Descendant(vec, (idx + dir.translate()).modulo(len as isize))
+            }
+        }
+    }
+    /// Translate to fix from Deactivated given a dir
+    fn translate_dir_fixed(&self, dir: Direction) -> FixState<Id> {
+        use FixState::*;
+        let obj = match self.pos.map(|x| self.check(&x).ok()).flatten() { 
+            None => return Deactivated,
+            Some(pos) => pos
+        };
+        let node = self.get(&obj, "invalid pos");
+        match dir {
+            Direction::Ascend => Owner(self.get_owners(&obj), 0),
+            _ => Descendant(node.descendant.clone(), 0)
+        }
+    }
+    fn shift_dir_unfixed(&mut self, dir: Direction, pos: Id) -> Option<Id> {
+        let node = self.get(&pos, "invalid pos");
+        match dir {
+            Direction::Ascend => {
+                node.owner
+            }
+            _ => {
+                node.descendant.get(0).cloned()
+            }
         }
     }
 }

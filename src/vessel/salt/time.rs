@@ -53,11 +53,14 @@ impl fmt::Display for TimeStamp
 fn to_duration(sys_time: SystemTime) -> Duration {
     sys_time.duration_since(UNIX_EPOCH).expect("Time went backwards")
 }
+fn wasm_to_duration(sys_time: wasm_timer::SystemTime) -> Duration {
+    sys_time.duration_since(wasm_timer::UNIX_EPOCH).expect("Time went backwards")
+}
 
 impl TimeRep for TimeStamp {
     fn now() -> Self {
         // Using nano_secs as timestamp.
-        let time = to_duration(wasm_timer::SystemTime::now());
+        let time = wasm_to_duration(wasm_timer::SystemTime::now());
         TimeStamp (time.as_secs(), time.subsec_nanos())
     }
     fn universal(&self) -> SystemTime {

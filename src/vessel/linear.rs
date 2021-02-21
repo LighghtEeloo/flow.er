@@ -11,3 +11,9 @@ where Id: Identity
     vec: Vec<Id>,
     pub fix: FixState<Id>,
 }
+
+
+// Dancer
+
+
+

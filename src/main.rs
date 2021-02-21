@@ -115,15 +115,16 @@ pub mod util {
     pub use std::iter::FromIterator;
 
     pub use super::json_util::*;
+    pub use super::modulo::*;
 }
 
-pub mod time_util {
+mod time_util {
     pub use wasm_timer;
     pub use std::time::{ UNIX_EPOCH, SystemTime, Duration };
     pub use chrono::prelude::*;
 }
 
-pub mod yew_util {
+mod yew_util {
     pub use yew::format::Json;
     pub use yew::web_sys::HtmlInputElement as InputElement;
     pub use yew::{ html, Component, ComponentLink, Html, InputData, NodeRef, ShouldRender };
@@ -134,7 +135,7 @@ pub mod yew_util {
 
 // impl
 
-pub mod json_util {
+mod json_util {
     pub use serde::{Deserialize, Serialize};
     pub use serde_json::json;
     pub use serde_json::from_str as from_json_str;
@@ -159,3 +160,24 @@ pub mod json_util {
     }
 }
 
+mod modulo {
+    ///
+    /// Modulo that handles negative numbers, works the same as Python's `%`.
+    ///
+    /// eg: `(a + b).modulo(c)`
+    ///
+    pub trait ModuloSignedExt {
+        fn modulo(&self, n: Self) -> Self;
+    }
+    macro_rules! modulo_signed_ext_impl {
+        ($($t:ty)*) => ($(
+            impl ModuloSignedExt for $t {
+                #[inline]
+                fn modulo(&self, n: Self) -> Self {
+                    (self % n + n) % n
+                }
+            }
+        )*)
+    }
+    modulo_signed_ext_impl! { i8 i16 i32 i64 isize u8 u16 u32 u64 usize }
+}
