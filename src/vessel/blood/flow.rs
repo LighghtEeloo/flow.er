@@ -14,6 +14,30 @@ where Id: Identity
     pub fix: FixState<Id>,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct FlowAdd<Id> {
+    target: Option<Id>,
+    dir: Direction,
+    /// May not be used
+    idx: FlowAddIndex
+}
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum FlowAddIndex {
+    Head,
+    Tail,
+    Index(usize)
+}
+
+impl FlowAddIndex {
+    fn insert_with<Id: Identity>(&self, node: &mut FlowNode<Id>, obj: Id) {
+        match self {
+            FlowAddIndex::Head => node.descendant.insert(0, obj),
+            FlowAddIndex::Tail => node.descendant.push(obj),
+            FlowAddIndex::Index(i) => node.descendant.insert(*i, obj)
+        }
+    }
+}
+
 impl<Id> Flow<Id> 
 where Id: Identity
 {
@@ -26,22 +50,26 @@ where Id: Identity
     ///          target.owner = obj       and target in obj.descendants;
     /// _: Descend target.
     /// if None is presented, create new root.
-    pub fn add(&mut self, obj: Id, target: Option<Id>, dir: Direction) {
+    pub fn add(&mut self, obj: Id, flow_add: FlowAdd<Id>) {
+        let target = flow_add.target;
+        let dir = flow_add.dir;
+        let idx = flow_add.idx;
         let owner: Option<Id> = target.map(|x| match dir {
             Direction::Ascend => self.map.get(&x).map(|x| x.owner).flatten(),
             _ => target
         }).flatten().filter(|x| {
-            self.map.get(&x).is_none()
+            self.check(&x).is_ok()
         });
         match owner {
             Some(id) => {
-                self.map.insert(obj, FlowNode::new(Some(id)));
-                self.get_mut(&id, "no owner found").descendant.push(obj);
+                self.map.insert(obj, FlowNode::from_owner(Some(id)));
+                let owner_node = self.get_mut(&id, "no owner found");
+                idx.insert_with(owner_node, obj);
                 match dir {
                     Direction::Ascend => {
                         let obj_node = self.get_mut(&obj, "failed insert obj");
                         let des = target.expect("Ascend when None as des");
-                        obj_node.descendant.push(des);
+                        idx.insert_with(obj_node, des);
                         for x in obj_node.descendant.clone() {
                             self.get_mut(&x, "Ascend when des is not found").owner = Some(obj);
                         }
@@ -51,7 +79,7 @@ where Id: Identity
             }
             None => {
                 // Always a new roots if None = des && None = self.pos
-                self.map.insert(obj, FlowNode::new(None));
+                self.map.insert(obj, FlowNode::from_owner(None));
                 self.roots.push(obj);
             }
         }
@@ -143,7 +171,7 @@ where Id: Identity
 impl<Id> FlowNode<Id> 
 where Id: Identity
 {
-    fn new(elderly: Option<Id>) -> Self {
+    fn from_owner(elderly: Option<Id>) -> Self {
         Self {
             descendant: Vec::new(),
             owner: elderly,
@@ -155,7 +183,7 @@ impl<Id> Default for FlowNode<Id>
 where Id: Identity
 {
     fn default() -> Self {
-        Self::new(None)
+        Self::from_owner(None)
     }
 }
 
