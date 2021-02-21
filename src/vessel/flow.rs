@@ -78,10 +78,7 @@ where Id: Identity
         self.pos = node.owner.map(|x| self.check(&x).ok()).flatten();
         self.fix = FixState::Deactivated;
     }
-    pub fn check(&self, obj: &Id) -> Result<Id, FlowNodeNotFoundError> {
-        if self.map.contains_key(obj) { Ok(*obj) } else { Err(FlowNodeNotFoundError) }
-    }
-    fn get(&self, id: &Id, expect: &'static str) -> &FlowNode<Id> {
+    pub fn get(&self, id: &Id, expect: &'static str) -> &FlowNode<Id> {
         self.map.get(id).expect(expect)
     }
     fn get_mut(&mut self, id: &Id, expect: &'static str) -> &mut FlowNode<Id> {
@@ -94,7 +91,7 @@ where Id: Identity
         match self.get(id, "invalid pos").owner {
             None => self.roots.clone(),
             _ => {
-                self.map.clone().into_iter().filter_map(|(tar, node)| { node.descendant.into_iter().find(|x| x == id).map(|_| tar) }).collect()
+                self.map.clone().into_iter().filter_map(|(tar, node)| { if node.descendant.contains(id) { Some(tar) } else { None } }).collect()
             }
         }
     }
@@ -170,11 +167,11 @@ pub struct FlowNodeNotFoundError;
 impl<Id> Dancer<Id> for Flow<Id> 
 where Id: Identity
 {
+    fn check(&self, obj: &Id) -> Result<Id, FlowNodeNotFoundError> {
+        if self.map.contains_key(obj) { Ok(*obj) } else { Err(FlowNodeNotFoundError) }
+    }
     fn current(&self) -> Option<Id> {
-        match self.pos {
-            Some(obj) => Some(obj),
-            None => None
-        }
+        self.pos.clone()
     }
     fn focus(&mut self, obj: Id) {
         // validate obj.
@@ -189,7 +186,7 @@ where Id: Identity
     ///     last: Owner(_) -> roll
     fn wander(&mut self, dir: Direction, fixed: bool) {
         // use FixState::*;
-        if self.map.len() == 0 { return }
+        if self.map.is_empty() { return }
         if Direction::Stay == dir && fixed == false {
             self.fix.deactivate();
             return

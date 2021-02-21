@@ -17,25 +17,25 @@ impl TagSet {
     pub fn position(&self, tag: &Tag) -> Option<usize> {
         self.into_iter().position(|x| x.clone() == tag.clone())
     }
-    fn find(&self, tag: &Tag) -> bool {
+    fn contains(&self, tag: &Tag) -> bool {
         self.position(&tag).is_some()
     }
     pub fn insert(&mut self, index: usize, tag: Tag) -> bool {
-        let inserting = !self.find(&tag) && index <= self.data.len();
+        let inserting = !self.contains(&tag) && index <= self.data.len();
         if inserting {
             self.data.insert(index, tag);
         }
         inserting
     }
     pub fn push(&mut self, tag: Tag) -> bool {
-        let inserting = !self.find(&tag);
+        let inserting = !self.contains(&tag);
         if inserting {
             self.data.push(tag);
         }
         inserting
     }
     pub fn remove(&mut self, tag: Tag) -> bool {
-        let removing = self.find(&tag);
+        let removing = self.contains(&tag);
         self.data.retain(|x| x.clone() != tag);
         removing
     }
