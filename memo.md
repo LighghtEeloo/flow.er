@@ -1,5 +1,19 @@
 # Memo
 
+## Next Step
+
+Some "next generation" feature requests.
+
+1. Name: flow-er
+2. Entity-based: nodes & tags.
+3. Model can be viewed in 4 different ways: 
+   1. LinearList
+   2. BranchFlow
+   3. TimeShift
+   4. Calendar
+4. CLI style integration
+5. Safer file / cloud storage
+
 ## Model Draft (v0.2.1)
 
 **Note: This model is no longer representitive after v0.2.2,** because...
