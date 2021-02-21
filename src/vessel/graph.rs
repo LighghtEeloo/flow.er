@@ -7,7 +7,9 @@ use super::prelude::*;
 pub struct Graph<Id>
 where Id: Identity
 {
-    root: Option<Id>
+    pub map: HashMap<Id, FlowNode<Id>>,
+    pub pos: Option<Id>,
+    pub fix: FixState<Id>,
 }
 
 
