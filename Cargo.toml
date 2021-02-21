@@ -1,5 +1,5 @@
 [package]
-name = "tracer-yew"
+name = "flower"
 version = "0.2.4"
 authors = ["LighghtEeloo <eelooecho@163.com>"]
 edition = "2018"

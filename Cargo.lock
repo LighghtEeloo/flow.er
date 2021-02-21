@@ -95,6 +95,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "flower"
+version = "0.2.4"
+dependencies = [
+ "chrono",
+ "serde",
+ "serde_json",
+ "wasm-timer",
+ "yew",
+ "yew-services",
+]
+
+[[package]]
 name = "fnv"
 version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -538,18 +550,6 @@ dependencies = [
  "libc",
  "wasi",
  "winapi",
-]
-
-[[package]]
-name = "tracer-yew"
-version = "0.2.4"
-dependencies = [
- "chrono",
- "serde",
- "serde_json",
- "wasm-timer",
- "yew",
- "yew-services",
 ]
 
 [[package]]
