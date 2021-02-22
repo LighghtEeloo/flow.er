@@ -2,9 +2,9 @@ use crate::util::*;
 use super::prelude::*;
 
 
-
+/// A tree provides non-cycle tree view.
 #[derive(Clone, Debug)]
-pub struct Graph<Id>
+pub struct Tree<Id>
 where Id: Identity
 {
     pub map: HashMap<Id, FlowNode<Id>>,
@@ -14,15 +14,15 @@ where Id: Identity
     pub fix: FixState<Id>,
 }
 
-impl<Id> Graph<Id>
+impl<Id> Tree<Id>
 where Id: Identity 
 {
     pub fn from_flow(flow: &Flow<Id>, target: &Id) -> Self {
         let mut vec = vec![target.clone()];
-        vec.extend(flow.get(target, "graph build failed").descendant.clone());
+        vec.extend(flow.get(target, "tree build failed").descendant.clone());
         // Todo: find nodes to include recursively
         Self {
-            map: HashMap::from_iter(vec.into_iter().map(|x| (x, flow.get(&x, "graph build failed").clone()))),
+            map: HashMap::from_iter(vec.into_iter().map(|x| (x, flow.get(&x, "tree build failed").clone()))),
             root: Some(target.clone()),
             pos: None,
             fix: FixState::Deactivated
@@ -32,7 +32,7 @@ where Id: Identity
 
 // Dancer
 
-impl<Id> Dancer<Id> for Graph<Id>
+impl<Id> Dancer<Id> for Tree<Id>
 where Id: Identity
 {
     fn check(&self, obj: &Id) -> Result<Id, FlowNodeNotFoundError> {

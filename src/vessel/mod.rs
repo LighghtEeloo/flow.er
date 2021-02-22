@@ -1,9 +1,13 @@
-mod salt;
+mod bone;
 mod blood;
+mod soul;
 mod vessel;
 
 pub mod prelude {
-    pub use super::salt::prelude::*;
-    pub use super::blood::prelude::*;
+    pub use super::{
+        bone::prelude::*,
+        blood::prelude::*,
+        soul::prelude::*,
+    };
     pub use super::vessel::*;
 }

@@ -2,7 +2,7 @@ use crate::util::*;
 use super::prelude::*;
 
 /// Flow
-/// The base model for flow-er. It (as well as Linear and Graph) holds only the entity-ids
+/// The base model for flow-er. It (as well as Linear and Tree) holds only the entity-ids
 /// and search for the actual entity when needed. It can have multiple roots and can
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Flow<Id> 
@@ -14,29 +14,6 @@ where Id: Identity
     pub fix: FixState<Id>,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub struct FlowAdd<Id> {
-    target: Option<Id>,
-    dir: Direction,
-    /// May not be used
-    idx: FlowAddIndex
-}
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub enum FlowAddIndex {
-    Head,
-    Tail,
-    Index(usize)
-}
-
-impl FlowAddIndex {
-    fn insert_with<Id: Identity>(&self, node: &mut FlowNode<Id>, obj: Id) {
-        match self {
-            FlowAddIndex::Head => node.descendant.insert(0, obj),
-            FlowAddIndex::Tail => node.descendant.push(obj),
-            FlowAddIndex::Index(i) => node.descendant.insert(*i, obj)
-        }
-    }
-}
 
 impl<Id> Flow<Id> 
 where Id: Identity
@@ -156,39 +133,6 @@ where Id: Identity
         }
     }
 }
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct FlowNode<Id> 
-where Id: Identity
-{
-    pub descendant: Vec<Id>,
-    /// owner:  
-    /// Some(id) if there is one;  
-    /// None if roots.
-    pub owner: Option<Id>,
-}
-
-impl<Id> FlowNode<Id> 
-where Id: Identity
-{
-    fn from_owner(elderly: Option<Id>) -> Self {
-        Self {
-            descendant: Vec::new(),
-            owner: elderly,
-        }
-    }
-}
-
-impl<Id> Default for FlowNode<Id> 
-where Id: Identity
-{
-    fn default() -> Self {
-        Self::from_owner(None)
-    }
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct FlowNodeNotFoundError;
 
 // Dancer
 
