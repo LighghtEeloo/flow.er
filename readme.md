@@ -30,6 +30,33 @@ and everything will be fine.
 
 Feel free to fire an issue if anything troubles you (❁´◡`❁)
 
+## Dev Serve
+
+After following intructions above, you'll be able to serve the app locally.
+
+First, clone / download this repo: https://github.com/LighghtEeloo/flow.er.git.
+
+Then just switch to the repo's root folder and run `trunk serve`. This will serve the app on `127.0.0.1:9720`, which you can visit via your preferred browser.
+
+The whole process will be like:
+```bash
+$ git clone https://github.com/LighghtEeloo/flow.er.git && cd flow.er
+$ trunk serve
+```
+And visit `127.0.0.1:9720` via your browser.
+
+## Supported Browsers
+
+Chrome, Firefox and Edge are (roughly) tested and all seem to be working well. 
+
+However, only desktop versions are considered for now.
+
+## Disclaimer
+
+This is a completely personal, non-profit project. I can try my best, but I won't be responsible for any of your data loss. 
+
+For now, this software isn't data-safe. Use at your own risk. This may get better as I develop, and you're welcomed to help improving it.
+
 ## Vision Board
 
 In the future the following features may be implemented:
