@@ -13,9 +13,11 @@ use std::hash::{Hash, Hasher};
 
 const LEN: usize = 6;
 
+pub trait IdentityBase: Hash + PartialEq + Eq + Debug {}
 
+// Todo: IdentityBase.
 /// For id.
-pub trait Identity: Hash + Copy + PartialEq + Eq + Clone + Debug {
+pub trait Identity: IdentityBase + Clone + Copy {
     fn from_u64(v: u64) -> Self;
     fn from_time(v: &impl TimeRep) -> Self {
         let mut s = DefaultHasher::new();
@@ -65,6 +67,8 @@ impl Debug for EntityId {
     }
 }
 
+impl IdentityBase for EntityId {}
+
 impl Identity for EntityId {
     fn from_u64(v: u64) -> Self {
         EntityId (v)
@@ -82,6 +86,8 @@ impl Debug for VesselId {
         write!(f, "{{{{{}}}}}", hash)
     }
 }
+
+impl IdentityBase for VesselId {}
 
 impl Identity for VesselId {
     fn from_u64(v: u64) -> Self {
