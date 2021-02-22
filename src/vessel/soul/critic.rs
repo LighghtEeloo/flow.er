@@ -1,7 +1,7 @@
 use crate::util::*;
 
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub enum Critic {
     FlowNodeNotFoundError,
     FlowNodeExistError

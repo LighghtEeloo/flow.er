@@ -62,60 +62,86 @@ where Id: Identity
         }
         self.focus(obj);
     }
-    /// Recursively delete the node and all its descendants. 
-    /// self.pos = owner
-    pub fn del_recursive(&mut self, obj: Id) {
-        let node = self.map.remove(&obj).unwrap_or(FlowNode::default());
-        let mut descendant = node.descendant;
-        // recursively del
-        loop {
-            let mut collector = vec![];
-            mem::swap(&mut collector, &mut descendant);
-            for x in collector {
-                let descendant_ = 
-                    self.map.remove(&x).map(|n| n.descendant).unwrap_or(vec![]);
-                descendant.extend(descendant_);
-            }
-            if descendant.is_empty() { break }
-        }
-        // trim to be valid.
-        self.trim();
-        self.pos = node.owner.map(|x| self.check(&x).ok()).flatten();
-        self.fix = FixState::Deactivated;
-    }
+    // /// Recursively delete the node and all its descendants. 
+    // /// self.pos = owner
+    // pub fn del_recursive(&mut self, obj: Id) {
+    //     let node = self.map.remove(&obj).unwrap_or(FlowNode::default());
+    //     let mut descendant = node.descendant;
+    //     // recursively del
+    //     loop {
+    //         let mut collector = vec![];
+    //         mem::swap(&mut collector, &mut descendant);
+    //         for x in collector {
+    //             let descendant_ = 
+    //                 self.map.remove(&x).map(|n| n.descendant).unwrap_or(vec![]);
+    //             descendant.extend(descendant_);
+    //         }
+    //         if descendant.is_empty() { break }
+    //     }
+    //     // trim to be valid.
+    //     self.trim();
+    //     self.pos = node.owner.map(|x| self.check(&x).ok()).flatten();
+    //     self.fix = FixState::Deactivated;
+    // }
     pub fn get(&self, id: &Id, expect: &'static str) -> &FlowNode<Id> {
         self.map.get(id).expect(expect)
     }
     fn get_mut(&mut self, id: &Id, expect: &'static str) -> &mut FlowNode<Id> {
         self.map.get_mut(id).expect(expect)
     }
-    /// for id, returns [owner] if id in owner.descendant;
-    /// returns self.roots if id is root.
-    /// note that the current impl is expensive.
+    /// For id, returns [owner] if id in owner.descendant;
+    /// returns [] if id is root.
+    /// 
+    /// Note that the current impl is a bit expensive.
     fn get_owners(&self, id: &Id) -> Vec<Id> {
         match self.get(id, "invalid pos").owner {
-            None => self.roots.clone(),
+            None => vec![],
             _ => {
-                self.map.clone().into_iter().filter_map(|(tar, node)| { if node.descendant.contains(id) { Some(tar) } else { None } }).collect()
+                self.map.iter().filter_map(|(&tar, node)| { if node.descendant.contains(id) { Some(tar) } else { None } }).collect()
             }
         }
     }
-    fn trim(&mut self) {
-        self.roots = self.roots.iter().cloned().filter(|x| self.check(&x).is_ok()).collect();
-        // Todo: trim map -> descendant.
+    /// Expensive way to check and clean all nodes that are invalid.
+    /// returns Err(vec) if nodes with id in vec are cleaned.
+    /// 
+    /// Depends on check_flow() and clean_flow().
+    pub fn trim(&mut self) -> Result<(), Vec<Id>> {
+        let trim_list = self.check_flow();
+        if trim_list.is_empty() {
+            Ok(())
+        } else {
+            self.clean_flow(&trim_list);
+            Err(trim_list)
+        }
     }
-    // /// move according to number delta, and return true if moved
-    // fn try_move(&mut self, delta: isize) -> isize {
-    //     match self.pos {
-    //         Some(pos) => {
-    //             let pos_ = pos as isize + delta;
-    //             let pos_: usize = if pos_ < 0 { 0 } else if pos_ < self.map.len() as isize { pos_ as usize } else { self.map.len() - 1 };
-    //             self.pos = Some(pos_);
-    //             pos_ as isize - pos as isize
-    //         }
-    //         None => 0
-    //     }
-    // }
+    fn check_flow(&self) -> Vec<Id> {
+        let mut sift = HashSet::new();
+        // Get all possible descendants
+        sift.extend(self.map.iter().map(|(_, node)| {
+            node.descendant.iter()
+        }).flatten());
+        // Get all possible owners
+        sift.extend(self.map.iter().filter_map(|(_, node)| {
+            node.owner
+        }));
+        sift.into_iter().filter(|x| self.check(x).is_err()).collect()
+    }
+    fn clean_flow(&mut self, list: &Vec<Id>) {
+        // remove from self.map
+        let _: Vec<()> = 
+            list.iter()
+            .map(|x| { self.map.remove(x); })
+            .collect();
+        let vec_descendant: Vec<&mut Vec<Id>> = 
+            self.map.iter_mut()
+            .map(|(_, node)| &mut node.descendant)
+            .collect();
+        // remove from descendant of all nodes
+        let _: Vec<()> = 
+            vec_descendant.into_iter()
+            .map(|det| { det.retain(|x| list.iter().find(|&y| y == x).is_none()); })
+            .collect();
+    }
     pub fn clear(&mut self) {
         mem::take(self);
     }
@@ -175,11 +201,28 @@ where Id: Identity
         }
         Ok(obj)
     }
-    /// depends on self.trim to collect.
+    /// depends on self.get_owners to collect.
     fn del(&mut self, obj: Id) -> Result<(), Critic> { 
-        self.map.remove(&obj).ok_or(FlowNodeNotFoundError)?;
-        self.trim();
-        Ok(()) 
+        let node_obj = self.map.remove(&obj).ok_or(FlowNodeNotFoundError)?;
+        let mut err_vec: Vec<Critic> = vec![];
+        err_vec.extend(
+            node_obj.descendant.into_iter().map(|tar| -> Result<(), Critic> {
+                let node_tar = self.map.get_mut(&tar).ok_or(FlowNodeNotFoundError)?;
+                node_tar.owner = None;
+                Ok(())
+            }).filter_map(|x| x.err()).take(1)
+        );
+        err_vec.extend(
+            self.get_owners(&obj).into_iter().map(|tar| -> Result<(), Critic> {
+                let node_tar = self.map.get_mut(&tar).ok_or(FlowNodeNotFoundError)?;
+                node_tar.descendant.retain(|&x| x != obj);
+                Ok(())
+            }).filter_map(|x| x.err()).take(1)
+        );
+        match err_vec.get(0) {
+            Some(&e) => Err(e),
+            _ => Ok(()) 
+        }
     }
 }
 
