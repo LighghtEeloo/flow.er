@@ -48,7 +48,7 @@ where Id: Identity
             self.fix.deactivate();
             return
         }
-        // Todo..
+        // Todo: migrate linear in stockpile.
         if fixed {
 
         } else {
