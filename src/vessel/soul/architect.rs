@@ -43,7 +43,7 @@ pub enum FlowLinkIndex {
     Index(usize)
 }
 impl FlowLinkIndex {
-    pub fn insert_with<Id: Identity>(&self, node: &mut FlowNode<Id>, obj: Id) {
+    pub fn inserted_with<Id: Identity>(&self, node: &mut FlowNode<Id>, obj: Id) {
         match self {
             FlowLinkIndex::Head => node.descendant.insert(0, obj),
             FlowLinkIndex::Tail => node.descendant.push(obj),
@@ -61,9 +61,9 @@ pub trait Architect<Id>: Debug
 where Id: IdentityBase
 {
     /// add new if not-found; return error if exist.
-    fn add(&mut self, obj: &Id) -> Result<&Id, Critic>;
+    fn add(&mut self, obj: Id) -> Result<Id, Critic>;
     ///  link two nodes as Ascend / Descend
-    fn link(&mut self, obj: &Id, flow_link: FlowLink<Id>) -> Result<&Id, Critic>;
+    fn link(&mut self, obj: Id, flow_link: FlowLink<Id>) -> Result<Id, Critic>;
     /// del node; automatically de-link all the surrounding links.
-    fn del(&mut self, obj: &Id) -> Result<(), Critic>;
+    fn del(&mut self, obj: Id) -> Result<(), Critic>;
 }

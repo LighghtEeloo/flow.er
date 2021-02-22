@@ -33,8 +33,8 @@ impl Vessel {
     fn insert_entity(&mut self, entity: Entity, flow_link: FlowLink<EntityId>) -> Result<(), Critic> {
         let id = entity.id();
         self.entity_map.insert(id, entity);
-        self.flow.add(&id)?;
-        self.flow.link(&id, flow_link)?;
+        self.flow.add(id)?;
+        self.flow.link(id, flow_link)?;
         Ok(())
     }
 }
