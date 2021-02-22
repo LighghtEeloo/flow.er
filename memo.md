@@ -15,10 +15,6 @@ Some "next generation" feature requests.
 5. Safer file / cloud storage
 6. Dry export
 
-## Model Draft (v0.2.1)
-
-**Note: This model is no longer representitive after v0.2.2,** because...
-
 Proposing a new app called *flow-er* with ...
   - a flattened Entity data collection with EntityId
   - a powerful FlowModel
@@ -26,7 +22,24 @@ Proposing a new app called *flow-er* with ...
   - better data operation (copy / move)
   - better UI
 
-### Data Model for Storage
+## Todo List
+
+- [ ] Router
+- [ ] vessel.vm (Dancer + Engineer)
+- [ ] Architect for flow
+- [ ] Critic
+
+
+
+
+
+----
+
+## Old Memo Select
+
+### Model Draft (v0.2.1)
+
+**Note: This model is no longer representitive after v0.2.2.**
 
 **Key Concepts**
 
@@ -58,13 +71,12 @@ Proposing a new app called *flow-er* with ...
 
 
 
-
-## Todo List
+### Todo List
 
 - [ ] Router.
   - [x] Router buttons.
   - [x] Src view.
-  - [ ] History.
+  - [x] History.
   - [ ] Settings.
 - [ ] Better FlowModel -> Branch.
   - [ ] How to manage / show cubes.
@@ -90,7 +102,7 @@ Proposing a new app called *flow-er* with ...
 - [ ] Caret-position-based new line.
 
 
-## Fix List
+### Fix List
 - [x] Better model which preserves the first node (title does the job).
 - [x] Queue-preserving deletion.
 - [x] Delayed deletion (with safe-lock).
@@ -101,7 +113,7 @@ Proposing a new app called *flow-er* with ...
 
 
 
-## Done List
+### Done List
 - [x] Support clipboard exporting / importing.
   - [x] Support json.
   - [x] Interface.
