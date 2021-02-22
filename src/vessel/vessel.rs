@@ -29,11 +29,13 @@ impl Vessel {
     /// updates entity_map if entity exists; 
     /// updates flow if not in flow.
     /// 
-    /// ignores flow_add if existing in flow.
-    fn insert_entity(&mut self, entity: Entity, flow_add: FlowAdd<EntityId>) {
+    /// ignores flow_link if existing in flow.
+    fn insert_entity(&mut self, entity: Entity, flow_link: FlowLink<EntityId>) -> Result<(), Critic> {
         let id = entity.id();
         self.entity_map.insert(id, entity);
-        self.flow.add(id, flow_add);
+        self.flow.add(&id)?;
+        self.flow.link(&id, flow_link)?;
+        Ok(())
     }
 }
 

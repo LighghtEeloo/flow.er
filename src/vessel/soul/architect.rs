@@ -30,31 +30,40 @@ where Id: Identity
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct FlowAdd<Id> {
+pub struct FlowLink<Id> {
     pub target: Option<Id>,
     pub dir: Direction,
     /// May not be used
-    pub idx: FlowAddIndex
+    pub idx: FlowLinkIndex
 }
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum FlowAddIndex {
+pub enum FlowLinkIndex {
     Head,
     Tail,
     Index(usize)
 }
-
-impl FlowAddIndex {
+impl FlowLinkIndex {
     pub fn insert_with<Id: Identity>(&self, node: &mut FlowNode<Id>, obj: Id) {
         match self {
-            FlowAddIndex::Head => node.descendant.insert(0, obj),
-            FlowAddIndex::Tail => node.descendant.push(obj),
-            FlowAddIndex::Index(i) => node.descendant.insert(*i, obj)
+            FlowLinkIndex::Head => node.descendant.insert(0, obj),
+            FlowLinkIndex::Tail => node.descendant.push(obj),
+            FlowLinkIndex::Index(i) => node.descendant.insert(*i, obj)
         }
+    }
+}
+impl Default for FlowLinkIndex {
+    fn default() -> Self {
+        FlowLinkIndex::Tail
     }
 }
 
 pub trait Architect<Id>: Debug
 where Id: IdentityBase
 {
-    fn add(&mut self, obj: &Id, flow_add: FlowAdd<Id>) -> Result<Id, FlowNodeExistError>;
+    /// add new if not-found; return error if exist.
+    fn add(&mut self, obj: &Id) -> Result<&Id, Critic>;
+    ///  link two nodes as Ascend / Descend
+    fn link(&mut self, obj: &Id, flow_link: FlowLink<Id>) -> Result<&Id, Critic>;
+    /// del node; automatically de-link all the surrounding links.
+    fn del(&mut self, obj: &Id) -> Result<(), Critic>;
 }

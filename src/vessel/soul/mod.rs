@@ -7,7 +7,7 @@ pub mod prelude {
         super::prelude::*,
         dancer::{ Direction, FixState, Dancer },
         // dancer::{ Direction, FixState, RelativePath, Dancer },
-        architect::{ Architect, FlowNode, FlowAdd, FlowAddIndex },
+        architect::{ Architect, FlowNode, FlowLink, FlowLinkIndex },
         critic::*,
     };
 }

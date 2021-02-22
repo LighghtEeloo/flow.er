@@ -31,7 +31,7 @@ where Id: Identity
 impl<Id> Dancer<Id> for Linear<Id>
 where Id: Identity
 {
-    fn check(&self, obj: &Id) -> Result<Id, FlowNodeNotFoundError> {
+    fn check(&self, obj: &Id) -> Result<Id, Critic> {
         if self.vec.contains(obj) { Ok(*obj) } else { Err(FlowNodeNotFoundError) }
     }
     fn current(&self) -> Option<Id> {

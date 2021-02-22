@@ -21,47 +21,47 @@ where Id: Identity
     pub fn new() -> Self {
         Flow::default()
     }
-    /// Add position: with target & dir. 
-    /// Descend: obj.owner = target       and obj in target.descendants; 
-    /// Ascend:  obj.owner = target.owner and obj in obj.owner.descendant, 
-    ///          target.owner = obj       and target in obj.descendants;
-    /// _: Descend target.
-    /// if None is presented, create new root.
-    pub fn add(&mut self, obj: Id, flow_add: FlowAdd<Id>) {
-        let target = flow_add.target;
-        let dir = flow_add.dir;
-        let idx = flow_add.idx;
-        let owner: Option<Id> = target.map(|x| match dir {
-            Direction::Ascend => self.map.get(&x).map(|x| x.owner).flatten(),
-            _ => target
-        }).flatten().filter(|x| {
-            self.check(&x).is_ok()
-        });
-        match owner {
-            Some(id) => {
-                self.map.insert(obj, FlowNode::from_owner(Some(id)));
-                let owner_node = self.get_mut(&id, "no owner found");
-                idx.insert_with(owner_node, obj);
-                match dir {
-                    Direction::Ascend => {
-                        let obj_node = self.get_mut(&obj, "failed insert obj");
-                        let des = target.expect("Ascend when None as des");
-                        idx.insert_with(obj_node, des);
-                        for x in obj_node.descendant.clone() {
-                            self.get_mut(&x, "Ascend when des is not found").owner = Some(obj);
-                        }
-                    }
-                    _ => ()
-                }
-            }
-            None => {
-                // Always a new roots if None = des && None = self.pos
-                self.map.insert(obj, FlowNode::from_owner(None));
-                self.roots.push(obj);
-            }
-        }
-        self.focus(obj);
-    }
+    // /// Add position: with target & dir. 
+    // /// Descend: obj.owner = target       and obj in target.descendants; 
+    // /// Ascend:  obj.owner = target.owner and obj in obj.owner.descendant, 
+    // ///          target.owner = obj       and target in obj.descendants;
+    // /// _: Descend target.
+    // /// if None is presented, create new root.
+    // pub fn add(&mut self, obj: Id, flow_link: FlowLink<Id>) {
+    //     let target = flow_link.target;
+    //     let dir = flow_link.dir;
+    //     let idx = flow_link.idx;
+    //     let owner: Option<Id> = target.map(|x| match dir {
+    //         Direction::Ascend => self.map.get(&x).map(|x| x.owner).flatten(),
+    //         _ => target
+    //     }).flatten().filter(|x| {
+    //         self.check(&x).is_ok()
+    //     });
+    //     match owner {
+    //         Some(id) => {
+    //             self.map.insert(obj, FlowNode::from_owner(Some(id)));
+    //             let owner_node = self.get_mut(&id, "no owner found");
+    //             idx.insert_with(owner_node, obj);
+    //             match dir {
+    //                 Direction::Ascend => {
+    //                     let obj_node = self.get_mut(&obj, "failed insert obj");
+    //                     let des = target.expect("Ascend when None as des");
+    //                     idx.insert_with(obj_node, des);
+    //                     for x in obj_node.descendant.clone() {
+    //                         self.get_mut(&x, "Ascend when des is not found").owner = Some(obj);
+    //                     }
+    //                 }
+    //                 _ => ()
+    //             }
+    //         }
+    //         None => {
+    //             // Always a new roots if None = des && None = self.pos
+    //             self.map.insert(obj, FlowNode::from_owner(None));
+    //             self.roots.push(obj);
+    //         }
+    //     }
+    //     self.focus(obj);
+    // }
     /// Recursively delete the node and all its descendants. 
     /// self.pos = owner
     pub fn del_recursive(&mut self, obj: Id) {
@@ -120,7 +120,6 @@ where Id: Identity
         mem::take(self);
     }
 }
-
 impl<Id> Default for Flow<Id> 
 where Id: Identity
 {
@@ -134,12 +133,30 @@ where Id: Identity
     }
 }
 
+
+// Architect
+
+impl<Id> Architect<Id> for Flow<Id> 
+where Id: Identity
+{
+    fn add(&mut self, obj: &Id) -> Result<&Id, Critic> { 
+        todo!() 
+    }
+    fn link(&mut self, obj: &Id, flow_link: FlowLink<Id>) -> Result<&Id, Critic> { 
+        todo!() 
+    }
+    fn del(&mut self, obj: &Id) -> Result<(), Critic> { 
+        todo!() 
+    }
+}
+
+
 // Dancer
 
 impl<Id> Dancer<Id> for Flow<Id> 
 where Id: Identity
 {
-    fn check(&self, obj: &Id) -> Result<Id, FlowNodeNotFoundError> {
+    fn check(&self, obj: &Id) -> Result<Id, Critic> {
         if self.map.contains_key(obj) { Ok(*obj) } else { Err(FlowNodeNotFoundError) }
     }
     fn current(&self) -> Option<Id> {

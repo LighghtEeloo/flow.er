@@ -79,7 +79,7 @@ where Id: Identity
 pub trait Dancer<Id>: Debug
 where Id: IdentityBase
 {
-    fn check(&self, obj: &Id) -> Result<Id, FlowNodeNotFoundError>;
+    fn check(&self, obj: &Id) -> Result<Id, Critic>;
     /// Return the current pos in Dancer.
     fn current(&self) -> Option<Id>;
     /// Update pos.
