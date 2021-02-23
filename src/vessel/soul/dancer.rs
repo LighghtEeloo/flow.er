@@ -27,34 +27,6 @@ pub enum FixState<Id> {
 impl<Id> FixState<Id> 
 where Id: Identity
 {
-    // /// [translate] the movement proposal
-    // pub fn translate(&self, dir: Direction) -> isize {
-    //     use FixState::*;
-    //     use Direction::*;
-    //     0
-    // }
-    // /// perform the self [shift] with delta
-    // pub fn shift_delta(&mut self, delta: isize) {
-    //     use FixState::*;
-    //     let pos: isize = match self {
-    //         Relative(x) => x.clone(),
-    //         _ => 0
-    //     };
-    //     let mut pos_new = pos + delta;
-    //     pos_new += 1;
-    //     pos_new = ((pos_new % 3) + 3) % 3; // modulus
-    //     pos_new -= 1;
-    //     let mut next = Relative(pos_new);
-    //     mem::swap(&mut next, self);
-    // }
-    // pub fn activate(&mut self) {
-    //     use FixState::*;
-    //     let mut next = match self {
-    //         Deactivated => Relative(0),
-    //         _ => self.clone()
-    //     };
-    //     mem::swap(&mut next, self);
-    // }
     pub fn to_id(&self) -> Option<Id> {
         use FixState::*;
         match self {
