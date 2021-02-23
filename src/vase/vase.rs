@@ -14,22 +14,22 @@ pub enum Router {
 }
 
 pub struct Vase {
-    router: Router,
-    vessel: Vessel,
-    storage: StorageService,
-    link: ComponentLink<Self>,
+    pub router: Router,
+    pub vessel: Vessel,
+    pub storage: StorageService,
+    pub link: ComponentLink<Self>,
 }
 
 const KEY: &str = "flow.er.data";
 
 #[derive(Debug, Clone)]
-pub enum Message {
-    
+pub enum VaseMsg {
+    SwitchRouter(Router),
     NoRender
 }
 
 impl Component for Vase {
-    type Message = Vec<Message>;
+    type Message = Vec<VaseMsg>;
     type Properties = ();
 
     fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
@@ -40,9 +40,6 @@ impl Component for Vase {
             } else {
                 Vessel::default()
             };
-            // Debug..
-            // let mut stockpile = Stockpile::new();
-            // stockpile.editor_info = EditorInfo::new_some(CubeId::new());
             vessel
         };
         // Note: trim only on startup.
@@ -59,15 +56,17 @@ impl Component for Vase {
     }
 
     fn update(&mut self, messages: Self::Message) -> ShouldRender {
-        use Message::*;
+        use VaseMsg::*;
         LOG!("Updating: {:#?}.", messages);
         let mut res = true;
         for message in messages {
             res = match message {
+                SwitchRouter(router) => {
+                    self.router = router; true
+                }
                 NoRender => false,
                 _ => {
-                    LOG!("No update pattern matched.");
-                    true
+                    LOG!("No update pattern matched."); false
                 }
             }
         }
