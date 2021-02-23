@@ -11,29 +11,50 @@ Some "next generation" feature requests.
    2. BranchFlow
    3. TimeShift
    4. Calendar
-4. CLI style integration
-5. Safer file / cloud storage
-6. Dry export
-
-Proposing a new app called *flow-er* with ...
-  - a flattened Entity data collection with EntityId
-  - a powerful FlowModel
-  - related keyword prompt
-  - better data operation (copy / move)
-  - better UI
+4. related keyword prompt
+5. better UI
+6. CLI style integration
+7. advanced data operation (copy / move)
+8. Safer file / cloud storage
+9. Dry export
 
 ## Todo List
 
 - [ ] Router
-- [ ] vessel.vm (Dancer + Engineer)
+- [ ] vessel.vm (Dancer + Animator)
 - [ ] Architect for flow
 - [ ] Critic
+
+## Vessel
+
+### Soul
+
+1. Architect
+    1. add
+    2. check
+    3. link
+    4. del
+2. Animator
+    1. compute
+    2. illustrate
+3. Dancer
+    1. current
+
+    2. focus
+
+    3. wander
+
+### Blood
+
+### Bone
 
 
 
 
 
 ----
+
+
 
 ## Old Memo Select
 
