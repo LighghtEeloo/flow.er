@@ -31,18 +31,16 @@ Some "next generation" feature requests.
 
 1. Architect
     1. add
-    2. check
-    3. link
-    4. del
+    2. link
+    3. del
 2. Animator
     1. compute
     2. illustrate
 3. Dancer
-    1. current
-
-    2. focus
-
-    3. wander
+    1. check
+    2. current
+    3. focus
+    4. wander
 
 ### Blood
 

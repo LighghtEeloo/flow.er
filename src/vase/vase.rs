@@ -7,7 +7,9 @@ use super::prelude::*;
 pub enum Router {
     Cube,
     Flow,
-    History,
+    Calendar,
+    TimeCapsule,
+
     Settings,
 }
 
@@ -44,7 +46,7 @@ impl Component for Vase {
             vessel
         };
         // Note: trim only on startup.
-        vessel.trim();
+        vessel.trim().err();
         // Test..
         LOG!("Loaded & Trimmed: {:#?}", vessel);
 

@@ -15,9 +15,7 @@ pub struct Vessel {
     flow: Flow<EntityId>,
     
     #[serde(skip)]
-    vm: Vec<Box<dyn Dancer<EntityId>>>,
-    #[serde(skip)]
-    refs: HashMap<EntityId, NodeRef>,
+    vm: Vec<Box<dyn Artist<EntityId>>>,
     #[serde(skip)]
     buffer: String,
 }

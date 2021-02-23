@@ -1,4 +1,5 @@
 use crate::util::*;
+use crate::yew_util::*;
 use super::prelude::*;
 
 /// Flow
@@ -219,6 +220,25 @@ where Id: Identity
             Some(&e) => Err(e),
             _ => Ok(()) 
         }
+    }
+}
+
+
+// Artist
+
+impl<Id> Artist<Id> for Flow<Id> where Id: Identity {}
+
+
+// Animator
+
+impl<Id> Animator<Id> for Flow<Id> 
+where Id: Identity
+{
+    fn compute(&mut self) { 
+        todo!() 
+    }
+    fn illustrate(&self) -> Html { 
+        todo!() 
     }
 }
 

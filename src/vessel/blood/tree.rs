@@ -1,13 +1,16 @@
 use crate::util::*;
+use crate::yew_util::*;
 use super::prelude::*;
 
 
 /// A tree provides non-cycle tree view.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Tree<Id>
 where Id: Identity
 {
     pub map: HashMap<Id, FlowNode<Id>>,
+    #[serde(skip)]
+    refs: HashMap<Id, NodeRef>,
     /// root should be None iff map.is_empty.
     pub root: Option<Id>,
     pub pos: Option<Id>,
@@ -22,13 +25,34 @@ where Id: Identity
         vec.extend(flow.get(target, "tree build failed").descendant.clone());
         // Todo: find nodes to include recursively
         Self {
-            map: HashMap::from_iter(vec.into_iter().map(|x| (x, flow.get(&x, "tree build failed").clone()))),
+            map: HashMap::from_iter(vec.clone().into_iter().map(|x| (x, flow.get(&x, "tree build failed").clone())) ),
+            refs: HashMap::from_iter(vec.clone().into_iter().map(|x| (x, NodeRef::default())) ),
             root: Some(target.clone()),
             pos: None,
             fix: FixState::Deactivated
         }
     }
 }
+
+
+// Artist
+
+impl<Id> Artist<Id> for Tree<Id> where Id: Identity {}
+
+
+// Animator
+
+impl<Id> Animator<Id> for Tree<Id> 
+where Id: Identity
+{
+    fn compute(&mut self) { 
+        todo!() 
+    }
+    fn illustrate(&self) -> Html { 
+        todo!() 
+    }
+}
+
 
 // Dancer
 

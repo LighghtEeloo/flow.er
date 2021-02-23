@@ -1,4 +1,5 @@
 use crate::util::*;
+use crate::yew_util::*;
 use super::prelude::*;
 
 
@@ -9,6 +10,8 @@ pub struct Linear<Id>
 where Id: Identity
 {
     pub vec: Vec<Id>,
+    #[serde(skip)]
+    refs: HashMap<Id, NodeRef>,
     pub pos: Option<Id>,
     pub fix: FixState<Id>,
 }
@@ -19,12 +22,33 @@ where Id: Identity
     pub fn from_flow(flow: &Flow<Id>, target: &Id) -> Self {
         let vec = flow.get(target, "linear build failed").descendant.clone();
         Self {
-            vec,
+            vec: vec.clone(),
+            refs: HashMap::from_iter(vec.clone().into_iter().map(|x| (x, NodeRef::default())) ),
             pos: None,
             fix: FixState::Deactivated
         }
     }
 }
+
+
+// Artist
+
+impl<Id> Artist<Id> for Linear<Id> where Id: Identity {}
+
+
+// Animator
+
+impl<Id> Animator<Id> for Linear<Id> 
+where Id: Identity
+{
+    fn compute(&mut self) { 
+        todo!() 
+    }
+    fn illustrate(&self) -> Html { 
+        todo!() 
+    }
+}
+
 
 // Dancer
 
