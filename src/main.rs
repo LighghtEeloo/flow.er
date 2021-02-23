@@ -1,17 +1,20 @@
 #[allow(dead_code)]
 #[allow(unused)]
-pub mod stockpile;
-pub mod view_model;
-pub mod vessel;
+// pub mod stockpile;
+// pub mod view_model;
+mod vessel;
+mod vase;
 
 
 fn main() {
     use crate::prelude::*;
-    yew::start_app::<Model>();
+    yew::start_app::<Vase>();
+    // yew::start_app::<Model>();
 }
 
 pub mod prelude {
-    pub use crate::view_model::Model;
+    // pub use crate::view_model::Model;
+    pub use super::vase::prelude::Vase;
 }
 
 
@@ -23,89 +26,89 @@ macro_rules! LOG {
     }}
 }
 
-/// Cubey: Cube-y, create Message from an array of CubeMessage-s.  
-/// 
-/// "-y" for Message macros.
-#[macro_export]
-macro_rules! Cubey {
-    () => (
-        $crate::view_model::Message::_Idle
-    );
-    ( $( $x:expr ),* ) => {
-        {
-            let mut temp_vec = Vec::new();
-            $(
-                temp_vec.push($x);
-            )*
-            $crate::view_model::Message::Cube(temp_vec)
-        }
-    };
-}
+// /// Cubey: Cube-y, create Message from an array of CubeMessage-s.  
+// /// 
+// /// "-y" for Message macros.
+// #[macro_export]
+// macro_rules! Cubey {
+//     () => (
+//         $crate::view_model::Message::_Idle
+//     );
+//     ( $( $x:expr ),* ) => {
+//         {
+//             let mut temp_vec = Vec::new();
+//             $(
+//                 temp_vec.push($x);
+//             )*
+//             $crate::view_model::Message::Cube(temp_vec)
+//         }
+//     };
+// }
 
-/// Branchy: Branch-y, create Message from an array of BranchMessage-s.  
-/// 
-/// "-y" for Message macros.
-#[macro_export]
-macro_rules! Branchy {
-    () => (
-        $crate::view_model::Message::_Idle
-    );
-    ( $( $x:expr ),* ) => {
-        {
-            let mut temp_vec = Vec::new();
-            $(
-                temp_vec.push($x);
-            )*
-            $crate::view_model::Message::Branch(temp_vec)
-        }
-    };
-}
+// /// Branchy: Branch-y, create Message from an array of BranchMessage-s.  
+// /// 
+// /// "-y" for Message macros.
+// #[macro_export]
+// macro_rules! Branchy {
+//     () => (
+//         $crate::view_model::Message::_Idle
+//     );
+//     ( $( $x:expr ),* ) => {
+//         {
+//             let mut temp_vec = Vec::new();
+//             $(
+//                 temp_vec.push($x);
+//             )*
+//             $crate::view_model::Message::Branch(temp_vec)
+//         }
+//     };
+// }
 
-/// Historyly: History-ly, create Message from an array of HistoryMessage-s.  
-/// 
-/// "-y" for Message macros.
-#[macro_export]
-macro_rules! Historyly {
-    () => (
-        $crate::view_model::Message::_Idle
-    );
-    ( $( $x:expr ),* ) => {
-        {
-            let mut temp_vec = Vec::new();
-            $(
-                temp_vec.push($x);
-            )*
-            $crate::view_model::Message::History(temp_vec)
-        }
-    };
-}
+// /// Historyly: History-ly, create Message from an array of HistoryMessage-s.  
+// /// 
+// /// "-y" for Message macros.
+// #[macro_export]
+// macro_rules! Historyly {
+//     () => (
+//         $crate::view_model::Message::_Idle
+//     );
+//     ( $( $x:expr ),* ) => {
+//         {
+//             let mut temp_vec = Vec::new();
+//             $(
+//                 temp_vec.push($x);
+//             )*
+//             $crate::view_model::Message::History(temp_vec)
+//         }
+//     };
+// }
 
-/// Globaly: Global-y, create Message from an array of GlobalMessage-s.  
-/// 
-/// "-y" for Message macros.
-#[macro_export]
-macro_rules! Globaly {
-    () => (
-        $crate::view_model::Message::_Idle
-    );
-    ( $( $x:expr ),* ) => {
-        {
-            let mut temp_vec = Vec::new();
-            $(
-                temp_vec.push($x);
-            )*
-            $crate::view_model::Message::Global(temp_vec)
-        }
-    };
-}
+// /// Globaly: Global-y, create Message from an array of GlobalMessage-s.  
+// /// 
+// /// "-y" for Message macros.
+// #[macro_export]
+// macro_rules! Globaly {
+//     () => (
+//         $crate::view_model::Message::_Idle
+//     );
+//     ( $( $x:expr ),* ) => {
+//         {
+//             let mut temp_vec = Vec::new();
+//             $(
+//                 temp_vec.push($x);
+//             )*
+//             $crate::view_model::Message::Global(temp_vec)
+//         }
+//     };
+// }
 
 pub mod util {
     pub use crate::{
         LOG,
-        Cubey,
-        Branchy,
-        Historyly,
-        Globaly
+    //     Cubey,
+    //     Branchy,
+    //     Historyly,
+    //     Globaly
     };
 
     pub use std::mem;
