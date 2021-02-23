@@ -31,23 +31,23 @@ where Id: Identity
 }
 
 
-// Artist
+// // Artist
 
-impl<Id> Artist<Id> for Linear<Id> where Id: Identity {}
+// impl<Id> Artist<Id> for Linear<Id> where Id: Identity {}
 
 
-// Animator
+// // Animator
 
-impl<Id> Animator<Id> for Linear<Id> 
-where Id: Identity
-{
-    fn compute(&mut self) { 
-        todo!() 
-    }
-    fn illustrate(&self) -> Html { 
-        todo!() 
-    }
-}
+// impl<Id> Animator<Id> for Linear<Id> 
+// where Id: Identity
+// {
+//     fn compute(&mut self) { 
+//         todo!() 
+//     }
+//     fn illustrate(&self) -> Html { 
+//         todo!() 
+//     }
+// }
 
 
 // Dancer

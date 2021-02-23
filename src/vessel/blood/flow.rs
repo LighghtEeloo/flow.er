@@ -224,23 +224,23 @@ where Id: Identity
 }
 
 
-// Artist
+// // Artist
 
-impl<Id> Artist<Id> for Flow<Id> where Id: Identity {}
+// impl<Id> Artist<Id> for Flow<Id> where Id: Identity {}
 
 
-// Animator
+// // Animator
 
-impl<Id> Animator<Id> for Flow<Id> 
-where Id: Identity
-{
-    fn compute(&mut self) { 
-        todo!() 
-    }
-    fn illustrate(&self) -> Html { 
-        todo!() 
-    }
-}
+// impl<Id> Animator<Id> for Flow<Id> 
+// where Id: Identity
+// {
+//     fn compute(&mut self) { 
+//         todo!() 
+//     }
+//     fn illustrate(&self) -> Html { 
+//         todo!() 
+//     }
+// }
 
 
 // Dancer
@@ -336,6 +336,46 @@ where Id: Identity
             _ => {
                 node.descendant.get(0).cloned()
             }
+        }
+    }
+}
+
+
+
+pub enum FlowMessage {
+    NodeAdd,
+    NodeLink(FlowLink<EntityId>),
+
+}
+
+#[derive(Properties, Clone)]
+pub struct Props {
+    flow: Flow<EntityId>
+}
+
+
+impl Component for Flow<EntityId> {
+    type Message = FlowMessage;
+    type Properties = Props;
+
+    fn create(props: Self::Properties, _link: ComponentLink<Self>) -> Self {
+        props.flow 
+    }
+
+    fn update(&mut self, _msg: Self::Message) -> ShouldRender {
+        true
+    }
+
+    fn change(&mut self, _props: Self::Properties) -> ShouldRender {
+        true
+    }
+
+    fn view(&self) -> Html {
+        // let onclick = self.props.on_add_to_cart.reform(|_| ());
+
+        html! {
+          <div>
+          </div>
         }
     }
 }
