@@ -43,11 +43,11 @@ pub enum FlowLinkIndex {
     Index(usize)
 }
 impl FlowLinkIndex {
-    pub fn inserted_with<Id: Identity>(&self, node: &mut FlowNode<Id>, obj: Id) {
+    pub fn inserted_to<Id: Identity>(&self, vec: &mut Vec<Id>, obj: Id) {
         match self {
-            FlowLinkIndex::Head => node.descendant.insert(0, obj),
-            FlowLinkIndex::Tail => node.descendant.push(obj),
-            FlowLinkIndex::Index(i) => node.descendant.insert(*i, obj)
+            FlowLinkIndex::Head => vec.insert(0, obj),
+            FlowLinkIndex::Tail => vec.push(obj),
+            FlowLinkIndex::Index(i) => vec.insert(*i, obj)
         }
     }
 }

@@ -41,12 +41,12 @@ where Id: Identity
             Some(id) => {
                 self.map.insert(obj, FlowNode::from_owner(Some(id)));
                 let owner_node = self.get_mut(&id, "no owner found");
-                idx.inserted_with(owner_node, obj);
+                idx.inserted_to(&mut owner_node.descendant, obj);
                 match dir {
                     Direction::Ascend => {
                         let obj_node = self.get_mut(&obj, "failed insert obj");
                         let des = target.expect("Ascend when None as des");
-                        idx.inserted_with(obj_node, des);
+                        idx.inserted_to(&mut obj_node.descendant, des);
                         for x in obj_node.descendant.clone() {
                             self.get_mut(&x, "Ascend when des is not found").owner = Some(obj);
                         }
@@ -180,23 +180,19 @@ where Id: Identity
             Some(tar) => {
                 match dir {
                     Direction::Ascend => {
-                        idx.inserted_with(node_obj, tar);
+                        idx.inserted_to(&mut node_obj.descendant, tar);
                         let node_tar = self.map.get_mut(&tar).ok_or(FlowNodeNotFoundError)?;
                         node_tar.owner = Some(obj);
                     }
                     _ => {
                         node_obj.owner = Some(tar);
                         let node_tar = self.map.get_mut(&tar).ok_or(FlowNodeNotFoundError)?;
-                        idx.inserted_with(node_tar, obj);
+                        idx.inserted_to(&mut node_tar.descendant, obj);
                     }
                 }
             }
             None => if !self.roots.contains(&obj) {
-                match idx {
-                    FlowLinkIndex::Head => self.roots.insert(0, obj),
-                    FlowLinkIndex::Index(i) => self.roots.insert(i, obj),
-                    FlowLinkIndex::Tail => self.roots.push(obj)
-                }
+                idx.inserted_to(&mut self.roots, obj);
             } 
         }
         Ok(obj)
