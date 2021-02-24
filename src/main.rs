@@ -102,6 +102,14 @@ macro_rules! LOG {
 //     };
 // }
 
+pub mod universe {
+    pub use crate::util::*;
+    pub use crate::yew_util::*;
+    pub use crate::time_util::*;
+    pub use crate::vessel::prelude::*;
+    pub use crate::vase::prelude::*;
+}
+
 pub mod util {
     pub use crate::{
         LOG,

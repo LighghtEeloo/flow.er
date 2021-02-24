@@ -9,6 +9,7 @@ use super::prelude::*;
 pub struct Linear<Id>
 where Id: Identity
 {
+    pub title: String,
     pub vec: Vec<Id>,
     #[serde(skip)]
     refs: HashMap<Id, NodeRef>,
@@ -22,6 +23,7 @@ where Id: Identity
     pub fn from_flow(flow: &Flow<Id>, target: &Id) -> Self {
         let vec = flow.get(target, "linear build failed").descendant.clone();
         Self {
+            title: String::new(),
             vec: vec.clone(),
             refs: HashMap::from_iter(vec.clone().into_iter().map(|x| (x, NodeRef::default())) ),
             pos: None,
