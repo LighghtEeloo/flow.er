@@ -35,24 +35,6 @@ where Id: Identity
 }
 
 
-// // Artist
-
-// impl<Id> Artist<Id> for Tree<Id> where Id: Identity {}
-
-
-// // Animator
-
-// impl<Id> Animator<Id> for Tree<Id> 
-// where Id: Identity
-// {
-//     fn compute(&mut self) { 
-//         todo!() 
-//     }
-//     fn illustrate(&self) -> Html { 
-//         todo!() 
-//     }
-// }
-
 
 // Dancer
 
