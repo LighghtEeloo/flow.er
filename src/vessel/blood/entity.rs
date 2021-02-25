@@ -55,23 +55,17 @@ impl IdentityProduct<EntityId> for Entity {
 }
 
 impl Entity {
-    pub fn face(&self) -> &Face {
-        &self.face
-    }
-    pub fn set_face(&mut self, face: Face) {
-        self.face = face;
-    }
-    pub fn bubble(&self) -> &Bubble {
-        &self.bubble
-    }
-    pub fn set_bubble(&mut self, bubble: Bubble) {
-        self.bubble = bubble;
-    }
-    pub fn process(&self) -> &ProcessStatus {
-        &self.process
-    }
-    pub fn set_process(&mut self, process: ProcessStatus) {
-        self.process = process;
+    pub fn update_entity(&mut self, field: EntityField) {
+        use EntityField::*;
+        match field {
+            TimeStamp(t) => { self.time = t }
+            Face(f) => { self.face = f }
+            Bubble(b) => { self.bubble = b }
+            ProcessStatus(p) => { self.process = p }
+            TagSet(tf) => { 
+                self.tags.update_tagset(tf)
+            }
+        }
     }
 }
 
@@ -109,4 +103,13 @@ impl ProcessStatus {
     pub fn type_src(&self) -> String {
         format!("static/icons/Process/{}.svg", Self::type_str(self))
     }
+}
+
+#[derive(Debug, Clone)]
+pub enum EntityField {
+    TimeStamp(TimeStamp),
+    Face(Face),
+    Bubble(Bubble),
+    ProcessStatus(ProcessStatus),
+    TagSet(TagSetField)
 }

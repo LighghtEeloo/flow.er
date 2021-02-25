@@ -75,7 +75,6 @@ impl Linear<EntityId> {
         }
     }
     fn node_status_view(&self, entity: &Entity, link: &ComponentLink<Vase>) -> Html {
-        let mut entity = entity.clone();
         let id = entity.id();
         let vec = ProcessStatus::vec_all();
         let status_meta: Vec<(String, String, ProcessStatus)> = 
@@ -89,8 +88,7 @@ impl Linear<EntityId> {
                 html! {
                     <div title={des.clone()}
                         onclick=link.callback(move |_| {
-                            entity.process = process;
-                            [VaseMsg::WriteEntity(entity)]
+                            [VaseMsg::WriteEntity(id, EntityField::ProcessStatus(process.clone()))]
                         })
                     > 
                         <img src={src} alt="process" /> 
@@ -100,9 +98,9 @@ impl Linear<EntityId> {
         html! {
             <div class="dropdown"> 
                 <button class="dropbtn"
-                    value=entity.process().type_str()
+                    value=entity.process.type_str()
                 > 
-                    <img src={entity.process().type_src()} alt="process" />
+                    <img src={entity.process.type_src()} alt="process" />
                 </button> 
                 
                 <div class="dropdown-content"> 
@@ -170,8 +168,7 @@ impl Linear<EntityId> {
                 //     }
                 // })
                 oninput=link.callback(move |e: InputData| {
-                    entity.face = e.value;
-                    [VaseMsg::WriteEntity(entity)]
+                    [VaseMsg::WriteEntity(id, EntityField::Face(e.value))]
                 })
                 readonly=self.locked
             />

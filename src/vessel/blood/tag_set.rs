@@ -35,8 +35,26 @@ impl TagSet {
         inserting
     }
     pub fn remove(&mut self, tag: Tag) -> bool {
-        let removing = self.contains(&tag);
-        self.data.retain(|x| x.clone() != tag);
+        let position = self.position(&tag);
+        let removing = position.is_some();
+        if let Some(i) = position {
+            self.data.remove(i);
+        }
         removing
     }
+    pub fn update_tagset(&mut self, field: TagSetField) {
+        use TagSetField::*;
+        match field {
+            AddTag(t) => { self.push(t); }
+            DelTag(t) => { self.remove(t); }
+            ClearTag => { self.data.clear(); }
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum TagSetField {
+    AddTag(Tag),
+    DelTag(Tag),
+    ClearTag,
 }

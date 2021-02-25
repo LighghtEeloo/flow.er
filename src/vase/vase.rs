@@ -14,7 +14,7 @@ const KEY: &str = "flow.er.data";
 #[derive(Debug, Clone)]
 pub enum VaseMsg {
     SwitchRouter(Router),
-    WriteEntity(Entity),
+    WriteEntity(EntityId, EntityField),
     NoRender
 }
 
@@ -54,6 +54,10 @@ impl Component for Vase {
                     self.vessel.router = router; true
                 }
                 NoRender => false,
+                WriteEntity(id, field) => {
+                    self.vessel.entity_map.get_mut(&id).map(|x| x.update_entity(field));
+                    true
+                }
                 // Test..
                 // _ => {
                 //     LOG!("No update pattern matched."); false
