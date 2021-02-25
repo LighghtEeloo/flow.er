@@ -50,8 +50,20 @@ impl Vase {
     fn main_editor(&self) -> Html {
         let router = self.vessel.router;
         let editor_str = router.type_str();
-        let vm_vec = self.vessel.vm_map.get(&router).map(|x| {
-            x.iter().map(|vm| vm.illustrate(&self.vessel, &self.link)).collect()
+        let vm_vec = self.vessel.vm_map.get(&router).map(|vec| {
+            let per_width = 100.0 / vec.len() as f64;
+            vec.iter().enumerate().map(|(vm_idx, vm)| {
+                let style = {
+                    format!("width: {}%;", per_width) 
+                    +&format!("left: {}%;", per_width * vm_idx as f64) 
+                    +&{ if vm_idx != 0 { format!("border-left: 2px solid gray;") } else { format!("") }}
+                };
+                html! {
+                    <div class="vm" style={ style }>
+                        { vm.illustrate(vm_idx, &self.vessel, &self.link) }
+                    </div>
+                }
+            }).collect()
         }).unwrap_or(Vec::new());
         let editor = 
             html! {

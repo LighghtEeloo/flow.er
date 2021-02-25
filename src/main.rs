@@ -66,6 +66,7 @@ pub mod util {
 
     pub use super::json_util::*;
     pub use super::modulo::*;
+    pub use super::rand_util::*;
 }
 
 mod time_util {
@@ -79,7 +80,7 @@ mod yew_util {
     pub use yew::web_sys::HtmlInputElement as InputElement;
     pub use yew::{ html, Bridge, Component, ComponentLink, Html, InputData, NodeRef, Properties, ShouldRender };
     pub use yew::{ events::KeyboardEvent };
-    pub use yew::agent::{ Bridged, Dispatched, Dispatcher };
+    // pub use yew::agent::{ Bridged, Dispatched, Dispatcher };
     pub use yew_services::storage::{ Area, StorageService };
 }
 
@@ -131,4 +132,12 @@ mod modulo {
         )*)
     }
     modulo_signed_ext_impl! { i8 i16 i32 i64 isize u8 u16 u32 u64 usize }
+}
+
+mod rand_util {
+    pub use rand::{ thread_rng, Rng };
+    pub fn random_u64() -> u64 {
+        let mut rng = thread_rng();
+        rng.gen()
+    }
 }

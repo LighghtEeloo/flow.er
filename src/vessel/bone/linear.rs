@@ -5,7 +5,7 @@ use super::prelude::*;
 
 /// Linear
 /// A Visualizable model for CubeView. Designed for todo-list-ish situations.
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct Linear<Id>
 where Id: Identity
 {
@@ -53,14 +53,17 @@ impl Animator<EntityId> for Linear<EntityId> {
         self.refs = HashMap::from_iter(self.vec.iter().cloned().map(|x| (x, NodeRef::default())) );
         self.refs.insert(self.title.clone(), NodeRef::default());
     }
-    fn illustrate(&self, vessel: &Vessel, link: &ComponentLink<Vase>) -> Html {
+    fn illustrate(&self, vm_idx: usize, vessel: &Vessel, link: &ComponentLink<Vase>) -> Html {
         let title_entity = vessel.entity_map.get(&self.title).cloned().unwrap_or_default();
         let vec_entity: Vec<Entity> = self.vec.iter().map(|id| vessel.entity_map.get(id).cloned().unwrap_or_default()).collect();
         html! {
             <div class="linear">
                 <div class="head">
                     <input
+                        type="Text"
                         ref=self.refs.get(&self.title).cloned().unwrap_or_default()
+                        placeholder="Enter node name."
+                        aria-label="New Project Name"
                         value=title_entity.face
                         // Todo..
                         oninput=link.callback(move |e: InputData| {
@@ -218,3 +221,17 @@ where Id: Identity
     }
 }
 
+
+impl<Id> Debug for Linear<Id> 
+where Id: Identity
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
+        f.debug_struct("Linear")
+         .field("title", &self.title)
+         .field("vec", &self.vec)
+         .field("pos", &self.pos)
+         .field("fix", &self.fix)
+         .field("locked", &self.locked)
+         .finish()
+    }
+}

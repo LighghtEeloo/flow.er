@@ -9,6 +9,17 @@
     background-color: aliceblue;
 }
 
+.cube .vm {
+    position: absolute;
+    border: none;
+    outline: none;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.linear {
+    height: 100%;
+}
 
 .cube-new .head input {
     width: 400px;

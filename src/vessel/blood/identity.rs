@@ -27,17 +27,16 @@ pub trait Identity: IdentityBase + Clone + Copy {
         let stamp = TimeStamp::now();
         Self::from_time(&stamp)
     }
+    fn new_rand() -> Self {
+        let rand = random_u64();
+        Self::from_u64(rand)
+    }
 }
-// impl<Id> Default for Id where Id: Identity {
-//     fn default() -> Self {
-//         Self::new_stamped()
-//     }
-// }
 
 /// For producing obj with id.
 pub trait IdentityProduct<Id: Identity>: Default + Clone + Debug {
     fn new() -> Self {
-        Self::with_id(Id::new_stamped())
+        Self::with_id(Id::new_rand())
     }
     fn with_id(id: Id) -> Self;
     fn id(&self) -> Id;
@@ -81,7 +80,7 @@ impl Identity for EntityId {
 
 impl Default for EntityId {
     fn default() -> Self {
-        Self::new_stamped()
+        Self::new_rand()
     }
 }
 
@@ -106,6 +105,6 @@ impl Identity for VesselId {
 
 impl Default for VesselId {
     fn default() -> Self {
-        Self::new_stamped()
+        Self::new_rand()
     }
 }

@@ -237,7 +237,7 @@ where Id: Identity
     fn compute(&mut self) { 
         todo!() 
     }
-    fn illustrate(&self, vessel: &Vessel, link: &ComponentLink<Vase>) -> Html { 
+    fn illustrate(&self, vm_idx: usize, vessel: &Vessel, link: &ComponentLink<Vase>) -> Html { 
         todo!() 
     }
 }

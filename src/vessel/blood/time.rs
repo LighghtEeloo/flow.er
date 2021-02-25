@@ -35,7 +35,7 @@ pub trait TimeRep {
 
 #[derive(Clone, Hash, PartialEq, Eq, Deserialize, Serialize)]
 pub struct TimeStamp (u64, u32);
-impl fmt::Debug for TimeStamp 
+impl Debug for TimeStamp 
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> { 
         let dt: DateTime<Local> = self.universal().into();
