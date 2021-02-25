@@ -30,23 +30,14 @@ where Id: Identity
 }
 
 
-// // Artist
+// Artist
 
 impl<Id> Artist<Id> for Inkblot<Id> where Id: Identity {}
 
 
 // Animator
 
-impl<Id> Animator<Id> for Inkblot<Id> 
-where Id: Identity
-{
-    fn compute(&mut self) { 
-        todo!() 
-    }
-    fn illustrate(&self) -> Html { 
-        todo!() 
-    }
-}
+impl<Id> Animator<Id> for Inkblot<Id> where Id: Identity {}
 
 
 // Dancer
@@ -61,10 +52,8 @@ where Id: Identity
         self.pos.clone()
     }
     fn focus(&mut self, obj: Id) {
-        todo!()
     }
     fn wander(&mut self, dir: Direction, fixed: bool) {
-        todo!()
     }
 }
 

@@ -26,6 +26,18 @@ impl Vessel {
     pub fn onload(&mut self) -> Result<(), Critic> {
         // trim flow
         self.trim()?;
+        self.vm_update();
+        Ok(())
+    }
+    fn trim(&mut self) -> Result<(), Critic> {
+        match self.flow.trim().err().map(|vec| {
+            LOG!("Trimmed: {:?}", vec);
+        }) {
+            Some(_) => Err(FlowNodeMismatchError),
+            _ => Ok(())
+        }
+    }
+    fn vm_update(&mut self) {
         // load vm
         self.vm_map = self.vm_info.iter().map(|(&router, vec_vm_type)| {
             let mut vec_vm: Vec< Box<dyn Artist<EntityId>> > = vec![];
@@ -47,15 +59,6 @@ impl Vessel {
             }
             (router, vec_vm)
         }).collect();
-        Ok(())
-    }
-    fn trim(&mut self) -> Result<(), Critic> {
-        match self.flow.trim().err().map(|vec| {
-            LOG!("Trimmed: {:?}", vec);
-        }) {
-            Some(_) => Err(FlowNodeMismatchError),
-            _ => Ok(())
-        }
     }
     /// add / updates an entity. 
     /// 

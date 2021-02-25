@@ -5,6 +5,8 @@ use super::prelude::*;
 pub trait Animator<Id>: Debug
 where Id: IdentityBase
 {
-    fn compute(&mut self);
-    fn illustrate(&self) -> Html;
+    fn compute(&mut self) {}
+    fn illustrate(&self) -> Html {
+        todo!()
+    }
 }
