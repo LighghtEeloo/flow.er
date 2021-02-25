@@ -19,7 +19,7 @@ impl Vase {
         let router_meta: Vec<(&str, Router, &str, bool)> = vec! {
             ("static/icons/hexagons.svg", Cube, "Cube", false),
             ("static/icons/branch.svg", Flow, "Flow", false),
-            ("static/icons/history.svg", Calendar, "Calendar", false),
+            ("static/icons/calendar.svg", Calendar, "Calendar", false),
             ("static/icons/history.svg", TimeCapsule, "TimeCapsule", false),
             ("static/icons/settings.svg", Settings, "Settings", true),
         };
@@ -48,24 +48,16 @@ impl Vase {
     }
 
     fn main_editor(&self) -> Html {
+        let router = self.vessel.router;
+        let editor_str = router.type_str();
+        let vm_vec = self.vessel.vm_map.get(&router).map(|x| {
+            x.iter().map(|vm| vm.illustrate(&self.vessel, &self.link)).collect()
+        }).unwrap_or(Vec::new());
         let editor = 
-            match self.vessel.router {
-                Router::Cube => {
-                    html! {}
-                }
-                Router::Flow => {
-                    html! {}
-                }
-                Router::TimeCapsule => {
-                    html! {}
-                    // let history_model = &self.history_model;
-                    // if history_model.src_view { 
-                    //     history_model.src_view()
-                    // } else { 
-                    //     history_model.history_view() 
-                    // }
-                }
-                _ => html! {}
+            html! {
+                <div class={editor_str}>
+                    { vm_vec }
+                </div>
             };
         html! {
             <div class="frame" id="main-editor">

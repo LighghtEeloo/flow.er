@@ -8,6 +8,7 @@ pub mod prelude {
         bone::prelude::*,
         blood::prelude::*,
         soul::prelude::*,
+        vessel::*,
     };
-    pub use super::vessel::*;
+    pub use crate::vase::prelude::{ Vase, VaseMsg };
 }

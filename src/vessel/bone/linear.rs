@@ -9,12 +9,13 @@ use super::prelude::*;
 pub struct Linear<Id>
 where Id: Identity
 {
-    pub title: String,
+    pub title: Id,
     pub vec: Vec<Id>,
     #[serde(skip)]
     refs: HashMap<Id, NodeRef>,
     pub pos: Option<Id>,
     pub fix: FixState<Id>,
+    pub locked: bool,
 }
 
 impl<Id> Linear<Id>
@@ -22,12 +23,15 @@ where Id: Identity
 {
     pub fn from_flow(flow: &Flow<Id>, target: &Id) -> Self {
         let vec = flow.get(target, "linear build failed").descendant.clone();
+        let mut refs = HashMap::from_iter(vec.clone().into_iter().map(|x| (x, NodeRef::default())) );
+        refs.insert(target.clone(), NodeRef::default());
         Self {
-            title: String::new(),
-            vec: vec.clone(),
-            refs: HashMap::from_iter(vec.clone().into_iter().map(|x| (x, NodeRef::default())) ),
+            title: target.clone(),
+            vec,
+            refs,
             pos: None,
-            fix: FixState::Deactivated
+            fix: FixState::Deactivated,
+            locked: false
         }
     }
     pub fn from_flow_boxed(flow: &Flow<Id>, target: &Id) -> Box<Self> {
@@ -38,19 +42,140 @@ where Id: Identity
 
 // // Artist
 
-impl<Id> Artist<Id> for Linear<Id> where Id: Identity {}
+impl Artist<EntityId> for Linear<EntityId> {}
 
 
 // Animator
 
-impl<Id> Animator<Id> for Linear<Id> 
-where Id: Identity
-{
-    fn compute(&mut self) { 
-        todo!() 
+impl Animator<EntityId> for Linear<EntityId> {
+    fn illustrate(&self, vessel: &Vessel, link: &ComponentLink<Vase>) -> Html {
+        let title_entity = vessel.entity_map.get(&self.title).cloned().unwrap_or_default();
+        let vec_entity: Vec<Entity> = self.vec.iter().map(|id| vessel.entity_map.get(id).cloned().unwrap_or_default()).collect();
+        html! {
+            <div class="linear">
+                <input class="head"
+                    ref=self.refs.get(&self.title).cloned().unwrap_or_default()
+                    value=title_entity.bubble
+                    // Todo..
+                />
+                <div class="node-group">
+                    { for vec_entity.iter().map(|entity| { self.node_view(entity, link) }) }
+                </div>
+            </div>
+        }
     }
-    fn illustrate(&self) -> Html { 
-        todo!() 
+}
+impl Linear<EntityId> {
+    fn node_view(&self, entity: &Entity, link: &ComponentLink<Vase>) -> Html {
+        html! {
+            <div class="node">
+                { self.node_status_view(&entity, link) }
+                { self.node_input_view(&entity, link) }
+            </div>
+        }
+    }
+    fn node_status_view(&self, entity: &Entity, link: &ComponentLink<Vase>) -> Html {
+        let mut entity = entity.clone();
+        let id = entity.id();
+        let vec = ProcessStatus::vec_all();
+        let status_meta: Vec<(String, String, ProcessStatus)> = 
+            vec.iter().map( |x| (
+                String::from(ProcessStatus::type_src(x)), 
+                String::from(ProcessStatus::type_str(x)),
+                x.clone()
+            ) ).collect();
+        let status_dropdown: Html = 
+            status_meta.into_iter().map(|(src, des, process)| {
+                html! {
+                    <div title={des.clone()}
+                        onclick=link.callback(move |_| {
+                            entity.process = process;
+                            [VaseMsg::WriteEntity(entity)]
+                        })
+                    > 
+                        <img src={src} alt="process" /> 
+                    </div> 
+                }
+            }).collect();
+        html! {
+            <div class="dropdown"> 
+                <button class="dropbtn"
+                    value=entity.process().type_str()
+                > 
+                    <img src={entity.process().type_src()} alt="process" />
+                </button> 
+                
+                <div class="dropdown-content"> 
+                    { status_dropdown }
+                </div> 
+            </div> 
+        }
+    }
+    fn node_input_view(&self, entity: &Entity, link: &ComponentLink<Vase>) -> Html {
+        let mut entity = entity.clone();
+        let id = entity.id();
+        let is_empty = entity.face.is_empty();
+        html! {
+            <input
+                type="text"
+                ref=self.refs.get(&id).unwrap().clone()
+                value=entity.face
+                placeholder="..."
+                aria-label="Item"
+                // onfocus=link.callback(move |_| {
+                //     Cubey![SetFocusId(Some(id))]
+                // })
+                // onkeydown=link.callback(move |e: KeyboardEvent| {
+                //     let meta = (e.ctrl_key(), e.shift_key(), e.code());
+                //     // LOG!("OnKeyDown: {:?}", meta);
+                //     match (meta.0, meta.1, meta.2.as_str()) { 
+                //         (false, false, "ArrowUp") => Cubey![Wander(Direction::Ascend, false)], 
+                //         (false, false, "ArrowDown") => Cubey![Wander(Direction::Descend, false)], 
+                //         (true, false, "ArrowUp") => Cubey![Wander(Direction::Ascend, true)], 
+                //         (true, false, "ArrowDown") => Cubey![Wander(Direction::Descend, true)], 
+                //         (false, false, "ArrowLeft") => Cubey![], 
+                //         (false, false, "ArrowRight") => Cubey![], 
+                //         _ => Cubey![]
+                //     }
+                // })
+                // onkeypress=link.callback(move |e: KeyboardEvent| {
+                //     let meta = (e.ctrl_key(), e.shift_key(), e.code());
+                //     // LOG!("OnKeyPress: {:?}", meta);
+                //     match (meta.0, meta.1, meta.2.as_str()) { 
+                //         _ => Cubey![]
+                //     }
+                // })
+                // onkeyup=link.callback(move |e: KeyboardEvent| {
+                //     let meta = (e.ctrl_key(), e.shift_key(), e.code());
+                //     // LOG!("OnKeyUp: {:?}", meta);
+                //     match (meta.0, meta.1, meta.2.as_str()) { 
+                //         // enter
+                //         (false, false, "Enter") => Cubey![NewNode(vec![id])],
+                //         // shift+enter
+                //         (false, true, "Enter") => Cubey![],
+                //         // backspace
+                //         (_, _, "Backspace") => {
+                //             if is_empty { Cubey![EraseNode(id)] }
+                //             else { Cubey![] }
+                //         }
+                //         // delete
+                //         (_, _, "Delete") => {
+                //             if is_empty { Cubey![EraseNode(id), EraseNode(id), Wander(Direction::Descend, false)] }
+                //             else { Cubey![] }
+                //         }
+                //         // ctrl released
+                //         (true, _, "ControlLeft") => Cubey![Wander(Direction::Stay, false)],
+                //         (true, _, "ControlRight") => Cubey![Wander(Direction::Stay, false)],
+                //         _ => Cubey![] 
+                //     }
+                // })
+                oninput=link.callback(move |e: InputData| {
+                    entity.face = e.value;
+                    [VaseMsg::WriteEntity(entity)]
+                })
+                readonly=self.locked
+            />
+        }
     }
 }
 

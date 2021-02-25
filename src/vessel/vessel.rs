@@ -90,6 +90,19 @@ impl Default for Router {
     fn default() -> Router { Router::Cube }
 }
 
+impl Router {
+    pub fn type_str(&self) -> &'static str {
+        use Router::*;
+        match self {
+            Cube => "cube",
+            Flow => "flow",
+            Calendar => "calendar",
+            TimeCapsule => "time-capsule",
+            Settings => "settings"
+        }
+    }
+}
+
 // #[derive(Debug, Default, Deserialize, Serialize)]
 pub type VMInfo = HashMap< Router, Vec< VMType > >;
 pub type VMMap = HashMap< Router, Vec< Box<dyn Artist<EntityId>> > >;

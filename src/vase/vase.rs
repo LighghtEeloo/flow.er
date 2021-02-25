@@ -14,6 +14,7 @@ const KEY: &str = "flow.er.data";
 #[derive(Debug, Clone)]
 pub enum VaseMsg {
     SwitchRouter(Router),
+    WriteEntity(Entity),
     NoRender
 }
 
@@ -53,9 +54,10 @@ impl Component for Vase {
                     self.vessel.router = router; true
                 }
                 NoRender => false,
-                _ => {
-                    LOG!("No update pattern matched."); false
-                }
+                // Test..
+                // _ => {
+                //     LOG!("No update pattern matched."); false
+                // }
             }
         }
         // Only self.vessel is saved.
