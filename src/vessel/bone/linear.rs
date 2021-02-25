@@ -23,7 +23,7 @@ where Id: Identity
 {
     pub fn from_flow(flow: &Flow<Id>, target: &Id) -> Self {
         let vec = flow.get(target, "linear build failed").descendant.clone();
-        let mut refs = HashMap::from_iter(vec.clone().into_iter().map(|x| (x, NodeRef::default())) );
+        let mut refs = HashMap::from_iter(vec.iter().cloned().map(|x| (x, NodeRef::default())) );
         refs.insert(target.clone(), NodeRef::default());
         Self {
             title: target.clone(),
@@ -48,6 +48,11 @@ impl Artist<EntityId> for Linear<EntityId> {}
 // Animator
 
 impl Animator<EntityId> for Linear<EntityId> {
+    fn flow_update(&mut self, flow: &Flow<EntityId>) {
+        self.vec = flow.get(&self.title, "linear update failed").descendant.clone();
+        self.refs = HashMap::from_iter(self.vec.iter().cloned().map(|x| (x, NodeRef::default())) );
+        self.refs.insert(self.title.clone(), NodeRef::default());
+    }
     fn illustrate(&self, vessel: &Vessel, link: &ComponentLink<Vase>) -> Html {
         let title_entity = vessel.entity_map.get(&self.title).cloned().unwrap_or_default();
         let vec_entity: Vec<Entity> = self.vec.iter().map(|id| vessel.entity_map.get(id).cloned().unwrap_or_default()).collect();
