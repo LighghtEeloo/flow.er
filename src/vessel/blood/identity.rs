@@ -28,6 +28,11 @@ pub trait Identity: IdentityBase + Clone + Copy {
         Self::from_time(&stamp)
     }
 }
+// impl<Id> Default for Id where Id: Identity {
+//     fn default() -> Self {
+//         Self::new_stamped()
+//     }
+// }
 
 /// For producing obj with id.
 pub trait IdentityProduct<Id: Identity>: Default + Clone + Debug {
@@ -74,6 +79,11 @@ impl Identity for EntityId {
     }
 }
 
+impl Default for EntityId {
+    fn default() -> Self {
+        Self::new_stamped()
+    }
+}
 
 
 #[derive(Clone, Copy, Hash, PartialEq, Eq, Deserialize, Serialize)]
@@ -91,5 +101,11 @@ impl IdentityBase for VesselId {}
 impl Identity for VesselId {
     fn from_u64(v: u64) -> Self {
         VesselId (v)
+    }
+}
+
+impl Default for VesselId {
+    fn default() -> Self {
+        Self::new_stamped()
     }
 }

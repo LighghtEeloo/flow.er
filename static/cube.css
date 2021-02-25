@@ -10,7 +10,7 @@
 }
 
 
-.cube-new .cube-input input {
+.cube-new .head input {
     width: 400px;
     height: 30px;
     position: absolute;
@@ -25,7 +25,7 @@
     font-family: var(--adviceFont);
 }
 
-.cube-new .cube-input .dash-line {
+.cube-new .head .dash-line {
     top: 0; right: 0; bottom: 0; left: 0;
     position: absolute;
     /* position: relative; */
@@ -37,7 +37,7 @@
 }
 
 
-.cube .cube-input input {
+.cube .head input {
     width: 100%;
     min-height: 60px;
     height: 10%;
@@ -59,7 +59,7 @@
     font-weight: normal;
 }
 
-.cube .cube-input .dash-line {
+.cube .head .dash-line {
     display: none;
 }
 

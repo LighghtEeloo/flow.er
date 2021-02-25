@@ -71,12 +71,9 @@ impl Vessel {
             }
         });
     }
-    /// add / updates an entity. 
+    /// add / updates an entity together with its flow. 
     /// 
-    /// updates entity_map if entity exists; 
-    /// updates flow if not in flow.
-    /// 
-    /// ignores flow_link if existing in flow.
+    /// if entity exists, updates entity_map but also complains, and no flow will be linked; 
     pub fn insert_entity(&mut self, entity: Entity, flow_link: FlowLink<EntityId>) -> Result<(), Critic> {
         let id = entity.id();
         self.entity_map.insert(id, entity);

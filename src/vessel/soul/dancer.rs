@@ -17,6 +17,9 @@ impl Direction {
         }
     }
 }
+impl Default for Direction {
+    fn default() -> Self { Direction::Stay }
+}
 
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub enum FixState<Id> {

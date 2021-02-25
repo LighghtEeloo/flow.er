@@ -40,7 +40,7 @@ where Id: Identity
 }
 
 
-// // Artist
+// Artist
 
 impl Artist<EntityId> for Linear<EntityId> {}
 
@@ -58,11 +58,16 @@ impl Animator<EntityId> for Linear<EntityId> {
         let vec_entity: Vec<Entity> = self.vec.iter().map(|id| vessel.entity_map.get(id).cloned().unwrap_or_default()).collect();
         html! {
             <div class="linear">
-                <input class="head"
-                    ref=self.refs.get(&self.title).cloned().unwrap_or_default()
-                    value=title_entity.bubble
-                    // Todo..
-                />
+                <div class="head">
+                    <input
+                        ref=self.refs.get(&self.title).cloned().unwrap_or_default()
+                        value=title_entity.face
+                        // Todo..
+                        oninput=link.callback(move |e: InputData| {
+                            [VaseMsg::WriteEntity(title_entity.id(), EntityField::Face(e.value))]
+                        })
+                    />
+                </div>
                 <div class="node-group">
                     { for vec_entity.iter().map(|entity| { self.node_view(entity, link) }) }
                 </div>

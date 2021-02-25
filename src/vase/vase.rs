@@ -1,6 +1,7 @@
 use crate::util::*;
 use crate::yew_util::*;
 use super::prelude::*;
+use super::prelude::{Vessel};
 
 
 pub struct Vase {
@@ -25,11 +26,34 @@ impl Component for Vase {
     fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
         let storage = StorageService::new(Area::Local).expect("storage was disabled by the user");
         let mut vessel: Vessel = {
-            let vessel = if let Json(Ok(restored_model)) = storage.restore(KEY) {
+            let mut vessel = if let Json(Ok(restored_model)) = storage.restore(KEY) {
                 restored_model
             } else {
                 Vessel::default()
             };
+            // Debug..
+            vessel = Vessel::default();
+
+            let mut init = || -> Result<(), Critic> {
+                let mut entity = Entity::default();
+                entity.face = format!("{:?}", entity.time);
+                vessel.insert_entity(entity.clone(), FlowLink::default())?;
+    
+                let mut a = Entity::default();
+                a.face = format!("A - {:?}", a.time);
+                vessel.insert_entity( a, FlowLink::new_descend_tail(entity.id()) )?;
+    
+                let mut b = Entity::default();
+                b.face = format!("B - {:?}", b.time);
+                vessel.insert_entity( b, FlowLink::new_descend_tail(entity.id()) )?;
+    
+                vessel.vm_info = HashMap::new();
+                vessel.vm_info.insert(Router::Cube, vec![VMType::Linear(entity.id())]);
+                Ok(())
+            };
+
+            init().err().map(|x| LOG!("{:?}", x));
+
             vessel
         };
         // Note: refresh on startup.

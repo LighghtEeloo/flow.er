@@ -29,13 +29,30 @@ where Id: Identity
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct FlowLink<Id> {
     pub target: Option<Id>,
     pub dir: Direction,
     /// May not be used
     pub idx: FlowLinkIndex
 }
+impl<Id> FlowLink<Id> {
+    pub fn new_descend(target: Id, idx: FlowLinkIndex) -> Self {
+        Self {
+            target: Some(target),
+            dir: Direction::Descend,
+            idx, 
+        }
+    }
+    pub fn new_descend_tail(target: Id) -> Self {
+        Self {
+            target: Some(target),
+            dir: Direction::Descend,
+            idx: FlowLinkIndex::Tail, 
+        }
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum FlowLinkIndex {
     Head,
@@ -49,6 +66,15 @@ impl FlowLinkIndex {
             FlowLinkIndex::Tail => vec.push(obj),
             FlowLinkIndex::Index(i) => vec.insert(*i, obj)
         }
+    }
+    pub fn new_index(idx: usize) -> Self {
+        FlowLinkIndex::Index(idx)
+    }
+    pub fn new_head() -> Self {
+        FlowLinkIndex::Head
+    }
+    pub fn new_tail() -> Self {
+        FlowLinkIndex::Tail
     }
 }
 impl Default for FlowLinkIndex {
