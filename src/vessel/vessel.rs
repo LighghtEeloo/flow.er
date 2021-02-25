@@ -26,7 +26,11 @@ impl Vessel {
     pub fn onload(&mut self) -> Result<(), Critic> {
         // trim flow
         self.trim()?;
-        self.vm_update();
+        self.vm_load();
+        Ok(())
+    }
+    pub fn refresh(&mut self) -> Result<(), Critic> {
+        self.vm_refresh();
         Ok(())
     }
     fn trim(&mut self) -> Result<(), Critic> {
@@ -37,8 +41,7 @@ impl Vessel {
             _ => Ok(())
         }
     }
-    fn vm_update(&mut self) {
-        // load vm
+    fn vm_load(&mut self) {
         self.vm_map = self.vm_info.iter().map(|(&router, vec_vm_type)| {
             let mut vec_vm: Vec< Box<dyn Artist<EntityId>> > = vec![];
             for vm_type in vec_vm_type.iter() {
@@ -59,6 +62,14 @@ impl Vessel {
             }
             (router, vec_vm)
         }).collect();
+    }
+    fn vm_refresh(&mut self) {
+        let flow = &self.flow;
+        self.vm_map.values_mut().for_each(|vec_vm| {
+            for vm in vec_vm.iter_mut() {
+                vm.flow_update(flow);
+            }
+        });
     }
     /// add / updates an entity. 
     /// 

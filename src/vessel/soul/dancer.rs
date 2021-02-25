@@ -49,7 +49,7 @@ where Id: Identity
 
 
 pub trait Dancer<Id>: Debug
-where Id: IdentityBase
+where Id: Identity
 {
     fn check(&self, obj: &Id) -> Result<Id, Critic>;
     /// Return the current pos in Dancer.

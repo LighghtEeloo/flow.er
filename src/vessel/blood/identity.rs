@@ -15,7 +15,6 @@ const LEN: usize = 6;
 
 pub trait IdentityBase: Hash + PartialEq + Eq + Debug {}
 
-// Todo: IdentityBase.
 /// For id.
 pub trait Identity: IdentityBase + Clone + Copy {
     fn from_u64(v: u64) -> Self;

@@ -64,6 +64,7 @@ impl Component for Vase {
                 // }
             }
         }
+        self.vessel.refresh();
         // Only self.vessel is saved.
         self.storage.store(KEY, Json(&self.vessel));
         res

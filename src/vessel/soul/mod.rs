@@ -11,5 +11,5 @@ pub mod prelude {
         dancer::{ Direction, FixState, Dancer },
         critic::{ Critic, FlowNodeNotFoundError, FlowNodeExistError, FlowNodeMismatchError },
     };
-    pub trait Artist<Id>: Dancer<Id> + Animator<Id> where Id: IdentityBase {}
+    pub trait Artist<Id>: Dancer<Id> + Animator<Id> where Id: Identity {}
 }

@@ -58,7 +58,7 @@ impl Default for FlowLinkIndex {
 }
 
 pub trait Architect<Id>: Debug
-where Id: IdentityBase
+where Id: Identity
 {
     /// add new if not-found; return error if exist.
     fn add(&mut self, obj: Id) -> Result<Id, Critic>;
