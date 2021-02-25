@@ -11,14 +11,52 @@ use super::prelude::*;
 
 #[derive(Debug, Default, Deserialize, Serialize)]
 pub struct Vessel {
-    entity_map: HashMap<EntityId, Entity>,
-    flow: Flow<EntityId>,
-    
+    pub entity_map: HashMap<EntityId, Entity>,
+    pub flow: Flow<EntityId>,
+    pub router: Router,
+    pub vm_info: VMInfo,
+
     #[serde(skip)]
-    buffer: String,
+    pub vm_map: VMMap,
+    #[serde(skip)]
+    pub buffer: String,
 }
 
 impl Vessel {
+    pub fn onload(&mut self) -> Result<(), Critic> {
+        // trim flow
+        self.trim()?;
+        // load vm
+        self.vm_map = self.vm_info.iter().map(|(&router, vec_vm_type)| {
+            let mut vec_vm: Vec< Box<dyn Artist<EntityId>> > = vec![];
+            for vm_type in vec_vm_type.iter() {
+                match vm_type {
+                    VMType::Inkblot(id) => {
+                        vec_vm.push(Inkblot::from_flow_boxed(&self.flow, id));
+                    }
+                    VMType::Linear(id) => {
+                        vec_vm.push(Linear::from_flow_boxed(&self.flow, id));
+                    }
+                    VMType::Tree(id) => {
+                        // Todo..
+                    }
+                    VMType::Graph(vec_id) => {
+    
+                    }
+                }
+            }
+            (router, vec_vm)
+        }).collect();
+        Ok(())
+    }
+    fn trim(&mut self) -> Result<(), Critic> {
+        match self.flow.trim().err().map(|vec| {
+            LOG!("Trimmed: {:?}", vec);
+        }) {
+            Some(_) => Err(FlowNodeMismatchError),
+            _ => Ok(())
+        }
+    }
     /// add / updates an entity. 
     /// 
     /// updates entity_map if entity exists; 
@@ -32,13 +70,32 @@ impl Vessel {
         self.flow.link(id, flow_link)?;
         Ok(())
     }
-    pub fn trim(&mut self) -> Result<(), Critic> {
-        match self.flow.trim().err().map(|vec| {
-            LOG!("Trimmed: {:?}", vec);
-        }) {
-            Some(_) => Err(FlowNodeMismatchError),
-            _ => Ok(())
-        }
-    }
+}
+
+
+#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, Deserialize, Serialize)]
+pub enum Router {
+    Cube,
+    Flow,
+    Calendar,
+    TimeCapsule,
+
+    Settings,
+}
+
+impl Default for Router {
+    fn default() -> Router { Router::Cube }
+}
+
+// #[derive(Debug, Default, Deserialize, Serialize)]
+pub type VMInfo = HashMap< Router, Vec< VMType > >;
+pub type VMMap = HashMap< Router, Vec< Box<dyn Artist<EntityId>> > >;
+
+#[derive(Debug, Deserialize, Serialize)]
+pub enum VMType {
+    Inkblot(EntityId),
+    Linear(EntityId),
+    Tree(EntityId),
+    Graph(Vec<EntityId>),
 }
 

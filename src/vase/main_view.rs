@@ -49,7 +49,7 @@ impl Vase {
 
     fn main_editor(&self) -> Html {
         let editor = 
-            match self.router {
+            match self.vessel.router {
                 Router::Cube => {
                     html! {}
                 }

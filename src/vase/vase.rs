@@ -3,18 +3,7 @@ use crate::yew_util::*;
 use super::prelude::*;
 
 
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum Router {
-    Cube,
-    Flow,
-    Calendar,
-    TimeCapsule,
-
-    Settings,
-}
-
 pub struct Vase {
-    pub router: Router,
     pub vessel: Vessel,
     pub storage: StorageService,
     pub link: ComponentLink<Self>,
@@ -42,13 +31,12 @@ impl Component for Vase {
             };
             vessel
         };
-        // Note: trim only on startup.
-        vessel.trim().err();
+        // Note: refresh on startup.
+        vessel.onload();
         // Test..
         LOG!("Loaded & Trimmed: {:#?}", vessel);
 
         Self {
-            router: Router::Cube,
             vessel,
             storage,
             link,
@@ -62,7 +50,7 @@ impl Component for Vase {
         for message in messages {
             res = match message {
                 SwitchRouter(router) => {
-                    self.router = router; true
+                    self.vessel.router = router; true
                 }
                 NoRender => false,
                 _ => {

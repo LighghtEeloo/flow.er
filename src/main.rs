@@ -77,8 +77,9 @@ mod time_util {
 mod yew_util {
     pub use yew::format::Json;
     pub use yew::web_sys::HtmlInputElement as InputElement;
-    pub use yew::{ html, Component, ComponentLink, Html, InputData, NodeRef, Properties, ShouldRender };
+    pub use yew::{ html, Bridge, Component, ComponentLink, Html, InputData, NodeRef, Properties, ShouldRender };
     pub use yew::{ events::KeyboardEvent };
+    pub use yew::agent::{ Bridged, Dispatched, Dispatcher };
     pub use yew_services::storage::{ Area, StorageService };
 }
 

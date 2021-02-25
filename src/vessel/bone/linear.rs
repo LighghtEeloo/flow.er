@@ -30,26 +30,29 @@ where Id: Identity
             fix: FixState::Deactivated
         }
     }
+    pub fn from_flow_boxed(flow: &Flow<Id>, target: &Id) -> Box<Self> {
+        Box::new(Self::from_flow(flow, target))
+    }
 }
 
 
 // // Artist
 
-// impl<Id> Artist<Id> for Linear<Id> where Id: Identity {}
+impl<Id> Artist<Id> for Linear<Id> where Id: Identity {}
 
 
-// // Animator
+// Animator
 
-// impl<Id> Animator<Id> for Linear<Id> 
-// where Id: Identity
-// {
-//     fn compute(&mut self) { 
-//         todo!() 
-//     }
-//     fn illustrate(&self) -> Html { 
-//         todo!() 
-//     }
-// }
+impl<Id> Animator<Id> for Linear<Id> 
+where Id: Identity
+{
+    fn compute(&mut self) { 
+        todo!() 
+    }
+    fn illustrate(&self) -> Html { 
+        todo!() 
+    }
+}
 
 
 // Dancer
