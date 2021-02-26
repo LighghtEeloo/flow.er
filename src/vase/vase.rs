@@ -22,6 +22,7 @@ pub enum VaseMsg {
     EraseEntity(EntityId),
     SetFocusId(VMMeta, EntityId),
     Focus(VMMeta),
+    // DelayedFocus(VMMeta),
     Wander(VMMeta, Direction, bool),
     NoRender
 }
@@ -77,7 +78,9 @@ impl Component for Vase {
 
     fn update(&mut self, messages: Self::Message) -> ShouldRender {
         use VaseMsg::*;
+        if messages.is_empty() { return false }
         LOG!("Updating: {:#?}.", messages);
+        // LOG!("self.vessel.vm_map: {:#?}", self.vessel.vm_map);
         let mut res = true;
         for message in messages {
             res = match message {
@@ -121,6 +124,10 @@ impl Component for Vase {
                     });
                     true
                 }
+                // DelayedFocus(vm_meta) => {
+                //     self.revisit(Vasey![Focus(vm_meta)]);
+                //     true
+                // }
                 Wander(vm_meta, dir, fixed) => {
                     let (router, vm_idx) = vm_meta;
                     self.vessel.vm_map.get_mut(&router).map(|vec| {
@@ -136,9 +143,9 @@ impl Component for Vase {
                 // _ => {
                 //     LOG!("No update pattern matched."); false
                 // }
-            }
+            };
+            self.vessel.refresh();
         }
-        self.vessel.refresh();
         // Only self.vessel is saved.
         self.storage.store(KEY, Json(&self.vessel));
         // Test..

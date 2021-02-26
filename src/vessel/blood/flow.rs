@@ -227,6 +227,7 @@ where Id: Identity
                 Ok(())
             }).filter_map(|x| x.err()).take(1)
         );
+        self.current();
         match err_vec.get(0) {
             Some(&e) => Err(e),
             _ => Ok(()) 

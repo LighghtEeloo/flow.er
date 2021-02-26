@@ -50,8 +50,17 @@ impl Artist<EntityId> for Linear<EntityId> {}
 impl Animator<EntityId> for Linear<EntityId> {
     fn flow_update(&mut self, flow: &Flow<EntityId>) {
         self.vec = flow.get(&self.title, "linear update failed").descendant.clone();
-        self.refs = HashMap::from_iter(self.vec.iter().cloned().map(|x| (x, NodeRef::default())) );
-        self.refs.insert(self.title.clone(), NodeRef::default());
+        let mut vec = self.vec.clone();
+        vec.push(self.title);
+        // final state: vec = refs
+        self.refs.retain(|&id, _| {
+            vec.iter().find(|&&x| id == x).is_some()
+        });
+        vec.iter().for_each(|&x| {
+            self.refs.entry(x).or_default();
+        });
+        // self.refs = HashMap::from_iter(self.vec.iter().cloned().map(|x| (x, NodeRef::default())) );
+        // self.refs.insert(self.title.clone(), NodeRef::default());
     }
     fn illustrate(&self, vm_meta: VMMeta, vessel: &Vessel, link: &ComponentLink<Vase>) -> Html {
         let (vm_router, vm_idx) = vm_meta;
@@ -72,18 +81,16 @@ impl Animator<EntityId> for Linear<EntityId> {
                         })
                         onkeydown=link.callback(move |e: KeyboardEvent| {
                             let meta = (e.ctrl_key(), e.shift_key(), e.code());
-                            LOG!("OnKeyDown: {:?}", meta);
                             match (meta.0, meta.1, meta.2.as_str()) { 
                                 (false, false, "ArrowDown") => Vasey![Wander(vm_meta, Direction::Descend, false)], 
                                 _ => Vasey![]
                             }
                         })
                         onkeyup=link.callback(move |e: KeyboardEvent| {
-                            LOG!("OnKeyUp: {:?}", e);
                             match e.code().as_str() { 
                                 "Enter" => Vasey!
                                     [ AddEntity(FlowLink::new_descend_head(owner_id))
-                                    // , Wander(vm_meta, Direction::Descend, false)
+                                    , Wander(vm_meta, Direction::Descend, false)
                                     ],
                                 _ => Vasey![] 
                             }
@@ -160,7 +167,6 @@ impl Linear<EntityId> {
                 })
                 onkeydown=link.callback(move |e: KeyboardEvent| {
                     let meta = (e.ctrl_key(), e.shift_key(), e.code());
-                    // LOG!("OnKeyDown: {:?}", meta);
                     match (meta.0, meta.1, meta.2.as_str()) { 
                         (false, false, "ArrowUp") => Vasey!
                             [Wander(vm_meta, Direction::Ascend, false)], 
@@ -170,39 +176,42 @@ impl Linear<EntityId> {
                             [Wander(vm_meta, Direction::Ascend, true)], 
                         (true, false, "ArrowDown") => Vasey!
                             [Wander(vm_meta, Direction::Descend, true)], 
-                        (false, false, "ArrowLeft") => Vasey![], 
-                        (false, false, "ArrowRight") => Vasey![], 
+                        // (false, false, "ArrowLeft") => Vasey![], 
+                        // (false, false, "ArrowRight") => Vasey![], 
                         _ => Vasey![]
                     }
                 })
                 // onkeypress=link.callback(move |e: KeyboardEvent| {
                 //     let meta = (e.ctrl_key(), e.shift_key(), e.code());
-                //     // LOG!("OnKeyPress: {:?}", meta);
                 //     match (meta.0, meta.1, meta.2.as_str()) { 
-                //         _ => Cubey![]
+                //         _ => Vasey![]
                 //     }
                 // })
                 onkeyup=link.callback(move |e: KeyboardEvent| {
                     let meta = (e.ctrl_key(), e.shift_key(), e.code());
-                    // LOG!("OnKeyUp: {:?}", meta);
                     match (meta.0, meta.1, meta.2.as_str()) { 
                         // enter
                         (false, false, "Enter") => Vasey!
                             [ AddEntity(FlowLink::new_descend_index(owner_id, idx + 1))
-                            // , Wander(vm_meta, Direction::Descend, false)
+                            , Wander(vm_meta, Direction::Descend, false)
                             ],
                         // // shift+enter
                         // (false, true, "Enter") => Vasey![],
-                        // // backspace
+                        // backspace
                         (_, _, "Backspace") => {
-                            if is_empty { Vasey![EraseEntity(id)] }
-                            else { Vasey![] }
+                            if is_empty { Vasey!
+                                [ EraseEntity(id)
+                                , Wander(vm_meta, Direction::Descend, false)
+                                ] 
+                            } else { Vasey![] }
                         }
-                        // // delete
-                        // (_, _, "Delete") => {
-                        //     if is_empty { Vasey![EraseEntity(id), EraseEntity(id), Wander(Direction::Descend, false)] }
-                        //     else { Vasey![] }
-                        // }
+                        // delete
+                        (_, _, "Delete") => {
+                            if is_empty { Vasey!
+                                [ EraseEntity(id)
+                                ] 
+                            } else { Vasey![] }
+                        }
                         // // ctrl released
                         // (true, _, "ControlLeft") => Vasey![Wander(Direction::Stay, false)],
                         // (true, _, "ControlRight") => Vasey![Wander(Direction::Stay, false)],
@@ -246,8 +255,6 @@ where Id: Identity
         }
         // Note: a pair of insert and remove!
         self.vec.insert(0, self.title);
-        LOG!("{:?}, {:?}", dir, fixed);
-        LOG!("{:?}", self.vec);
         let try_move = |delta: isize| -> Option<usize> {
             let current = self.current()?;
             let pos = self.vec.iter().position(|&x| x == current)? as isize;
@@ -258,9 +265,10 @@ where Id: Identity
         if fixed {
 
         } else {
-            try_move(dir.translate()).map(|pos| {
-                self.focus(self.vec[pos])
-            });
+            match try_move(dir.translate()) {
+                Some(pos) => self.focus(self.vec[pos]),
+                None => self.focus(self.title),
+            }
         }
         self.vec.remove(0);
     }

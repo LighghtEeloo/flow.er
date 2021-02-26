@@ -43,7 +43,9 @@ impl IdentityProduct<EntityId> for Entity {
         Self {
             id,
             time: TimeStamp::now(),
-            face: Face::new(),
+            // Debug: Direct Face!!
+            face: format!("{:?}", id),
+            // face: Face::new(),
             bubble: Bubble::new(),
             process: ProcessStatus::New,
             tags: TagSet::new()
