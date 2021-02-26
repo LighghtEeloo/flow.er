@@ -80,7 +80,9 @@
     margin: 0 auto;
     /* margin: 60px auto; */
     height: auto;
-    width: 60%;
+    min-width: 60%;
+    width: 400px;
+    max-width: 100%;
     /* border: solid 4px green; */
 }
 
