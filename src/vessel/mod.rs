@@ -10,5 +10,5 @@ pub mod prelude {
         soul::prelude::*,
         vessel::*,
     };
-    pub use crate::vase::prelude::{ Vase, VaseMsg };
+    pub use crate::vase::prelude::{ Vase, VaseMsg, VaseMsg::* };
 }

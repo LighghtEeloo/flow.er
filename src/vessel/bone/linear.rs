@@ -53,8 +53,10 @@ impl Animator<EntityId> for Linear<EntityId> {
         self.refs = HashMap::from_iter(self.vec.iter().cloned().map(|x| (x, NodeRef::default())) );
         self.refs.insert(self.title.clone(), NodeRef::default());
     }
-    fn illustrate(&self, vm_idx: usize, vessel: &Vessel, link: &ComponentLink<Vase>) -> Html {
+    fn illustrate(&self, vm_meta: VMMeta, vessel: &Vessel, link: &ComponentLink<Vase>) -> Html {
+        let (vm_router, vm_idx) = vm_meta;
         let title_entity = vessel.entity_map.get(&self.title).cloned().unwrap_or_default();
+        let title_id = title_entity.id();
         let vec_entity: Vec<Entity> = self.vec.iter().map(|id| vessel.entity_map.get(id).cloned().unwrap_or_default()).collect();
         html! {
             <div class="linear">
@@ -65,25 +67,39 @@ impl Animator<EntityId> for Linear<EntityId> {
                         placeholder="Enter node name."
                         aria-label="New Project Name"
                         value=title_entity.face
-                        // Todo..
+                        onfocus=link.callback(move |_| {
+                            Vasey![SetFocusId(vm_meta, title_id)]
+                        })
+                        onkeydown=link.callback(move |e: KeyboardEvent| {
+                            let meta = (e.ctrl_key(), e.shift_key(), e.code());
+                            LOG!("OnKeyDown: {:?}", meta);
+                            match (meta.0, meta.1, meta.2.as_str()) { 
+                                (false, false, "ArrowDown") => Vasey![Wander(vm_meta, Direction::Descend, false)], 
+                                _ => Vasey![]
+                            }
+                        })
+                        // onkeyup=link.callback(move |e: KeyboardEvent| {
+                        //     LOG!("OnKeyUp: {:?}", e);
+                        //     if e.key() == "Enter" { Vasey![AddNode] } else { Vasey![] }
+                        // })
                         oninput=link.callback(move |e: InputData| {
-                            [VaseMsg::WriteEntity(title_entity.id(), EntityField::Face(e.value))]
+                            Vasey![WriteEntity(title_id, EntityField::Face(e.value))]
                         })
                     />
                 </div>
                 <div class="node-group">
-                    { for vec_entity.iter().map(|entity| { self.node_view(entity, link) }) }
+                    { for vec_entity.iter().map(|entity| { self.node_view(vm_meta, entity, link) }) }
                 </div>
             </div>
         }
     }
 }
 impl Linear<EntityId> {
-    fn node_view(&self, entity: &Entity, link: &ComponentLink<Vase>) -> Html {
+    fn node_view(&self, vm_meta: VMMeta, entity: &Entity, link: &ComponentLink<Vase>) -> Html {
         html! {
             <div class="node">
                 { self.node_status_view(&entity, link) }
-                { self.node_input_view(&entity, link) }
+                { self.node_input_view(vm_meta, &entity, link) }
             </div>
         }
     }
@@ -101,7 +117,7 @@ impl Linear<EntityId> {
                 html! {
                     <div title={des.clone()}
                         onclick=link.callback(move |_| {
-                            [VaseMsg::WriteEntity(id, EntityField::ProcessStatus(process.clone()))]
+                            Vasey![WriteEntity(id, EntityField::ProcessStatus(process.clone()))]
                         })
                     > 
                         <img src={src} alt="process" /> 
@@ -122,7 +138,7 @@ impl Linear<EntityId> {
             </div> 
         }
     }
-    fn node_input_view(&self, entity: &Entity, link: &ComponentLink<Vase>) -> Html {
+    fn node_input_view(&self, vm_meta: VMMeta, entity: &Entity, link: &ComponentLink<Vase>) -> Html {
         let mut entity = entity.clone();
         let id = entity.id();
         let is_empty = entity.face.is_empty();
@@ -133,22 +149,22 @@ impl Linear<EntityId> {
                 value=entity.face
                 placeholder="..."
                 aria-label="Item"
-                // onfocus=link.callback(move |_| {
-                //     Cubey![SetFocusId(Some(id))]
-                // })
-                // onkeydown=link.callback(move |e: KeyboardEvent| {
-                //     let meta = (e.ctrl_key(), e.shift_key(), e.code());
-                //     // LOG!("OnKeyDown: {:?}", meta);
-                //     match (meta.0, meta.1, meta.2.as_str()) { 
-                //         (false, false, "ArrowUp") => Cubey![Wander(Direction::Ascend, false)], 
-                //         (false, false, "ArrowDown") => Cubey![Wander(Direction::Descend, false)], 
-                //         (true, false, "ArrowUp") => Cubey![Wander(Direction::Ascend, true)], 
-                //         (true, false, "ArrowDown") => Cubey![Wander(Direction::Descend, true)], 
-                //         (false, false, "ArrowLeft") => Cubey![], 
-                //         (false, false, "ArrowRight") => Cubey![], 
-                //         _ => Cubey![]
-                //     }
-                // })
+                onfocus=link.callback(move |_| {
+                    Vasey![SetFocusId(vm_meta, id)]
+                })
+                onkeydown=link.callback(move |e: KeyboardEvent| {
+                    let meta = (e.ctrl_key(), e.shift_key(), e.code());
+                    // LOG!("OnKeyDown: {:?}", meta);
+                    match (meta.0, meta.1, meta.2.as_str()) { 
+                        (false, false, "ArrowUp") => Vasey![Wander(vm_meta, Direction::Ascend, false)], 
+                        (false, false, "ArrowDown") => Vasey![Wander(vm_meta, Direction::Descend, false)], 
+                        (true, false, "ArrowUp") => Vasey![Wander(vm_meta, Direction::Ascend, true)], 
+                        (true, false, "ArrowDown") => Vasey![Wander(vm_meta, Direction::Descend, true)], 
+                        (false, false, "ArrowLeft") => Vasey![], 
+                        (false, false, "ArrowRight") => Vasey![], 
+                        _ => Vasey![]
+                    }
+                })
                 // onkeypress=link.callback(move |e: KeyboardEvent| {
                 //     let meta = (e.ctrl_key(), e.shift_key(), e.code());
                 //     // LOG!("OnKeyPress: {:?}", meta);
@@ -161,7 +177,7 @@ impl Linear<EntityId> {
                 //     // LOG!("OnKeyUp: {:?}", meta);
                 //     match (meta.0, meta.1, meta.2.as_str()) { 
                 //         // enter
-                //         (false, false, "Enter") => Cubey![NewNode(vec![id])],
+                //         (false, false, "Enter") => Cubey![AddNode()],
                 //         // shift+enter
                 //         (false, true, "Enter") => Cubey![],
                 //         // backspace
@@ -181,7 +197,7 @@ impl Linear<EntityId> {
                 //     }
                 // })
                 oninput=link.callback(move |e: InputData| {
-                    [VaseMsg::WriteEntity(id, EntityField::Face(e.value))]
+                    Vasey![WriteEntity(id, EntityField::Face(e.value))]
                 })
                 readonly=self.locked
             />
@@ -196,10 +212,13 @@ impl<Id> Dancer<Id> for Linear<Id>
 where Id: Identity
 {
     fn check(&self, obj: &Id) -> Result<Id, Critic> {
-        if self.vec.contains(obj) { Ok(*obj) } else { Err(FlowNodeNotFoundError) }
+        if self.vec.contains(obj) || *obj == self.title { Ok(*obj) } else { Err(FlowNodeNotFoundError) }
     }
     fn current(&self) -> Option<Id> {
         self.pos.clone()
+    }
+    fn current_ref(&self) -> Option<NodeRef> {
+        self.current().map(|id| {self.refs.get(&id).cloned()}).flatten()
     }
     fn focus(&mut self, obj: Id) {
         // validate obj.
@@ -212,12 +231,25 @@ where Id: Identity
             self.fix.deactivate();
             return
         }
-        // Todo: migrate linear in stockpile.
+        // Note: a pair of insert and remove!
+        self.vec.insert(0, self.title);
+        LOG!("{:?}, {:?}", dir, fixed);
+        LOG!("{:?}", self.vec);
+        let try_move = |delta: isize| -> Option<usize> {
+            let current = self.current()?;
+            let pos = self.vec.iter().position(|&x| x == current)? as isize;
+            let pos = pos + delta;
+            let pos = if pos < 0 { 0 } else if pos < self.vec.len() as isize { pos as usize } else { self.vec.len() - 1 };
+            Some(pos)
+        };
         if fixed {
 
         } else {
-
+            try_move(dir.translate()).map(|pos| {
+                self.focus(self.vec[pos])
+            });
         }
+        self.vec.remove(0);
     }
 }
 

@@ -22,6 +22,23 @@ macro_rules! LOG {
     }}
 }
 
+
+#[macro_export]
+macro_rules! Vasey {
+    () => (
+        vec![]
+    );
+    ( $( $x:expr ),* ) => {
+        {
+            let mut temp_vec = Vec::new();
+            $(
+                temp_vec.push($x);
+            )*
+            temp_vec
+        }
+    };
+}
+
 // /// Globaly: Global-y, create Message from an array of GlobalMessage-s.  
 // /// 
 // /// "-y" for Message macros.
@@ -55,7 +72,8 @@ pub mod util {
     //     Cubey,
     //     Branchy,
     //     Historyly,
-    //     Globaly
+    //     Globaly,
+        Vasey
     };
 
     pub use std::mem;

@@ -1,4 +1,5 @@
 use crate::util::*;
+use crate::yew_util::*;
 use super::prelude::*;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -57,6 +58,7 @@ where Id: Identity
     fn check(&self, obj: &Id) -> Result<Id, Critic>;
     /// Return the current pos in Dancer.
     fn current(&self) -> Option<Id>;
+    fn current_ref(&self) -> Option<NodeRef>;
     /// Update pos.
     fn focus(&mut self, obj: Id);
     fn wander(&mut self, dir: Direction, fixed: bool);

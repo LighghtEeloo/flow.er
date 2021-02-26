@@ -51,6 +51,10 @@ where Id: Identity
     fn current(&self) -> Option<Id> {
         self.pos.clone()
     }
+    
+    fn current_ref(&self) -> Option<NodeRef> {
+        None
+    }
     fn focus(&mut self, obj: Id) {
     }
     fn wander(&mut self, dir: Direction, fixed: bool) {

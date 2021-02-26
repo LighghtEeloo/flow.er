@@ -68,6 +68,7 @@ impl Vessel {
         self.vm_map.values_mut().for_each(|vec_vm| {
             for vm in vec_vm.iter_mut() {
                 vm.flow_update(flow);
+                vm.compute();
             }
         });
     }
@@ -113,6 +114,7 @@ impl Router {
 
 // #[derive(Debug, Default, Deserialize, Serialize)]
 pub type VMInfo = HashMap< Router, Vec< VMType > >;
+pub type VMMeta = (Router, usize);
 pub type VMMap = HashMap< Router, Vec< Box<dyn Artist<EntityId>> > >;
 
 #[derive(Debug, Deserialize, Serialize)]

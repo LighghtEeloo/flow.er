@@ -11,6 +11,8 @@ where Id: Identity
 {
     pub map: HashMap<Id, FlowNode<Id>>,
     pub roots: Vec<Id>,
+    #[serde(skip)]
+    refs: HashMap<Id, NodeRef>,
     pub pos: Option<Id>,
     pub fix: FixState<Id>,
 }
@@ -22,13 +24,20 @@ where Id: Identity
     pub fn new() -> Self {
         Flow::default()
     }
+    /// **Add / update link.**
+    /// 
     /// Add position: with target & dir. 
+    /// 
     /// Descend: obj.owner = target       and obj in target.descendants; 
+    /// 
     /// Ascend:  obj.owner = target.owner and obj in obj.owner.descendant, 
-    ///          target.owner = obj       and target in obj.descendants;
+    /// 
+    /// while    target.owner = obj       and target in obj.descendants;
+    /// 
     /// _: Descend target.
+    /// 
     /// if None is presented, create new root.
-    pub fn add_with_link(&mut self, obj: Id, flow_link: FlowLink<Id>) {
+    pub fn update_link(&mut self, obj: Id, flow_link: FlowLink<Id>) {
         let target = flow_link.target;
         let dir = flow_link.dir;
         let idx = flow_link.idx;
@@ -153,8 +162,9 @@ where Id: Identity
     fn default() -> Self {
         Self {
             map: HashMap::new(),
-            pos: None,
             roots: Vec::new(),
+            refs: HashMap::new(),
+            pos: None,
             fix: FixState::Deactivated,
         }
     }
@@ -224,22 +234,22 @@ where Id: Identity
 }
 
 
-// // Artist
+// Artist
 
 impl<Id> Artist<Id> for Flow<Id> where Id: Identity {}
 
 
-// // Animator
+// Animator
 
 impl<Id> Animator<Id> for Flow<Id> 
 where Id: Identity
 {
-    fn compute(&mut self) { 
-        todo!() 
-    }
-    fn illustrate(&self, vm_idx: usize, vessel: &Vessel, link: &ComponentLink<Vase>) -> Html { 
-        todo!() 
-    }
+    // fn compute(&mut self) { 
+    //     todo!() 
+    // }
+    // fn illustrate(&self, vm_idx: usize, vessel: &Vessel, link: &ComponentLink<Vase>) -> Html { 
+    //     todo!() 
+    // }
 }
 
 
@@ -253,6 +263,9 @@ where Id: Identity
     }
     fn current(&self) -> Option<Id> {
         self.pos.clone()
+    }
+    fn current_ref(&self) -> Option<NodeRef> {
+        self.current().map(|id| {self.refs.get(&id).cloned()}).flatten()
     }
     fn focus(&mut self, obj: Id) {
         // validate obj.

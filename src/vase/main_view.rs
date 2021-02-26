@@ -30,7 +30,7 @@ impl Vase {
                         <div class={if !bottom {"router"} else {"router router-bottom"}}>
                             <div class="router-content"
                                 onclick=self.link.callback(move |_| {
-                                    [VaseMsg::SwitchRouter(router)]
+                                    [SwitchRouter(router)]
                                 })
                             >
                                 <img src={src} alt={describe}/>
@@ -56,11 +56,11 @@ impl Vase {
                 let style = {
                     format!("width: {}%;", per_width) 
                     +&format!("left: {}%;", per_width * vm_idx as f64) 
-                    +&{ if vm_idx != 0 { format!("border-left: 2px solid gray;") } else { format!("") }}
+                    +&{ if vm_idx != 0 { format!("border-left: 2px solid gray;") } else { format!("") } }
                 };
                 html! {
                     <div class="vm" style={ style }>
-                        { vm.illustrate(vm_idx, &self.vessel, &self.link) }
+                        { vm.illustrate((router, vm_idx), &self.vessel, &self.link) }
                     </div>
                 }
             }).collect()

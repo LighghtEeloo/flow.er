@@ -9,7 +9,7 @@ where Id: Identity
         unimplemented!()
     }
     fn compute(&mut self) {}
-    fn illustrate(&self, vm_idx: usize, vessel: &Vessel, link: &ComponentLink<Vase>) -> Html {
+    fn illustrate(&self, vm_meta: VMMeta, vessel: &Vessel, link: &ComponentLink<Vase>) -> Html {
         unimplemented!()
     }
 }
