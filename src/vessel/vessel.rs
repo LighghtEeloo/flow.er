@@ -82,6 +82,11 @@ impl Vessel {
         self.flow.link(id, flow_link)?;
         Ok(())
     }
+    pub fn erase_entity(&mut self, obj: EntityId) -> Result<(), Critic> {
+        self.flow.del(obj)?;
+        self.entity_map.remove(&obj);
+        Ok(())
+    }
 }
 
 

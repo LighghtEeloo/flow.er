@@ -37,19 +37,21 @@ pub struct FlowLink<Id> {
     pub idx: FlowLinkIndex
 }
 impl<Id> FlowLink<Id> {
-    pub fn new_descend(target: Id, idx: FlowLinkIndex) -> Self {
+    fn new_descend(target: Id, idx: FlowLinkIndex) -> Self {
         Self {
             target: Some(target),
             dir: Direction::Descend,
             idx, 
         }
     }
+    pub fn new_descend_head(target: Id) -> Self {
+        Self::new_descend(target, FlowLinkIndex::Head)
+    }
     pub fn new_descend_tail(target: Id) -> Self {
-        Self {
-            target: Some(target),
-            dir: Direction::Descend,
-            idx: FlowLinkIndex::Tail, 
-        }
+        Self::new_descend(target, FlowLinkIndex::Tail)
+    }
+    pub fn new_descend_index(target: Id, idx: usize) -> Self {
+        Self::new_descend(target, FlowLinkIndex::Index(idx))
     }
 }
 

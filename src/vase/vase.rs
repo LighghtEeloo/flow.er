@@ -19,6 +19,7 @@ pub enum VaseMsg {
     AddEntity(FlowLink<EntityId>),
     LinkEntity(EntityId, FlowLink<EntityId>),
     WriteEntity(EntityId, EntityField),
+    EraseEntity(EntityId),
     SetFocusId(VMMeta, EntityId),
     Focus(VMMeta),
     Wander(VMMeta, Direction, bool),
@@ -94,6 +95,10 @@ impl Component for Vase {
                 }
                 WriteEntity(id, field) => {
                     self.vessel.entity_map.get_mut(&id).map(|x| x.update_entity(field));
+                    true
+                }
+                EraseEntity(id) => {
+                    self.vessel.erase_entity(id).err();
                     true
                 }
                 SetFocusId((router, vm_idx), id) => {

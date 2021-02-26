@@ -210,6 +210,7 @@ where Id: Identity
     }
     /// depends on self.get_owners to collect.
     fn del(&mut self, obj: Id) -> Result<(), Critic> { 
+        let vec_owners = self.get_owners(&obj);
         let node_obj = self.map.remove(&obj).ok_or(FlowNodeNotFoundError)?;
         let mut err_vec: Vec<Critic> = vec![];
         err_vec.extend(
@@ -220,7 +221,7 @@ where Id: Identity
             }).filter_map(|x| x.err()).take(1)
         );
         err_vec.extend(
-            self.get_owners(&obj).into_iter().map(|tar| -> Result<(), Critic> {
+            vec_owners.into_iter().map(|tar| -> Result<(), Critic> {
                 let node_tar = self.map.get_mut(&tar).ok_or(FlowNodeNotFoundError)?;
                 node_tar.descendant.retain(|&x| x != obj);
                 Ok(())

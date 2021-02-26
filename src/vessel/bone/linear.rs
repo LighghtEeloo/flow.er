@@ -56,7 +56,7 @@ impl Animator<EntityId> for Linear<EntityId> {
     fn illustrate(&self, vm_meta: VMMeta, vessel: &Vessel, link: &ComponentLink<Vase>) -> Html {
         let (vm_router, vm_idx) = vm_meta;
         let title_entity = vessel.entity_map.get(&self.title).cloned().unwrap_or_default();
-        let title_id = title_entity.id();
+        let owner_id = title_entity.id();
         let vec_entity: Vec<Entity> = self.vec.iter().map(|id| vessel.entity_map.get(id).cloned().unwrap_or_default()).collect();
         html! {
             <div class="linear">
@@ -64,11 +64,11 @@ impl Animator<EntityId> for Linear<EntityId> {
                     <input
                         type="Text"
                         ref=self.refs.get(&self.title).cloned().unwrap_or_default()
-                        placeholder="Enter node name."
-                        aria-label="New Project Name"
+                        placeholder="An arbitrary node."
+                        aria-label="Arbitrary Node"
                         value=title_entity.face
                         onfocus=link.callback(move |_| {
-                            Vasey![SetFocusId(vm_meta, title_id)]
+                            Vasey![SetFocusId(vm_meta, owner_id)]
                         })
                         onkeydown=link.callback(move |e: KeyboardEvent| {
                             let meta = (e.ctrl_key(), e.shift_key(), e.code());
@@ -78,28 +78,34 @@ impl Animator<EntityId> for Linear<EntityId> {
                                 _ => Vasey![]
                             }
                         })
-                        // onkeyup=link.callback(move |e: KeyboardEvent| {
-                        //     LOG!("OnKeyUp: {:?}", e);
-                        //     if e.key() == "Enter" { Vasey![AddNode] } else { Vasey![] }
-                        // })
+                        onkeyup=link.callback(move |e: KeyboardEvent| {
+                            LOG!("OnKeyUp: {:?}", e);
+                            match e.code().as_str() { 
+                                "Enter" => Vasey!
+                                    [ AddEntity(FlowLink::new_descend_head(owner_id))
+                                    // , Wander(vm_meta, Direction::Descend, false)
+                                    ],
+                                _ => Vasey![] 
+                            }
+                        })
                         oninput=link.callback(move |e: InputData| {
-                            Vasey![WriteEntity(title_id, EntityField::Face(e.value))]
+                            Vasey![WriteEntity(owner_id, EntityField::Face(e.value))]
                         })
                     />
                 </div>
                 <div class="node-group">
-                    { for vec_entity.iter().map(|entity| { self.node_view(vm_meta, entity, link) }) }
+                    { for vec_entity.iter().enumerate().map(|(idx, entity)| { self.node_view(idx, entity, owner_id, vm_meta, link) }) }
                 </div>
             </div>
         }
     }
 }
 impl Linear<EntityId> {
-    fn node_view(&self, vm_meta: VMMeta, entity: &Entity, link: &ComponentLink<Vase>) -> Html {
+    fn node_view(&self, idx: usize, entity: &Entity, owner_id: EntityId, vm_meta: VMMeta, link: &ComponentLink<Vase>) -> Html {
         html! {
             <div class="node">
                 { self.node_status_view(&entity, link) }
-                { self.node_input_view(vm_meta, &entity, link) }
+                { self.node_input_view(idx, &entity, owner_id, vm_meta, link) }
             </div>
         }
     }
@@ -138,7 +144,7 @@ impl Linear<EntityId> {
             </div> 
         }
     }
-    fn node_input_view(&self, vm_meta: VMMeta, entity: &Entity, link: &ComponentLink<Vase>) -> Html {
+    fn node_input_view(&self, idx: usize, entity: &Entity, owner_id: EntityId, vm_meta: VMMeta, link: &ComponentLink<Vase>) -> Html {
         let mut entity = entity.clone();
         let id = entity.id();
         let is_empty = entity.face.is_empty();
@@ -156,10 +162,14 @@ impl Linear<EntityId> {
                     let meta = (e.ctrl_key(), e.shift_key(), e.code());
                     // LOG!("OnKeyDown: {:?}", meta);
                     match (meta.0, meta.1, meta.2.as_str()) { 
-                        (false, false, "ArrowUp") => Vasey![Wander(vm_meta, Direction::Ascend, false)], 
-                        (false, false, "ArrowDown") => Vasey![Wander(vm_meta, Direction::Descend, false)], 
-                        (true, false, "ArrowUp") => Vasey![Wander(vm_meta, Direction::Ascend, true)], 
-                        (true, false, "ArrowDown") => Vasey![Wander(vm_meta, Direction::Descend, true)], 
+                        (false, false, "ArrowUp") => Vasey!
+                            [Wander(vm_meta, Direction::Ascend, false)], 
+                        (false, false, "ArrowDown") => Vasey!
+                            [Wander(vm_meta, Direction::Descend, false)], 
+                        (true, false, "ArrowUp") => Vasey!
+                            [Wander(vm_meta, Direction::Ascend, true)], 
+                        (true, false, "ArrowDown") => Vasey!
+                            [Wander(vm_meta, Direction::Descend, true)], 
                         (false, false, "ArrowLeft") => Vasey![], 
                         (false, false, "ArrowRight") => Vasey![], 
                         _ => Vasey![]
@@ -172,30 +182,33 @@ impl Linear<EntityId> {
                 //         _ => Cubey![]
                 //     }
                 // })
-                // onkeyup=link.callback(move |e: KeyboardEvent| {
-                //     let meta = (e.ctrl_key(), e.shift_key(), e.code());
-                //     // LOG!("OnKeyUp: {:?}", meta);
-                //     match (meta.0, meta.1, meta.2.as_str()) { 
-                //         // enter
-                //         (false, false, "Enter") => Cubey![AddNode()],
-                //         // shift+enter
-                //         (false, true, "Enter") => Cubey![],
-                //         // backspace
-                //         (_, _, "Backspace") => {
-                //             if is_empty { Cubey![EraseNode(id)] }
-                //             else { Cubey![] }
-                //         }
-                //         // delete
-                //         (_, _, "Delete") => {
-                //             if is_empty { Cubey![EraseNode(id), EraseNode(id), Wander(Direction::Descend, false)] }
-                //             else { Cubey![] }
-                //         }
-                //         // ctrl released
-                //         (true, _, "ControlLeft") => Cubey![Wander(Direction::Stay, false)],
-                //         (true, _, "ControlRight") => Cubey![Wander(Direction::Stay, false)],
-                //         _ => Cubey![] 
-                //     }
-                // })
+                onkeyup=link.callback(move |e: KeyboardEvent| {
+                    let meta = (e.ctrl_key(), e.shift_key(), e.code());
+                    // LOG!("OnKeyUp: {:?}", meta);
+                    match (meta.0, meta.1, meta.2.as_str()) { 
+                        // enter
+                        (false, false, "Enter") => Vasey!
+                            [ AddEntity(FlowLink::new_descend_index(owner_id, idx + 1))
+                            // , Wander(vm_meta, Direction::Descend, false)
+                            ],
+                        // // shift+enter
+                        // (false, true, "Enter") => Vasey![],
+                        // // backspace
+                        (_, _, "Backspace") => {
+                            if is_empty { Vasey![EraseEntity(id)] }
+                            else { Vasey![] }
+                        }
+                        // // delete
+                        // (_, _, "Delete") => {
+                        //     if is_empty { Vasey![EraseEntity(id), EraseEntity(id), Wander(Direction::Descend, false)] }
+                        //     else { Vasey![] }
+                        // }
+                        // // ctrl released
+                        // (true, _, "ControlLeft") => Vasey![Wander(Direction::Stay, false)],
+                        // (true, _, "ControlRight") => Vasey![Wander(Direction::Stay, false)],
+                        _ => Vasey![] 
+                    }
+                })
                 oninput=link.callback(move |e: InputData| {
                     Vasey![WriteEntity(id, EntityField::Face(e.value))]
                 })
