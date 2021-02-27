@@ -59,7 +59,7 @@ impl Component for Vase {
     
                 vessel.vm_info = HashMap::new();
                 vessel.vm_info.insert(Router::Cube, vec![VMType::Inkblot(root_id)]);
-                // vessel.vm_info.insert(Router::Cube, vec![VMType::Linear(root_id), VMType::Inkblot(root_id)]);
+                vessel.vm_info.insert(Router::Cube, vec![VMType::Linear(root_id), VMType::Inkblot(root_id)]);
                 // vessel.vm_info.insert(Router::Cube, vec![VMType::Linear(entity.id()), VMType::Linear(entity.id())]);
                 Ok(())
             };

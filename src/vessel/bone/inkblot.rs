@@ -10,9 +10,6 @@ pub struct Inkblot<Id>
 where Id: Identity
 {
     pub target: Id,
-    // #[serde(skip)]
-    // refs: HashMap<Id, NodeRef>,
-    pub pos: Option<Id>,
 }
 
 impl<Id> Inkblot<Id>
@@ -21,7 +18,6 @@ where Id: Identity
     pub fn from_flow(flow: &Flow<Id>, target: &Id) -> Self {
         Self {
             target: *target,
-            pos: None,
         }
     }
     pub fn from_flow_boxed(flow: &Flow<Id>, target: &Id) -> Box<Self> {
@@ -97,7 +93,7 @@ where Id: Identity
         Ok(*obj)
     }
     fn current(&self) -> Option<Id> {
-        self.pos.clone()
+        None
     }
     
     fn current_ref(&self) -> Option<NodeRef> {

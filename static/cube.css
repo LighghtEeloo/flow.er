@@ -11,10 +11,12 @@
 
 .cube .vm {
     position: absolute;
+    display: block;
     border: none;
     outline: none;
     height: 100%;
     box-sizing: border-box;
+    --headerHeight: 80px;
 }
 
 .inkblot {
@@ -24,20 +26,22 @@
 }
 
 .inkblot textarea.bubble {
-    position: relative;
+    position: absolute;
     margin: 0 auto;
     display: block;
-    top: 0; bottom: 0; left: 0; right: 0;
+    top: var(--headerHeight); 
+    bottom: 0; left: 0; right: 0;
     background-color: transparent;
     font-family: var(--bubbleFont);
     font-size: normal;
+    border-color: rgba(63, 63, 63, 0.2);
     /* border: solid gray 1px; */
     /* border: none; */
     outline: none;
-    min-width: 60%;
+    min-width: 70%;
     width: 300px;
     max-width: 100%;
-    height: 70%;
+    height: calc(100% - var(--headerHeight));
     resize: none;
 }
 
@@ -74,11 +78,12 @@
 .inkblot .head input,
 .linear .head input {
     width: 100%;
-    min-height: 60px;
-    height: 10%;
+    min-height: 10%;
+    height: var(--headerHeight);
     position: relative;
     top: 0; right: 0; bottom: 0; left: 0;
-    margin: 2.5% auto;
+    margin: 0 auto;
+    /* margin: 2.5% auto; */
     padding: 0;
     background-color: rgba(0,0,0,0);
     border: none;
@@ -111,7 +116,7 @@
     top: 0; right: 0; bottom: 0; left: 0;
     margin: 0 auto;
     height: auto;
-    min-width: 60%;
+    min-width: 70%;
     width: 400px;
     max-width: 100%;
 }
