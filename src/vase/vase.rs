@@ -41,9 +41,11 @@ impl Component for Vase {
             };
             // Debug..
             // let mut vessel = Vessel::default();
+            let mut vessel = vessel;
 
-            // let mut init_test = || -> Result<(), Critic> {
-            //     let mut entity = Entity::default();
+            let mut init_test = || -> Result<(), Critic> {
+                let mut root_id = vessel.flow.roots.get(0).cloned().unwrap_or_default();
+                // let mut entity = Entity::default();
             //     entity.face = format!("{:?}", entity.time);
             //     vessel.insert_entity(entity.clone(), FlowLink::default())?;
     
@@ -55,12 +57,14 @@ impl Component for Vase {
             //     b.face = format!("B - {}", b.time);
             //     vessel.insert_entity( b, FlowLink::new_descend_tail(entity.id()) )?;
     
-            //     vessel.vm_info = HashMap::new();
-            //     vessel.vm_info.insert(Router::Cube, vec![VMType::Linear(entity.id()), VMType::Linear(entity.id())]);
-            //     Ok(())
-            // };
+                vessel.vm_info = HashMap::new();
+                vessel.vm_info.insert(Router::Cube, vec![VMType::Inkblot(root_id)]);
+                // vessel.vm_info.insert(Router::Cube, vec![VMType::Linear(root_id), VMType::Inkblot(root_id)]);
+                // vessel.vm_info.insert(Router::Cube, vec![VMType::Linear(entity.id()), VMType::Linear(entity.id())]);
+                Ok(())
+            };
 
-            // init_test().err().map(|x| LOG!("{:?}", x));
+            init_test().err().map(|x| LOG!("{:?}", x));
 
             vessel
         };

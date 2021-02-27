@@ -36,7 +36,7 @@
     top: calc(var(--history-span-height) * -0.25);
     height: var(--history-span-height);
     font-size: var(--history-span-height);
-    font-family: var(--adviceFont);
+    font-family: var(--headFont);
     line-height: var(--history-span-height);
 }
 
