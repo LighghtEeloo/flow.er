@@ -4,6 +4,8 @@ A *notebook* and *mind-map* app, integrated with *todo-list* and *calendar* view
 
 Flow.er is a Rust WASM app running in browser. It uses local storage tech to save cache, and supports downloading all progress / exporting to clipboard. One can import data back with source code mode.
 
+***Notice: this repo is under heavy development, and is currently not usable. To see the demo version, you can try `tracer-yew-lock` branch, which is the last version of this software and is already usable. For detailed concerns, please read [this](https://github.com/LighghtEeloo/flow.er/issues/1#issuecomment-785710178) and follow the instructions below.***
+
 ## Dev Install
 
 This projects uses `trunk` as a Rust WASM application bundler.
