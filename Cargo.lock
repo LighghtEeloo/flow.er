@@ -95,6 +95,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "flow-arena"
+version = "0.1.0"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "flow_er"
 version = "0.2.4"
 dependencies = [

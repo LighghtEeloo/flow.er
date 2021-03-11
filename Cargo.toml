@@ -4,6 +4,7 @@ version = "0.2.4"
 authors = ["LighghtEeloo <eelooecho@163.com>"]
 edition = "2018"
 readme = "readme.md"
+repository = "https://github.com/LighghtEeloo/flow.er"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -33,3 +34,7 @@ rev = "3740140"
 package = "yew-services"
 
 
+[workspace]
+members = [
+	"flow-arena",
+]
