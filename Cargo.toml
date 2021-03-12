@@ -6,8 +6,6 @@ edition = "2018"
 readme = "readme.md"
 repository = "https://github.com/LighghtEeloo/flow.er"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 # strum = "0.20"
 # strum_macros = "0.20"
@@ -17,11 +15,6 @@ serde_json = "1"
 wasm-timer = "0.2.0"
 chrono = { version = "0.4", features = ["unstable-locales"] }
 
-
-# yew = { path = "C:\\Xpace\\Repo\\yew\\packages\\yew" }
-# yew-services = { path = "C:\\Xpace\\Repo\\yew\\packages\\yew-services" }
-# yew = { path = "/home/lighght/Yggdrasill/Hof/Repo/yew/packages/yew" }
-# yew-services = { path = "/home/lighght/Yggdrasill/Hof/Repo/yew/packages/yew-services" }
 
 [dependencies.yew]
 git = "https://github.com/yewstack/yew.git"
@@ -36,5 +29,6 @@ package = "yew-services"
 
 [workspace]
 members = [
-	"flow-arena",
+	"flow_arena",
+	"flow_vessel"
 ]

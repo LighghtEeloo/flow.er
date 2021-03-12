@@ -49,7 +49,7 @@ pub trait FlowLike {
     fn devote_push(&mut self, obj: &Self::Id, des: &Self::Id) -> Result<(), ()>;
     /// removes from node_map and purges.
     fn decay(&mut self, obj: &Self::Id) -> Result<(), ()>;
-    /// cuts all the links, but doesn't remove.
+    /// cuts all the links (except root), but doesn't remove.
     fn purge(&mut self, obj: &Self::Id) -> Result<(), ()>;
 }
 
@@ -76,26 +76,27 @@ impl<Id: Clone + Hash + Eq + Default + Debug> Flow<Id> {
     #[cfg(debug_assertions)]
     fn check(&self) {
         for (id, node) in self.node_map.iter() {
+            let current_str = format!(", current: \nid: {:?}, \nnode: {:#?}", id, node);
             assert_eq!(id.clone(), node.id);
             if id.clone() == self.root {
                 // root identical
-                assert_eq!(Id::default(), self.root);
+                assert_eq!(Id::default(), self.root, "! root identical {}", current_str);
                 // root has no parent
-                assert_eq!(node.parent, None);
+                assert_eq!(node.parent, None, "! root non-parent {}", current_str);
             } else {
                 // nodes must have parent, except for root
-                assert_ne!(node.parent, None);
+                assert_ne!(node.parent, None, "! nodes must have parent {}", current_str);
             }
-            // // children exist
+            // children exist
             node.children.iter().for_each(|id| {
-                assert!(self.node_map.get(id).is_some())
+                assert!(self.node_map.get(id).is_some(), "! children exist {}", current_str)
             });
             // parent exist
             if let Some(parent_id) = node.parent.clone() {
                 let maybe = self.node_map.get(&parent_id);
-                assert!(maybe.is_some());
+                assert!(maybe.is_some(), "! parent exist {}", current_str);
                 if let Some(node) = maybe {
-                    assert!(node.children.iter().find(|x| x.clone() == id).is_some())
+                    assert!(node.children.iter().find(|x| x.clone() == id).is_some(), "! parent has children {}", current_str)
                 }
             }
         }
@@ -108,11 +109,11 @@ impl<Id: Clone + Hash + Eq + Default + Debug> FlowLike for Flow<Id> {
     type NodeRef = Node<Id>;
     /// ensures root and returns it
     fn root(&mut self) -> &mut Node<Id> {
-        if cfg!(debug_assertions) { self.check() };
+        // no check because not necessarily clean
         self.node_map.entry(Id::default()).or_default()
     }
     fn node(&self, obj: &Id) -> Option<&Node<Id>> {
-        if cfg!(debug_assertions) { self.check() };
+        // no check because no change
         self.node_map.get(obj)
     }
     fn grow(&mut self, mut obj: Node<Id>) -> Result<(), ()> {
@@ -160,11 +161,13 @@ impl<Id: Clone + Hash + Eq + Default + Debug> FlowLike for Flow<Id> {
     /// removes from node_map and purges.
     fn decay(&mut self, obj: &Id) -> Result<(), ()> {
         if cfg!(debug_assertions) { self.check() };
-        self.node_map.remove(obj).map(|_|
-            self.purge(obj).ok()
+        self.purge(obj).ok().map(|_|
+            self.node_map.remove(obj).map(|_|
+                self.root().children.retain(|rooted| rooted != obj)
+            )
         ).flatten().ok_or(())
     }
-    /// cuts all the links, but doesn't remove.
+    /// cuts all the links (except root), but doesn't remove.
     fn purge(&mut self, obj: &Id) -> Result<(), ()> {
         if cfg!(debug_assertions) { self.check() };
         for (_, node) in self.node_map.iter_mut() {
@@ -175,6 +178,8 @@ impl<Id: Clone + Hash + Eq + Default + Debug> FlowLike for Flow<Id> {
                 .clone()
                 .and_then(|x| if x == *obj { Some(root) } else { Some(x) });
         }
+        // must be in root
+        self.root().children.push(obj.clone());
         Ok(())
     }
 }
@@ -186,10 +191,6 @@ impl<Id: Serialize + Hash + Eq> Serialize for Flow<Id> {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         let mut flow = serializer.serialize_struct("Flow", 2)?;
         flow.serialize_field("root", &self.root)?;
-        // let mut seq = serializer.serialize_seq(Some(self.node_map.len()))?;
-        // for (_, e) in self.node_map {
-        //     seq.serialize_element(e)?;
-        // }
         let seq: Vec<&Node<Id>> = self.node_map.values().collect();
         flow.serialize_field("node_map", &seq)?;
         flow.end()
@@ -353,11 +354,9 @@ mod tests {
         let node: NodeEntity = Node::from_id(1.into());
         print_wrapper(&serde_json::to_string(&node).unwrap(), false);
         let flow = make_flow(false);
-        // println!("{:#?}", flow);
         let str = serde_json::to_string(&flow).unwrap();
         print_wrapper(&str, false);
         let _flow: FlowEntity = serde_json::from_str(&str).unwrap();
-        // println!("{:#?}", _flow);
         assert_eq!(flow, _flow)
     }
 }
