@@ -3,18 +3,18 @@ use std::{collections::HashMap, fmt::Debug, hash::Hash};
 #[cfg(feature = "serde1")]
 use serde::{Serialize, Deserialize};
 
-use crate::{Flow, FlowLike, Node};
+use crate::{FlowArena, FlowLike, Node};
 
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct FlowArena<Id: Hash + Eq + Clone, Entity> {
-    flow: Flow<Id>,
+    flow: FlowArena<Id>,
     map: HashMap<Id, Entity>
 }
 
 impl<Id: Clone + Hash + Eq + Default + Debug, Entity> FlowArena<Id, Entity> {
     pub fn new() -> Self {
         Self {
-            flow: Flow::new(),
+            flow: FlowArena::new(),
             map: HashMap::new()
         }
     }

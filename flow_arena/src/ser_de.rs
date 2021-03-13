@@ -1,14 +1,14 @@
-use super::{Node, Flow};
+use super::{Node, FlowArena};
 use std::{fmt, hash::Hash};
 
 #[cfg(feature = "serde1")]
 use serde::ser::{Serialize, Serializer, SerializeStruct};
 #[cfg(feature = "serde1")]
-impl<Id: Serialize + Hash + Eq> Serialize for Flow<Id> {
+impl<Id: Serialize + Hash + Eq, Entity: Serialize> Serialize for FlowArena<Id, Entity> {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         let mut flow = serializer.serialize_struct("Flow", 2)?;
         flow.serialize_field("root", &self.root)?;
-        let seq: Vec<&Node<Id>> = self.node_map.values().collect();
+        let seq: Vec<&Node<Id, Entity>> = self.node_map.values().collect();
         flow.serialize_field("node_map", &seq)?;
         flow.end()
     }
@@ -19,7 +19,7 @@ use serde::de::{self, Deserialize, Deserializer, Visitor, SeqAccess, MapAccess};
 #[cfg(feature = "serde1")]
 use std::marker::PhantomData;
 #[cfg(feature = "serde1")]
-impl<'de, Id: Clone + Hash + Eq + Deserialize<'de>> Deserialize<'de> for Flow<Id> {
+impl<'de, Id: Deserialize<'de> + Clone + Hash + Eq, Entity: Deserialize<'de>> Deserialize<'de> for FlowArena<Id, Entity> {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         enum Field { Root, NodeMap }
         impl<'de> Deserialize<'de> for Field {
@@ -49,15 +49,15 @@ impl<'de, Id: Clone + Hash + Eq + Deserialize<'de>> Deserialize<'de> for Flow<Id
             }
         }
 
-        struct FlowVisitor<Id: Hash + Eq> {
-            marker: PhantomData<fn() -> Flow<Id>>
+        struct FlowVisitor<Id: Hash + Eq, Entity> {
+            marker: PhantomData<fn() -> FlowArena<Id, Entity>>
         }
 
-        impl<'de, Id: Clone + Hash + Eq + Deserialize<'de>> Visitor<'de> for FlowVisitor<Id> {
-            type Value = Flow<Id>;
+        impl<'de, Id: Deserialize<'de> + Clone + Hash + Eq, Entity: Deserialize<'de>> Visitor<'de> for FlowVisitor<Id, Entity> {
+            type Value = FlowArena<Id, Entity>;
 
             fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-                formatter.write_str("struct Flow")
+                formatter.write_str("struct FlowArena")
             }
 
             fn visit_seq<V>(self, mut seq: V) -> Result<Self::Value, V::Error>
@@ -66,7 +66,7 @@ impl<'de, Id: Clone + Hash + Eq + Deserialize<'de>> Deserialize<'de> for Flow<Id
             {
                 let root = seq.next_element()?
                     .ok_or_else(|| de::Error::invalid_length(0, &self))?;
-                let node_vec: Vec<Node<Id>> = seq.next_element()?
+                let node_vec: Vec<Node<Id, Entity>> = seq.next_element()?
                     .ok_or_else(|| de::Error::invalid_length(1, &self))?;
                 let node_map = node_vec.into_iter().map(|node| (node.id().clone(), node)).collect();
                 Ok(Self::Value { root, node_map })
@@ -90,7 +90,7 @@ impl<'de, Id: Clone + Hash + Eq + Deserialize<'de>> Deserialize<'de> for Flow<Id
                             if node_map.is_some() {
                                 return Err(de::Error::duplicate_field("node_map"));
                             }
-                            let node_vec: Vec<Node<Id>> = map.next_value()?;
+                            let node_vec: Vec<Node<Id, Entity>> = map.next_value()?;
                             node_map = Some(node_vec.into_iter().map(|node| (node.id().clone(), node)).collect());
                         }
                     }

@@ -1,9 +1,11 @@
-use flow_arena::{FlowArena, Flow, Node};
+// use flow_arena::{FlowArena, Node};
 
 #[cfg(test)]
 mod tests {
+    // use super::*;
     #[test]
     fn it_works() {
-        assert_eq!(2 + 2, 4);
+        // let flow: FlowArena<Id> = FlowArena::new();
+
     }
 }

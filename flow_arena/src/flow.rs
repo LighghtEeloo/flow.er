@@ -6,19 +6,21 @@ use serde::{Serialize, Deserialize};
 #[derive(Clone, Default)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 #[cfg_attr(debug_assertions, derive(PartialEq))]
-pub struct Node<Id> {
+pub struct Node<Id, Entity> {
     id: Id,
+    pub entity: Entity,
     parent: Option<Id>,
     children: Vec<Id>,
 }
 
-impl<Id> Node<Id> {
+impl<Id, Entity> Node<Id, Entity> {
     pub fn id(&self) -> &Id {
         &self.id
     }
-    pub fn from_id(id: Id) -> Self {
+    pub fn from_id(id: Id, entity: Entity) -> Self {
         Node {
             id,
+            entity,
             parent: None,
             children: Vec::new(),
         }
@@ -26,16 +28,17 @@ impl<Id> Node<Id> {
 }
 
 #[cfg(debug_assertions)]
-impl<Id: Debug> Debug for Node<Id> {
+impl<Id: Debug, Entity: Debug> Debug for Node<Id, Entity> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct(format!("{:?}", self.id()).as_str())
             .field("parent", &self.parent)
             .field("children", &self.children)
+            .field(":", &self.entity)
             .finish()
     }
 }
 
-pub trait FlowLike {
+pub trait Flow {
     type Id;
     type Node;
     type NodeRef;
@@ -57,19 +60,21 @@ pub trait FlowLike {
 
 #[derive(Clone)]
 #[cfg_attr(debug_assertions, derive(PartialEq, Debug))]
-pub struct Flow<Id: Hash + Eq> {
+pub struct FlowArena<Id: Hash + Eq, Entity> {
     /// root: can be a Nil node or a dummy node, but must be in node_map.
     pub(crate) root: Id,
-    pub(crate) node_map: HashMap<Id, Node<Id>>,
+    pub(crate) node_map: HashMap<Id, Node<Id, Entity>>,
 }
 
-impl<Id: Clone + Hash + Eq + Default + Debug> Flow<Id> {
+pub type FlowPure<Id> = FlowArena<Id, ()>;
+
+impl<Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug> FlowArena<Id, Entity> {
     pub fn new() -> Self {
-        let node: Node<Id> = Node::default();
+        let node: Node<Id, Entity> = Node::default();
         let root = node.id().clone();
         let mut node_map = HashMap::new();
         node_map.insert(root.clone(), node);
-        Flow { root, node_map }
+        FlowArena { root, node_map }
     }
     /// panics if anything went wrong. Iff in debug state.
     #[cfg(debug_assertions)]
@@ -102,20 +107,20 @@ impl<Id: Clone + Hash + Eq + Default + Debug> Flow<Id> {
     } 
 }
 
-impl<Id: Clone + Hash + Eq + Default + Debug> FlowLike for Flow<Id> {
+impl<Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug> Flow for FlowArena<Id, Entity> {
     type Id = Id;
-    type Node = Node<Id>;
-    type NodeRef = Node<Id>;
+    type Node = Node<Id, Entity>;
+    type NodeRef = Node<Id, Entity>;
     /// ensures root and returns it
-    fn root(&mut self) -> &mut Node<Id> {
+    fn root(&mut self) -> &mut Node<Id, Entity> {
         // no check because not necessarily clean
         self.node_map.entry(Id::default()).or_default()
     }
-    fn node(&self, obj: &Id) -> Option<&Node<Id>> {
+    fn node(&self, obj: &Id) -> Option<&Node<Id, Entity>> {
         // no check because no change
         self.node_map.get(obj)
     }
-    fn grow(&mut self, mut obj: Node<Id>) -> Result<(), ()> {
+    fn grow(&mut self, mut obj: Node<Id, Entity>) -> Result<(), ()> {
         if cfg!(debug_assertions) { self.check() };
         obj.parent = Some(self.root.clone());
         match self.node_map.get(obj.id()) {
@@ -187,8 +192,8 @@ impl<Id: Clone + Hash + Eq + Default + Debug> FlowLike for Flow<Id> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    type FlowEntity = Flow<EntityId>;
-    type NodeEntity = Node<EntityId>;
+    type FlowEntity = FlowArena<EntityId, ()>;
+    type NodeEntity = Node<EntityId, ()>;
     #[derive(Clone, Default, Hash, PartialEq, Eq)]
     #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
     struct EntityId {
@@ -213,8 +218,8 @@ mod tests {
     }
 
     fn make_flow(aloud: bool) -> FlowEntity {
-        let mut flow: FlowEntity = Flow::new();
-        let obj_vec: Vec<NodeEntity> = (0..21).collect::<Vec<u64>>().iter_mut().map(|x| Node::from_id(x.clone().into())).collect();
+        let mut flow: FlowEntity = FlowArena::new();
+        let obj_vec: Vec<NodeEntity> = (0..21).collect::<Vec<u64>>().iter_mut().map(|x| Node::from_id(x.clone().into(), ())).collect();
         wrapper("Grow", flow.grow(obj_vec[1].clone()).is_ok(), &flow, aloud);
         wrapper("Grow", flow.grow(obj_vec[2].clone()).is_ok(), &flow, aloud);
         wrapper("Grow", flow.grow(obj_vec[3].clone()).is_ok(), &flow, aloud);
@@ -233,7 +238,7 @@ mod tests {
 
     #[test]
     fn root() {
-        let mut flow: FlowEntity = Flow::new();
+        let mut flow: FlowEntity = FlowArena::new();
         assert_eq!(flow.root().clone(), Node::default());
     }
 
@@ -246,7 +251,7 @@ mod tests {
         };
         let id: EntityId = 1.into();
         print_wrapper(&serde_json::to_string(&id).unwrap(), false);
-        let node: NodeEntity = Node::from_id(1.into());
+        let node: NodeEntity = Node::from_id(1.into(), ());
         print_wrapper(&serde_json::to_string(&node).unwrap(), false);
         let flow = make_flow(false);
         let str = serde_json::to_string(&flow).unwrap();
