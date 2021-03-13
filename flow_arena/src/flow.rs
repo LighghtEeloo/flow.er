@@ -39,8 +39,9 @@ pub trait FlowLike {
     type Id;
     type Node;
     type NodeRef;
-    /// ensures root and returns it
+    /// ensures root and returns it; no check
     fn root(&mut self) -> &mut Self::NodeRef;
+    // no check
     fn node(&self, obj: &Self::Id) -> Option<&Self::NodeRef>;
     /// inserts obj to node_map; err if exist
     fn grow(&mut self, obj: Self::Node) -> Result<(), ()>;
@@ -74,7 +75,7 @@ impl<Id: Clone + Hash + Eq + Default + Debug> Flow<Id> {
     }
     /// panics if anything went wrong. Iff in debug state.
     #[cfg(debug_assertions)]
-    fn check(&self) {
+    pub(crate) fn check(&self) {
         for (id, node) in self.node_map.iter() {
             let current_str = format!(", current: \nid: {:?}, \nnode: {:#?}", id, node);
             assert_eq!(id.clone(), node.id);

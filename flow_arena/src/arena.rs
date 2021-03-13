@@ -20,8 +20,8 @@ impl<Id: Clone + Hash + Eq + Default + Debug, Entity> FlowArena<Id, Entity> {
     }
     /// panics if anything went wrong. Iff in debug state.
     #[cfg(debug_assertions)]
-    fn check(&self) {
-        todo!()
+    pub(crate) fn check(&self) {
+        self.flow.check();
     }
 }
 
@@ -37,23 +37,28 @@ impl<Id: Clone + Hash + Eq + Default + Debug, Entity: Default> FlowLike for Flow
         self.flow.node(obj)
     }
     fn grow(&mut self, obj: Self::Node) -> Result<(), ()> {
+        if cfg!(debug_assertions) { self.check() };
         let id = obj.0.id().clone();
         self.flow.grow(obj.0)?;
         self.map.insert(id, obj.1.unwrap_or_default());
         Ok(())
     }
     fn devote(&mut self, obj: &Self::Id, des: &Self::Id, nth: usize) -> Result<(), ()> {
+        if cfg!(debug_assertions) { self.check() };
         self.flow.devote(obj, des, nth)
     }
     fn devote_push(&mut self, obj: &Self::Id, des: &Self::Id) -> Result<(), ()> {
+        if cfg!(debug_assertions) { self.check() };
         self.flow.devote_push(obj, des)
     }
     fn decay(&mut self, obj: &Self::Id) -> Result<(), ()> {
+        if cfg!(debug_assertions) { self.check() };
         self.flow.decay(obj)?;
         self.map.remove(obj);
         Ok(())
     }
     fn purge(&mut self, obj: &Self::Id) -> Result<(), ()> {
+        if cfg!(debug_assertions) { self.check() };
         self.flow.purge(obj)
     }
 
