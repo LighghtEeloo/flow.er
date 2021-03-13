@@ -1,8 +1,8 @@
-use std::time::SystemTime;
+use serde::{Serialize, Deserialize};
 
 use super::identity::*;
 use super::tag::*;
-use serde::{Serialize, Deserialize};
+use super::time::TimeLog;
 
 
 // Entity Area
@@ -10,7 +10,7 @@ use serde::{Serialize, Deserialize};
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Entity {
     id: EntityId,
-    pub time: Option<SystemTime>,
+    pub time: Option<TimeLog>,
     pub face: Face,
     pub bubble: Bubble,
     pub process: ProcessStatus,
