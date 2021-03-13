@@ -43,7 +43,7 @@ pub trait Flow {
     type Node;
     /// ensures root and returns it; no check
     fn root(&mut self) -> &mut Self::Node;
-    // no check
+    /// no check
     fn node(&self, obj: &Self::Id) -> Option<&Self::Node>;
     /// inserts obj to node_map; err if exist
     fn grow(&mut self, obj: Self::Node) -> Result<(), ()>;
@@ -109,6 +109,7 @@ impl<Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug> FlowArena
 impl<Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug> Flow for FlowArena<Id, Entity> {
     type Id = Id;
     type Node = Node<Id, Entity>;
+
     /// ensures root and returns it
     fn root(&mut self) -> &mut Node<Id, Entity> {
         // no check because not necessarily clean
