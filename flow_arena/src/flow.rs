@@ -41,11 +41,10 @@ impl<Id: Debug, Entity: Debug> Debug for Node<Id, Entity> {
 pub trait Flow {
     type Id;
     type Node;
-    type NodeRef;
     /// ensures root and returns it; no check
-    fn root(&mut self) -> &mut Self::NodeRef;
+    fn root(&mut self) -> &mut Self::Node;
     // no check
-    fn node(&self, obj: &Self::Id) -> Option<&Self::NodeRef>;
+    fn node(&self, obj: &Self::Id) -> Option<&Self::Node>;
     /// inserts obj to node_map; err if exist
     fn grow(&mut self, obj: Self::Node) -> Result<(), ()>;
     /// link obj as a child of des at the nth place; err if nth > len or no obj / des
@@ -110,7 +109,6 @@ impl<Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug> FlowArena
 impl<Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug> Flow for FlowArena<Id, Entity> {
     type Id = Id;
     type Node = Node<Id, Entity>;
-    type NodeRef = Node<Id, Entity>;
     /// ensures root and returns it
     fn root(&mut self) -> &mut Node<Id, Entity> {
         // no check because not necessarily clean
