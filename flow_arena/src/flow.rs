@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fmt::{self, Debug}, hash::Hash};
+use std::{collections::{HashMap, HashSet}, fmt::{self, Debug}, hash::Hash};
 
 #[cfg(feature = "serde1")]
 use serde::{Serialize, Deserialize};
@@ -135,6 +135,8 @@ impl<Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug> Flow for 
     }
     fn devote(&mut self, obj: &Id, des: &Id, nth: usize) -> Result<(), ()> {
         if cfg!(debug_assertions) { self.check() };
+        // Note: no obj in root.
+        self.root().children.retain(|x| x != obj);
         if self.node_map.contains_key(obj) {
             self.node_map.get_mut(des)
                 .map(|owner| {
@@ -174,16 +176,29 @@ impl<Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug> Flow for 
     /// cuts all the links (except root), but doesn't remove.
     fn purge(&mut self, obj: &Id) -> Result<(), ()> {
         if cfg!(debug_assertions) { self.check() };
+        // Note: move children to parent.
+        let mut orphan: Vec<Id> = Vec::new();
+        let re_owner = self.node_map.get(obj)
+            .map_or(None, |x| x.parent.clone())
+            .unwrap_or(self.root.clone());
         for (_, node) in self.node_map.iter_mut() {
             let root = self.root.clone();
             node.children.retain(|x| *x != *obj);
             node.parent = node
                 .parent
                 .clone()
-                .and_then(|x| if x == *obj { Some(root) } else { Some(x) });
+                .and_then(|x| if x == *obj { 
+                    orphan.push(node.id.clone());
+                    Some(root) 
+                } else { Some(x) });
         }
         // must be in root
         self.root().children.push(obj.clone());
+        self.node_map.get_mut(&dbg!(re_owner)).map(|x| {
+            let mut h: HashSet<Id> = x.children.iter().cloned().collect();
+            h.extend(orphan.into_iter());
+            x.children = h.into_iter().collect();
+        });
         Ok(())
     }
 }
