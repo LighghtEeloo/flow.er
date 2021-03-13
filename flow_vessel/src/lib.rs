@@ -46,6 +46,11 @@ impl Vessel {
     pub fn entity_get(&mut self, id: &EntityId) -> Option<&mut Entity> {
         self.flow_arena.node_map.get_mut(id).map(|x| &mut x.entity)
     }
+    pub fn entity_list(&self, id: &EntityId) -> Vec<&Entity> {
+        let vec = self.flow_arena.node_map.get(id).map(|x| x.children.clone()).unwrap_or_default();
+        
+        vec.into_iter().filter_map(|id| self.flow_arena.node_map.get(&id)).map(|x| &x.entity).collect()
+    }
     // pub fn entity_ensure(&mut self, id: &EntityId) -> &mut Entity {
     //     &mut self.flow_arena.node_map
     //     .entry(id.clone())
@@ -78,5 +83,19 @@ mod tests {
         let id = vessel.entity_grow();
         println!("{:#?}", vessel);
         println!("{:?}", vessel.entity_get(&id));
+    }
+    #[test]
+    fn entity_list() {
+        let mut vessel = Vessel::new();
+        let id = vessel.entity_grow();
+        let id1 = vessel.entity_grow();
+        let id2 = vessel.entity_grow();
+        let id3 = vessel.entity_grow();
+        vessel.flow_arena.devote_push(&id1, &id).ok();
+        vessel.flow_arena.devote_push(&id2, &id).ok();
+        vessel.flow_arena.devote_push(&id3, &id).ok();
+        println!("{:#?}", vessel);
+        println!("{:?}", vessel.entity_get(&id));
+        println!("{:#?}", vessel.entity_list(&id));
     }
 }

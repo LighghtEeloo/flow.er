@@ -39,7 +39,8 @@ impl Debug for EntityId {
             write!(f, "(({}))", hash)
         } else {
             // raw
-            write!(f, "[[{:?}]]", self.unique)
+            let hash: String = format!("{:x}", self.unique).as_str().chars().take(LEN).collect();
+            write!(f, "[[{}]]", hash)
         }
     }
 }
