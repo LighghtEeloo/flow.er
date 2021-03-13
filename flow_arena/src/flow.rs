@@ -9,8 +9,8 @@ use serde::{Serialize, Deserialize};
 pub struct Node<Id, Entity> {
     id: Id,
     pub entity: Entity,
-    parent: Option<Id>,
-    children: Vec<Id>,
+    pub parent: Option<Id>,
+    pub children: Vec<Id>,
 }
 
 impl<Id, Entity> Node<Id, Entity> {
@@ -62,8 +62,8 @@ pub trait Flow {
 pub struct FlowArena<Id: Hash + Eq, Entity> {
     /// root: can be a Nil node or a dummy node, but must be in node_map;    
     /// it could contain title info.
-    pub(crate) root: Id,
-    pub(crate) node_map: HashMap<Id, Node<Id, Entity>>,
+    pub root: Id,
+    pub node_map: HashMap<Id, Node<Id, Entity>>,
 }
 
 pub type FlowPure<Id> = FlowArena<Id, ()>;
