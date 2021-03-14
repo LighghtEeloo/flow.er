@@ -19,18 +19,14 @@ pub struct Entity {
 
 impl Entity {
     pub fn new_time(id_factory: &EntityIdFactory) -> Self {
-        Self {
-            id: id_factory.time_id(),
-            time: None,
-            face: Face::new(),
-            bubble: Bubble::new(),
-            process: ProcessStatus::New,
-            tags: TagSet::new()
-        }
+        Self::new_id(&id_factory.time_id())
     }
     pub fn new_incr(id_factory: &mut EntityIdFactory) -> Self {
-        Self {
-            id: id_factory.time_id(),
+        Self::new_id(&id_factory.incr_id())
+    }
+    pub fn new_id(id: &EntityId) -> Self {
+        Entity {
+            id: id.clone(),
             time: None,
             face: Face::new(),
             bubble: Bubble::new(),
@@ -57,14 +53,7 @@ impl Entity {
 
 impl Default for Entity {
     fn default() -> Self { 
-        Entity {
-            id: EntityId::default(),
-            time: None,
-            face: Face::default(),
-            bubble: Bubble::default(),
-            process: ProcessStatus::New,
-            tags: TagSet::default()
-        }
+        Self::new_id(&EntityId::default())
     }
 }
 

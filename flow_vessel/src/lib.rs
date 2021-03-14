@@ -54,22 +54,20 @@ impl Vessel {
         
         vec.into_iter().filter_map(|id| self.flow_arena.node_map.get(&id)).map(|x| &x.entity).collect()
     }
-    // pub fn entity_ensure(&mut self, id: &EntityId) -> &mut Entity {
-    //     &mut self.flow_arena.node_map
-    //     .entry(id.clone())
-    //     .or_insert_with(|| {
-    //         let entity = Entity::new_time(&self.id_factory);
-    //         Node::from_id(entity.id().clone(), entity)
-    //     }).entity
-    //     // match self.flow_arena.node_map.get_mut(id).map(|x| &mut x.entity) {
-    //     //     Some(x) => x,
-    //     //     None => {
-    //     //         let entity = Entity::new_time(&self.id_factory);
-    //     //         self.flow_arena.node_map.insert(entity.id().clone(), Node::from_id(entity.id().clone().clone(), entity.clone()));
-    //     //         &mut self.flow_arena.node_map.get_mut(&entity.id().clone()).unwrap().entity
-    //     //     }
-    //     // }
-    // }
+    pub fn entity_ensure(&mut self, id: &EntityId) -> &mut Entity {
+        // match self.flow_arena.node_map.get_mut(id).map(|x| &mut x.entity) {
+        //     Some(x) => x,
+        //     None => {
+        //         let entity = Entity::new_time(&self.id_factory);
+        //         self.flow_arena.node_map.insert(entity.id().clone(), Node::from_id(entity.id().clone().clone(), entity.clone()));
+        //         &mut self.flow_arena.node_map.get_mut(&entity.id().clone()).unwrap().entity
+        //     }
+        // }
+        if !self.flow_arena.node_map.contains_key(id) {
+            self.entity_insert(Entity::new_id(id));
+        }
+        self.entity_get_mut(id).expect("contains key")
+    }
     pub fn entity_decay(&mut self, id: &EntityId) {
         self.flow_arena.decay(id).ok();
     }
@@ -89,6 +87,14 @@ mod tests {
         let id = vessel.entity_grow();
         println!("{:#?}", vessel);
         println!("{:?}", vessel.entity_get_mut(&id));
+    }
+    #[test]
+    fn entity_ensure() {
+        let mut vessel = Vessel::new();
+        let _id = vessel.entity_grow();
+        let id1 = vessel.id_factory.incr_id();
+        vessel.entity_ensure(&id1);
+        println!("{:#?}", vessel);
     }
     #[test]
     fn entity_list() {
