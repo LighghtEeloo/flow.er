@@ -43,7 +43,10 @@ impl Vessel {
         self.flow_arena.grow(Node::from_id(id.clone(), entity)).ok();
         id
     }
-    pub fn entity_get(&mut self, id: &EntityId) -> Option<&mut Entity> {
+    pub fn entity_get(&mut self, id: &EntityId) -> Option<&Entity> {
+        self.flow_arena.node_map.get(id).map(|x| &x.entity)
+    }
+    pub fn entity_get_mut(&mut self, id: &EntityId) -> Option<&mut Entity> {
         self.flow_arena.node_map.get_mut(id).map(|x| &mut x.entity)
     }
     pub fn entity_list(&self, id: &EntityId) -> Vec<&Entity> {
@@ -67,6 +70,9 @@ impl Vessel {
     //     //     }
     //     // }
     // }
+    pub fn entity_decay(&mut self, id: &EntityId) {
+        self.flow_arena.decay(id).ok();
+    }
 }
 
 #[cfg(test)]
@@ -82,7 +88,7 @@ mod tests {
         let mut vessel = Vessel::new();
         let id = vessel.entity_grow();
         println!("{:#?}", vessel);
-        println!("{:?}", vessel.entity_get(&id));
+        println!("{:?}", vessel.entity_get_mut(&id));
     }
     #[test]
     fn entity_list() {
@@ -91,11 +97,37 @@ mod tests {
         let id1 = vessel.entity_grow();
         let id2 = vessel.entity_grow();
         let id3 = vessel.entity_grow();
+        let id4 = vessel.entity_grow();
         vessel.flow_arena.devote_push(&id1, &id).ok();
         vessel.flow_arena.devote_push(&id2, &id).ok();
         vessel.flow_arena.devote_push(&id3, &id).ok();
+        vessel.flow_arena.devote_push(&id4, &id).ok();
+        vessel.flow_arena.devote_push(&id4, &id1).ok();
+        // 0_0 --> id --> [id1, id2, id3]
+        //          `-------`-> id4
+        vessel.entity_get_mut(&id).map(|entity| entity.face = format!("Aloha!"));
         println!("{:#?}", vessel);
-        println!("{:?}", vessel.entity_get(&id));
+        println!("{:#?}", vessel.entity_get(&id));
         println!("{:#?}", vessel.entity_list(&id));
+    }
+    #[test]
+    fn entity_decay() {
+        let mut vessel = Vessel::new();
+        let id = vessel.entity_grow();
+        let id1 = vessel.entity_grow();
+        let id2 = vessel.entity_grow();
+        let id3 = vessel.entity_grow();
+        let id4 = vessel.entity_grow();
+        vessel.flow_arena.devote_push(&id1, &id).ok();
+        vessel.flow_arena.devote_push(&id2, &id).ok();
+        vessel.flow_arena.devote_push(&id3, &id).ok();
+        vessel.flow_arena.devote_push(&id4, &id).ok();
+        vessel.flow_arena.devote_push(&id4, &id1).ok();
+        // 0_0 --> id --> [id1, id2, id3]
+        //          `-------`-> id4
+        vessel.entity_get_mut(&id).map(|entity| entity.face = format!("Aloha!"));
+        vessel.entity_get_mut(&id1).map(|entity| entity.face = format!("Bobi."));
+        vessel.entity_decay(&id);
+        println!("{:#?}", vessel);
     }
 }
