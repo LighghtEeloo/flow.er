@@ -8,6 +8,7 @@ use identity::{EntityId, EntityIdFactory};
 use entity::Entity;
 use std::fmt::Debug;
 
+#[derive(Default)]
 pub struct Vessel {
     flow_arena: FlowArena<EntityId, Entity>,
 

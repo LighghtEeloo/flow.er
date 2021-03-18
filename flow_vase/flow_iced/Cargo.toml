@@ -1,0 +1,11 @@
+[package]
+name = "flow_iced"
+version = "0.1.0"
+authors = ["LighghtEeloo <eelooecho@163.com>"]
+edition = "2018"
+
+[dependencies.flow_vessel]
+path = "../../flow_vessel"
+
+[dependencies]
+iced = "0.2"

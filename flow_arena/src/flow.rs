@@ -57,7 +57,7 @@ pub trait Flow {
 }
 
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 #[cfg_attr(debug_assertions, derive(PartialEq, Debug))]
 pub struct FlowArena<Id: Hash + Eq, Entity> {
     /// root: can be a Nil node or a dummy node, but must be in node_map;    
