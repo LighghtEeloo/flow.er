@@ -2,7 +2,7 @@ use std::default;
 
 use iced::{Column, Element, HorizontalAlignment, Length, Text, TextInput, button, scrollable, text_input};
 
-pub fn main_gui() -> iced::Result {
+pub fn main() -> iced::Result {
     todo!()
 }
 

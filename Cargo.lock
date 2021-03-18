@@ -103,10 +103,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "flow_cli"
+version = "0.1.0"
+
+[[package]]
 name = "flow_er"
 version = "0.2.4"
 dependencies = [
  "chrono",
+ "flow_cli",
  "rand 0.7.3",
  "serde",
  "serde_json",

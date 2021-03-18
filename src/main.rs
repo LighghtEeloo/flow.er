@@ -5,8 +5,9 @@ mod vase;
 
 
 fn main() {
-    use crate::prelude::*;
-    yew::start_app::<Vase>();
+    // use crate::prelude::*;
+    // yew::start_app::<Vase>();
+    flow_cli::main()
 }
 
 pub mod prelude {

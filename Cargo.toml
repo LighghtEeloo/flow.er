@@ -31,7 +31,10 @@ package = "yew-services"
 members = [
 	"flow_arena",
 	"flow_vessel",
-	"flow_vase\flow_cli",
+	"flow_vase/flow_cli",
 	# "flow_vase/flow_iced",
 	# "flow_vase/flow_yew"
 ]
+
+[dependencies.flow_cli]
+path = "flow_vase/flow_cli"
