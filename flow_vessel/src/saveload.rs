@@ -118,6 +118,7 @@ mod tests {
         let f = Vessel::load();
         let vessel = futures::executor::block_on(f).map_err(|_| "load err")?;
         println!("{:#?}", vessel);
+        // let vessel = Vessel::new();
         let f = vessel.save();
         futures::executor::block_on(f).map_err(|_| "save err")
     }
