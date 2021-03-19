@@ -16,7 +16,6 @@ pub struct Entity {
     pub bubble: Bubble,
     pub process: ProcessStatus,
     pub tags: TagSet,
-    pub view: (),
 }
 
 impl Entity {
@@ -34,7 +33,6 @@ impl Entity {
             bubble: Bubble::new(),
             process: ProcessStatus::New,
             tags: TagSet::new(),
-            view: (),
         }
     }
     pub fn id(&self) -> &EntityId {

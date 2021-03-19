@@ -3,6 +3,7 @@ mod time;
 mod process;
 mod tag;
 mod entity;
+mod cube;
 mod saveload;
 mod vessel;
 
@@ -12,4 +13,5 @@ pub use time::{TimeNote, TimeRep};
 pub use process::ProcessStatus;
 pub use tag::{Tag, TagSet, TagSetField};
 pub use entity::{Entity, EntityField, Face, Bubble};
+pub use cube::Cube;
 pub use vessel::Vessel;
