@@ -24,14 +24,14 @@ impl TimeRep for SystemTime {
 
 #[derive(Default)]
 #[derive(Clone, Serialize, Deserialize)]
-pub struct TimeLog {
+pub struct TimeNote {
     start: Option<SystemTime>,
     end: Option<SystemTime>
 }
 
-impl TimeLog {
-    pub fn new() -> TimeLog {
-        TimeLog::default()
+impl TimeNote {
+    pub fn new() -> TimeNote {
+        TimeNote::default()
     }
     pub fn set_start(&mut self, start: SystemTime) -> &mut Self {
         self.start = Some(start);
@@ -49,7 +49,7 @@ impl TimeLog {
     }
 }
 
-impl TimeRep for TimeLog {
+impl TimeRep for TimeNote {
     fn human_local_detail(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "[:")?;
         self.start.map(|t: SystemTime| t.human_local_detail(f));
@@ -78,7 +78,7 @@ impl TimeRep for TimeLog {
     }
 }
 
-impl Debug for TimeLog {
+impl Debug for TimeNote {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.human_local(f)
     }
@@ -91,7 +91,7 @@ mod tests {
     #[test]
     fn time_log() {
         let u_dur = 200;
-        let mut time = TimeLog::new();
+        let mut time = TimeNote::new();
         time.set_start(SystemTime::now());
         sleep(Duration::from_millis(u_dur));
         time.set_end(SystemTime::now());
