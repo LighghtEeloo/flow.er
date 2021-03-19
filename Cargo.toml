@@ -6,7 +6,10 @@ edition = "2018"
 readme = "readme.md"
 repository = "https://github.com/LighghtEeloo/flow.er"
 
-
+[features]
+cli = []
+iced = []
+yew = []
 
 [workspace]
 members = [
