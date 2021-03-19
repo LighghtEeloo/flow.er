@@ -1,13 +1,14 @@
 use std::fmt::Debug;
 use serde::{Serialize, Deserialize};
 
-use super::{Entity, EntityId, EntityIdFactory, Cube, Node, Flow, FlowArena};
+use super::{Entity, EntityId, EntityIdFactory, Node, Flow, FlowArena, Router, Cube};
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct Vessel {
     flow_arena: FlowArena<EntityId, Entity>,
     id_factory: EntityIdFactory,
     cubes: Vec<Cube>,
+    router: Router,
 }
 
 impl Vessel {
@@ -16,6 +17,7 @@ impl Vessel {
             flow_arena: FlowArena::new(),
             id_factory: EntityIdFactory::default(),
             cubes: Vec::new(),
+            router: Router::default()
         }
     }
 }

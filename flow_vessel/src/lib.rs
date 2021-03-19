@@ -13,5 +13,5 @@ pub use time::{TimeNote, TimeRep};
 pub use process::ProcessStatus;
 pub use tag::{Tag, TagSet, TagSetField};
 pub use entity::{Entity, EntityField, Face, Bubble};
-pub use cube::Cube;
+pub use cube::{Cube, Router};
 pub use vessel::Vessel;

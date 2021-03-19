@@ -6,5 +6,4 @@ fn main() {
 
 #[cfg(not(feature="yew"))]
 fn main() {
-
 }

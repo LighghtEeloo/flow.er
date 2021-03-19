@@ -1,6 +1,23 @@
 use serde::{Serialize, Deserialize};
 
 use super::EntityId;
+
+#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, Deserialize, Serialize)]
+pub enum Router {
+    Cube,
+    Flow,
+    Calendar,
+    TimeCapsule,
+
+    Settings,
+}
+
+impl Default for Router {
+    fn default() -> Self {
+        Router::Cube
+    }
+}
+
 /// Cube is the basic unit of view, 
 /// containing the minimum info for rendering.
 #[derive(Debug, Clone, Serialize, Deserialize)]
