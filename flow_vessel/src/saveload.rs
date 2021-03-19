@@ -108,3 +108,17 @@ impl Vessel {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn saveload() -> Result<(), &'static str> {
+        let f = Vessel::load();
+        let vessel = futures::executor::block_on(f).map_err(|_| "load err")?;
+        println!("{:#?}", vessel);
+        let f = vessel.save();
+        futures::executor::block_on(f).map_err(|_| "save err")
+    }
+}
