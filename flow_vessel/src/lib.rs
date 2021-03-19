@@ -3,6 +3,8 @@ mod entity;
 mod time;
 mod tag;
 
+mod saveload;
+
 use flow_arena::{Flow, FlowArena, Node};
 use identity::{EntityId, EntityIdFactory};
 use entity::Entity;
