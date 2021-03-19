@@ -71,7 +71,7 @@ impl Component for Vase {
         // Note: refresh on startup.
         vessel.onload();
         // Test..
-        LOG!("Loaded & Trimmed: {:#?}", vessel);
+        LOG!("Loaded {} & Trimmed: {:#?}", KEY, vessel);
 
         Self {
             vessel,
