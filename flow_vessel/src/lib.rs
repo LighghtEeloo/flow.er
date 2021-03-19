@@ -7,8 +7,9 @@ use flow_arena::{Flow, FlowArena, Node};
 use identity::{EntityId, EntityIdFactory};
 use entity::Entity;
 use std::fmt::Debug;
+use serde::{Serialize, Deserialize};
 
-#[derive(Default)]
+#[derive(Default, Serialize, Deserialize)]
 pub struct Vessel {
     flow_arena: FlowArena<EntityId, Entity>,
 
@@ -135,6 +136,28 @@ mod tests {
         vessel.entity_get_mut(&id).map(|entity| entity.face = format!("Aloha!"));
         vessel.entity_get_mut(&id1).map(|entity| entity.face = format!("Bobi."));
         vessel.entity_decay(&id);
+        println!("{:#?}", vessel);
+    }
+    #[test]
+    fn serde() {
+        let mut vessel = Vessel::new();
+        let id = vessel.entity_grow();
+        let id1 = vessel.entity_grow();
+        let id2 = vessel.entity_grow();
+        let id3 = vessel.entity_grow();
+        let id4 = vessel.entity_grow();
+        vessel.flow_arena.devote_push(&id1, &id).ok();
+        vessel.flow_arena.devote_push(&id2, &id).ok();
+        vessel.flow_arena.devote_push(&id3, &id).ok();
+        vessel.flow_arena.devote_push(&id4, &id).ok();
+        vessel.flow_arena.devote_push(&id4, &id1).ok();
+        // 0_0 --> id --> [id1, id2, id3]
+        //          `-------`-> id4
+        vessel.entity_get_mut(&id).map(|entity| entity.face = format!("Aloha!"));
+        vessel.entity_get_mut(&id1).map(|entity| entity.face = format!("Bobi."));
+        let str = serde_json::to_string(&vessel).expect("failed to serialize vessel");
+        println!("Serialize: {}", str);
+        let vessel: Vessel = serde_json::from_str(&str).expect("failed to deserialize");
         println!("{:#?}", vessel);
     }
 }
