@@ -3,7 +3,7 @@ use serde::{Serialize, Deserialize};
 
 use super::{Entity, EntityId, EntityIdFactory, Node, Flow, FlowArena, Router, Cube};
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Default, Clone, Serialize, Deserialize)]
 pub struct Vessel {
     flow_arena: FlowArena<EntityId, Entity>,
     id_factory: EntityIdFactory,

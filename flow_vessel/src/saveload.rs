@@ -78,12 +78,14 @@ impl Vessel {
 #[cfg(target_arch = "wasm32")]
 impl Vessel {
     fn storage() -> Option<web_sys::Storage> {
+        // web_sys::console::log_1(&"Storage".into());
         let window = web_sys::window()?;
 
         window.local_storage().ok()?
     }
 
     pub async fn load() -> Result<Vessel, LoadError> {
+        web_sys::console::log_1(&"loading...".into());
         let storage = Self::storage().ok_or(LoadError::FileError)?;
 
         let contents = storage
@@ -95,6 +97,7 @@ impl Vessel {
     }
 
     pub async fn save(self) -> Result<(), SaveError> {
+        web_sys::console::log_1(&"saving...".into());
         let storage = Self::storage().ok_or(SaveError::FileError)?;
 
         let json = serde_json::to_string_pretty(&self).map_err(|_| SaveError::FormatError)?;
@@ -103,7 +106,7 @@ impl Vessel {
             .set_item("flow.er.vessel", &json)
             .map_err(|_| SaveError::WriteError)?;
 
-        let _ = wasm_timer::Delay::new(std::time::Duration::from_secs(2)).await;
+        // let _ = wasm_timer::Delay::new(std::time::Duration::from_secs(2)).await;
 
         Ok(())
     }
@@ -116,7 +119,7 @@ mod tests {
     #[test]
     fn saveload() -> Result<(), &'static str> {
         let f = Vessel::load();
-        let vessel = futures::executor::block_on(f).map_err(|_| "load err")?;
+        let vessel = futures::executor::block_on(f).map_err(|_| "load err").unwrap_or(Vessel::new());
         println!("{:#?}", vessel);
         // let vessel = Vessel::new();
         let f = vessel.save();

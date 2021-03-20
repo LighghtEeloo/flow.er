@@ -109,6 +109,10 @@ impl Vase {
                 // onclick=self.link.callback(move |_| {
                 //     Message::Global(vec![GlobalMessage::SrcHit])
                 // })
+                // Debug: refresh onclick.
+                onclick=self.link.callback(move |_| {
+                    [Refresh]
+                })
             >
                 <img src="static/icons/StatusBar/src-code.svg" alt="code_pic"/>
                 <span>{"  Source Code  "}</span>

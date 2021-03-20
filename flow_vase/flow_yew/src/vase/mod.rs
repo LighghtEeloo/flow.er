@@ -2,6 +2,7 @@ mod view;
 
 use yew::{Component, ComponentLink, Html, ShouldRender};
 use flow_vessel::*;
+use super::log_obj;
 
 pub struct Vase {
     vessel: Vessel,
@@ -31,8 +32,11 @@ impl Component for Vase {
     type Properties = ();
 
     fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
+        let vessel_future = Vessel::load();
+        let vessel = futures::executor::block_on(vessel_future).unwrap_or(Vessel::new());
+        log_obj("Vessel", &vessel);
         Self {
-            vessel: Vessel::new(),
+            vessel,
             link
         }
     }
@@ -69,6 +73,11 @@ impl Component for Vase {
             self.link.callback(move |()| left.clone()).emit(());
             false
         } else {
+            // save
+            let save_res = futures::executor::block_on(self.vessel.clone().save());
+            if save_res.is_err() {
+                log_obj("load err", -1);
+            }
             true
         }
     }

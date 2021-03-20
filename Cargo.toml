@@ -19,6 +19,7 @@ members = [
 	# "flow_vase/flow_iced",
 	"flow_vase/flow_yew",
 	"flow_vase/flow_yew_legacy",
+	# "wasm-timer",
 ]
 
 [dependencies.flow_cli]

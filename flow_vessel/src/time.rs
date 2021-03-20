@@ -1,6 +1,8 @@
-use std::{fmt::Debug, time::{SystemTime, Duration}};
+use std::{fmt::Debug, time::Duration};
+use std::time::SystemTime;
 use chrono::{DateTime, Local, Utc};
 use serde::{Serialize, Deserialize};
+
 pub trait TimeRep {
     fn human_local_detail(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result;
     fn human_local(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result;

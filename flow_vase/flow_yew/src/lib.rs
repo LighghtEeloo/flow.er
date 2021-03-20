@@ -1,6 +1,12 @@
+#[allow(unused_unsafe)]
 mod vase;
 pub fn main() {
     yew::start_app::<vase::Vase>();
+}
+
+pub fn log_obj<T: std::fmt::Debug>(name: &str, obj: T) {
+    let log = format!("{}: {:#?}", name, obj);
+    unsafe { yew::web_sys::console::log_1(&log.into()); }
 }
 
 #[cfg(test)]

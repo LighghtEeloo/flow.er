@@ -47,7 +47,7 @@ impl Debug for EntityId {
 
 impl Identity for EntityId {}
 
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct EntityIdFactory {
     cnt: u64
 }
@@ -63,10 +63,26 @@ impl EntityIdFactory {
     }
     pub fn time_id(&self) -> EntityId {
         EntityId {
-            time: SystemTime::now(),
+            time: now(),
             unique: rand::random()
         }
     }
+}
+
+#[cfg(target_arch = "wasm32")]
+fn now() -> SystemTime {
+    let dur = wasm_timer::SystemTime::now()
+        .duration_since(wasm_timer::UNIX_EPOCH)
+        .expect("time went backwards");
+    UNIX_EPOCH + dur
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+fn now() -> SystemTime {
+    let dur = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .expect("time went backwards");
+    UNIX_EPOCH + dur
 }
 
 #[cfg(test)]
