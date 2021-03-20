@@ -1,5 +1,5 @@
-/target
-/dist
+**/target
+**/dist
 /.idea
 /.vscode
 _*.txt

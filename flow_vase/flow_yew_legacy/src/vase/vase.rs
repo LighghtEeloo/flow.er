@@ -43,25 +43,31 @@ impl Component for Vase {
             // Debug..
             // let mut vessel = Vessel::default();
             let mut vessel = vessel;
+            if vessel.flow.roots.is_empty() {
+                let entity = Entity::new();
+                let root_id = entity.id();
+                vessel.entity_map.insert(root_id, entity);
+                vessel.flow.add(root_id);
+                vessel.flow.roots.push(root_id);
+            }
+            unsafe{LOG!("{:#?}", vessel)};
 
             let mut init_test = || -> Result<(), Critic> {
-                let mut root_id = vessel.flow.roots.get(0).cloned().unwrap_or_default();
-                // let mut entity = Entity::default();
-            //     entity.face = format!("{:?}", entity.time);
-            //     vessel.insert_entity(entity.clone(), FlowLink::default())?;
+                let root_id = vessel.flow.roots[0];
+                unsafe{LOG!("{:#?}", root_id)};
     
-            //     let mut a = Entity::default();
-            //     a.face = format!("A - {}", a.time);
-            //     vessel.insert_entity( a, FlowLink::new_descend_tail(entity.id()) )?;
+                let mut a = Entity::default();
+                a.face = format!("A - {}", a.time);
+                vessel.insert_entity( a, FlowLink::new_descend_tail(root_id) )?;
     
-            //     let mut b = Entity::default();
-            //     b.face = format!("B - {}", b.time);
-            //     vessel.insert_entity( b, FlowLink::new_descend_tail(entity.id()) )?;
+                let mut b = Entity::default();
+                b.face = format!("B - {}", b.time);
+                vessel.insert_entity( b, FlowLink::new_descend_tail(root_id) )?;
     
                 vessel.vm_info = HashMap::new();
-                vessel.vm_info.insert(Router::Cube, vec![VMType::Inkblot(root_id)]);
+                // vessel.vm_info.insert(Router::Cube, vec![VMType::Inkblot(root_id)]);
                 vessel.vm_info.insert(Router::Cube, vec![VMType::Linear(root_id), VMType::Inkblot(root_id)]);
-                // vessel.vm_info.insert(Router::Cube, vec![VMType::Linear(entity.id()), VMType::Linear(entity.id())]);
+                // vessel.vm_info.insert(Router::Cube, vec![VMType::Linear(root_id), VMType::Linear(root_id)]);
                 Ok(())
             };
 
