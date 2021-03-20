@@ -1,4 +1,5 @@
 mod view;
+mod node;
 
 use yew::{Component, ComponentLink, Html, ShouldRender};
 use flow_vessel::*;
