@@ -22,3 +22,9 @@ package = "yew"
 git = "https://github.com/yewstack/yew.git"
 rev = "3740140"
 package = "yew-services"
+
+[dependencies.flow_arena]
+path = "../../flow_arena"
+
+[dependencies.flow_vessel]
+path = "../../flow_vessel"

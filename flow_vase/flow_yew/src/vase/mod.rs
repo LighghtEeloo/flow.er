@@ -1,23 +1,24 @@
-mod main;
+mod view;
 
-use yew::{html, Component, ComponentLink, Html, ShouldRender};
-
-use main::main_view;
+use yew::{Component, ComponentLink, Html, ShouldRender};
+use flow_vessel::{Router, Vessel};
 
 pub struct Vase {
-    link: ComponentLink<Self>
+    vessel: Vessel,
+    link: ComponentLink<Self>,
 }
 
-pub enum Message {
-
+pub enum Msg {
+    SwitchRouter(Router)
 }
 
 impl Component for Vase {
-    type Message = Message;
+    type Message = Vec<Msg>;
     type Properties = ();
 
     fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
         Self {
+            vessel: Vessel::new(),
             link
         }
     }

@@ -346,6 +346,8 @@ name = "flow_yew"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "flow_arena",
+ "flow_vessel",
  "rand 0.7.3",
  "serde",
  "serde_json",

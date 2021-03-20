@@ -1,6 +1,6 @@
 use yew::{html, Html};
-
-use super::Vase;
+use flow_vessel::{export_json, Router};
+use super::{Vase, Msg::*};
 
 impl Vase {
     pub fn main_view(&self) -> Html {
@@ -50,25 +50,25 @@ impl Vase {
     fn main_editor(&self) -> Html {
         let router = self.vessel.router;
         let editor_str = router.type_str();
-        let vm_vec = self.vessel.vm_map.get(&router).map(|vec| {
-            let per_width = 100.0 / vec.len() as f64;
-            vec.iter().enumerate().map(|(vm_idx, vm)| {
-                let style = {
-                    format!("width: {}%;", per_width) 
-                    +&format!("left: {}%;", per_width * vm_idx as f64) 
-                    +&{ if vm_idx != 0 { format!("border-left: 2px solid gray;") } else { format!("") } }
-                };
-                html! {
-                    <div class="vm" style={ style }>
-                        { vm.illustrate((router, vm_idx), &self.vessel, &self.link) }
-                    </div>
-                }
-            }).collect()
-        }).unwrap_or(Vec::new());
+        // let vm_vec = self.vessel.vm_map.get(&router).map(|vec| {
+        //     let per_width = 100.0 / vec.len() as f64;
+        //     vec.iter().enumerate().map(|(vm_idx, vm)| {
+        //         let style = {
+        //             format!("width: {}%;", per_width) 
+        //             +&format!("left: {}%;", per_width * vm_idx as f64) 
+        //             +&{ if vm_idx != 0 { format!("border-left: 2px solid gray;") } else { format!("") } }
+        //         };
+        //         html! {
+        //             <div class="vm" style={ style }>
+        //             // vm cube view
+        //             </div>
+        //         }
+        //     }).collect()
+        // }).unwrap_or(Vec::new());
         let editor = 
             html! {
                 <div class={editor_str}>
-                    { vm_vec }
+                    // { vm_vec }
                 </div>
             };
         html! {

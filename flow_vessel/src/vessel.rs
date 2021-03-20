@@ -7,8 +7,8 @@ use super::{Entity, EntityId, EntityIdFactory, Node, Flow, FlowArena, Router, Cu
 pub struct Vessel {
     flow_arena: FlowArena<EntityId, Entity>,
     id_factory: EntityIdFactory,
-    cubes: Vec<Cube>,
-    router: Router,
+    pub cubes: Vec<Cube>,
+    pub router: Router,
 }
 
 impl Vessel {

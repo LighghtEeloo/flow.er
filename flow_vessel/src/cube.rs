@@ -18,6 +18,19 @@ impl Default for Router {
     }
 }
 
+impl Router {
+    pub fn type_str(&self) -> &'static str {
+        use Router::*;
+        match self {
+            Cube => "cube",
+            Flow => "flow",
+            Calendar => "calendar",
+            TimeCapsule => "time-capsule",
+            Settings => "settings"
+        }
+    }
+}
+
 /// Cube is the basic unit of view, 
 /// containing the minimum info for rendering.
 #[derive(Debug, Clone, Serialize, Deserialize)]
