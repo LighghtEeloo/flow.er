@@ -16,16 +16,17 @@ impl Vase {
 
     fn sidebar_routers(&self) -> Html {
         use Router::*;
-        let router_meta: Vec<(&str, Router, &str, bool)> = vec! {
-            ("static/icons/hexagons.svg", Cube, "Cube", false),
-            ("static/icons/branch.svg", Flow, "Flow", false),
-            ("static/icons/calendar.svg", Calendar, "Calendar", false),
-            ("static/icons/history.svg", TimeCapsule, "TimeCapsule", false),
-            ("static/icons/settings.svg", Settings, "Settings", true),
+        let router_meta: Vec<(&str, Router, bool)> = vec! {
+            ("static/icons/branch.svg", BirdView, false),
+            ("static/icons/hexagons.svg", Board, false),
+            ("static/icons/calendar.svg", Todos, false),
+            ("static/icons/calendar.svg", Calendar, false),
+            ("static/icons/history.svg", TimeAnchor, false),
+            ("static/icons/settings.svg", Settings, true),
         };
         let sidebar_routers: Html = 
             router_meta.into_iter().map(
-                |(src, router, describe, bottom)| {
+                |(src, router, bottom)| {
                     html! {
                         <div class={if !bottom {"router"} else {"router router-bottom"}}>
                             <div class="router-content"
@@ -33,8 +34,8 @@ impl Vase {
                                     [SwitchRouter{router}]
                                 })
                             >
-                                <img src={src} alt={describe}/>
-                                <span class="tooltip">{describe}</span>
+                                <img src={src} alt={router.display_str()}/>
+                                <span class="tooltip">{router.display_str()}</span>
                             </div>
                         </div>
                     }
