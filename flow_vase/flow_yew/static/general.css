@@ -1,0 +1,50 @@
+body {
+    --len-left-sidebar: 50px;
+    --len-status-bar: 20px;
+
+    --mainColor: rgba(216, 230, 236, 0.829);
+    --backColor: rgba(217, 229, 235, 0.541);
+    /* --routerColor: rgba(216, 230, 236, 0.829); */
+    --emphasizeColor: rgba(238, 244, 247, 0.829);
+    --dividerColor: rgba(10, 55, 77, 1);
+
+    --headFont: 'Segoe UI', Tahoma, Verdana, Geneva, sans-serif;
+    --itemFont: 'Times New Roman', Times, serif;
+    --bubbleFont: Verdana, Geneva, Garamond;
+    --handFont: cursive, Helvetica, "Courier New", Courier, Garamond, monospace;
+    --size-button: 36px;
+}
+
+
+.node-group {
+    --lightColor: rgba(248, 253, 255, 0.925);
+    --borderColor: rgba(222, 229, 233, 0.925);
+    --dropdownColor: rgba(121, 191, 238, 0.431);
+    --dropdownHoverColor: rgba(121, 191, 238, 0.808);
+    --optionColor: #f9f9f9;
+    --optionHoverColor: #f1f1f1;
+}
+
+input {
+    font-family: var(--itemFont);
+}
+
+
+/* Scroll Bar */
+::-webkit-scrollbar {
+    width: 12px;                /* width of the entire scrollbar */
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;        /* color of the tracking area */
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #a8a8a8;  /* color of the scroll thumb */
+    border-radius: 20px;        /* roundness of the scroll thumb */
+    border: 3px solid #f1f1f1;  /* creates padding around scroll thumb */
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: #c2c2c2;  /* color of the scroll thumb */
+    cursor: pointer;
+}

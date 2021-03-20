@@ -1,0 +1,192 @@
+@import "general.css";
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+	margin: 0;
+    padding: 0;
+}
+
+body {
+    height: 100vh;
+}
+
+
+.app-wrapper {
+    height: 100%;
+    width: 100%;
+}
+
+.frame {
+	border: solid var(--dividerColor) 2px;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    display: block;
+}
+
+.frame#left-sidebar {
+    background-color: var(--backColor);
+    height: calc(100% - var(--len-status-bar));
+    width: var(--len-left-sidebar);
+    left: 0;
+    top: 0;
+    /* margin-right: -1px; */
+    border-right: none;
+}
+
+.frame#main-editor {
+    height: calc(100% - var(--len-status-bar));
+    width: calc(100% - var(--len-left-sidebar));
+    top: 0;
+    right: 0;
+}
+
+.frame#status-bar {
+    height: var(--len-status-bar);
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    border-top: none;
+	/* border-left: solid var(--dividerColor) 2px; */
+    /* margin-top: -1px; */
+    background-color: var(--backColor);
+}
+
+
+/* Router Buttons */
+
+.router::before {
+    content: " ";
+    display: block;
+    padding-top: 100%;
+}
+
+.router {
+    position: relative;
+    background-color: var(--mainColor);
+    border-bottom: 2px solid var(--dividerColor);
+    list-style-type: none;
+}
+
+.router.router-bottom::before {
+    content: " ";
+    display: block;
+    padding-top: 0;
+    padding-bottom: 100%;
+}
+
+.router.router-bottom {
+    border-bottom: none;
+    border-top: 2px solid var(--dividerColor);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: auto
+}
+
+.router .router-content {
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    /* width: auto; height: auto;
+    margin: auto; */
+}
+
+.router .router-content img {
+    width: 48%;
+    height: auto;
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    margin: auto;
+    /* display: flex;
+    align-items: center;
+    justify-content: center; */
+}
+
+.tooltip {
+    visibility: hidden;
+    width: auto;
+    background-color: grey;
+    color: #fff;
+    text-align: center;
+    padding: 3px 6px;
+    border-radius: 4px;
+
+    font-size: 10pt;
+   
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 1;
+    /* top: calc(50% - 6px); */
+    bottom: 0%;
+    left: 105%; 
+  }
+
+.router .router-content:hover {
+    background-color: var(--emphasizeColor);
+    cursor: pointer;
+}
+.router .router-content:hover .tooltip {
+    visibility: visible;
+}
+
+
+/* Src Button */
+
+#status-bar .status-bar-button
+{
+    position: relative;
+    bottom: 0;
+    left: 0;
+    margin: 0;
+    padding: 1px;
+    height: calc(var(--len-status-bar) - 2px);
+    width: 112px;
+    border: none;
+    outline: none;
+	border-right: solid var(--dividerColor) 2px;
+    background-color: var(--mainColor);
+}
+
+#status-bar .status-bar-button span {
+    position: relative;
+    top: -1px;
+}
+
+#status-bar .status-bar-button img
+{
+    position: relative;
+    top: 1px;
+    margin: 0;
+    height: calc(var(--len-status-bar) * 0.7);
+}
+
+#status-bar .status-bar-button:hover {
+    background-color: var(--emphasizeColor);
+}
+
+
+/* Src */
+
+.src {
+    height: 100%
+}
+
+.src textarea.src-input {
+    display: block;
+    border: none;
+    outline: none;
+    width: 100%;
+    height: 100%;
+    resize: none;
+}
+
+
+.frame p {
+    font-family: cursive, 'Times New Roman', serif;
+}
