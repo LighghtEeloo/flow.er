@@ -1,7 +1,7 @@
 mod view;
 
 use yew::{Component, ComponentLink, Html, ShouldRender};
-use flow_vessel::{Router, Vessel};
+use flow_vessel::*;
 
 pub struct Vase {
     vessel: Vessel,
@@ -10,8 +10,19 @@ pub struct Vase {
 
 #[derive(Debug, Clone)]
 pub enum Msg {
-    SwitchRouter(Router),
-    Refresh
+    // router level
+    SwitchRouter{
+        router: Router
+    },
+
+    // entity level
+    EntityUpdate {
+        id: EntityId,
+        field: EntityField
+    },
+
+    // refresh
+    Refresh,
 }
 
 impl Component for Vase {
@@ -34,10 +45,18 @@ impl Component for Vase {
                 use Msg::*;
                 // returns true if non-block, false if needs revisit or finish
                 match msg {
-                    SwitchRouter(router) => {
+                    SwitchRouter{ router} => {
                         self.vessel.router = router;
                         true
                     },
+
+                    EntityUpdate { id, field } => {
+                        self.vessel.entity_get_mut(&id).map(|entity| {
+                            entity.update_entity(field)
+                        });
+                        true
+                    }
+
                     Refresh => false,
                 }
             } else {

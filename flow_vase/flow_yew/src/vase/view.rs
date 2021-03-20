@@ -30,7 +30,7 @@ impl Vase {
                         <div class={if !bottom {"router"} else {"router router-bottom"}}>
                             <div class="router-content"
                                 onclick=self.link.callback(move |_| {
-                                    [SwitchRouter(router)]
+                                    [SwitchRouter{router}]
                                 })
                             >
                                 <img src={src} alt={describe}/>
