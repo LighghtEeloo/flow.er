@@ -18,7 +18,7 @@ members = [
 	"flow_vase/flow_cli",
 	# "flow_vase/flow_iced",
 	"flow_vase/flow_yew",
-	"flow_vase/flow_yew_dep",
+	"flow_vase/flow_yew_legacy",
 ]
 
 [dependencies.flow_cli]
@@ -27,5 +27,5 @@ path = "flow_vase/flow_cli"
 [dependencies.flow_yew]
 path = "flow_vase/flow_yew"
 
-[dependencies.flow_yew_dep]
-path = "flow_vase/flow_yew_dep"
+[dependencies.flow_yew_legacy]
+path = "flow_vase/flow_yew_legacy"

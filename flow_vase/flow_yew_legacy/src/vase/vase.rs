@@ -1,3 +1,4 @@
+#[allow(unused)]
 use crate::util::*;
 use crate::yew_util::*;
 use super::prelude::*;
@@ -64,14 +65,14 @@ impl Component for Vase {
                 Ok(())
             };
 
-            init_test().err().map(|x| LOG!("{:?}", x));
+            init_test().err().map(|x| unsafe{LOG!("{:?}", x)});
 
             vessel
         };
         // Note: refresh on startup.
         vessel.onload();
         // Test..
-        LOG!("Loaded {} & Trimmed: {:#?}", KEY, vessel);
+        unsafe{LOG!("Loaded {} & Trimmed: {:#?}", KEY, vessel)};
 
         Self {
             vessel,
@@ -83,7 +84,7 @@ impl Component for Vase {
     fn update(&mut self, messages: Self::Message) -> ShouldRender {
         use VaseMsg::*;
         if messages.is_empty() { return false }
-        LOG!("Updating: {:#?}.", messages);
+        unsafe{LOG!("Updating: {:#?}.", messages)};
         // LOG!("self.vessel.vm_map: {:#?}", self.vessel.vm_map);
         let mut res = true;
         for message in messages {

@@ -1,5 +1,5 @@
 [package]
-name = "flow_yew_dep"
+name = "flow_yew_legacy"
 version = "0.2.4"
 authors = ["LighghtEeloo <eelooecho@163.com>"]
 edition = "2018"

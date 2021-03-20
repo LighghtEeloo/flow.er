@@ -322,7 +322,7 @@ version = "0.2.4"
 dependencies = [
  "flow_cli",
  "flow_yew",
- "flow_yew_dep",
+ "flow_yew_legacy",
 ]
 
 [[package]]
@@ -357,7 +357,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "flow_yew_dep"
+name = "flow_yew_legacy"
 version = "0.2.4"
 dependencies = [
  "chrono",
