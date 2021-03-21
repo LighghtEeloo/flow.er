@@ -9,7 +9,7 @@ const LEN: usize = 5;
 pub trait Identity: Default + Debug + Clone + Hash + PartialEq + Eq {
 }
 
-#[derive(Clone, Hash, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Hash, PartialEq, Eq, Serialize, Deserialize)]
 pub struct EntityId {
     time: SystemTime,
     unique: u64
