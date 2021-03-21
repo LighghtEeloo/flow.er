@@ -1,9 +1,11 @@
 mod view;
-mod node;
+mod cube_vm;
+mod todo;
 
 use yew::{Component, ComponentLink, Html, ShouldRender};
 use flow_vessel::*;
 use super::log_obj;
+
 
 pub struct Vase {
     vessel: Vessel,

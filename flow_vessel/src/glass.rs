@@ -7,7 +7,7 @@ use super::EntityId;
 pub enum Router {
     BirdView,
     Board,
-    Todos,
+    Promised,
     Calendar,
     TimeAnchor,
 
@@ -26,7 +26,7 @@ impl Router {
         match self {
             BirdView => "bird-view",
             Board => "board",
-            Todos => "todos",
+            Promised => "promised",
             Calendar => "calendar",
             TimeAnchor => "time-capsule",
             Settings => "settings"
@@ -37,7 +37,7 @@ impl Router {
         match self {
             BirdView => "BirdView",
             Board => "Board",
-            Todos => "Todos",
+            Promised => "Promised",
             Calendar => "Calendar",
             TimeAnchor => "TimeAnchor",
             Settings => "Settings"
@@ -55,31 +55,62 @@ pub enum Cube {
     /// A single entity and its points.
     PointView {
         obj: EntityId,
-        current: usize
+        current: Option<usize>
     },
     /// A single entity and a todo list view
     TodoList {
         obj: EntityId,
-        current: usize
+        current: Option<usize>
     },
     FlowView {
         obj: EntityId,
         current: EntityId
     },
-    Calendar {
+    CalendarView {
         current: EntityId
     },
+    TimeView,
+    SettingView,
+    Blank {
+        alt: String
+    }
 }
 
+impl Default for Cube {
+    fn default() -> Self {
+        Cube::Blank {
+            alt: format!("Clean and innocent.")
+        }
+    }
+}
 
 
 /// A overall layer of routers and cubes.
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct Glass {
-    bird_view: Option<Cube>,
+    bird_view: Cube,
     board: Vec<Cube>,
-    todos: Option<Cube>,
-    calendar: Option<Cube>,
-    time_anchor: (),
-    settings: (),
+    promised: Cube,
+    calendar: Cube,
+    time_anchor: Cube,
+    settings: Cube,
+}
+
+impl Glass {
+    pub fn router(&self, router: Router) -> Vec<Cube> {
+        if router == Router::Board {
+            self.board.clone()
+        } else {
+            use Cube::*;
+            let cube = match router {
+                Router::BirdView => self.bird_view.clone(),
+                Router::Promised => self.promised.clone(),
+                Router::Calendar => self.calendar.clone(),
+                Router::TimeAnchor => self.time_anchor.clone(),
+                Router::Settings => self.settings.clone(),
+                _ => Cube::default()
+            };
+            [cube].to_vec()
+        }
+    }
 }

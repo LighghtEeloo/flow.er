@@ -64,6 +64,8 @@ impl Vessel {
     }
 }
 
+pub type EntityNode = Node<EntityId, Entity>;
+
 #[cfg(test)]
 mod tests {
     use super::*;
