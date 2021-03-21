@@ -1,5 +1,5 @@
 #[allow(unused_unsafe)]
-mod vase;
+pub mod vase;
 pub fn main() {
     yew::start_app::<vase::Vase>();
 }

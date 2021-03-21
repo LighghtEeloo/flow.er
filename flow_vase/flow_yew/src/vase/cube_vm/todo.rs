@@ -1,5 +1,5 @@
 use yew::{ComponentLink, Html, NodeRef, html, InputData};
-use flow_vessel::{Entity, EntityId, EntityField, ProcessStatus};
+use flow_vessel::{Entity, EntityId, EntityField, EntityNode, ProcessStatus};
 use super::{Vase, Msg::*};
 
 #[derive(Clone)]
@@ -148,7 +148,7 @@ pub struct TodoList {
 }
 
 impl TodoList {
-    pub fn new(entity_node: &super::EntityNode, link: ComponentLink<Vase>) -> Self {
+    pub fn new(entity_node: &EntityNode, link: ComponentLink<Vase>) -> Self {
         let mut nodes = Vec::new();
         let id = entity_node.entity.id();
         for id in entity_node.children.iter() {
@@ -159,7 +159,7 @@ impl TodoList {
             nodes
         }
     }
-    pub fn update(&mut self, entity_node: &super::EntityNode) {
+    pub fn update(&mut self, entity_node: &EntityNode) {
         let link = self.head.link.clone();
         let correct = &entity_node.children;
         let target = self.nodes.clone();

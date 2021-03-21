@@ -1,6 +1,5 @@
 mod view;
 mod cube_vm;
-mod todo;
 
 use yew::{Component, ComponentLink, Html, ShouldRender};
 use flow_vessel::*;
