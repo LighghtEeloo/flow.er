@@ -2,7 +2,7 @@ use std::{fmt::Debug, hash::Hash};
 use std::time::{SystemTime, UNIX_EPOCH};
 use serde::{Serialize, Deserialize};
 
-use super::time::TimeRep;
+use super::time::{TimeRep, now};
 
 const LEN: usize = 5;
 
@@ -67,22 +67,6 @@ impl EntityIdFactory {
             unique: rand::random()
         }
     }
-}
-
-#[cfg(target_arch = "wasm32")]
-fn now() -> SystemTime {
-    let dur = wasm_timer::SystemTime::now()
-        .duration_since(wasm_timer::UNIX_EPOCH)
-        .expect("time went backwards");
-    UNIX_EPOCH + dur
-}
-
-#[cfg(not(target_arch = "wasm32"))]
-fn now() -> SystemTime {
-    let dur = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .expect("time went backwards");
-    UNIX_EPOCH + dur
 }
 
 #[cfg(test)]

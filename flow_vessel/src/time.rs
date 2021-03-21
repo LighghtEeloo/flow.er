@@ -1,5 +1,6 @@
-use std::{fmt::Debug, time::Duration};
-use std::time::SystemTime;
+use std::{fmt::Debug, time::{SystemTime, Duration}};
+#[cfg(target_arch = "wasm32")]
+use std::time::UNIX_EPOCH;
 use chrono::{DateTime, Local, Utc};
 use serde::{Serialize, Deserialize};
 
@@ -84,6 +85,19 @@ impl Debug for TimeNote {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.human_local(f)
     }
+}
+
+#[cfg(target_arch = "wasm32")]
+fn now() -> SystemTime {
+    let dur = wasm_timer::SystemTime::now()
+        .duration_since(wasm_timer::UNIX_EPOCH)
+        .expect("time went backwards");
+    UNIX_EPOCH + dur
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+pub fn now() -> SystemTime {
+    SystemTime::now()
 }
 
 #[cfg(test)]
