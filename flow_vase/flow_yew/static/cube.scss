@@ -44,7 +44,7 @@
     resize: none;
 }
 
-.linear {
+.todo-list {
     height: 100%;
 }
 
@@ -75,7 +75,7 @@
 
 
 .inkblot .head input,
-.linear .head input {
+.todo-list .head input {
     width: 100%;
     min-height: 10%;
     height: var(--headerHeight);
@@ -98,7 +98,7 @@
     font-weight: 0.9;
 }
 
-.linear .head input {
+.todo-list .head input {
     /* line-height: 60px; */
     font-family: var(--headFont);
     font-size: xx-large;
@@ -106,11 +106,11 @@
     font-weight: normal;
 }
 
-.linear .head .dash-line {
+.todo-list .head .dash-line {
     display: none;
 }
 
-.linear .node-group {
+.todo-list .node-view {
     position: relative;
     top: 0; right: 0; bottom: 0; left: 0;
     margin: 0 auto;
@@ -120,12 +120,12 @@
     max-width: 100%;
 }
 
-.linear .node-group .node {
+.todo-list .node-view .node {
     position: relative;
     height: calc(var(--size-button) + 4px);
 }
 
-.linear .node-group .node input {
+.todo-list .node-view .node input {
     --horizontal-margin: 3px;
     display: inline;
     position: absolute;
@@ -182,8 +182,7 @@
     display: none; 
     position: absolute; 
     background-color: var(--optionColor); 
-    box-shadow: 0px 8px 8px  
-        0px rgba(0, 0, 0, 0.2); 
+    box-shadow: 0px 8px 8px 0px rgba(0, 0, 0, 0.2); 
     z-index: 0; 
 } 
 
