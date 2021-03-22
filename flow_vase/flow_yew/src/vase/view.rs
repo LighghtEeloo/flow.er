@@ -1,5 +1,5 @@
 use yew::{html, Html};
-use flow_vessel::{export_json, Router};
+use flow_vessel::{Router, TimeClockLocal, export_json};
 use super::{Vase, Msg::*};
 
 impl Vase {
@@ -70,8 +70,8 @@ impl Vase {
     fn status_bar(&self) -> Html {
         html! {
             <div class="frame" id="status-bar">
-                { self.src_view_button_view() }
-                { self.export_button_view() }
+                { self.src_button() }
+                { self.export_button() }
                 <p style="
                     position: absolute;
                     top: 0; bottom: 0; left: 0; right: 0;
@@ -83,6 +83,7 @@ impl Vase {
                 ">
                     {"Lorem ipsum dolor sit amet consectetur, adipisicing elit."}
                 </p>
+                // { self.status_bar_clock() }
             </div>
         }
     }
@@ -104,7 +105,7 @@ impl Vase {
                             // Todo: close vm.
                             [Refresh]
                         })
-                    />
+                    > { "x" } </button>
                     // cube_vm view
                     { cv.view() }
                 </div>
@@ -115,7 +116,7 @@ impl Vase {
 
 
 impl Vase {
-    fn src_view_button_view(&self) -> Html {
+    fn src_button(&self) -> Html {
         html! {
             <button class="status-bar-button" id="src-button"
                 title="The source code of the cube."
@@ -133,7 +134,7 @@ impl Vase {
             </button>
         }
     }
-    fn export_button_view(&self) -> Html {
+    fn export_button(&self) -> Html {
         html! {
             <button class="status-bar-button" id="export-button"
                 title="Copy src to clipboard."
@@ -144,5 +145,15 @@ impl Vase {
             </button>
         }
     }
+    // Note: Clock not available yet.
+    // fn status_bar_clock(&self) -> Html {
+    //     let time = format!("{}", TimeClockLocal::from(flow_vessel::now()));
+    //     html! {
+    //         <div class="status-bar-button" id="clock">
+    //             <span>{ time }</span>
+    //         </div>
+    //     }
+    // }
 }
+
 

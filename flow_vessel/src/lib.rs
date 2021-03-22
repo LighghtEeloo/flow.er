@@ -10,7 +10,7 @@ mod vessel;
 
 pub use flow_arena::{Flow, FlowArena, Node};
 pub use identity::{EntityId, EntityIdFactory};
-pub use time::{TimeNote, TimeRep, now};
+pub use time::{TimeNote, TimeRep, TimeClockLocal, now};
 pub use process::ProcessStatus;
 pub use tag::{Tag, TagSet, TagSetField};
 pub use entity::{Entity, EntityField, Face, Bubble};

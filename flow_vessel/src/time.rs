@@ -1,4 +1,4 @@
-use std::{fmt::Debug, time::{SystemTime, Duration}};
+use std::{fmt::{Debug, Display}, time::{SystemTime, Duration}};
 #[cfg(target_arch = "wasm32")]
 use std::time::UNIX_EPOCH;
 use chrono::{DateTime, Local, Utc};
@@ -7,6 +7,7 @@ use serde::{Serialize, Deserialize};
 pub trait TimeRep {
     fn human_local_detail(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result;
     fn human_local(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result;
+    fn clock_local(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result;
     fn human_utc(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result;
 }
 
@@ -19,11 +20,35 @@ impl TimeRep for SystemTime {
         let dt: DateTime<Local> = self.clone().into();
         write!(f, "{} (Local)", dt.format("%Y-%m-%d %H:%M:%S").to_string())
     }
+    fn clock_local(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let dt: DateTime<Local> = self.clone().into();
+        write!(f, "{}", dt.format("%H:%M:%S").to_string())
+    }
     fn human_utc(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let dt: DateTime<Utc> = self.clone().into();
         write!(f, "{} (UTC)", dt.format("%Y-%m-%d %H:%M:%S").to_string())
     }
 }
+
+pub struct TimeClockLocal<T> (T);
+
+impl<T: Sized> From<T> for TimeClockLocal<T> {
+    fn from(t: T) -> Self {
+        Self (t)
+    }
+}
+
+impl<T: Sized + TimeRep> Display for TimeClockLocal<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.clock_local(f)
+    }
+}
+
+// impl Debug for dyn TimeRep {
+//     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+//         todo!()
+//     }
+// }
 
 #[derive(Default)]
 #[derive(Clone, Serialize, Deserialize)]
@@ -70,6 +95,14 @@ impl TimeRep for TimeNote {
         write!(f, ":]")?;
         write!(f, "")
     }
+    fn clock_local(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if let Some(time) = None.or(self.start).or(self.end) {
+            let dt: DateTime<Local> = time.into();
+            write!(f, "{}", dt.format("%H:%M:%S").to_string())
+        } else {
+            write!(f, "len_0")
+        }
+    }
 
     fn human_utc(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "[:")?;
@@ -83,7 +116,11 @@ impl TimeRep for TimeNote {
 
 impl Debug for TimeNote {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.human_local(f)
+        if f.alternate() {
+            self.human_local_detail(f)
+        } else {
+            self.human_local(f)
+        }
     }
 }
 
