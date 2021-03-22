@@ -1,5 +1,6 @@
 use yew::{html, Html};
-use flow_vessel::{Router, TimeClockLocal, export_json};
+use flow_vessel::{Router, export_json};
+// use flow_vessel::display::TimeClockLocal;
 use super::{Vase, Msg::*};
 
 impl Vase {
@@ -94,7 +95,8 @@ impl Vase {
         let per_width = 100.0 / self.cube_vm_vec.len() as f64;
         self.cube_vm_vec.iter().enumerate().map(|(idx, cv)| {
             let style = {
-                format!("width: {}%;", per_width) 
+                format!("position: absolute; height: 100%;") 
+                +&format!("width: {}%;", per_width) 
                 +&format!("left: {}%;", per_width * idx as f64) 
                 +&{ if idx != 0 { format!("border-left: 2px solid gray;") } else { format!("") } }
             };

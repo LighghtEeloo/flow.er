@@ -132,9 +132,12 @@ impl Default for Glass {
                     obj: EntityId::default(),
                     current: EntityId::default()
                 },
-            // board: vec![Blank { alt: format!("Focus on a node to start.") }],
+            // board: vec![],
             // Test..
-            board: vec![TodoList { current: None, obj: EntityId::default() }],
+            board: vec![
+                TodoList { current: None, obj: EntityId::default() },
+                TodoList { current: None, obj: EntityId::default() },
+            ],
             promised: Cube::default(),
             calendar: CalendarView { current: now() },
             time_anchor: TimeView,
@@ -144,7 +147,7 @@ impl Default for Glass {
 }
 
 impl Glass {
-    pub fn router(&self, router: Router) -> Vec<Cube> {
+    pub fn switch_router(&self, router: Router) -> Vec<Cube> {
         use Cube::Blank;
         if router == Router::Board {
             if self.board.is_empty() {

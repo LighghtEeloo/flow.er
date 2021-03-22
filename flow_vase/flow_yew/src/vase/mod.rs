@@ -72,6 +72,7 @@ impl Component for Vase {
                 match msg {
                     SwitchRouter{ router} => {
                         self.vessel.router = router;
+                        self.vessel.glass.switch_router(router);
                         true
                     },
 
@@ -94,7 +95,15 @@ impl Component for Vase {
             self.link.callback(move |()| left.clone()).emit(());
             false
         } else {
+            // update cube_vm_vec
+            self.cube_vm_vec = self.vessel.get_cube_vec().iter()
+                .map(|cube| CubeVM::new(
+                    cube, 
+                    &self.vessel, 
+                    self.link.clone()
+                )).collect();
             // save
+            log_obj("Vessel", &self.vessel);
             let save_res = futures::executor::block_on(self.vessel.clone().save());
             if save_res.is_err() {
                 log_obj("load err", -1);

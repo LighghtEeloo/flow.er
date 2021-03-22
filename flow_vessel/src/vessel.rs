@@ -25,9 +25,11 @@ impl Vessel {
 impl Debug for Vessel {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Vessel")
+         .field("router", &self.router)
+         .field("glass", &self.glass)
+         .field("id_factory", &self.id_factory)
          .field("root", &self.flow_arena.root)
          .field("node_map", &self.flow_arena.node_map)
-         .field("id_factory", &self.id_factory)
          .finish()
     }
 }
@@ -71,7 +73,7 @@ pub type EntityNode = Node<EntityId, Entity>;
 
 impl Vessel {
     pub fn get_cube_vec(&self) -> Vec<Cube> {
-        self.glass.router(self.router)
+        self.glass.switch_router(self.router)
     }
 }
 

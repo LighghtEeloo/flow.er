@@ -1,4 +1,4 @@
-use std::{fmt::{Debug, Display}, time::{SystemTime, Duration}};
+use std::{fmt::Debug, time::{SystemTime, Duration}};
 #[cfg(target_arch = "wasm32")]
 use std::time::UNIX_EPOCH;
 use chrono::{DateTime, Local, Utc};
@@ -30,25 +30,6 @@ impl TimeRep for SystemTime {
     }
 }
 
-pub struct TimeClockLocal<T> (T);
-
-impl<T: Sized> From<T> for TimeClockLocal<T> {
-    fn from(t: T) -> Self {
-        Self (t)
-    }
-}
-
-impl<T: Sized + TimeRep> Display for TimeClockLocal<T> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.0.clock_local(f)
-    }
-}
-
-// impl Debug for dyn TimeRep {
-//     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-//         todo!()
-//     }
-// }
 
 #[derive(Default)]
 #[derive(Clone, Serialize, Deserialize)]
@@ -135,6 +116,53 @@ pub fn now() -> SystemTime {
 #[cfg(not(target_arch = "wasm32"))]
 pub fn now() -> SystemTime {
     SystemTime::now()
+}
+
+pub mod display {
+    use std::fmt::Display;
+    use super::TimeRep;    
+
+    pub struct TimeClockLocal<T> (T);
+
+    impl<T: Sized> From<T> for TimeClockLocal<T> {
+        fn from(t: T) -> Self {
+            Self (t)
+        }
+    }
+
+    impl<T: Sized + TimeRep> Display for TimeClockLocal<T> {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            self.0.clock_local(f)
+        }
+    }
+
+    pub struct TimeHumanLocal<T> (T);
+
+    impl<T: Sized> From<T> for TimeHumanLocal<T> {
+        fn from(t: T) -> Self {
+            Self (t)
+        }
+    }
+
+    impl<T: Sized + TimeRep> Display for TimeHumanLocal<T> {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            self.0.human_local(f)
+        }
+    }
+
+    pub struct TimeHumanUTC<T> (T);
+
+    impl<T: Sized> From<T> for TimeHumanUTC<T> {
+        fn from(t: T) -> Self {
+            Self (t)
+        }
+    }
+
+    impl<T: Sized + TimeRep> Display for TimeHumanUTC<T> {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            self.0.human_utc(f)
+        }
+    }
 }
 
 #[cfg(test)]
