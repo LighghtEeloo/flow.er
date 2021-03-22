@@ -51,6 +51,8 @@ impl Vase {
     fn main_editor(&self) -> Html {
         let router = self.vessel.router;
         let editor_str = router.type_str();
+        let vm_vec: Vec<Html> = self.cube_vm_vec.iter()
+            .map(|cv| cv.view()).collect();
         // let vm_vec = self.vessel.vm_map.get(&router).map(|vec| {
         //     let per_width = 100.0 / vec.len() as f64;
         //     vec.iter().enumerate().map(|(vm_idx, vm)| {
@@ -69,7 +71,7 @@ impl Vase {
         let editor = 
             html! {
                 <div class={editor_str}>
-                    // { vm_vec }
+                    { vm_vec }
                 </div>
             };
         html! {

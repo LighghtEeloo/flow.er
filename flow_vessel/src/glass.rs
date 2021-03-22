@@ -1,4 +1,5 @@
 use serde::{Serialize, Deserialize};
+use std::time::SystemTime;
 
 use super::EntityId;
 
@@ -67,7 +68,7 @@ pub enum Cube {
         current: EntityId
     },
     CalendarView {
-        current: EntityId
+        current: SystemTime
     },
     TimeView,
     SettingView,
@@ -86,7 +87,7 @@ impl Default for Cube {
 
 
 /// A overall layer of routers and cubes.
-#[derive(Default, Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Glass {
     bird_view: Cube,
     board: Vec<Cube>,
@@ -96,12 +97,24 @@ pub struct Glass {
     settings: Cube,
 }
 
+impl Default for Glass {
+    fn default() -> Self {
+        Glass {
+            bird_view: Cube::default(),
+            board: vec![Cube::default()],
+            promised: Cube::default(),
+            calendar: Cube::default(),
+            time_anchor: Cube::TimeView,
+            settings: Cube::SettingView,
+        }
+    }
+}
+
 impl Glass {
     pub fn router(&self, router: Router) -> Vec<Cube> {
         if router == Router::Board {
             self.board.clone()
         } else {
-            use Cube::*;
             let cube = match router {
                 Router::BirdView => self.bird_view.clone(),
                 Router::Promised => self.promised.clone(),

@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 use serde::{Serialize, Deserialize};
 
-use super::{Entity, EntityId, EntityIdFactory, Node, Flow, FlowArena, Router, Glass};
+use super::{Entity, EntityId, EntityIdFactory, Node, Flow, FlowArena, Router, Glass, Cube};
 
 #[derive(Default, Clone, Serialize, Deserialize)]
 pub struct Vessel {
@@ -48,6 +48,9 @@ impl Vessel {
     pub fn entity_get_mut(&mut self, id: &EntityId) -> Option<&mut Entity> {
         self.flow_arena.node_map.get_mut(id).map(|x| &mut x.entity)
     }
+    pub fn node(&self, id: &EntityId) -> Option<&Node<EntityId, Entity>> {
+        self.flow_arena.node(id)
+    }
     pub fn entity_list(&self, id: &EntityId) -> Vec<&Entity> {
         let vec = self.flow_arena.node_map.get(id).map(|x| x.children.clone()).unwrap_or_default();
         
@@ -65,6 +68,12 @@ impl Vessel {
 }
 
 pub type EntityNode = Node<EntityId, Entity>;
+
+impl Vessel {
+    pub fn get_cube_vec(&self) -> Vec<Cube> {
+        self.glass.router(self.router)
+    }
+}
 
 #[cfg(test)]
 mod tests {

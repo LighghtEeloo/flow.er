@@ -88,7 +88,7 @@ impl Debug for TimeNote {
 }
 
 #[cfg(target_arch = "wasm32")]
-fn now() -> SystemTime {
+pub fn now() -> SystemTime {
     let dur = wasm_timer::SystemTime::now()
         .duration_since(wasm_timer::UNIX_EPOCH)
         .expect("time went backwards");

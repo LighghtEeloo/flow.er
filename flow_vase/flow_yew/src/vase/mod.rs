@@ -3,11 +3,14 @@ mod cube_vm;
 
 use yew::{Component, ComponentLink, Html, ShouldRender};
 use flow_vessel::*;
+
 use super::log_obj;
+use cube_vm::CubeVM;
 
 
 pub struct Vase {
     vessel: Vessel,
+    cube_vm_vec: Vec<CubeVM>,
     link: ComponentLink<Self>,
 }
 
@@ -36,9 +39,13 @@ impl Component for Vase {
     fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
         let vessel_future = Vessel::load();
         let vessel = futures::executor::block_on(vessel_future).unwrap_or(Vessel::new());
+        let cubes = vessel.get_cube_vec();
+        let cube_vm_vec = cubes.iter()
+            .map(|c| CubeVM::new(c, &vessel, link.clone())).collect();
         log_obj("Vessel", &vessel);
         Self {
             vessel,
+            cube_vm_vec,
             link
         }
     }

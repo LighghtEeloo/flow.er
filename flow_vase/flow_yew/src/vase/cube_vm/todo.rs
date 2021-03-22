@@ -208,6 +208,11 @@ impl TodoList {
         target.truncate(correct.len());
         target
     }
+    pub fn view(&self) -> Html {
+        html! {
+            <> </>
+        }
+    }
 }
 
 #[cfg(test)]
