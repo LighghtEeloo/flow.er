@@ -1,5 +1,5 @@
 use yew::{ComponentLink, Html, NodeRef, html, InputData};
-use flow_vessel::{Entity, EntityId, EntityField, EntityNode, ProcessStatus};
+use flow_vessel::{Entity, EntityField, EntityId, EntityNode, ProcessStatus, Vessel};
 use super::{Vase, Msg::*};
 
 #[derive(Clone)]
@@ -208,9 +208,17 @@ impl TodoList {
         target.truncate(correct.len());
         target
     }
-    pub fn view(&self) -> Html {
+    pub fn view(&self, vessel: &Vessel) -> Html {
+        let nodes_view: Vec<Html> = self.nodes.iter().enumerate()
+            .map(|(idx, node)| {
+                node.view(
+                    idx, 
+                    vessel.entity_get(&node.id).expect("must exist"), 
+                    self.head.id
+                )
+            }).collect();
         html! {
-            <> </>
+            <div class="node-view"> { nodes_view } </div>
         }
     }
 }

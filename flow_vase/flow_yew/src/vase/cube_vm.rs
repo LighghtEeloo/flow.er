@@ -75,16 +75,21 @@ impl CubeVM {
             Cube::Blank { alt } => Blank { alt }
         }
     }
-    pub fn view(&self) -> Html {
+    pub fn view(&self, vessel: &Vessel) -> Html {
         match self {
             CubeVM::Blank { alt } => {
                 html_uni_vec(format!("blank"), html! {
                     <span> {alt} </span>
                 })
             }
+            CubeVM::TodoList { current: _, todo } => {
+                html_uni_vec(format!("todo-list"), html! {
+                    <span> { todo.view(vessel) } </span>
+                })
+            }
             _ => {
                 html_uni_vec(format!("none"), html! {
-                    <></>
+                    <>{"Not implemented."}</>
                 })
             }
         }

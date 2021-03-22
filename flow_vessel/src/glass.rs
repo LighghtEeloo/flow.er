@@ -1,4 +1,5 @@
 use serde::{Serialize, Deserialize};
+use serde_json::to_vec;
 use std::time::SystemTime;
 
 use super::{EntityId, now};
@@ -131,7 +132,9 @@ impl Default for Glass {
                     obj: EntityId::default(),
                     current: EntityId::default()
                 },
-            board: vec![Blank { alt: format!("Focus on a node to start.") }],
+            // board: vec![Blank { alt: format!("Focus on a node to start.") }],
+            // Test..
+            board: vec![TodoList { current: None, obj: EntityId::default() }],
             promised: Cube::default(),
             calendar: CalendarView { current: now() },
             time_anchor: TimeView,
@@ -142,8 +145,13 @@ impl Default for Glass {
 
 impl Glass {
     pub fn router(&self, router: Router) -> Vec<Cube> {
+        use Cube::Blank;
         if router == Router::Board {
-            self.board.clone()
+            if self.board.is_empty() {
+                vec![Blank { alt: format!("Focus on a node to start.") }]
+            } else {
+                self.board.clone()
+            }
         } else {
             let cube = match router {
                 Router::BirdView => self.bird_view.clone(),
@@ -151,7 +159,7 @@ impl Glass {
                 Router::Calendar => self.calendar.clone(),
                 Router::TimeAnchor => self.time_anchor.clone(),
                 Router::Settings => self.settings.clone(),
-                _ => Cube::Blank { alt: format!("Error.") }
+                _ => Blank { alt: format!("Error.") }
             };
             [cube].to_vec()
         }

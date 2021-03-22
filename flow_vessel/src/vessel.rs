@@ -42,7 +42,7 @@ impl Vessel {
         self.flow_arena.grow(Node::from_id(id.clone(), entity)).ok();
         id
     }
-    pub fn entity_get(&mut self, id: &EntityId) -> Option<&Entity> {
+    pub fn entity_get(&self, id: &EntityId) -> Option<&Entity> {
         self.flow_arena.node_map.get(id).map(|x| &x.entity)
     }
     pub fn entity_get_mut(&mut self, id: &EntityId) -> Option<&mut Entity> {

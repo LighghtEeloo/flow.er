@@ -107,7 +107,7 @@ impl Vase {
                         })
                     > { "x" } </button>
                     // cube_vm view
-                    { cv.view() }
+                    { cv.view(&self.vessel) }
                 </div>
             }
         }).collect()
