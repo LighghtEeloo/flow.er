@@ -51,23 +51,9 @@ impl Vase {
     fn main_editor(&self) -> Html {
         let router = self.vessel.router;
         let editor_str = router.type_str();
-        let vm_vec: Vec<Html> = self.cube_vm_vec.iter()
-            .map(|cv| cv.view()).collect();
-        // let vm_vec = self.vessel.vm_map.get(&router).map(|vec| {
-        //     let per_width = 100.0 / vec.len() as f64;
-        //     vec.iter().enumerate().map(|(vm_idx, vm)| {
-        //         let style = {
-        //             format!("width: {}%;", per_width) 
-        //             +&format!("left: {}%;", per_width * vm_idx as f64) 
-        //             +&{ if vm_idx != 0 { format!("border-left: 2px solid gray;") } else { format!("") } }
-        //         };
-        //         html! {
-        //             <div class="vm" style={ style }>
-        //             // vm cube view
-        //             </div>
-        //         }
-        //     }).collect()
-        // }).unwrap_or(Vec::new());
+        // let vm_vec: Vec<Html> = self.cube_vm_vec.iter()
+        //     .map(|cv| cv.view()).collect();
+        let vm_vec: Vec<Html> = self.cube_vm_vec_view();
         let editor = 
             html! {
                 <div class={editor_str}>
@@ -102,9 +88,34 @@ impl Vase {
     }
 }
 
+impl Vase {
+    fn cube_vm_vec_view(&self) -> Vec<Html> {
+        let per_width = 100.0 / self.cube_vm_vec.len() as f64;
+        self.cube_vm_vec.iter().enumerate().map(|(idx, cv)| {
+            let style = {
+                format!("width: {}%;", per_width) 
+                +&format!("left: {}%;", per_width * idx as f64) 
+                +&{ if idx != 0 { format!("border-left: 2px solid gray;") } else { format!("") } }
+            };
+            html! {
+                <div class="vm" style={ style }>
+                    <button class="btn-close"
+                        onclick=self.link.callback(|_| {
+                            // Todo: close vm.
+                            [Refresh]
+                        })
+                    />
+                    // cube_vm view
+                    { cv.view() }
+                </div>
+            }
+        }).collect()
+    }
+}
+
 
 impl Vase {
-    pub fn src_view_button_view(&self) -> Html {
+    fn src_view_button_view(&self) -> Html {
         html! {
             <button class="status-bar-button" id="src-button"
                 title="The source code of the cube."
@@ -122,7 +133,7 @@ impl Vase {
             </button>
         }
     }
-    pub fn export_button_view(&self) -> Html {
+    fn export_button_view(&self) -> Html {
         html! {
             <button class="status-bar-button" id="export-button"
                 title="Copy src to clipboard."

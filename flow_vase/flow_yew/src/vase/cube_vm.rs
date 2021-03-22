@@ -78,12 +78,12 @@ impl CubeVM {
     pub fn view(&self) -> Html {
         match self {
             CubeVM::Blank { alt } => {
-                html_uni_vec("blank".to_owned(), html! {
+                html_uni_vec(format!("blank"), html! {
                     <span> {alt} </span>
                 })
             }
             _ => {
-                html_uni_vec("none".to_owned(), html! {
+                html_uni_vec(format!("none"), html! {
                     <></>
                 })
             }
@@ -96,3 +96,4 @@ fn html_uni_vec(class: String, content: Html) -> Html {
         <div class=class> {content} </div>
     }
 }
+

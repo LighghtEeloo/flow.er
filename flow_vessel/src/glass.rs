@@ -1,7 +1,7 @@
 use serde::{Serialize, Deserialize};
 use std::time::SystemTime;
 
-use super::EntityId;
+use super::{EntityId, now};
 
 /// Describes the app router.
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, Deserialize, Serialize)]
@@ -85,6 +85,31 @@ impl Default for Cube {
     }
 }
 
+impl Cube {
+    pub fn new(router: Router) -> Self {
+        use Cube::*;
+        match router {
+            Router::BirdView => 
+                FlowView {
+                    obj: EntityId::default(),
+                    current: EntityId::default()
+                },
+            Router::Board => Cube::default(),
+            Router::Promised => Cube::default(),
+            Router::Calendar => CalendarView { current: now() },
+            Router::TimeAnchor => TimeView,
+            Router::Settings => SettingView,
+        }
+    }
+    pub fn is_blank(&self) -> bool {
+        if let Cube::Blank{ alt: _ } = self {
+            true
+        } else {
+            false
+        }
+    }
+}
+
 
 /// A overall layer of routers and cubes.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -99,13 +124,18 @@ pub struct Glass {
 
 impl Default for Glass {
     fn default() -> Self {
+        use Cube::*;
         Glass {
-            bird_view: Cube::default(),
-            board: vec![Cube::default()],
+            bird_view: 
+                FlowView {
+                    obj: EntityId::default(),
+                    current: EntityId::default()
+                },
+            board: vec![Blank { alt: format!("Focus on a node to start.") }],
             promised: Cube::default(),
-            calendar: Cube::default(),
-            time_anchor: Cube::TimeView,
-            settings: Cube::SettingView,
+            calendar: CalendarView { current: now() },
+            time_anchor: TimeView,
+            settings: SettingView,
         }
     }
 }
@@ -121,7 +151,7 @@ impl Glass {
                 Router::Calendar => self.calendar.clone(),
                 Router::TimeAnchor => self.time_anchor.clone(),
                 Router::Settings => self.settings.clone(),
-                _ => Cube::default()
+                _ => Cube::Blank { alt: format!("Error.") }
             };
             [cube].to_vec()
         }
