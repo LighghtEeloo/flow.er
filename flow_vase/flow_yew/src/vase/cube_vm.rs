@@ -1,10 +1,21 @@
 use yew::{ComponentLink, Html, html};
 use std::time::SystemTime;
-use flow_vessel::{Cube, EntityId, Vessel};
+use flow_vessel::{Cube, EntityId, Router, Vessel};
 
 pub use super::{Vase, Msg};
 
 mod todo;
+
+// pub struct CubeVM {
+//     meta: CubeMeta,
+//     view: CubeView
+// }
+
+pub struct CubeMeta {
+    origin: Cube,
+    router: Router,
+    idx: usize
+}
 
 pub enum CubeVM {
     /// A single entity's notebook.

@@ -100,14 +100,17 @@ impl Vase {
                 +&format!("left: {}%;", per_width * idx as f64) 
                 +&{ if idx != 0 { format!("border-left: 2px solid gray;") } else { format!("") } }
             };
+            let btn_close: Html = html! {
+                <button class="btn-close"
+                    onclick=self.link.callback(|_| {
+                        // Todo: close vm.
+                        [Refresh]
+                    })
+                > { "x" } </button>
+            };
             html! {
                 <div class="vm" style={ style }>
-                    <button class="btn-close"
-                        onclick=self.link.callback(|_| {
-                            // Todo: close vm.
-                            [Refresh]
-                        })
-                    > { "x" } </button>
+                    { btn_close }
                     // cube_vm view
                     { cv.view(&self.vessel) }
                 </div>
