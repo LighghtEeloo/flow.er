@@ -155,12 +155,12 @@ impl Glass {
         }
     }
     pub fn refresh(&mut self) {
-        self.clean();
         let _: Vec<()> = Router::vec_all().iter().map(|&router| {
             self.ensured(router);
         }).collect();
+        self.clean();
     }
-    pub(crate) fn ensured(&mut self, router: Router) -> Vec<Cube> {
+    fn ensured(&mut self, router: Router) -> Vec<Cube> {
         // let mut maybe_vec = self.map.get(&router).cloned();
         // if maybe_vec.is_none() {
         //     self.map.insert(router, vec![Cube::new(router)]);
@@ -169,11 +169,13 @@ impl Glass {
         // maybe_vec.expect("should have inserted before")
         self.map.entry(router).or_insert(vec![Cube::new(router)]).clone()
     }
-    pub(crate) fn clean(&mut self) {
-        let _: Vec<()> = self.map.iter_mut().map(|(_, vec)| {
+    fn clean(&mut self) {
+        let _: Vec<()> = self.map.iter_mut().map(|(&router, vec)| {
             vec.retain(|x| !x.is_blank() );
+            if vec.is_empty() {
+                vec.push(Cube::new(router))
+            }
         }).collect();
-        // self.map = HashMap::new();
     }
 }
 
