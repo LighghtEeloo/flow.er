@@ -6,18 +6,37 @@ pub use super::{Vase, Msg};
 
 mod todo;
 
-// pub struct CubeVM {
-//     meta: CubeMeta,
-//     view: CubeView
-// }
+pub struct CubeVM {
+    meta: CubeMeta,
+    view: CubeView
+}
 
+impl CubeVM {
+    pub fn new(idx: usize, cube: &Cube, vessel: &Vessel, link: ComponentLink<Vase>) -> Self {
+        let meta = 
+            CubeMeta {
+                origin: cube.clone(),
+                router: vessel.router,
+                idx
+            };
+        Self {
+            meta, 
+            view: CubeView::new(cube, vessel, link)
+        }
+    }
+    pub fn view(&self, vessel: &Vessel) -> Html {
+        self.view.view(vessel, self.meta.clone())
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct CubeMeta {
     origin: Cube,
     router: Router,
     idx: usize
 }
 
-pub enum CubeVM {
+pub enum CubeView {
     /// A single entity's notebook.
     Inkblot {
         obj: EntityId
@@ -46,7 +65,7 @@ pub enum CubeVM {
     }
 }
 
-impl Default for CubeVM {
+impl Default for CubeView {
     fn default() -> Self {
         Self::Blank {
             alt: format!("Clean and innocent.")
@@ -54,9 +73,9 @@ impl Default for CubeVM {
     }
 }
 
-impl CubeVM {
+impl CubeView {
     pub fn new(cube: &Cube, vessel: &Vessel, link: ComponentLink<Vase>) -> Self {
-        use CubeVM::*;
+        use CubeView::*;
         match cube.clone() {
             Cube::Inkblot { obj } => 
                 Inkblot { obj },
@@ -86,14 +105,14 @@ impl CubeVM {
             Cube::Blank { alt } => Blank { alt }
         }
     }
-    pub fn view(&self, vessel: &Vessel) -> Html {
+    pub fn view(&self, vessel: &Vessel, meta: CubeMeta) -> Html {
         match self {
-            CubeVM::Blank { alt } => {
+            CubeView::Blank { alt } => {
                 html_uni_vec(format!("blank"), html! {
                     <span> {alt} </span>
                 })
             }
-            CubeVM::TodoList { current: _, todo } => {
+            CubeView::TodoList { current: _, todo } => {
                 html_uni_vec(format!("todo-list"), html! {
                     <span> { todo.view(vessel) } </span>
                 })

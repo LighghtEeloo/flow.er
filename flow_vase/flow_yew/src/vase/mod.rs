@@ -5,7 +5,7 @@ use yew::{Component, ComponentLink, Html, ShouldRender};
 use flow_vessel::*;
 
 use super::log_obj;
-use cube_vm::CubeVM;
+use cube_vm::{CubeVM, CubeMeta};
 
 
 pub struct Vase {
@@ -17,8 +17,13 @@ pub struct Vase {
 #[derive(Debug, Clone)]
 pub enum Msg {
     // router level
-    SwitchRouter{
+    SwitchRouter {
         router: Router
+    },
+
+    // vm level
+    CloseVM {
+        meta: CubeMeta
     },
 
     // entity level
@@ -53,8 +58,13 @@ impl Component for Vase {
         //     v
         // };
         let cubes = vessel.get_cube_vec();
-        let cube_vm_vec = cubes.iter()
-            .map(|c| CubeVM::new(c, &vessel, link.clone())).collect();
+        let cube_vm_vec = cubes.iter().enumerate()
+            .map(|(idx,cube)| CubeVM::new(
+                idx, 
+                cube, 
+                &vessel, 
+                link.clone()
+            )).collect();
         log_obj("Vessel", &vessel);
         Self {
             vessel,
@@ -75,6 +85,11 @@ impl Component for Vase {
                         self.vessel.router = router;
                         true
                     },
+
+                    CloseVM { meta } => {
+                        // Todo: close.
+                        true
+                    }
 
                     EntityUpdate { id, field } => {
                         self.vessel.entity_get_mut(&id).map(|entity| {
@@ -98,8 +113,9 @@ impl Component for Vase {
             // clean the glass
             self.vessel.clean_glass();
             // update cube_vm_vec
-            self.cube_vm_vec = self.vessel.get_cube_vec().iter()
-                .map(|cube| CubeVM::new(
+            self.cube_vm_vec = self.vessel.get_cube_vec().iter().enumerate()
+                .map(|(idx, cube)| CubeVM::new(
+                    idx,
                     cube, 
                     &self.vessel, 
                     self.link.clone()
