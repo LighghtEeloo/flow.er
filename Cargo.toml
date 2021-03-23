@@ -7,9 +7,9 @@ readme = "readme.md"
 repository = "https://github.com/LighghtEeloo/flow.er"
 
 [features]
-cli = []
+cli = ["flow_cli"]
 iced = []
-yew = []
+yew = ["flow_yew"]
 
 [workspace]
 members = [
@@ -17,16 +17,18 @@ members = [
 	"flow_vessel",
 	"flow_vase/flow_cli",
 	# "flow_vase/flow_iced",
-	"flow_vase/flow_yew",
-	"flow_vase/flow_yew_legacy",
-	# "wasm-timer",
+	# "flow_vase/flow_yew",
+	# "flow_vase/flow_yew_legacy",
 ]
 
 [dependencies.flow_cli]
 path = "flow_vase/flow_cli"
+optional = true
 
 [dependencies.flow_yew]
 path = "flow_vase/flow_yew"
+optional = true
 
 [dependencies.flow_yew_legacy]
 path = "flow_vase/flow_yew_legacy"
+optional = true
