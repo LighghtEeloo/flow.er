@@ -28,7 +28,8 @@ impl CubeVM {
         }
     }
     pub fn view(&self, vessel: &Vessel, per_width: f64) -> Html {
-        let idx = self.meta.idx;
+        let meta = self.meta;
+        let idx = meta.idx;
         let style = {
             format!("position: absolute; height: 100%;") 
             +&format!("width: {}%;", per_width) 
@@ -37,12 +38,9 @@ impl CubeVM {
         };
         let btn_close: Html = html! {
             <button class="btn-close"
-                onclick=self.link.callback(|_| {
+                onclick=self.link.callback(move |_| {
                     // Todo: close vm.
-                    // [ CloseVM { meta: self.meta.clone() } ]
-                    [ CloseVM { meta: CubeMeta {
-                        idx: 0, router: Router::Board
-                    } } ]
+                    [ CloseVM { meta } ]
                 })
             > { "x" } </button>
         };
