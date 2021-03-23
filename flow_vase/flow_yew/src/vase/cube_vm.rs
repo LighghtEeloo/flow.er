@@ -2,38 +2,68 @@ use yew::{ComponentLink, Html, html};
 use std::time::SystemTime;
 use flow_vessel::{Cube, EntityId, Router, Vessel};
 
-pub use super::{Vase, Msg};
+pub use super::{Vase, Msg, Msg::*};
 
 mod todo;
 
 pub struct CubeVM {
-    meta: CubeMeta,
-    view: CubeView
+    pub meta: CubeMeta,
+    pub view: CubeView,
+    pub link: ComponentLink<Vase>
 }
 
 impl CubeVM {
     pub fn new(idx: usize, cube: &Cube, vessel: &Vessel, link: ComponentLink<Vase>) -> Self {
         let meta = 
             CubeMeta {
-                origin: cube.clone(),
+                // origin: cube.clone(),
                 router: vessel.router,
                 idx
             };
+        let view = CubeView::new(cube, vessel, link.clone());
         Self {
             meta, 
-            view: CubeView::new(cube, vessel, link)
+            view,
+            link
         }
     }
-    pub fn view(&self, vessel: &Vessel) -> Html {
+    pub fn view(&self, vessel: &Vessel, per_width: f64) -> Html {
+        let idx = self.meta.idx;
+        let style = {
+            format!("position: absolute; height: 100%;") 
+            +&format!("width: {}%;", per_width) 
+            +&format!("left: {}%;", per_width * idx as f64) 
+            +&{ if idx != 0 { format!("border-left: 2px solid gray;") } else { format!("") } }
+        };
+        let btn_close: Html = html! {
+            <button class="btn-close"
+                onclick=self.link.callback(|_| {
+                    // Todo: close vm.
+                    // [ CloseVM { meta: self.meta.clone() } ]
+                    [ CloseVM { meta: CubeMeta {
+                        idx: 0, router: Router::Board
+                    } } ]
+                })
+            > { "x" } </button>
+        };
+        html! {
+            <div class="vm" style={ style }>
+                { btn_close }
+                // cube_vm view
+                { self.view_inner(vessel) }
+            </div>
+        }
+    }
+    pub fn view_inner(&self, vessel: &Vessel) -> Html {
         self.view.view(vessel, self.meta.clone())
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct CubeMeta {
-    origin: Cube,
-    router: Router,
-    idx: usize
+    // origin: Cube,
+    pub router: Router,
+    pub idx: usize
 }
 
 pub enum CubeView {

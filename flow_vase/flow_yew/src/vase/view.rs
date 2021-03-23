@@ -1,6 +1,6 @@
 use yew::{html, Html};
 use flow_vessel::{Router, export_json};
-// use flow_vessel::display::TimeClockLocal;
+// use flow_vessel::display::*;
 use super::{Vase, Msg::*};
 
 impl Vase {
@@ -93,28 +93,8 @@ impl Vase {
 impl Vase {
     fn cube_vm_vec_view(&self) -> Vec<Html> {
         let per_width = 100.0 / self.cube_vm_vec.len() as f64;
-        self.cube_vm_vec.iter().enumerate().map(|(idx, cv)| {
-            let style = {
-                format!("position: absolute; height: 100%;") 
-                +&format!("width: {}%;", per_width) 
-                +&format!("left: {}%;", per_width * idx as f64) 
-                +&{ if idx != 0 { format!("border-left: 2px solid gray;") } else { format!("") } }
-            };
-            let btn_close: Html = html! {
-                <button class="btn-close"
-                    onclick=self.link.callback(|_| {
-                        // Todo: close vm.
-                        [Refresh]
-                    })
-                > { "x" } </button>
-            };
-            html! {
-                <div class="vm" style={ style }>
-                    { btn_close }
-                    // cube_vm view
-                    { cv.view(&self.vessel) }
-                </div>
-            }
+        self.cube_vm_vec.iter().map(|cv| {
+            cv.view(&self.vessel, per_width)
         }).collect()
     }
 }
