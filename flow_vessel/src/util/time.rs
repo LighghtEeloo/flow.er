@@ -30,6 +30,18 @@ impl TimeRep for SystemTime {
     }
 }
 
+#[cfg(target_arch = "wasm32")]
+pub fn now() -> SystemTime {
+    let dur = wasm_timer::SystemTime::now()
+        .duration_since(wasm_timer::UNIX_EPOCH)
+        .expect("time went backwards");
+    UNIX_EPOCH + dur
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+pub fn now() -> SystemTime {
+    SystemTime::now()
+}
 
 #[derive(Default)]
 #[derive(Clone, Serialize, Deserialize)]
@@ -105,18 +117,6 @@ impl Debug for TimeNote {
     }
 }
 
-#[cfg(target_arch = "wasm32")]
-pub fn now() -> SystemTime {
-    let dur = wasm_timer::SystemTime::now()
-        .duration_since(wasm_timer::UNIX_EPOCH)
-        .expect("time went backwards");
-    UNIX_EPOCH + dur
-}
-
-#[cfg(not(target_arch = "wasm32"))]
-pub fn now() -> SystemTime {
-    SystemTime::now()
-}
 
 pub mod display {
     use std::fmt::Display;

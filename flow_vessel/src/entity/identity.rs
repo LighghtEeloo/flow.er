@@ -2,7 +2,7 @@ use std::{fmt::Debug, hash::Hash};
 use std::time::{SystemTime, UNIX_EPOCH};
 use serde::{Serialize, Deserialize};
 
-use super::time::{TimeRep, now};
+use crate::{TimeRep, now};
 
 const LEN: usize = 5;
 

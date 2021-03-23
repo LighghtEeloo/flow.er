@@ -1,8 +1,8 @@
 use serde::{Serialize, Deserialize};
 
+use crate::TimeNote;
 use super::identity::*;
 use super::tag::*;
-use super::time::TimeNote;
 use super::process::ProcessStatus;
 
 

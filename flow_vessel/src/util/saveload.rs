@@ -1,4 +1,4 @@
-use super::Vessel;
+use crate::Vessel;
 
 #[derive(Debug, Clone)]
 pub enum LoadError {
