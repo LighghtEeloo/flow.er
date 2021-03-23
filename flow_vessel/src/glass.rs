@@ -1,5 +1,4 @@
 use serde::{Serialize, Deserialize};
-use serde_json::to_vec;
 use std::time::SystemTime;
 
 use super::{EntityId, now};
@@ -136,7 +135,8 @@ impl Default for Glass {
             // Test..
             board: vec![
                 TodoList { current: None, obj: EntityId::default() },
-                TodoList { current: None, obj: EntityId::default() },
+                // TodoList { current: None, obj: EntityId::default() },
+                Inkblot { obj: EntityId::default() }
             ],
             promised: Cube::default(),
             calendar: CalendarView { current: now() },
@@ -166,5 +166,8 @@ impl Glass {
             };
             [cube].to_vec()
         }
+    }
+    pub fn clean(&mut self) {
+        self.board.retain(|x| !x.is_blank() )
     }
 }

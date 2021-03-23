@@ -39,18 +39,19 @@ impl Component for Vase {
     fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
         let vessel_future = Vessel::load();
         let vessel = futures::executor::block_on(vessel_future).unwrap_or(Vessel::new());
-        let vessel = {
-            let mut v = Vessel::default();
-            let ids: Vec<EntityId> = (0..5).into_iter().map(|_|{
-                v.entity_grow()
-            }).collect();
-            v.entity_get_mut(&ids[0]).map(|x| x.face = "A".to_owned());
-            v.entity_get_mut(&ids[1]).map(|x| x.face = "B".to_owned());
-            v.entity_get_mut(&ids[2]).map(|x| x.face = "C".to_owned());
-            v.entity_get_mut(&ids[3]).map(|x| x.face = "D".to_owned());
-            v.entity_get_mut(&ids[4]).map(|x| x.face = "E".to_owned());
-            v
-        };
+        // Test..
+        // let vessel = {
+        //     let mut v = Vessel::default();
+        //     let ids: Vec<EntityId> = (0..5).into_iter().map(|_|{
+        //         v.entity_grow()
+        //     }).collect();
+        //     v.entity_get_mut(&ids[0]).map(|x| x.face = "A".to_owned());
+        //     v.entity_get_mut(&ids[1]).map(|x| x.face = "B".to_owned());
+        //     v.entity_get_mut(&ids[2]).map(|x| x.face = "C".to_owned());
+        //     v.entity_get_mut(&ids[3]).map(|x| x.face = "D".to_owned());
+        //     v.entity_get_mut(&ids[4]).map(|x| x.face = "E".to_owned());
+        //     v
+        // };
         let cubes = vessel.get_cube_vec();
         let cube_vm_vec = cubes.iter()
             .map(|c| CubeVM::new(c, &vessel, link.clone())).collect();
@@ -72,7 +73,6 @@ impl Component for Vase {
                 match msg {
                     SwitchRouter{ router} => {
                         self.vessel.router = router;
-                        self.vessel.glass.switch_router(router);
                         true
                     },
 
@@ -95,6 +95,8 @@ impl Component for Vase {
             self.link.callback(move |()| left.clone()).emit(());
             false
         } else {
+            // clean the glass
+            self.vessel.clean_glass();
             // update cube_vm_vec
             self.cube_vm_vec = self.vessel.get_cube_vec().iter()
                 .map(|cube| CubeVM::new(
