@@ -70,7 +70,6 @@ pub enum CubeView {
     },
     /// A single entity and a todo list view
     TodoList {
-        current: Option<usize>,
         todo: todo::TodoList
     },
     PromisedLand,
@@ -108,13 +107,11 @@ impl CubeView {
             Cube::TodoList { obj, current } => {
                 let node = vessel.node(&obj);
                 node.map(|node| {
-                    TodoList { 
+                    todo::TodoList::new_cube(
+                        node, 
                         current, 
-                        todo: todo::TodoList::new(
-                            node, 
-                            link
-                        )
-                    }
+                        link
+                    )
                 }).unwrap_or_default()
             }
             Cube::PromisedLand => PromisedLand,
@@ -136,7 +133,7 @@ impl CubeView {
                     <span> {alt} </span>
                 })
             }
-            CubeView::TodoList { current: _, todo } => {
+            CubeView::TodoList { todo } => {
                 html_uni_vec(format!("todo-list"), html! {
                     <span> { todo.view(vessel) } </span>
                 })

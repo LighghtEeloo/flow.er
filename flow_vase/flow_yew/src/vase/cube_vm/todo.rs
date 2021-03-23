@@ -1,6 +1,6 @@
 use yew::{ComponentLink, Html, NodeRef, html, InputData};
 use flow_vessel::{Entity, EntityField, EntityId, EntityNode, ProcessStatus, Vessel};
-use super::{Vase, Msg::*};
+use super::{Vase, Msg::*, CubeView};
 
 #[derive(Clone)]
 pub struct TodoNode {
@@ -12,7 +12,7 @@ pub struct TodoNode {
 
 
 impl TodoNode {
-    pub fn new(id: EntityId, link: ComponentLink<Vase>) -> Self {
+    pub fn new_cube(id: EntityId, link: ComponentLink<Vase>) -> Self {
         Self {
             id,
             link,
@@ -143,20 +143,25 @@ impl TodoNode {
 
 #[derive(Clone)]
 pub struct TodoList {
+    current: Option<usize>,
     head: TodoNode,
     nodes: Vec<TodoNode>
 }
 
 impl TodoList {
-    pub fn new(entity_node: &EntityNode, link: ComponentLink<Vase>) -> Self {
+    pub fn new_cube(entity_node: &EntityNode, current: Option<usize>, link: ComponentLink<Vase>) -> CubeView {
         let mut nodes = Vec::new();
         let id = entity_node.entity.id();
         for id in entity_node.children.iter() {
-            nodes.push(TodoNode::new(id.clone(), link.clone()))
+            nodes.push(TodoNode::new_cube(id.clone(), link.clone()))
         }
-        Self {
-            head: TodoNode::new(id.clone(), link),
+        let todo = Self {
+            current,
+            head: TodoNode::new_cube(id.clone(), link),
             nodes
+        };
+        CubeView::TodoList {
+            todo
         }
     }
     pub fn update(&mut self, entity_node: &EntityNode) {
@@ -200,7 +205,7 @@ impl TodoList {
                     }
                 },
                 None => {
-                    let node = TodoNode::new(c.clone(), link.clone());
+                    let node = TodoNode::new_cube(c.clone(), link.clone());
                     target.insert(i, node);
                 }
             }
