@@ -144,7 +144,7 @@ impl Default for Glass {
 }
 
 impl Glass {
-    pub fn switch_router(&self, router: Router) -> Vec<Cube> {
+    pub fn get_cube_vec(&self, router: Router) -> Vec<Cube> {
         let vec = 
             self.map.get(&router).cloned()
             .unwrap_or(Vec::new());
@@ -194,6 +194,6 @@ mod tests {
     }
     fn switch(router: Router, glass: &Glass) {
         println!("{:#?}", glass);
-        println!("{:?}: {:?}", router, glass.switch_router(router));
+        println!("{:?}: {:?}", router, glass.get_cube_vec(router));
     }
 }
