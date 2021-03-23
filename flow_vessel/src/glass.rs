@@ -169,13 +169,17 @@ impl Glass {
         });
     }
     /// removes a cube within a safe idx
-    pub fn remove_cube(&mut self, meta: CubeMeta) {
+    pub fn remove_cube(&mut self, meta: CubeMeta) -> Cube {
         let router = meta.router;
         let vec = self.ensured(router);
         let idx = meta.idx.min(vec.len());
         self.map.get_mut(&router).map(|vec|{
-            vec.remove(idx);
-        });
+            vec.remove(idx)
+        }).expect("glass.ensured() failed.")
+    }
+    pub fn swap_cube(&mut self, meta_1: CubeMeta, meta_2: CubeMeta) {
+        let cube = self.remove_cube(meta_2);
+        self.insert_cube(cube, meta_1);
     }
     pub fn refresh(&mut self) {
         let _: Vec<()> = Router::vec_all().iter().map(|&router| {
