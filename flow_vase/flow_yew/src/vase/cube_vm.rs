@@ -53,7 +53,7 @@ impl CubeVM {
         }
     }
     pub fn view_inner(&self, vessel: &Vessel) -> Html {
-        self.view.view(vessel, self.meta.clone())
+        self.view.view(vessel)
     }
 }
 
@@ -79,6 +79,7 @@ pub enum CubeView {
         current: Option<usize>,
         todo: todo::TodoList
     },
+    PromisedLand,
     FlowView {
         obj: EntityId,
         current: EntityId
@@ -122,6 +123,7 @@ impl CubeView {
                     }
                 }).unwrap_or_default()
             }
+            Cube::PromisedLand => PromisedLand,
             Cube::FlowView { obj, current } => {
                 FlowView { obj, current }
             }
@@ -133,7 +135,7 @@ impl CubeView {
             Cube::Blank { alt } => Blank { alt }
         }
     }
-    pub fn view(&self, vessel: &Vessel, meta: CubeMeta) -> Html {
+    pub fn view(&self, vessel: &Vessel) -> Html {
         match self {
             CubeView::Blank { alt } => {
                 html_uni_vec(format!("blank"), html! {

@@ -75,6 +75,8 @@ pub enum Cube {
         obj: EntityId,
         current: Option<usize>
     },
+    /// A todo-oriented view accross the app
+    PromisedLand,
     FlowView {
         obj: EntityId,
         current: EntityId
@@ -171,5 +173,25 @@ impl Glass {
         let _: Vec<()> = self.map.iter_mut().map(|(_, vec)| {
             vec.retain(|x| !x.is_blank() );
         }).collect();
+        // self.map = HashMap::new();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use Router::*;
+    #[test]
+    fn glass_update() {
+        let mut glass = Glass::default();
+        switch(Board, &glass);
+        glass.clean();
+        switch(Board, &glass);
+        glass.refresh();
+        switch(Board, &glass);
+    }
+    fn switch(router: Router, glass: &Glass) {
+        println!("{:#?}", glass);
+        println!("{:?}: {:?}", router, glass.switch_router(router));
     }
 }
