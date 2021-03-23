@@ -124,6 +124,11 @@ impl Cube {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
+pub struct CubeMeta {
+    pub router: Router,
+    pub idx: usize
+}
 
 /// A overall layer of routers and cubes.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -153,6 +158,24 @@ impl Glass {
         } else {
             vec
         }
+    }
+    /// inserts a cube within a safe idx
+    pub fn insert_cube(&mut self, cube: Cube, meta: CubeMeta) {
+        let router = meta.router;
+        let vec = self.ensured(router);
+        let idx = meta.idx.min(vec.len());
+        self.map.get_mut(&router).map(|vec|{
+            vec.insert(idx, cube);
+        });
+    }
+    /// removes a cube within a safe idx
+    pub fn remove_cube(&mut self, meta: CubeMeta) {
+        let router = meta.router;
+        let vec = self.ensured(router);
+        let idx = meta.idx.min(vec.len());
+        self.map.get_mut(&router).map(|vec|{
+            vec.remove(idx);
+        });
     }
     pub fn refresh(&mut self) {
         let _: Vec<()> = Router::vec_all().iter().map(|&router| {

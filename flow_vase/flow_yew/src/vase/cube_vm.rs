@@ -1,6 +1,6 @@
 use yew::{ComponentLink, Html, html};
 use std::time::SystemTime;
-use flow_vessel::{Cube, EntityId, Router, Vessel};
+use flow_vessel::{Cube, CubeMeta, EntityId, Vessel};
 
 pub use super::{Vase, Msg, Msg::*};
 
@@ -57,12 +57,6 @@ impl CubeVM {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
-pub struct CubeMeta {
-    // origin: Cube,
-    pub router: Router,
-    pub idx: usize
-}
 
 pub enum CubeView {
     /// A single entity's notebook.

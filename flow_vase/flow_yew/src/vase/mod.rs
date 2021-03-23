@@ -5,7 +5,7 @@ use yew::{Component, ComponentLink, Html, ShouldRender};
 use flow_vessel::*;
 
 use super::log_obj;
-use cube_vm::{CubeVM, CubeMeta};
+use cube_vm::CubeVM;
 
 
 pub struct Vase {
