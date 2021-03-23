@@ -1,5 +1,5 @@
 use serde::{Serialize, Deserialize};
-use std::time::SystemTime;
+use std::{collections::HashMap, time::SystemTime};
 
 use super::{EntityId, now};
 
@@ -44,6 +44,18 @@ impl Router {
             Settings => "Settings"
         }
     }
+    pub fn vec_all() -> Vec<Self> {
+        use Router::*;
+        vec! [
+            BirdView,
+            Board,
+            Promised,
+            Calendar,
+            TimeAnchor,
+        
+            Settings,
+        ]
+    }
 }
 
 /// The basic unit of view, containing minimum info for rendering.
@@ -80,7 +92,7 @@ pub enum Cube {
 impl Default for Cube {
     fn default() -> Self {
         Cube::Blank {
-            alt: format!("Clean and innocent.")
+            alt: format!("Focus on a node to start.")
         }
     }
 }
@@ -114,60 +126,50 @@ impl Cube {
 /// A overall layer of routers and cubes.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Glass {
-    bird_view: Cube,
-    board: Vec<Cube>,
-    promised: Cube,
-    calendar: Cube,
-    time_anchor: Cube,
-    settings: Cube,
+    map: HashMap<Router, Vec<Cube>>
 }
 
 impl Default for Glass {
     fn default() -> Self {
-        use Cube::*;
-        Glass {
-            bird_view: 
-                FlowView {
-                    obj: EntityId::default(),
-                    current: EntityId::default()
-                },
-            // board: vec![],
-            // Test..
-            board: vec![
-                TodoList { current: None, obj: EntityId::default() },
-                // TodoList { current: None, obj: EntityId::default() },
-                Inkblot { obj: EntityId::default() }
-            ],
-            promised: Cube::default(),
-            calendar: CalendarView { current: now() },
-            time_anchor: TimeView,
-            settings: SettingView,
+        let map = Router::vec_all().iter()
+            .map(|&router| {
+                (router, vec![Cube::new(router)])
+            }).collect();
+        Self {
+            map
         }
     }
 }
 
 impl Glass {
     pub fn switch_router(&self, router: Router) -> Vec<Cube> {
-        use Cube::Blank;
-        if router == Router::Board {
-            if self.board.is_empty() {
-                vec![Blank { alt: format!("Focus on a node to start.") }]
-            } else {
-                self.board.clone()
-            }
+        let vec = 
+            self.map.get(&router).cloned()
+            .unwrap_or(Vec::new());
+        if vec.is_empty() {
+            vec![Cube::default()]
         } else {
-            let cube = match router {
-                Router::BirdView => self.bird_view.clone(),
-                Router::Promised => self.promised.clone(),
-                Router::Calendar => self.calendar.clone(),
-                Router::TimeAnchor => self.time_anchor.clone(),
-                Router::Settings => self.settings.clone(),
-                _ => Blank { alt: format!("Error.") }
-            };
-            [cube].to_vec()
+            vec
         }
     }
-    pub fn clean(&mut self) {
-        self.board.retain(|x| !x.is_blank() )
+    pub fn refresh(&mut self) {
+        self.clean();
+        let _: Vec<()> = Router::vec_all().iter().map(|&router| {
+            self.ensured(router);
+        }).collect();
+    }
+    pub(crate) fn ensured(&mut self, router: Router) -> Vec<Cube> {
+        // let mut maybe_vec = self.map.get(&router).cloned();
+        // if maybe_vec.is_none() {
+        //     self.map.insert(router, vec![Cube::new(router)]);
+        //     maybe_vec = self.map.get(&router).cloned();
+        // }
+        // maybe_vec.expect("should have inserted before")
+        self.map.entry(router).or_insert(vec![Cube::new(router)]).clone()
+    }
+    pub(crate) fn clean(&mut self) {
+        let _: Vec<()> = self.map.iter_mut().map(|(_, vec)| {
+            vec.retain(|x| !x.is_blank() );
+        }).collect();
     }
 }

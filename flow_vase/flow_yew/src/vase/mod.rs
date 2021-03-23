@@ -111,7 +111,7 @@ impl Component for Vase {
             false
         } else {
             // clean the glass
-            self.vessel.clean_glass();
+            self.vessel.refresh_glass();
             // update cube_vm_vec
             self.cube_vm_vec = self.vessel.get_cube_vec().iter().enumerate()
                 .map(|(idx, cube)| CubeVM::new(

@@ -20,16 +20,6 @@ impl ProcessStatus {
             New => "New",
         }.to_string()
     }
-    pub fn reflect(name: &str) -> Self {
-        match name {
-            "Done" => Done,
-            "Marching" => Marching,
-            "Pending" => Pending,
-            "Planning" => Planning,
-            "New" => New,
-            _ => New,
-        }
-    }
     pub fn vec_all() -> Vec<Self> {
         vec! {
             New,
