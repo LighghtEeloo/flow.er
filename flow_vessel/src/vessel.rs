@@ -75,9 +75,6 @@ impl Vessel {
     pub fn get_cube_vec(&self) -> Vec<Cube> {
         self.glass.get_cube_vec(self.router)
     }
-    pub fn refresh_glass(&mut self) {
-        self.glass.refresh()
-    }
 }
 
 #[cfg(test)]

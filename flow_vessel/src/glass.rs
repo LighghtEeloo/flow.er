@@ -103,7 +103,10 @@ impl Cube {
                     obj: EntityId::default(),
                     current: EntityId::default()
                 },
-            Router::Board => Cube::default(),
+            Router::Board => Cube::ClauseTree { 
+                obj: EntityId::default(),
+                current: None
+            },
             Router::Promised => Cube::PromisedLand,
             Router::Calendar => CalendarView { current: now() },
             Router::TimeAnchor => TimeView,

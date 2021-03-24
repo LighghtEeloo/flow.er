@@ -55,6 +55,11 @@ impl Component for Vase {
         //     v.entity_get_mut(&ids[2]).map(|x| x.face = "C".to_owned());
         //     v.entity_get_mut(&ids[3]).map(|x| x.face = "D".to_owned());
         //     v.entity_get_mut(&ids[4]).map(|x| x.face = "E".to_owned());
+        //     let router = Router::Board;
+        //     v.glass.insert_cube(
+        //         Cube::new(router), 
+        //         CubeMeta { router, idx: 1 }
+        //     );
         //     v
         // };
         let cubes = vessel.get_cube_vec();
@@ -74,6 +79,7 @@ impl Component for Vase {
     }
 
     fn update(&mut self, msg_queue: Self::Message) -> ShouldRender {
+        log_obj("Update", &msg_queue);
         let mut msg_visitor = msg_queue.into_iter();
         while {
             let next = msg_visitor.next();
@@ -112,7 +118,7 @@ impl Component for Vase {
             false
         } else {
             // clean the glass
-            self.vessel.refresh_glass();
+            self.vessel.glass.refresh();
             // update cube_vm_vec
             self.cube_vm_vec = self.vessel.get_cube_vec().iter().enumerate()
                 .map(|(idx, cube)| CubeVM::new(
@@ -122,7 +128,7 @@ impl Component for Vase {
                     self.link.clone()
                 )).collect();
             // save
-            log_obj("Vessel", &self.vessel);
+            log_obj("Vessel saved", &self.vessel);
             let save_res = futures::executor::block_on(self.vessel.clone().save());
             if save_res.is_err() {
                 log_obj("load err", -1);
