@@ -23,12 +23,12 @@ impl ClauseNode {
     pub fn view(&self, idx: usize, entity: &Entity, owner_id: EntityId) -> Html {
         html! {
             <div class="node">
-                { self.status_view(&entity) }
+                { self.symbol_view(&entity) }
                 { self.input_view(idx, &entity, owner_id) }
             </div>
         }
     }
-    fn status_view(&self, entity: &Entity) -> Html {
+    fn symbol_view(&self, entity: &Entity) -> Html {
         let id = entity.id().clone();
         let vec = Process::vec_all();
         let status_meta: Vec<(String, String, Process)> = 
