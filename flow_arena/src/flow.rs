@@ -50,6 +50,9 @@ pub trait Flow {
     /// link obj as a child of des at the nth place; err if nth > len or no obj / des
     fn devote(&mut self, obj: &Self::Id, des: &Self::Id, nth: usize) -> Result<(), ()>;
     fn devote_push(&mut self, obj: &Self::Id, des: &Self::Id) -> Result<(), ()>;
+    // /// insert a flow and devote to a node; err on id collision
+    // fn merge_flow(&mut self, flow: Self, des: &Self::Id, nth: usize) -> Result<(), ()>;
+    // fn merge_flow_push(&mut self, flow: Self, des: &Self::Id) -> Result<(), ()>;
     /// removes from node_map and purges.
     fn decay(&mut self, obj: &Self::Id) -> Result<(), ()>;
     /// cuts all the links (except root), but doesn't remove.
@@ -164,6 +167,25 @@ impl<Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug> Flow for 
             self.devote(obj, des, nth)
         }).unwrap_or(Err(()))
     }
+    // fn merge_flow(&mut self, flow: Self, des: &Self::Id, nth: usize) -> Result<(), ()> {
+    //     if cfg!(debug_assertions) { self.check() };
+    //     let collision = self.node_map.keys().any(|id| flow.node_map.contains_key(id));
+    //     if collision {
+    //         Err(())
+    //     } else {
+    //         let node_map = flow.node_map.into_iter();
+    //         self.node_map.extend(node_map);
+    //         // Todo: devote
+    //         Ok(())
+    //     }
+    // }
+    // fn merge_flow_push(&mut self, flow: Self, des: &Self::Id) -> Result<(), ()> {
+    //     if cfg!(debug_assertions) { self.check() };
+    //     let nth = self.node_map.get(des).map(|owner| owner.children.len());
+    //     nth.map(|nth| {
+    //         self.merge_flow(flow, des, nth)
+    //     }).unwrap_or(Err(()))
+    // }
     /// removes from node_map and purges.
     fn decay(&mut self, obj: &Id) -> Result<(), ()> {
         if cfg!(debug_assertions) { self.check() };
