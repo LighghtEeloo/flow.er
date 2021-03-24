@@ -65,7 +65,7 @@ pub enum CubeView {
     },
     /// A single entity and a todo list view
     ClauseTree {
-        todo: clause_tree::ClauseTree
+        clause: clause_tree::ClauseTree
     },
     PromisedLand,
     FlowView {
@@ -125,9 +125,9 @@ impl CubeView {
                     <span> {alt} </span>
                 })
             }
-            CubeView::ClauseTree { todo } => {
-                html_uni_vec(format!("todo-list"), html! {
-                    <span> { todo.view(vessel) } </span>
+            CubeView::ClauseTree { clause } => {
+                html_uni_vec(format!("clause-tree"), html! {
+                    <span> { clause.view(vessel) } </span>
                 })
             }
             _ => {

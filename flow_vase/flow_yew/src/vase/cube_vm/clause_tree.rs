@@ -3,7 +3,7 @@ use flow_vessel::{Entity, EntityField, EntityId, EntityNode, Symbol, Process, Ve
 use super::{Vase, Msg::*, CubeView};
 
 #[derive(Clone)]
-pub struct TodoNode {
+pub struct ClauseNode {
     id: EntityId,
     link: ComponentLink<Vase>,
     node_ref: NodeRef,
@@ -11,7 +11,7 @@ pub struct TodoNode {
 }
 
 
-impl TodoNode {
+impl ClauseNode {
     pub fn new_cube(id: EntityId, link: ComponentLink<Vase>) -> Self {
         Self {
             id,
@@ -145,8 +145,8 @@ impl TodoNode {
 #[derive(Clone)]
 pub struct ClauseTree {
     current: Option<usize>,
-    head: TodoNode,
-    nodes: Vec<TodoNode>
+    head: ClauseNode,
+    nodes: Vec<ClauseNode>
 }
 
 impl ClauseTree {
@@ -154,15 +154,15 @@ impl ClauseTree {
         let mut nodes = Vec::new();
         let id = entity_node.entity.id();
         for id in entity_node.children.iter() {
-            nodes.push(TodoNode::new_cube(id.clone(), link.clone()))
+            nodes.push(ClauseNode::new_cube(id.clone(), link.clone()))
         }
-        let todo = Self {
+        let clause = Self {
             current,
-            head: TodoNode::new_cube(id.clone(), link),
+            head: ClauseNode::new_cube(id.clone(), link),
             nodes
         };
         CubeView::ClauseTree {
-            todo
+            clause
         }
     }
     pub fn update(&mut self, entity_node: &EntityNode) {
@@ -171,7 +171,7 @@ impl ClauseTree {
         let target = self.nodes.clone();
         self.nodes = ClauseTree::update_iter_impl(target, correct, link);
     }
-    fn update_iter_impl(mut target: Vec<TodoNode>, correct: &Vec<EntityId>, link: ComponentLink<Vase>) -> Vec<TodoNode> {
+    fn update_iter_impl(mut target: Vec<ClauseNode>, correct: &Vec<EntityId>, link: ComponentLink<Vase>) -> Vec<ClauseNode> {
         for (i, c) in correct.iter().enumerate() {
             match target.get(i) {
                 Some(node) => {
@@ -206,7 +206,7 @@ impl ClauseTree {
                     }
                 },
                 None => {
-                    let node = TodoNode::new_cube(c.clone(), link.clone());
+                    let node = ClauseNode::new_cube(c.clone(), link.clone());
                     target.insert(i, node);
                 }
             }

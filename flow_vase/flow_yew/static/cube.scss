@@ -44,7 +44,7 @@
     resize: none;
 }
 
-.todo-list {
+.clause-tree {
     height: 100%;
 }
 
@@ -75,7 +75,7 @@
 
 
 .inkblot .head input,
-.todo-list .head input {
+.clause-tree .head input {
     width: 100%;
     min-height: 10%;
     height: var(--headerHeight);
@@ -98,52 +98,56 @@
     font-weight: 0.9;
 }
 
-.todo-list .head input {
-    /* line-height: 60px; */
-    font-family: var(--headFont);
-    font-size: xx-large;
-    font-style: normal;
-    font-weight: normal;
+.clause-tree {
+    .head {
+        input {
+            /* line-height: 60px; */
+            font-family: var(--headFont);
+            font-size: xx-large;
+            font-style: normal;
+            font-weight: normal;
+        }
+        
+        .dash-line {
+            display: none;
+        }
+    }
+    
+    .node-view {
+        position: relative;
+        top: 0; right: 0; bottom: 0; left: 0;
+        margin: 0 auto;
+        height: auto;
+        min-width: 70%;
+        width: 400px;
+        max-width: 100%;
+        
+        .node {
+            position: relative;
+            height: calc(var(--size-button) + 4px);
+            
+            input {
+                --horizontal-margin: 3px;
+                display: inline;
+                position: absolute;
+                top: 0;
+                right: 0;
+                margin: 2px var(--horizontal-margin) 1px;
+                padding: 0 1%;
+                width: calc(100% - var(--size-button) - var(--horizontal-margin) * 2);
+                height: calc(var(--size-button) - 1px);
+                line-height: calc(var(--size-button) - 1px);
+                font-size: calc(var(--size-button) * 0.6);
+                background-color: var(--lightColor);
+                border-style: solid;
+                border-color: var(--borderColor);
+                box-shadow: none;
+            }
+        }
+    }
 }
-
-.todo-list .head .dash-line {
-    display: none;
-}
-
-.todo-list .node-view {
-    position: relative;
-    top: 0; right: 0; bottom: 0; left: 0;
-    margin: 0 auto;
-    height: auto;
-    min-width: 70%;
-    width: 400px;
-    max-width: 100%;
-}
-
-.todo-list .node-view .node {
-    position: relative;
-    height: calc(var(--size-button) + 4px);
-}
-
-.todo-list .node-view .node input {
-    --horizontal-margin: 3px;
-    display: inline;
-    position: absolute;
-    top: 0;
-    right: 0;
-    margin: 2px var(--horizontal-margin) 1px;
-    padding: 0 1%;
-    width: calc(100% - var(--size-button) - var(--horizontal-margin) * 2);
-    height: calc(var(--size-button) - 1px);
-    line-height: calc(var(--size-button) - 1px);
-    font-size: calc(var(--size-button) * 0.6);
-    background-color: var(--lightColor);
-    border-style: solid;
-    border-color: var(--borderColor);
-    box-shadow: none;
-}
-
-
+    
+    
 /* Dropdown */
 
 .dropdown { 
