@@ -65,13 +65,8 @@ pub enum Cube {
     Inkblot {
         obj: EntityId
     },
-    /// A single entity and its points.
-    PointView {
-        obj: EntityId,
-        current: Option<usize>
-    },
-    /// A single entity and a todo list view
-    TodoList {
+    /// A single entity  view
+    ClauseTree {
         obj: EntityId,
         current: Option<usize>
     },
@@ -180,6 +175,11 @@ impl Glass {
     pub fn swap_cube(&mut self, meta_1: CubeMeta, meta_2: CubeMeta) {
         let cube = self.remove_cube(meta_2);
         self.insert_cube(cube, meta_1);
+    }
+    /// replaces the cube at meta with a new one
+    pub fn replace_cube(&mut self, cube: Cube, meta: CubeMeta) {
+        self.remove_cube(meta);
+        self.insert_cube(cube, meta)
     }
     pub fn refresh(&mut self) {
         let _: Vec<()> = Router::vec_all().iter().map(|&router| {

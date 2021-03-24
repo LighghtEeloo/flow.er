@@ -4,7 +4,7 @@ use flow_vessel::{Cube, CubeMeta, EntityId, Vessel};
 
 pub use super::{Vase, Msg, Msg::*};
 
-mod todo;
+mod clause_tree;
 
 pub struct CubeVM {
     pub meta: CubeMeta,
@@ -63,14 +63,9 @@ pub enum CubeView {
     Inkblot {
         obj: EntityId
     },
-    /// A single entity and its points.
-    PointView {
-        obj: EntityId,
-        current: Option<usize>
-    },
     /// A single entity and a todo list view
-    TodoList {
-        todo: todo::TodoList
+    ClauseTree {
+        todo: clause_tree::ClauseTree
     },
     PromisedLand,
     FlowView {
@@ -101,13 +96,10 @@ impl CubeView {
         match cube.clone() {
             Cube::Inkblot { obj } => 
                 Inkblot { obj },
-            Cube::PointView { obj, current } => {
-                PointView { obj, current }
-            }
-            Cube::TodoList { obj, current } => {
+            Cube::ClauseTree { obj, current } => {
                 let node = vessel.node(&obj);
                 node.map(|node| {
-                    todo::TodoList::new_cube(
+                    clause_tree::ClauseTree::new_cube(
                         node, 
                         current, 
                         link
@@ -133,7 +125,7 @@ impl CubeView {
                     <span> {alt} </span>
                 })
             }
-            CubeView::TodoList { todo } => {
+            CubeView::ClauseTree { todo } => {
                 html_uni_vec(format!("todo-list"), html! {
                     <span> { todo.view(vessel) } </span>
                 })

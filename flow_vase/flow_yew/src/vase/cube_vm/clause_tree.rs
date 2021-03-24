@@ -143,13 +143,13 @@ impl TodoNode {
 
 
 #[derive(Clone)]
-pub struct TodoList {
+pub struct ClauseTree {
     current: Option<usize>,
     head: TodoNode,
     nodes: Vec<TodoNode>
 }
 
-impl TodoList {
+impl ClauseTree {
     pub fn new_cube(entity_node: &EntityNode, current: Option<usize>, link: ComponentLink<Vase>) -> CubeView {
         let mut nodes = Vec::new();
         let id = entity_node.entity.id();
@@ -161,7 +161,7 @@ impl TodoList {
             head: TodoNode::new_cube(id.clone(), link),
             nodes
         };
-        CubeView::TodoList {
+        CubeView::ClauseTree {
             todo
         }
     }
@@ -169,7 +169,7 @@ impl TodoList {
         let link = self.head.link.clone();
         let correct = &entity_node.children;
         let target = self.nodes.clone();
-        self.nodes = TodoList::update_iter_impl(target, correct, link);
+        self.nodes = ClauseTree::update_iter_impl(target, correct, link);
     }
     fn update_iter_impl(mut target: Vec<TodoNode>, correct: &Vec<EntityId>, link: ComponentLink<Vase>) -> Vec<TodoNode> {
         for (i, c) in correct.iter().enumerate() {
