@@ -75,7 +75,7 @@ pub enum Cube {
         obj: EntityId,
         current: Option<usize>
     },
-    /// A todo-oriented view accross the app
+    /// A todo-oriented pool view
     PromisedLand,
     FlowView {
         obj: EntityId,
@@ -109,7 +109,7 @@ impl Cube {
                     current: EntityId::default()
                 },
             Router::Board => Cube::default(),
-            Router::Promised => Cube::default(),
+            Router::Promised => Cube::PromisedLand,
             Router::Calendar => CalendarView { current: now() },
             Router::TimeAnchor => TimeView,
             Router::Settings => SettingView,

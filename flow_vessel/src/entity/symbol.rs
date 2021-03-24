@@ -1,6 +1,14 @@
 use serde::{Serialize, Deserialize};
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub enum ProcessStatus {
+pub enum Symbol {
+    ProcessTracker(Process),
+    Linted(Lint),
+    Innocent
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub enum Process {
     Done,
     Marching,
     Pending,
@@ -8,9 +16,8 @@ pub enum ProcessStatus {
     New,
 }
 
-
-use ProcessStatus::*;
-impl ProcessStatus {
+use Process::*;
+impl Process {
     pub fn type_str(&self) -> String {
         match self {
             Done => "Done",
@@ -33,3 +40,17 @@ impl ProcessStatus {
         format!("static/icons/Process/{}.svg", Self::type_str(self))
     }
 }
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub enum Lint {
+    Numberic,
+    Upper,
+    Lower,
+    Greek,
+
+    Circle,
+    Square,
+    Dash
+}
+
+// Todo: impl Lint.

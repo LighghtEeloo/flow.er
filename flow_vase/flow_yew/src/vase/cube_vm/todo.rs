@@ -1,5 +1,5 @@
 use yew::{ComponentLink, Html, NodeRef, html, InputData};
-use flow_vessel::{Entity, EntityField, EntityId, EntityNode, ProcessStatus, Vessel};
+use flow_vessel::{Entity, EntityField, EntityId, EntityNode, Symbol, Process, Vessel};
 use super::{Vase, Msg::*, CubeView};
 
 #[derive(Clone)]
@@ -30,11 +30,11 @@ impl TodoNode {
     }
     fn status_view(&self, entity: &Entity) -> Html {
         let id = entity.id().clone();
-        let vec = ProcessStatus::vec_all();
-        let status_meta: Vec<(String, String, ProcessStatus)> = 
+        let vec = Process::vec_all();
+        let status_meta: Vec<(String, String, Process)> = 
             vec.iter().map( |x| (
-                String::from(ProcessStatus::type_src(x)), 
-                String::from(ProcessStatus::type_str(x)),
+                String::from(Process::type_src(x)), 
+                String::from(Process::type_str(x)),
                 x.clone()
             ) ).collect();
         let status_dropdown: Html = 
@@ -42,11 +42,12 @@ impl TodoNode {
                 html! {
                     <div title={des.clone()}
                         onclick=self.link.callback(move |_| {
-                            [ EntityUpdate {
-                                id, 
-                                // id: id.clone(), 
-                                field: EntityField::ProcessStatus(process.clone())
-                            } ]
+                            // [ EntityUpdate {
+                            //     id, 
+                            //     // id: id.clone(), 
+                            //     field: EntityField::Symbol(Symbol:: process.clone())
+                            // } ]
+                            []
                         })
                     > 
                         <img src={src} alt="process" /> 
@@ -56,9 +57,9 @@ impl TodoNode {
         html! {
             <div class="dropdown"> 
                 <button class="dropbtn"
-                    value=entity.process.type_str()
+                    // value=entity.symbol.type_str()
                 > 
-                    <img src={entity.process.type_src()} alt="process" />
+                    // <img src={entity.symbol.type_src()} alt="process" />
                 </button> 
                 
                 <div class="dropdown-content"> 
