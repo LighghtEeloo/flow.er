@@ -88,6 +88,7 @@ impl Component for Vase {
 
                     CloseVM { meta } => {
                         // Todo: close.
+                        self.vessel.glass.remove_cube(meta);
                         true
                     }
 

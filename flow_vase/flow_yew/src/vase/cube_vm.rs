@@ -139,8 +139,27 @@ impl CubeView {
                 })
             }
             _ => {
+                let debug = format!("{:#?}", vessel);
                 html_uni_vec(format!("none"), html! {
-                    <>{"Not implemented."}</>
+                    <>
+                        <>{"Not implemented."}</>
+                        <pre style="
+                            position: absolute;
+                            height: 90%; 
+                            top: 0;
+                            bottom: 0;
+                            width: 60%;
+                            right: 5%;
+                            overflow: scroll;
+                            margin: auto 0;
+                            padding: 12px;
+                            border: solid 6px green;
+                            border-radius: 10px;
+                            // font-family: 
+                        ">
+                            {&*debug}
+                        </pre>
+                    </>
                 })
             }
         }
