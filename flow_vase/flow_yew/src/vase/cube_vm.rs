@@ -1,9 +1,10 @@
 use yew::{ComponentLink, Html, html};
 use std::time::SystemTime;
-use flow_vessel::{CubeType, CubeMeta, EntityId, Vessel};
+use flow_vessel::{Cube, CubeMeta, CubeType, EntityId, Vessel};
 
 pub use super::{Vase, Msg, Msg::*};
 
+mod inkblot;
 mod clause_tree;
 
 pub struct CubeVM {
@@ -13,12 +14,13 @@ pub struct CubeVM {
 }
 
 impl CubeVM {
-    pub fn new(idx: usize, cube: &CubeType, vessel: &Vessel, link: ComponentLink<Vase>) -> Self {
+    pub fn new(idx: usize, cube: &Cube, vessel: &Vessel, link: ComponentLink<Vase>) -> Self {
         let meta = 
             CubeMeta {
                 // origin: cube.clone(),
                 router: vessel.router,
-                idx
+                idx,
+                cube_type: cube.cube_type
             };
         let view = CubeView::new(cube, vessel, link.clone());
         Self {
@@ -27,7 +29,7 @@ impl CubeVM {
             link
         }
     }
-    pub fn update(&mut self, cube: &CubeType, vessel: &Vessel) {
+    pub fn update(&mut self, cube: &Cube, vessel: &Vessel) {
         self.view = self.view.clone().update_new(cube, vessel);
     }
     pub fn view(&self, vessel: &Vessel, per_width: f64) -> Html {
@@ -65,7 +67,7 @@ impl CubeVM {
 pub enum CubeView {
     /// A single entity's notebook.
     Inkblot {
-        obj: EntityId
+        inkblot: inkblot::Inkblot
     },
     /// A single entity and a todo list view
     ClauseTree {
@@ -83,7 +85,8 @@ pub enum CubeView {
     SettingView,
     Blank {
         alt: String
-    }
+    },
+    _Plain
 }
 
 impl Default for CubeView {
@@ -95,50 +98,55 @@ impl Default for CubeView {
 }
 
 impl CubeView {
-    pub fn new(cube: &CubeType, vessel: &Vessel, link: ComponentLink<Vase>) -> Self {
-        use CubeView::*;
-        match cube.clone() {
-            CubeType::Inkblot { obj } => 
-                Inkblot { obj },
-            CubeType::ClauseTree { obj, current } => {
-                let node = vessel.node(&obj);
+    pub fn new(cube: &Cube, vessel: &Vessel, link: ComponentLink<Vase>) -> Self {
+        let cube = cube.clone();
+        match cube.cube_type {
+            CubeType::Inkblot => {
+                inkblot::Inkblot::new_cube(cube)
+            }
+            CubeType::ClauseTree => {
+                let node = vessel.node(&cube.obj.unwrap_or_default());
                 node.map(|node| {
                     clause_tree::ClauseTree::new_cube(
                         node, 
-                        current, 
+                        cube.current_idx, 
                         link
                     )
                 }).unwrap_or_default()
             }
-            CubeType::PromisedLand => PromisedLand,
-            CubeType::FlowView { obj, current } => {
-                FlowView { obj, current }
+            CubeType::PromisedLand => {
+                CubeView::_Plain
             }
-            CubeType::CalendarView { current } => {
-                CalendarView { current }
+            CubeType::FlowView => {
+                CubeView::_Plain
             }
-            CubeType::TimeView => TimeView,
-            CubeType::SettingView => SettingView,
-            CubeType::Blank { alt } => Blank { alt }
+            CubeType::CalendarView => {
+                CubeView::_Plain
+            }
+            CubeType::TimeView => {
+                CubeView::_Plain
+            }
+            CubeType::SettingView => {
+                CubeView::_Plain
+            }
+            CubeType::Blank => {
+                CubeView::_Plain
+            }
         }
     }
-    pub fn update_new(self, cube: &CubeType, vessel: &Vessel) -> Self {
+    pub fn update_new(self, cube: &Cube, vessel: &Vessel) -> Self {
         use CubeView::*;
+        let cube_type = cube.cube_type;
         match self.clone() {
             CubeView::Blank { alt } => {
-                if let CubeType::Blank { alt: _alt } = cube {
-                    Blank { alt: _alt.clone() }
-                } else {
-                    self
-                }
+                Blank { alt: cube.clone().alt.unwrap_or_default() }
             }
             CubeView::ClauseTree { mut clause } => {
-                if let CubeType::ClauseTree { obj, current } = cube {
-                    clause.update(vessel.node(obj).expect("should have node_entity"));
-                    ClauseTree { clause }
-                } else {
-                    self
-                }
+                let entity_node = 
+                    vessel.node(&clause.head_id())
+                    .expect("should have node_entity");
+                clause.update(entity_node);
+                ClauseTree { clause }
             }
             _ => self
         }

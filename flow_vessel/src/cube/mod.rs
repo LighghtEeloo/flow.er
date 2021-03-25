@@ -99,11 +99,11 @@ impl Default for CubeType {
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct Cube {
     pub cube_type: CubeType,
-    obj: Option<EntityId>,
-    current_id: Option<EntityId>,
-    current_idx: Option<usize>,
-    time: Option<SystemTime>,
-    alt: Option<String>,
+    pub obj: Option<EntityId>,
+    pub current_id: Option<EntityId>,
+    pub current_idx: Option<usize>,
+    pub time: Option<SystemTime>,
+    pub alt: Option<String>,
 }
 
 

@@ -119,6 +119,7 @@ impl ClauseNode {
     }
 }
 
+// symbol view
 impl ClauseNode {
     fn process(&self, id: EntityId, process: Process) -> Html {
         let process_meta: Vec<(String, String, Process)> = 
@@ -185,6 +186,9 @@ impl ClauseTree {
         CubeView::ClauseTree {
             clause
         }
+    }
+    pub fn head_id(&self) -> EntityId {
+        self.head.id
     }
     pub fn update(&mut self, entity_node: &EntityNode) {
         let link = self.head.link.clone();
