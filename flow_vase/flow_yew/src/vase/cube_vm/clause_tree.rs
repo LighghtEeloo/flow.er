@@ -257,7 +257,32 @@ impl ClauseTree {
                 )
             }).collect();
         html! {
-            <div class="node-view"> { nodes_view } </div>
+            <>
+                { self.head_view(vessel) }
+                <div class="node-view"> { nodes_view } </div>
+            </>
+        }
+    }
+
+    fn head_view(&self, vessel: &Vessel) -> Html {
+        let id = self.head_id();
+        let entity = vessel.entity_get(&id).expect("Host doesn't exist.");
+        let link = self.head.link.clone();
+        html! {
+            <div class="head">
+                <input
+                    type="Text"
+                    placeholder="An arbitrary node."
+                    aria-label="Arbitrary Node"
+                    value=entity.face
+                    oninput=link.callback(move |e: InputData| {
+                        [EntityUpdate{
+                            id, 
+                            field: EntityField::Face(e.value)
+                        }]
+                    })
+                />
+            </div>
         }
     }
 }
