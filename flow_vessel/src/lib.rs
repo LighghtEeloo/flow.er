@@ -12,7 +12,7 @@ pub use entity::{
     entity::{Entity, EntityField, Face, Bubble},
 };
 pub use cube::{Cube, CubeType, CubeMeta};
-pub use glass::{Glass, Router};
+pub use glass::{Glass, Router, cubes};
 pub use util::{
     json::{from_json, to_json, export_json},
     time::{TimeNote, TimeRep, display, now}

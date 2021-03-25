@@ -1,18 +1,27 @@
-use crate::EntityId;
 use super::{Cube, CubeType};
+use crate::EntityId;
 
 pub struct ClauseTree {
     pub obj: EntityId,
-    pub current: Option<usize>
+    pub current: Option<usize>,
 }
 
-impl From<ClauseTree> for Cube {
-    fn from(clause_tree: ClauseTree) -> Self {
-        Self {
+impl Into<Cube> for ClauseTree {
+    fn into(self) -> Cube {
+        Cube {
             cube_type: CubeType::ClauseTree,
-            obj: Some(clause_tree.obj),
-            current_idx: clause_tree.current,
-            ..Self::default()
+            obj: Some(self.obj),
+            current_idx: self.current,
+            ..Cube::default()
+        }
+    }
+}
+
+impl From<Cube> for ClauseTree {
+    fn from(cube: Cube) -> Self {
+        Self {
+            obj: cube.obj.unwrap_or_default(),
+            current: cube.current_idx,
         }
     }
 }

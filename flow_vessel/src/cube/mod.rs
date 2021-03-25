@@ -2,89 +2,70 @@ use serde::{Serialize, Deserialize};
 use std::time::SystemTime;
 use crate::{EntityId, now, Router};
 
-mod inkblot {
-    use crate::EntityId;
-    use super::{Cube, CubeType};
-
-    pub struct Inkblot {
-        pub obj: EntityId
-    }
-
-    impl From<Inkblot> for Cube {
-        fn from(inkblot: Inkblot) -> Self {
-            Self {
-                cube_type: CubeType::Inkblot,
-                obj: Some(inkblot.obj),
-                ..Self::default()
-            }
-        }
-    }
-}
-
+mod inkblot;
 mod clause_tree;
-
-mod flow_view {
-    use crate::EntityId;
+mod promise_land {
     use super::{Cube, CubeType};
-
-    pub struct FlowView {
-        pub obj: EntityId,
-        pub current: Option<EntityId>
-    }
-
-    impl From<FlowView> for Cube {
-        fn from(flow: FlowView) -> Self {
-            Self {
-                cube_type: CubeType::FlowView,
-                obj: Some(flow.obj),
-                current_id: flow.current,
-                ..Self::default()
+    pub struct PromisedLand;
+    impl Into<Cube> for PromisedLand {
+        fn into(self) -> Cube {
+            Cube {
+                cube_type: CubeType::PromisedLand,
+                ..Cube::default()
             }
         }
     }
-}
-
-mod calendar_view {
-    use std::time::SystemTime;
-    use super::{Cube, CubeType};
-
-    pub struct CalendarView {
-        pub current: SystemTime
-    }
-
-    impl From<CalendarView> for Cube {
-        fn from(calendar: CalendarView) -> Self {
-            Self {
-                cube_type: CubeType::CalendarView,
-                time: Some(calendar.current),
-                ..Self::default()
-            }
+    impl From<Cube> for PromisedLand {
+        fn from(_cube: Cube) -> Self {
+            Self
         }
     }
 }
-
-mod blank {
+mod flow_view;
+mod calendar_view;
+mod time_view {
     use super::{Cube, CubeType};
-
-    pub struct Blank {
-        pub alt: String
-    }
-
-    impl From<Blank> for Cube {
-        fn from(blank: Blank) -> Self {
-            Self {
-                cube_type: CubeType::Blank,
-                alt: Some(blank.alt),
-                ..Self::default()
+    pub struct TimeView;
+    impl Into<Cube> for TimeView {
+        fn into(self) -> Cube {
+            Cube {
+                cube_type: CubeType::TimeView,
+                ..Cube::default()
             }
         }
     }
+    impl From<Cube> for TimeView {
+        fn from(_cube: Cube) -> Self {
+            Self
+        }
+    }
 }
+mod setting_view {
+    use super::{Cube, CubeType};
+    pub struct SettingView;
+    impl Into<Cube> for SettingView {
+        fn into(self) -> Cube {
+            Cube {
+                cube_type: CubeType::SettingView,
+                ..Cube::default()
+            }
+        }
+    }
+    impl From<Cube> for SettingView {
+        fn from(_cube: Cube) -> Self {
+            Self
+        }
+    }
+}
+mod blank;
 
 pub use inkblot::Inkblot;
 pub use clause_tree::ClauseTree;
 pub use flow_view::FlowView;
+pub use promise_land::PromisedLand;
 pub use calendar_view::CalendarView;
+pub use time_view::TimeView;
+pub use setting_view::SettingView;
 pub use blank::Blank;
 
 
@@ -93,14 +74,19 @@ pub use blank::Blank;
 pub enum CubeType {
     /// A single entity's notebook.
     Inkblot,
-    /// A single entity  view
+    /// A single entity  view.
     ClauseTree,
-    /// A todo-oriented pool view
+    /// A todo-oriented pool view.
     PromisedLand,
+    /// A flow view from a point.
     FlowView,
+    /// A calendar with agenda.
     CalendarView,
+    /// A version control panel.
     TimeView,
+    /// A setting panel.
     SettingView,
+    /// Blank Page with simple notes.
     Blank
 }
 
@@ -112,22 +98,13 @@ impl Default for CubeType {
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct Cube {
-    cube_type: CubeType,
+    pub cube_type: CubeType,
     obj: Option<EntityId>,
     current_id: Option<EntityId>,
     current_idx: Option<usize>,
     time: Option<SystemTime>,
     alt: Option<String>,
 }
-
-// template
-// impl From<Inkblot> for Cube {
-//     fn from(: Inkblot) -> Self {
-//         Self {
-//             ..Self::default()
-//         }
-//     }
-// }
 
 
 impl Cube {
@@ -143,13 +120,11 @@ impl Cube {
                     obj: EntityId::default(),
                     current: None
                 }.into(),
-            // Router::Promised => PromisedLand,
+            Router::Promised => PromisedLand.into(),
             Router::Calendar => 
                 CalendarView { current: now() }.into(),
-            // Router::TimeAnchor => TimeView,
-            // Router::Settings => SettingView,
-            // Todo..
-            _ => Cube::default()
+            Router::TimeAnchor => TimeView.into(),
+            Router::Settings => SettingView.into(),
         }
     }
     pub fn is_blank(&self) -> bool {

@@ -5,7 +5,16 @@ pub use super::cube::{CubeType, CubeMeta, Cube};
 
 // Todo: blob export.
 pub mod cubes {
-    pub use crate::cube::{};
+    pub use crate::cube::{
+        Inkblot,
+        ClauseTree,
+        PromisedLand,
+        FlowView,
+        CalendarView,
+        TimeView,
+        SettingView,
+        Blank
+    };
 }
 
 /// Describes the app router.
@@ -126,6 +135,7 @@ impl Glass {
         self.remove_cube(meta);
         self.insert_cube(cube, meta)
     }
+    /// ensure and clean
     pub fn refresh(&mut self) {
         let _: Vec<()> = Router::vec_all().iter().map(|&router| {
             self.ensured(router);
@@ -133,12 +143,6 @@ impl Glass {
         self.clean();
     }
     fn ensured(&mut self, router: Router) -> Vec<Cube> {
-        // let mut maybe_vec = self.map.get(&router).cloned();
-        // if maybe_vec.is_none() {
-        //     self.map.insert(router, vec![Cube::new(router)]);
-        //     maybe_vec = self.map.get(&router).cloned();
-        // }
-        // maybe_vec.expect("should have inserted before")
         self.map.entry(router).or_insert(vec![Cube::new(router)]).clone()
     }
     fn clean(&mut self) {
