@@ -27,8 +27,8 @@ impl CubeVM {
             link
         }
     }
-    pub fn update(&mut self, cube: &Cube) {
-        
+    pub fn update(&mut self, cube: &Cube, vessel: &Vessel) {
+        self.view = self.view.clone().update_new(cube, vessel);
     }
     pub fn view(&self, vessel: &Vessel, per_width: f64) -> Html {
         let meta = self.meta;
@@ -61,6 +61,7 @@ impl CubeVM {
 }
 
 
+#[derive(Clone)]
 pub enum CubeView {
     /// A single entity's notebook.
     Inkblot {
@@ -119,6 +120,27 @@ impl CubeView {
             Cube::TimeView => TimeView,
             Cube::SettingView => SettingView,
             Cube::Blank { alt } => Blank { alt }
+        }
+    }
+    pub fn update_new(self, cube: &Cube, vessel: &Vessel) -> Self {
+        use CubeView::*;
+        match self.clone() {
+            CubeView::Blank { alt } => {
+                if let Cube::Blank { alt: _alt } = cube {
+                    Blank { alt: _alt.clone() }
+                } else {
+                    self
+                }
+            }
+            CubeView::ClauseTree { mut clause } => {
+                if let Cube::ClauseTree { obj, current } = cube {
+                    clause.update(vessel.node(obj).expect("should have node_entity"));
+                    ClauseTree { clause }
+                } else {
+                    self
+                }
+            }
+            _ => self
         }
     }
     pub fn view(&self, vessel: &Vessel) -> Html {

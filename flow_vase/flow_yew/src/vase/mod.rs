@@ -133,10 +133,14 @@ impl Component for Vase {
             self.vessel.glass.refresh();
             let cube_vec = self.vessel.get_cube_vec();
             // Test: non-invasively update cube_vm_vec.
-            let _: Vec<()> = self.cube_vm_vec.iter_mut().zip(cube_vec.iter())
-                .map(|(cube_vm, cube)| 
-                    cube_vm.update(cube)
-                ).collect();
+            for (cube_vm, cube) in self.cube_vm_vec.iter_mut().zip(cube_vec.iter()) {
+                cube_vm.update(cube, &self.vessel)
+            }
+            // let _: Vec<()> = self.cube_vm_vec.iter_mut().zip(cube_vec.iter())
+            //     .map(|(cube_vm, cube)| 
+            //         cube_vm.update(cube, &self.vessel)
+            //     ).collect();
+
             // self.cube_vm_vec = self.vessel.get_cube_vec().iter().enumerate()
             //     .map(|(idx, cube)| 
             //         // Todo: Update here?.
@@ -147,6 +151,7 @@ impl Component for Vase {
             //             self.link.clone()
             //         )
             //     ).collect();
+
             // save
             log_obj("Vessel saved", &self.vessel);
             let save_res = futures::executor::block_on(self.vessel.clone().save());
