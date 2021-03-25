@@ -116,6 +116,7 @@ impl Cube {
                     current: Some(EntityId::default())
                 }.into(),
             Router::Board => 
+                // Debug..
                 ClauseTree { 
                     obj: EntityId::default(),
                     current: None

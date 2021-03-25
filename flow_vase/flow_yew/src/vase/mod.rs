@@ -61,7 +61,11 @@ impl Component for Vase {
             v.entity_get_mut(&ids[3]).map(|x| x.face = "D".to_owned());
             v.entity_get_mut(&ids[4]).map(|x| x.face = "E".to_owned());
             let router = Router::Board;
-            let cube = Cube::new(router);
+            let cube: Cube = 
+                cubes::Inkblot {
+                    obj: EntityId::default(),
+                }.into();
+            // let cube = Cube::new(router);
             let cube_type = cube.cube_type;
             v.glass.insert_cube(
                 cube, 

@@ -204,6 +204,7 @@ impl ClauseTree {
         self.nodes = ClauseTree::update_iter_impl(target, correct, link);
     }
     fn update_iter_impl(mut target: Vec<ClauseNode>, correct: &Vec<EntityId>, link: ComponentLink<Vase>) -> Vec<ClauseNode> {
+        // final effect: correct is identical to target
         for (i, c) in correct.iter().enumerate() {
             match target.get(i) {
                 Some(node) => {

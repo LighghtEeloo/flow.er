@@ -46,25 +46,25 @@ impl Animator<EntityId> for Inkblot<EntityId>  {
                         placeholder="An arbitrary node."
                         aria-label="Arbitrary Node"
                         value=entity.face
-                        onfocus=link.callback(move |_| {
-                            Vasey![SetFocusId(vm_meta, owner_id)]
-                        })
-                        onkeydown=link.callback(move |e: KeyboardEvent| {
-                            let meta = (e.ctrl_key(), e.shift_key(), e.code());
-                            match (meta.0, meta.1, meta.2.as_str()) { 
-                                (false, false, "ArrowDown") => Vasey![Wander(vm_meta, Direction::Descend, false)], 
-                                _ => Vasey![]
-                            }
-                        })
-                        onkeyup=link.callback(move |e: KeyboardEvent| {
-                            match e.code().as_str() { 
-                                "Enter" => Vasey!
-                                    [ AddEntity(FlowLink::new_descend_head(owner_id))
-                                    , Wander(vm_meta, Direction::Descend, false)
-                                    ],
-                                _ => Vasey![] 
-                            }
-                        })
+                        // onfocus=link.callback(move |_| {
+                        //     Vasey![SetFocusId(vm_meta, owner_id)]
+                        // })
+                        // onkeydown=link.callback(move |e: KeyboardEvent| {
+                        //     let meta = (e.ctrl_key(), e.shift_key(), e.code());
+                        //     match (meta.0, meta.1, meta.2.as_str()) { 
+                        //         (false, false, "ArrowDown") => Vasey![Wander(vm_meta, Direction::Descend, false)], 
+                        //         _ => Vasey![]
+                        //     }
+                        // })
+                        // onkeyup=link.callback(move |e: KeyboardEvent| {
+                        //     match e.code().as_str() { 
+                        //         "Enter" => Vasey!
+                        //             [ AddEntity(FlowLink::new_descend_head(owner_id))
+                        //             , Wander(vm_meta, Direction::Descend, false)
+                        //             ],
+                        //         _ => Vasey![] 
+                        //     }
+                        // })
                         oninput=link.callback(move |e: InputData| {
                             Vasey![WriteEntity(owner_id, EntityField::Face(e.value))]
                         })

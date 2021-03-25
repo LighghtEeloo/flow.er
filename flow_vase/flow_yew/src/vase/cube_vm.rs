@@ -103,7 +103,7 @@ impl CubeView {
         let cube = cube.clone();
         match cube.cube_type {
             CubeType::Inkblot => {
-                inkblot::Inkblot::new_cube(cube)
+                inkblot::Inkblot::new_cube(cube, link)
             }
             CubeType::ClauseTree => {
                 let node = vessel.node(&cube.obj.unwrap_or_default());
@@ -142,6 +142,10 @@ impl CubeView {
             CubeView::Blank { alt: _ } => {
                 Blank { alt: cube.clone().alt.unwrap_or_default() }
             }
+            CubeView::Inkblot { mut inkblot } => {
+                inkblot.update(cube);
+                Inkblot { inkblot }
+            }
             CubeView::ClauseTree { mut clause } => {
                 let entity_node = 
                     vessel.node(&clause.head_id())
@@ -157,6 +161,11 @@ impl CubeView {
             CubeView::Blank { alt } => {
                 html_uni_vec(format!("blank"), html! {
                     <span> {alt} </span>
+                })
+            }
+            CubeView::Inkblot { inkblot } => {
+                html_uni_vec(format!("inkblot"), html! {
+                    <span> { inkblot.view(vessel) } </span>
                 })
             }
             CubeView::ClauseTree { clause } => {
