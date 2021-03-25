@@ -7,6 +7,7 @@
   - [ ] lint display
 - [ ] formatted ClauseTree
 - [ ] Dry
+- [ ] Markdown Bubble
 
 ## flow_yew
 - [ ] hidable buttons
