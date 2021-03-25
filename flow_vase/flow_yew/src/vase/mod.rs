@@ -97,6 +97,7 @@ impl Component for Vase {
                 match msg {
                     SwitchRouter{ router} => {
                         self.vessel.router = router;
+                        self.cube_vm_vec = Vec::new();
                         true
                     },
 

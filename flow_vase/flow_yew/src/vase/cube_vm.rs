@@ -48,13 +48,13 @@ impl CubeVM {
                     // Todo: close vm.
                     [ CloseVM { meta } ]
                 })
-            > { "x" } </button>
+            > { "✕" } </button>
         };
         html! {
             <div class="vm" style={ style }>
                 // cube_vm view
                 { self.view_inner(vessel) }
-                { btn_close }
+                { if idx != 0 { btn_close } else { html!{} } }
             </div>
         }
     }

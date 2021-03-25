@@ -1,5 +1,5 @@
 use yew::{ComponentLink, Html, NodeRef, html, InputData};
-use flow_vessel::{Entity, EntityField, EntityId, EntityNode, Symbol, Process, Vessel};
+use flow_vessel::{Entity, EntityField, EntityId, EntityNode, Lint, Process, Symbol, Vessel};
 use super::{Vase, Msg::*, CubeView};
 
 #[derive(Clone)]
@@ -21,24 +21,26 @@ impl ClauseNode {
     pub fn view(&self, idx: usize, entity: &Entity, owner_id: EntityId) -> Html {
         html! {
             <div class="node">
-                { self.symbol_view(&entity) }
+                { self.symbol_view(idx, &entity) }
                 { self.input_view(idx, &entity, owner_id) }
             </div>
         }
     }
-    fn symbol_view(&self, entity: &Entity) -> Html {
+    fn symbol_view(&self, idx: usize, entity: &Entity) -> Html {
         let indent = entity.indent;
         let id = entity.id().clone();
-        let dropdown = match entity.symbol.clone() {
+        let symbol = match entity.symbol.clone() {
             Symbol::ProcessTracker(process) => 
                 self.process(id, process),
+            Symbol::Linted(lint) =>
+                self.lint(idx, lint),
             _ => html!{<></>}
         };
         let style = 
             format!("left: calc({} * var(--size-button) + {}px);", indent, indent);
         html! {
-            <div class="dropdown" style=style> 
-                { dropdown }
+            <div class="symbol" style=style> 
+                { symbol }
             </div> 
         }
     }
@@ -158,8 +160,13 @@ impl ClauseNode {
             </>
         }
     }
-    fn lint() -> Html {
-        todo!()
+    fn lint(&self, idx: usize, lint: Lint) -> Html {
+        let text = lint.display(idx);
+        html! {
+            <>
+            <div class="symbol-text"> {text} </div>
+            </>
+        }
     }
 }
 

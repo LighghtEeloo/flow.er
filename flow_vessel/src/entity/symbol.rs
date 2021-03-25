@@ -54,3 +54,8 @@ pub enum Lint {
 }
 
 // Todo: impl Lint.
+impl Lint {
+    pub fn display(&self, idx: usize) -> String {
+        "▣".into()
+    }
+}

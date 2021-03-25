@@ -138,7 +138,7 @@
     
 /* Dropdown */
 
-.dropdown { 
+.symbol { 
     display: block; 
     position: absolute; 
     top: 0;
@@ -148,6 +148,14 @@
     width: var(--size-button);
     margin: 1px 0;
     
+    .symbol-text {
+        color: black; 
+        width: var(--size-button);
+        height: var(--size-button);
+        text-align: center;
+        line-height: calc(var(--size-button) - 1px);
+    }
+
     .dropbtn { 
         position: relative;
         top: 0;
@@ -193,7 +201,7 @@
     
 } 
 
-.dropdown:hover {
+.symbol:hover {
     .dropdown-content { 
         display: inline-block; 
         min-width: var(--size-button) / 2; 
