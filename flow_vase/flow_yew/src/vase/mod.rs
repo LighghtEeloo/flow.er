@@ -134,25 +134,27 @@ impl Component for Vase {
         } else {
             // clean the glass
             self.vessel.glass.refresh();
-            let cube_vec = self.vessel.get_cube_vec();
-            // Test: non-invasively update cube_vm_vec.
-            for (idx,(cube_vm, cube)) in self.cube_vm_vec.iter_mut().zip(cube_vec.iter()).enumerate() {
-                cube_vm.update(idx, cube, &self.vessel)
+            // if no cube_vm then regenerate; else update
+            if self.cube_vm_vec.len() == 0 {
+                self.cube_vm_vec = self.vessel.get_cube_vec().iter().enumerate()
+                    .map(|(idx, cube)| 
+                        CubeVM::new(
+                            idx,
+                            cube, 
+                            &self.vessel, 
+                            self.link.clone()
+                        )
+                    ).collect();
+            } else {
+                let cube_vec = self.vessel.get_cube_vec();
+                // Test: non-invasively update cube_vm_vec.
+                for (idx,(cube_vm, cube)) in self.cube_vm_vec.iter_mut().zip(cube_vec.iter()).enumerate() {
+                    cube_vm.update(idx, cube, &self.vessel)
+                }
             }
             // let _: Vec<()> = self.cube_vm_vec.iter_mut().zip(cube_vec.iter())
             //     .map(|(cube_vm, cube)| 
             //         cube_vm.update(cube, &self.vessel)
-            //     ).collect();
-
-            // self.cube_vm_vec = self.vessel.get_cube_vec().iter().enumerate()
-            //     .map(|(idx, cube)| 
-            //         // Todo: Update here?.
-            //         CubeVM::new(
-            //             idx,
-            //             cube, 
-            //             &self.vessel, 
-            //             self.link.clone()
-            //         )
             //     ).collect();
 
             // save
