@@ -1,6 +1,6 @@
 [package]
 name = "flow_yew"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["LighghtEeloo <eelooecho@163.com>"]
 edition = "2018"
 
@@ -10,7 +10,6 @@ edition = "2018"
 rand = { version = "0.7", features = ["wasm-bindgen"] }
 serde = "1"
 serde_json = "1"
-wasm-timer = "0.2.0"
 futures = "0.3"
 chrono = { version = "0.4", features = ["unstable-locales"] }
 

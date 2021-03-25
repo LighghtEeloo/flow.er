@@ -10,6 +10,9 @@ chrono = "0.4"
 rand = "0.7"
 serde_json = "1"
 futures = "0.3"
+# strum = "0.20"
+# strum_macros = "0.20"
+# indexmap = "1.6"
 
 [dependencies.serde]
 version = "1"

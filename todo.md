@@ -2,12 +2,17 @@
 - [ ] (abort) merge_flow
 
 ## flow_vessel
-- [ ] entity_symbol
-- [ ] entity_lint
-- [ ] ClauseTree
+- [ ] symbol system
+  - [ ] auto indent
+  - [ ] lint display
+- [ ] formatted ClauseTree
+- [ ] Dry
 
 ## flow_yew
-- [ ] vm buttons
+- [ ] hidable buttons
+- [ ] add vm
+- [ ] swap vms
+- [ ] completely replace and remove legacy version
 
 ## flow_cli
 - [ ] more gui logic in vessel
