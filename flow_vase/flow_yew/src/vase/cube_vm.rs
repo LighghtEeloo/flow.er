@@ -29,7 +29,8 @@ impl CubeVM {
             link
         }
     }
-    pub fn update(&mut self, cube: &Cube, vessel: &Vessel) {
+    pub fn update(&mut self, idx: usize, cube: &Cube, vessel: &Vessel) {
+        self.meta.idx = idx;
         self.view = self.view.clone().update_new(cube, vessel);
     }
     pub fn view(&self, vessel: &Vessel, per_width: f64) -> Html {
@@ -51,9 +52,9 @@ impl CubeVM {
         };
         html! {
             <div class="vm" style={ style }>
-                { btn_close }
                 // cube_vm view
                 { self.view_inner(vessel) }
+                { btn_close }
             </div>
         }
     }
@@ -136,9 +137,9 @@ impl CubeView {
     }
     pub fn update_new(self, cube: &Cube, vessel: &Vessel) -> Self {
         use CubeView::*;
-        let cube_type = cube.cube_type;
+        // let cube_type = cube.cube_type;
         match self.clone() {
-            CubeView::Blank { alt } => {
+            CubeView::Blank { alt: _ } => {
                 Blank { alt: cube.clone().alt.unwrap_or_default() }
             }
             CubeView::ClauseTree { mut clause } => {

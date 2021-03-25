@@ -57,7 +57,7 @@ impl Vase {
         let vm_vec: Vec<Html> = self.cube_vm_vec_view();
         let editor = 
             html! {
-                <div class={editor_str}>
+                <div id={editor_str} class="vm-container">
                     { vm_vec }
                 </div>
             };
