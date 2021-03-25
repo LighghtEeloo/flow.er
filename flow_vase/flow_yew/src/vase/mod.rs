@@ -22,6 +22,10 @@ pub enum Msg {
     },
 
     // vm level
+    OpenVM {
+        cube: Cube,
+        meta: CubeMeta
+    },
     CloseVM {
         meta: CubeMeta
     },
@@ -44,24 +48,26 @@ impl Component for Vase {
     fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
         let vessel_future = Vessel::load();
         let vessel = futures::executor::block_on(vessel_future).unwrap_or(Vessel::new());
-        // Test..
-        // let vessel = {
-        //     let mut v = Vessel::default();
-        //     let ids: Vec<EntityId> = (0..5).into_iter().map(|_|{
-        //         v.entity_grow()
-        //     }).collect();
-        //     v.entity_get_mut(&ids[0]).map(|x| x.face = "A".to_owned());
-        //     v.entity_get_mut(&ids[1]).map(|x| x.face = "B".to_owned());
-        //     v.entity_get_mut(&ids[2]).map(|x| x.face = "C".to_owned());
-        //     v.entity_get_mut(&ids[3]).map(|x| x.face = "D".to_owned());
-        //     v.entity_get_mut(&ids[4]).map(|x| x.face = "E".to_owned());
-        //     let router = Router::Board;
-        //     v.glass.insert_cube(
-        //         Cube::new(router), 
-        //         CubeMeta { router, idx: 1 }
-        //     );
-        //     v
-        // };
+        // Debug..
+        /* */
+        let vessel = {
+            let mut v = Vessel::default();
+            let ids: Vec<EntityId> = (0..5).into_iter().map(|_|{
+                v.entity_grow()
+            }).collect();
+            v.entity_get_mut(&ids[0]).map(|x| x.face = "A".to_owned());
+            v.entity_get_mut(&ids[1]).map(|x| x.face = "B".to_owned());
+            v.entity_get_mut(&ids[2]).map(|x| x.face = "C".to_owned());
+            v.entity_get_mut(&ids[3]).map(|x| x.face = "D".to_owned());
+            v.entity_get_mut(&ids[4]).map(|x| x.face = "E".to_owned());
+            let router = Router::Board;
+            v.glass.insert_cube(
+                Cube::new(router), 
+                CubeMeta { router, idx: 1 }
+            );
+            v
+        };
+        // */
         let cubes = vessel.get_cube_vec();
         let cube_vm_vec = cubes.iter().enumerate()
             .map(|(idx,cube)| CubeVM::new(
@@ -92,9 +98,15 @@ impl Component for Vase {
                         true
                     },
 
+                    OpenVM { cube, meta } => {
+                        self.vessel.glass.push_cube(cube.clone(), meta.router);
+                        let idx = meta.idx;
+                        self.cube_vm_vec.push(CubeVM::new(idx, &cube, &self.vessel, self.link.clone()));
+                        true
+                    }
                     CloseVM { meta } => {
-                        // Todo: close.
                         self.vessel.glass.remove_cube(meta);
+                        self.cube_vm_vec.remove(meta.idx);
                         true
                     }
 
@@ -119,14 +131,22 @@ impl Component for Vase {
         } else {
             // clean the glass
             self.vessel.glass.refresh();
-            // update cube_vm_vec
-            self.cube_vm_vec = self.vessel.get_cube_vec().iter().enumerate()
-                .map(|(idx, cube)| CubeVM::new(
-                    idx,
-                    cube, 
-                    &self.vessel, 
-                    self.link.clone()
-                )).collect();
+            let cube_vec = self.vessel.get_cube_vec();
+            // Test: non-invasively update cube_vm_vec.
+            let _: Vec<()> = self.cube_vm_vec.iter_mut().zip(cube_vec.iter())
+                .map(|(cube_vm, cube)| 
+                    cube_vm.update(cube)
+                ).collect();
+            // self.cube_vm_vec = self.vessel.get_cube_vec().iter().enumerate()
+            //     .map(|(idx, cube)| 
+            //         // Todo: Update here?.
+            //         CubeVM::new(
+            //             idx,
+            //             cube, 
+            //             &self.vessel, 
+            //             self.link.clone()
+            //         )
+            //     ).collect();
             // save
             log_obj("Vessel saved", &self.vessel);
             let save_res = futures::executor::block_on(self.vessel.clone().save());

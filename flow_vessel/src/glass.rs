@@ -166,6 +166,13 @@ impl Glass {
             vec.insert(idx, cube);
         });
     }
+    pub fn push_cube(&mut self, cube: Cube, router: Router) {
+        let vec = self.ensured(router);
+        let idx = vec.len();
+        self.map.get_mut(&router).map(|vec|{
+            vec.insert(idx, cube);
+        });
+    }
     /// removes a cube within a safe idx
     pub fn remove_cube(&mut self, meta: CubeMeta) -> Cube {
         let router = meta.router;

@@ -27,6 +27,9 @@ impl CubeVM {
             link
         }
     }
+    pub fn update(&mut self, cube: &Cube) {
+        
+    }
     pub fn view(&self, vessel: &Vessel, per_width: f64) -> Html {
         let meta = self.meta;
         let idx = meta.idx;

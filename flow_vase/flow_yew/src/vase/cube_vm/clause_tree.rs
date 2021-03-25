@@ -7,7 +7,6 @@ pub struct ClauseNode {
     id: EntityId,
     link: ComponentLink<Vase>,
     node_ref: NodeRef,
-    buffer_empty: bool,
 }
 
 
@@ -17,7 +16,6 @@ impl ClauseNode {
             id,
             link,
             node_ref: NodeRef::default(),
-            buffer_empty: true,
         }
     }
     pub fn view(&self, idx: usize, entity: &Entity, owner_id: EntityId) -> Html {
@@ -29,42 +27,18 @@ impl ClauseNode {
         }
     }
     fn symbol_view(&self, entity: &Entity) -> Html {
+        let indent = entity.indent;
         let id = entity.id().clone();
-        let vec = Process::vec_all();
-        let status_meta: Vec<(String, String, Process)> = 
-            vec.iter().map( |x| (
-                String::from(Process::type_src(x)), 
-                String::from(Process::type_str(x)),
-                x.clone()
-            ) ).collect();
-        let status_dropdown: Html = 
-            status_meta.into_iter().map(|(src, des, process)| {
-                html! {
-                    <div title={des.clone()}
-                        onclick=self.link.callback(move |_| {
-                            // [ EntityUpdate {
-                            //     id, 
-                            //     // id: id.clone(), 
-                            //     field: EntityField::Symbol(Symbol:: process.clone())
-                            // } ]
-                            []
-                        })
-                    > 
-                        <img src={src} alt="process" /> 
-                    </div> 
-                }
-            }).collect();
+        let dropdown = match entity.symbol.clone() {
+            Symbol::ProcessTracker(process) => 
+                self.process(id, process),
+            _ => html!{<></>}
+        };
+        let style = 
+            format!("left: calc({} * var(--size-button) + {}px);", indent, indent);
         html! {
-            <div class="dropdown"> 
-                <button class="dropbtn"
-                    // value=entity.symbol.type_str()
-                > 
-                    // <img src={entity.symbol.type_src()} alt="process" />
-                </button> 
-                
-                <div class="dropdown-content"> 
-                    { status_dropdown }
-                </div> 
+            <div class="dropdown" style=style> 
+                { dropdown }
             </div> 
         }
     }
@@ -72,11 +46,15 @@ impl ClauseNode {
         let mut entity = entity.clone();
         let id = entity.id().clone();
         let is_empty = entity.face.is_empty();
+        let indent = entity.indent + 1;
+        let style = 
+            format!("width: calc(100% - {} * var(--size-button) - var(--horizontal-margin) * 2);", indent);
         html! {
             <input
                 type="text"
                 ref=self.node_ref.clone()
                 value=entity.face
+                style=style
                 placeholder="..."
                 aria-label="Item"
                 // onfocus=self.link.callback(move |_| {
@@ -138,6 +116,49 @@ impl ClauseNode {
                 // readonly=self.locked
             />
         }
+    }
+}
+
+impl ClauseNode {
+    fn process(&self, id: EntityId, process: Process) -> Html {
+        let process_meta: Vec<(String, String, Process)> = 
+        Process::vec_all().iter().map( |x| (
+            String::from(Process::type_src(x)), 
+            String::from(Process::type_str(x)),
+            x.clone()
+        ) ).collect();
+        let dropdown: Html = 
+            process_meta.into_iter().map(|(src, des, process)| {
+                html! {
+                    <div title={des.clone()}
+                        onclick=self.link.callback(move |_| {
+                            [ EntityUpdate {
+                                id, 
+                                // id: id.clone(), 
+                                field: EntityField::Symbol(Symbol::ProcessTracker(process.clone()))
+                            } ]
+                        })
+                    > 
+                        <img src={src} alt="process" /> 
+                    </div> 
+                }
+            }).collect();
+        html! {    
+            <>
+                <button class="dropbtn"
+                    value=process.type_str()
+                > 
+                    <img src={process.type_src()} alt="process" />
+                </button> 
+                
+                <div class="dropdown-content"> 
+                    {dropdown}
+                </div> 
+            </>
+        }
+    }
+    fn lint() -> Html {
+        todo!()
     }
 }
 

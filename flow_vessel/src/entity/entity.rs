@@ -3,7 +3,7 @@ use serde::{Serialize, Deserialize};
 use crate::TimeNote;
 use super::identity::*;
 use super::tag::*;
-use super::symbol::Symbol;
+use super::symbol::*;
 
 
 // Entity Area
@@ -14,7 +14,7 @@ pub struct Entity {
     pub time: Option<TimeNote>,
     pub face: Face,
     pub bubble: Bubble,
-    // pub indent: Indent,
+    pub indent: Indent,
     pub symbol: Symbol,
     pub tags: TagSet,
 }
@@ -32,7 +32,8 @@ impl Entity {
             time: None,
             face: Face::new(),
             bubble: Bubble::new(),
-            symbol: Symbol::Innocent,
+            indent: 0,
+            symbol: Symbol::Linted(Lint::Dash),
             tags: TagSet::new(),
         }
     }
@@ -45,7 +46,7 @@ impl Entity {
             TimeNote(t) => { self.time = Some(t) }
             Face(f) => { self.face = f }
             Bubble(b) => { self.bubble = b }
-            Symbol(p) => { self.symbol = p }
+            Symbol(s) => { self.symbol = s }
             TagSet(tf) => { 
                 self.tags.update_tagset(tf)
             }
@@ -62,6 +63,7 @@ impl Default for Entity {
 
 pub type Face = String;
 pub type Bubble = String;
+pub type Indent = i32;
 
 #[derive(Debug, Clone)]
 pub enum EntityField {
