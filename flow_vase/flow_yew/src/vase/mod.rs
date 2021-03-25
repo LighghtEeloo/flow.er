@@ -52,18 +52,26 @@ impl Component for Vase {
         /* */
         let vessel = {
             let mut v = Vessel::default();
-            let ids: Vec<EntityId> = (0..5).into_iter().map(|_|{
+            let ids: Vec<EntityId> = (0..6).into_iter().map(|_|{
                 v.entity_grow()
             }).collect();
-            v.entity_get_mut(&ids[0]).map(|x| x.face = "A".to_owned());
-            v.entity_get_mut(&ids[1]).map(|x| x.face = "B".to_owned());
-            v.entity_get_mut(&ids[2]).map(|x| x.face = "C".to_owned());
-            v.entity_get_mut(&ids[3]).map(|x| x.face = "D".to_owned());
-            v.entity_get_mut(&ids[4]).map(|x| x.face = "E".to_owned());
+            v.entity_get_mut(&EntityId::default()).map(|x| x.face = "The Ripple of Your Shadow".to_owned());
+            v.entity_get_mut(&ids[0]).map(|x| x.face = "Hi Player, ".to_owned());
+            v.entity_get_mut(&ids[1]).map(|x| x.face = "it has been a while. ".to_owned());
+            v.entity_get_mut(&ids[2]).map(|x| x.face = "I've been watching you, all along the way. ".to_owned());
+            v.entity_get_mut(&ids[3]).map(|x| x.face = "You seem lost. ".to_owned());
+            v.entity_get_mut(&ids[4]).map(|x| x.face = "Nothing but a long, long dream. ".to_owned());
+            v.entity_get_mut(&ids[5]).map(|x| {
+                x.face = "Wake up now. ".to_owned();
+                x.bubble = 
+"Your life is waiting. 
+Do what you have to do. 
+Be a king. ".to_owned();
+            });
             let router = Router::Board;
             let cube: Cube = 
                 cubes::Inkblot {
-                    obj: EntityId::default(),
+                    obj: ids[5],
                 }.into();
             // let cube = Cube::new(router);
             let cube_type = cube.cube_type;
