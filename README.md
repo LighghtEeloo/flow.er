@@ -63,7 +63,7 @@ For now, this software isn't data-safe. Use at your own risk. This may get bette
 
 
 ## Todo
-See `todo.md`.
+See [todo.md](./todo.md).
 
 ## Project Technical Detail
 
@@ -126,7 +126,7 @@ As for `Entity`, it's the content of every node. Every entity has a (hopefully) 
 1. face: the name of the entity.
 2. bubble: a detailed description / note of the entity.
 3. symbol: whether it's...
-   1. A ordered / unordered list entry.
+   1. An ordered / unordered list entry.
    2. A todo-list entry.
    3. Plain.
 4. tags: a tag system.
