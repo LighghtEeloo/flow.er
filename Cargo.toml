@@ -17,8 +17,8 @@ members = [
 	"flow_vessel",
 	"flow_vase/flow_cli",
 	# "flow_vase/flow_iced",
-	# "flow_vase/flow_yew",
-	# "flow_vase/flow_yew_legacy",
+	"flow_vase/flow_yew",
+	"flow_vase/flow_yew_legacy",
 ]
 
 [dependencies.flow_cli]

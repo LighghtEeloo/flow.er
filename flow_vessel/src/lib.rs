@@ -1,4 +1,5 @@
 mod entity;
+mod cube;
 mod glass;
 mod vessel;
 mod util;
@@ -10,7 +11,8 @@ pub use entity::{
     tag::{Tag, TagSet, TagSetField},
     entity::{Entity, EntityField, Face, Bubble},
 };
-pub use glass::{Glass, Router, Cube, CubeMeta};
+pub use cube::{Cube, CubeType, CubeMeta};
+pub use glass::{Glass, Router};
 pub use util::{
     json::{from_json, to_json, export_json},
     time::{TimeNote, TimeRep, display, now}

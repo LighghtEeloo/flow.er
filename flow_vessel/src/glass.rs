@@ -1,7 +1,12 @@
 use serde::{Serialize, Deserialize};
-use std::{collections::HashMap, time::SystemTime};
+use std::{collections::HashMap};
 
-use super::{EntityId, now};
+pub use super::cube::{CubeType, CubeMeta, Cube};
+
+// Todo: blob export.
+pub mod cubes {
+    pub use crate::cube::{};
+}
 
 /// Describes the app router.
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, Deserialize, Serialize)]
@@ -56,76 +61,6 @@ impl Router {
             Settings,
         ]
     }
-}
-
-/// The basic unit of view, containing minimum info for rendering.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum Cube {
-    /// A single entity's notebook.
-    Inkblot {
-        obj: EntityId
-    },
-    /// A single entity  view
-    ClauseTree {
-        obj: EntityId,
-        current: Option<usize>
-    },
-    /// A todo-oriented pool view
-    PromisedLand,
-    FlowView {
-        obj: EntityId,
-        current: EntityId
-    },
-    CalendarView {
-        current: SystemTime
-    },
-    TimeView,
-    SettingView,
-    Blank {
-        alt: String
-    }
-}
-
-impl Default for Cube {
-    fn default() -> Self {
-        Cube::Blank {
-            alt: format!("Focus on a node to start.")
-        }
-    }
-}
-
-impl Cube {
-    pub fn new(router: Router) -> Self {
-        use Cube::*;
-        match router {
-            Router::BirdView => 
-                FlowView {
-                    obj: EntityId::default(),
-                    current: EntityId::default()
-                },
-            Router::Board => Cube::ClauseTree { 
-                obj: EntityId::default(),
-                current: None
-            },
-            Router::Promised => Cube::PromisedLand,
-            Router::Calendar => CalendarView { current: now() },
-            Router::TimeAnchor => TimeView,
-            Router::Settings => SettingView,
-        }
-    }
-    pub fn is_blank(&self) -> bool {
-        if let Cube::Blank{ alt: _ } = self {
-            true
-        } else {
-            false
-        }
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct CubeMeta {
-    pub router: Router,
-    pub idx: usize
 }
 
 /// A overall layer of routers and cubes.

@@ -23,7 +23,7 @@ pub enum Msg {
 
     // vm level
     OpenVM {
-        cube: Cube,
+        cube: CubeType,
         meta: CubeMeta
     },
     CloseVM {
@@ -62,7 +62,7 @@ impl Component for Vase {
             v.entity_get_mut(&ids[4]).map(|x| x.face = "E".to_owned());
             let router = Router::Board;
             v.glass.insert_cube(
-                Cube::new(router), 
+                CubeType::new(router), 
                 CubeMeta { router, idx: 1 }
             );
             v

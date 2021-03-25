@@ -1,6 +1,6 @@
 use yew::{ComponentLink, Html, html};
 use std::time::SystemTime;
-use flow_vessel::{Cube, CubeMeta, EntityId, Vessel};
+use flow_vessel::{CubeType, CubeMeta, EntityId, Vessel};
 
 pub use super::{Vase, Msg, Msg::*};
 
@@ -13,7 +13,7 @@ pub struct CubeVM {
 }
 
 impl CubeVM {
-    pub fn new(idx: usize, cube: &Cube, vessel: &Vessel, link: ComponentLink<Vase>) -> Self {
+    pub fn new(idx: usize, cube: &CubeType, vessel: &Vessel, link: ComponentLink<Vase>) -> Self {
         let meta = 
             CubeMeta {
                 // origin: cube.clone(),
@@ -27,7 +27,7 @@ impl CubeVM {
             link
         }
     }
-    pub fn update(&mut self, cube: &Cube, vessel: &Vessel) {
+    pub fn update(&mut self, cube: &CubeType, vessel: &Vessel) {
         self.view = self.view.clone().update_new(cube, vessel);
     }
     pub fn view(&self, vessel: &Vessel, per_width: f64) -> Html {
@@ -95,12 +95,12 @@ impl Default for CubeView {
 }
 
 impl CubeView {
-    pub fn new(cube: &Cube, vessel: &Vessel, link: ComponentLink<Vase>) -> Self {
+    pub fn new(cube: &CubeType, vessel: &Vessel, link: ComponentLink<Vase>) -> Self {
         use CubeView::*;
         match cube.clone() {
-            Cube::Inkblot { obj } => 
+            CubeType::Inkblot { obj } => 
                 Inkblot { obj },
-            Cube::ClauseTree { obj, current } => {
+            CubeType::ClauseTree { obj, current } => {
                 let node = vessel.node(&obj);
                 node.map(|node| {
                     clause_tree::ClauseTree::new_cube(
@@ -110,30 +110,30 @@ impl CubeView {
                     )
                 }).unwrap_or_default()
             }
-            Cube::PromisedLand => PromisedLand,
-            Cube::FlowView { obj, current } => {
+            CubeType::PromisedLand => PromisedLand,
+            CubeType::FlowView { obj, current } => {
                 FlowView { obj, current }
             }
-            Cube::CalendarView { current } => {
+            CubeType::CalendarView { current } => {
                 CalendarView { current }
             }
-            Cube::TimeView => TimeView,
-            Cube::SettingView => SettingView,
-            Cube::Blank { alt } => Blank { alt }
+            CubeType::TimeView => TimeView,
+            CubeType::SettingView => SettingView,
+            CubeType::Blank { alt } => Blank { alt }
         }
     }
-    pub fn update_new(self, cube: &Cube, vessel: &Vessel) -> Self {
+    pub fn update_new(self, cube: &CubeType, vessel: &Vessel) -> Self {
         use CubeView::*;
         match self.clone() {
             CubeView::Blank { alt } => {
-                if let Cube::Blank { alt: _alt } = cube {
+                if let CubeType::Blank { alt: _alt } = cube {
                     Blank { alt: _alt.clone() }
                 } else {
                     self
                 }
             }
             CubeView::ClauseTree { mut clause } => {
-                if let Cube::ClauseTree { obj, current } = cube {
+                if let CubeType::ClauseTree { obj, current } = cube {
                     clause.update(vessel.node(obj).expect("should have node_entity"));
                     ClauseTree { clause }
                 } else {
