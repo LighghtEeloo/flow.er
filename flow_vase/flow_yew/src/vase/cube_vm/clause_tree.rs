@@ -27,7 +27,8 @@ impl ClauseNode {
         }
     }
     fn symbol_view(&self, idx: usize, entity: &Entity) -> Html {
-        let indent = entity.indent;
+        let indent_base = 0;
+        let indent = indent_base;
         let id = entity.id().clone();
         let symbol = match entity.symbol.clone() {
             Symbol::ProcessTracker(process) => 
@@ -45,10 +46,11 @@ impl ClauseNode {
         }
     }
     fn input_view(&self, idx: usize, entity: &Entity, owner_id: EntityId) -> Html {
+        let indent_base = 0;
+        let indent = indent_base + 1;
         let mut entity = entity.clone();
         let id = entity.id().clone();
         let is_empty = entity.face.is_empty();
-        let indent = entity.indent + 1;
         let style = 
             format!("width: calc(100% - {} * var(--size-button) - var(--horizontal-margin) * 2);", indent);
         html! {
@@ -110,7 +112,7 @@ impl ClauseNode {
                 //     }
                 // })
                 oninput=self.link.callback(move |e: InputData| {
-                    [ EntityUpdate {
+                    [ UpdateEntity {
                         id, 
                         field: EntityField::Face(e.value)
                     } ]
@@ -135,7 +137,7 @@ impl ClauseNode {
                 html! {
                     <div title={des.clone()}
                         onclick=self.link.callback(move |_| {
-                            [ EntityUpdate {
+                            [ UpdateEntity {
                                 id, 
                                 // id: id.clone(), 
                                 field: EntityField::Symbol(Symbol::ProcessTracker(process.clone()))
@@ -276,7 +278,7 @@ impl ClauseTree {
                     aria-label="Arbitrary Node"
                     value=entity.face
                     oninput=link.callback(move |e: InputData| {
-                        [EntityUpdate{
+                        [UpdateEntity{
                             id, 
                             field: EntityField::Face(e.value)
                         }]

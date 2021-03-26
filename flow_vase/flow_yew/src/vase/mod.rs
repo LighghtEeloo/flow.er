@@ -31,7 +31,7 @@ pub enum Msg {
     },
 
     // entity level
-    EntityUpdate {
+    UpdateEntity {
         id: EntityId,
         field: EntityField
     },
@@ -52,7 +52,7 @@ impl Component for Vase {
         /* */
         let vessel = {
             let mut v = Vessel::default();
-            let ids: Vec<EntityId> = (0..6).into_iter().map(|_|{
+            let ids: Vec<EntityId> = (0..7).into_iter().map(|_|{
                 v.entity_grow()
             }).collect();
             v.entity_get_mut(&EntityId::default()).map(|x| x.face = "The Ripple of Your Shadow".to_owned());
@@ -68,6 +68,8 @@ impl Component for Vase {
 Do what you have to do. 
 Be a king. ".to_owned();
             });
+            v.entity_get_mut(&ids[6]).map(|x| x.symbol = Symbol::ProcessTracker(Process::New) );
+            v.entity_get_mut(&ids[6]).map(|x| x.face = "Do your job.".into() );
             let router = Router::Board;
             let cube: Cube = 
                 cubes::Inkblot {
@@ -125,7 +127,7 @@ Be a king. ".to_owned();
                         true
                     }
 
-                    EntityUpdate { id, field } => {
+                    UpdateEntity { id, field } => {
                         self.vessel.entity_get_mut(&id).map(|entity| {
                             entity.update_entity(field)
                         });

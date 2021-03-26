@@ -14,9 +14,10 @@ pub struct Entity {
     pub time: Option<TimeNote>,
     pub face: Face,
     pub bubble: Bubble,
-    pub indent: Indent,
     pub symbol: Symbol,
     pub tags: TagSet,
+    pub blocked: bool,
+    pub symbol_toggle: bool,
 }
 
 impl Entity {
@@ -30,11 +31,12 @@ impl Entity {
         Entity {
             id: id.clone(),
             time: None,
-            face: Face::new(),
-            bubble: Bubble::new(),
-            indent: 0,
-            symbol: Symbol::Linted(Lint::Dash),
-            tags: TagSet::new(),
+            face: Face::default(),
+            bubble: Bubble::default(),
+            symbol: Symbol::Linted(Lint::default()),
+            tags: TagSet::default(),
+            blocked: false,
+            symbol_toggle: false,
         }
     }
     pub fn id(&self) -> &EntityId {
@@ -63,7 +65,6 @@ impl Default for Entity {
 
 pub type Face = String;
 pub type Bubble = String;
-pub type Indent = i32;
 
 #[derive(Debug, Clone)]
 pub enum EntityField {
