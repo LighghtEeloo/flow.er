@@ -64,11 +64,11 @@ impl ClauseNode {
         let indent_base = 0;
         let indent = indent_base;
         let id = entity.id().clone();
-        let symbol = match entity.symbol.clone() {
-            Symbol::ProcessTracker(process) => 
+        let symbol = match (entity.symbol_toggle, entity.symbol.clone()) {
+            (false, Symbol::ProcessTracker(process)) => 
                 self.process(id, process),
-            Symbol::Linted(lint) =>
-                self.lint(idx, lint),
+            (false, Symbol::Linted(lint)) =>
+                self.lint(id, idx, lint),
             _ => html!{<></>}
         };
         let style = 
@@ -182,8 +182,14 @@ impl ClauseNode {
             }).collect();
         html! {    
             <>
-                <button class="dropbtn"
+                <button class="dropbtn process"
                     value=process.type_str()
+                    onclick=self.link.callback(move|_| {
+                        [EntityUpdate{
+                            id,
+                            field: EntityField::SymbolToggle
+                        }]
+                    })
                 > 
                     <img src={process.type_src()} alt="process" />
                 </button> 
@@ -194,12 +200,19 @@ impl ClauseNode {
             </>
         }
     }
-    fn lint(&self, idx: usize, lint: Lint) -> Html {
+    fn lint(&self, id: EntityId, idx: usize, lint: Lint) -> Html {
         let text = lint.display(idx);
         html! {
-            <>
-            <div class="symbol-text"> {text} </div>
-            </>
+            <button class="dropbtn lint"
+                onclick=self.link.callback(move|_| {
+                    [EntityUpdate{
+                        id,
+                        field: EntityField::SymbolToggle
+                    }]
+                })
+            > 
+                <div class="symbol-text"> {text} </div>
+            </button> 
         }
     }
 }

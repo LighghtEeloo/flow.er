@@ -149,17 +149,20 @@
     margin: 1px 0;
     
     .symbol-text {
+        position: absolute;
+        top: 0;
+        left: 0;
         color: black; 
         width: var(--size-button);
         height: var(--size-button);
         text-align: center;
-        line-height: calc(var(--size-button) - 1px);
+        line-height: calc(var(--size-button) - 2px);
     }
 
     .dropbtn { 
         position: relative;
         top: 0;
-        background-color: var(--dropdownColor); 
+        background-color: transparent; 
         color: white; 
         height: var(--size-button);
         width: var(--size-button);
@@ -171,6 +174,10 @@
         border-radius: calc(var(--size-button) / 12);
     } 
     
+    .dropbtn.process {
+        background-color: var(--dropdownColor); 
+    }
+
     .dropbtn img,
     .dropdown-content div img {
         width:  calc(var(--size-button) * 0.6);
@@ -207,7 +214,7 @@
         min-width: var(--size-button) / 2; 
         z-index: 1; 
     } 
-    .dropbtn { 
+    .dropbtn.process { 
         background-color: var(--dropdownHoverColor); 
     }
 } 
