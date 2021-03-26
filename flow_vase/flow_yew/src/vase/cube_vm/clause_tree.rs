@@ -20,22 +20,36 @@ impl ClauseNode {
     }
     pub fn view(&self, idx: usize, entity: &Entity, owner: EntityId) -> Html {
         let id = entity.id().clone();
-        let btn_add = html! {
-            <button class="btn-add" style="position: absolute; right: 10%"
-                onclick=self.link.callback(move |_| {
-                    [EntityAdd{
-                        owner,
-                        idx: idx + 1
-                    }]
-                })
-            >{"+"}</button>
+        let btn_add = {
+            let style = "
+                position: absolute; 
+                top: 1px;
+                right: var(--size-button);
+            ";
+            html! {
+                <button class="btn-add btn-operate" style=style
+                    onclick=self.link.callback(move |_| {
+                        [EntityAdd{
+                            owner,
+                            idx: idx + 1
+                        }]
+                    })
+                >{"＋"}</button>
+            }
         };
-        let btn_del = html! {
-            <button class="btn-del" style="position: absolute; left: 90%"
-                onclick=self.link.callback(move |_| {
-                    [EntityDelete{id}]
-                })
-            >{"x"}</button>
+        let btn_del = {
+            let style = "
+                position: absolute; 
+                top: 1px;
+                right: 0;
+            ";
+            html! {
+                <button class="btn-del btn-operate" style=style
+                    onclick=self.link.callback(move |_| {
+                        [EntityDelete{id}]
+                    })
+                >{"✕"}</button>
+            }
         };
         html! {
             <div class="node">
@@ -220,10 +234,16 @@ impl ClauseTree {
     pub fn update(&mut self, entity_node: &EntityNode) {
         let link = self.head.link.clone();
         let correct = &entity_node.children;
-        let target = self.nodes.clone();
-        self.nodes = ClauseTree::update_iter_impl(target, correct, link);
+        // let target = self.nodes.clone();
+        self.nodes = ClauseTree::update_rebuild(correct, link);
+        // self.nodes = ClauseTree::update_iter_impl(target, correct, link);
     }
-    fn update_iter_impl(mut target: Vec<ClauseNode>, correct: &Vec<EntityId>, link: ComponentLink<Vase>) -> Vec<ClauseNode> {
+    fn update_rebuild(correct: &Vec<EntityId>, link: ComponentLink<Vase>) -> Vec<ClauseNode> {
+        correct.iter().map(|id| {
+            ClauseNode::new_cube(id.clone(), link.clone())
+        }).collect()
+    }
+    fn _update_iter_impl(mut target: Vec<ClauseNode>, correct: &Vec<EntityId>, link: ComponentLink<Vase>) -> Vec<ClauseNode> {
         // final effect: correct is identical to target
         for (i, c) in correct.iter().enumerate() {
             match target.get(i) {

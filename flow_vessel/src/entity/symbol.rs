@@ -80,10 +80,13 @@ impl Lint {
     }
     pub fn display(&self, mut idx: usize) -> String {
         use Lint::*;
-        "⚉";
+        // Note: Some backups.
+        "small: ⚬";
+        "machine: ⚉";
+        "solid: ●";
         match self {
             Numberic => {format!("{}", idx+1)}
-            Circle => {"⚬".into()}
+            Circle => {"○".into()}
             Square => {"▣".into()}
             Dash => {"-".into()}
             UnOrdered(s) => {s.into()}

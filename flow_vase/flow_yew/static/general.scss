@@ -18,10 +18,14 @@ body {
 .vm {
     --size-btn-small: 20px;
 
-    button {
-        width: var(--size-button);
-        height: var(--size-button);
-        background-color: rgba(95, 158, 160, 0.904);
+    .btn-operate {
+        width: calc(var(--size-button) - 2px);
+        height: calc(var(--size-button) - 2px);
+        margin: 1px;
+        background-color: rgba(129, 191, 216, 0.904);
+        border: 1px;
+        font-size: calc(var(--size-button) * 0.5);
+        line-height: calc(var(--size-button) - 2px);
     }
 }
 
