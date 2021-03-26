@@ -7,7 +7,7 @@ mod util;
 pub use flow_arena::{Flow, FlowArena, Node};
 pub use entity::{
     identity::{EntityId, EntityIdFactory},
-    symbol::{Symbol, Process, Lint},
+    symbol::{Symbol, Process, Lint, AlphaBet, Babel, BABEL},
     tag::{Tag, TagSet, TagSetField},
     entity::{Entity, EntityField, Face, Bubble},
 };
