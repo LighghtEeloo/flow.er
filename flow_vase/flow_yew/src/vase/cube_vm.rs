@@ -142,16 +142,11 @@ impl CubeView {
             CubeView::Blank { alt: _ } => {
                 Blank { alt: cube.clone().alt.unwrap_or_default() }
             }
-            CubeView::Inkblot { mut inkblot } => {
-                inkblot.update(cube);
-                Inkblot { inkblot }
+            CubeView::Inkblot { inkblot } => {
+                inkblot.update_new(cube, vessel)
             }
-            CubeView::ClauseTree { mut clause } => {
-                let entity_node = 
-                    vessel.node(&clause.head_id())
-                    .expect("should have node_entity");
-                clause.update(entity_node);
-                ClauseTree { clause }
+            CubeView::ClauseTree { clause } => {
+                clause.update_new(cube, vessel)
             }
             _ => self
         }

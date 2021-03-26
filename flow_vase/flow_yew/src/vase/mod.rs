@@ -92,13 +92,7 @@ Be a king. ".to_owned();
         };
         // */
         let cubes = vessel.get_cube_vec();
-        let cube_vm_vec = cubes.iter().enumerate()
-            .map(|(idx,cube)| CubeVM::new(
-                idx, 
-                cube, 
-                &vessel, 
-                link.clone()
-            )).collect();
+        let cube_vm_vec = Self::cube_vm_vec(cubes, &vessel, link.clone());
         log_obj("Vessel", &vessel);
         Self {
             vessel,
@@ -163,21 +157,13 @@ Be a king. ".to_owned();
         } else {
             // clean the glass
             self.vessel.glass.refresh();
-            // if no cube_vm then regenerate; else update
-            if self.cube_vm_vec.len() == 0 {
-                self.cube_vm_vec = self.vessel.get_cube_vec().iter().enumerate()
-                    .map(|(idx, cube)| 
-                        CubeVM::new(
-                            idx,
-                            cube, 
-                            &self.vessel, 
-                            self.link.clone()
-                        )
-                    ).collect();
+            // if not equal in num then rebuild; else update
+            let cubes = self.vessel.get_cube_vec();
+            if self.cube_vm_vec.len() != cubes.len() {
+                self.cube_vm_vec = Self::cube_vm_vec(cubes, &self.vessel, self.link.clone());
             } else {
-                let cube_vec = self.vessel.get_cube_vec();
                 // Test: non-invasively update cube_vm_vec.
-                for (idx,(cube_vm, cube)) in self.cube_vm_vec.iter_mut().zip(cube_vec.iter()).enumerate() {
+                for (idx,(cube_vm, cube)) in self.cube_vm_vec.iter_mut().zip(cubes.iter()).enumerate() {
                     cube_vm.update(idx, cube, &self.vessel)
                 }
             }
@@ -187,7 +173,8 @@ Be a king. ".to_owned();
             //     ).collect();
 
             // save
-            log_obj("Vessel saved", &self.vessel);
+            // Debug..
+            // log_obj("Vessel saved", &self.vessel);
             let save_res = futures::executor::block_on(self.vessel.clone().save());
             if save_res.is_err() {
                 log_obj("load err", -1);
@@ -202,5 +189,17 @@ Be a king. ".to_owned();
 
     fn view(&self) -> Html {
         self.main_view()
+    }
+}
+
+impl Vase {
+    fn cube_vm_vec(cubes: Vec<Cube>, vessel: &Vessel, link: ComponentLink<Vase>) -> Vec<CubeVM> {
+        cubes.iter().enumerate()
+            .map(|(idx,cube)| CubeVM::new(
+                idx, 
+                cube, 
+                vessel, 
+                link.clone()
+            )).collect()
     }
 }

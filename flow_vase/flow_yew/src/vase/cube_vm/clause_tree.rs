@@ -1,5 +1,5 @@
 use yew::{ComponentLink, Html, NodeRef, html, InputData};
-use flow_vessel::{Entity, EntityField, EntityId, EntityNode, Lint, Process, Symbol, Vessel};
+use flow_vessel::{Cube, Entity, EntityField, EntityId, EntityNode, Lint, Process, Symbol, Vessel};
 use super::{Vase, Msg::*, CubeView};
 
 #[derive(Clone)]
@@ -231,12 +231,18 @@ impl ClauseTree {
     pub fn head_id(&self) -> EntityId {
         self.head.id
     }
-    pub fn update(&mut self, entity_node: &EntityNode) {
-        let link = self.head.link.clone();
-        let correct = &entity_node.children;
-        // let target = self.nodes.clone();
-        self.nodes = ClauseTree::update_rebuild(correct, link);
-        // self.nodes = ClauseTree::update_iter_impl(target, correct, link);
+    pub fn update_new(mut self, cube: &Cube, vessel: &Vessel) -> CubeView {
+        let entity_node =  vessel.node(&self.head_id());
+        if let Some(entity_node) = entity_node {
+            let link = self.head.link.clone();
+            let correct = &entity_node.children;
+            // let target = self.nodes.clone();
+            self.nodes = ClauseTree::update_rebuild(correct, link);
+            // self.nodes = ClauseTree::update_iter_impl(target, correct, link);
+            CubeView::ClauseTree { clause: self }
+        } else {
+            CubeView::default()
+        }
     }
     fn update_rebuild(correct: &Vec<EntityId>, link: ComponentLink<Vase>) -> Vec<ClauseNode> {
         correct.iter().map(|id| {

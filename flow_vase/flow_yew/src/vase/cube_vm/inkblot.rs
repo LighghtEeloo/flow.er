@@ -25,8 +25,18 @@ impl Inkblot {
             };
         inkblot.into()
     }
-    pub fn update(&mut self, cube: &Cube) {
-        self.obj = cube.obj.unwrap_or_default()
+    pub fn update_new(mut self, cube: &Cube, vessel: &Vessel) -> CubeView {
+        let blank = CubeView::default();
+        if let Some(obj) = cube.obj {
+            if vessel.entity_get(&obj).is_some() {
+                self.obj = obj;
+                CubeView::Inkblot { inkblot: self }
+            } else {
+                blank
+            }
+        } else {
+            blank
+        }
     }
     pub fn view(&self, vessel: &Vessel) -> Html {
         let entity = vessel.entity_get(&self.obj).cloned().expect("Host invalid.");
