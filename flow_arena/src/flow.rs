@@ -1,4 +1,5 @@
-use std::{collections::{HashMap, HashSet}, fmt::{self, Debug}, hash::Hash};
+use std::{collections::HashMap, fmt::{self, Debug}, hash::Hash};
+use indexmap::IndexSet;
 
 #[cfg(feature = "serde1")]
 use serde::{Serialize, Deserialize};
@@ -215,9 +216,13 @@ impl<Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug> Flow for 
                 } else { Some(x) });
         }
         // must be in root
+        let root = self.root.clone();
+        self.node_map.get_mut(obj).map(|node| {
+            node.parent = Some(root)
+        });
         self.root().children.push(obj.clone());
-        self.node_map.get_mut(&dbg!(re_owner)).map(|x| {
-            let mut h: HashSet<Id> = x.children.iter().cloned().collect();
+        self.node_map.get_mut(&re_owner).map(|x| {
+            let mut h: IndexSet<Id> = x.children.iter().cloned().collect();
             h.extend(orphan.into_iter());
             x.children = h.into_iter().collect();
         });
@@ -261,9 +266,20 @@ mod tests {
         wrapper("Grow", flow.grow(obj_vec[2].clone()).is_ok(), &flow, aloud);
         wrapper("Grow", flow.grow(obj_vec[3].clone()).is_ok(), &flow, aloud);
         wrapper("Grow", flow.grow(obj_vec[4].clone()).is_ok(), &flow, aloud);
-        wrapper("Devote", flow.devote(obj_vec[4].id(), obj_vec[1].id(), 0).is_ok(), &flow, aloud);
-        wrapper("Purge", flow.purge(obj_vec[1].id()).is_ok(), &flow, aloud);
-        wrapper("Decay", flow.decay(obj_vec[1].id()).is_ok(), &flow, aloud);
+        wrapper("Grow", flow.grow(obj_vec[5].clone()).is_ok(), &flow, aloud);
+        wrapper("Grow", flow.grow(obj_vec[6].clone()).is_ok(), &flow, aloud);
+        wrapper("Grow", flow.grow(obj_vec[7].clone()).is_ok(), &flow, aloud);
+        wrapper("Grow", flow.grow(obj_vec[8].clone()).is_ok(), &flow, aloud);
+        wrapper("Grow", flow.grow(obj_vec[9].clone()).is_ok(), &flow, aloud);
+        wrapper("Devote 4->1", flow.devote(obj_vec[4].id(), obj_vec[1].id(), 0).is_ok(), &flow, aloud);
+        wrapper("Devote 5->1", flow.devote(obj_vec[5].id(), obj_vec[1].id(), 0).is_ok(), &flow, aloud);
+        wrapper("Devote 6->1", flow.devote(obj_vec[6].id(), obj_vec[1].id(), 0).is_ok(), &flow, aloud);
+        wrapper("Devote 7->1", flow.devote(obj_vec[7].id(), obj_vec[1].id(), 0).is_ok(), &flow, aloud);
+        wrapper("Devote 8->1", flow.devote(obj_vec[8].id(), obj_vec[1].id(), 0).is_ok(), &flow, aloud);
+        wrapper("Devote 9->1", flow.devote(obj_vec[9].id(), obj_vec[1].id(), 0).is_ok(), &flow, aloud);
+        wrapper("Decay 4", flow.decay(obj_vec[4].id()).is_ok(), &flow, aloud);
+        wrapper("Purge 1", flow.purge(obj_vec[1].id()).is_ok(), &flow, aloud);
+        wrapper("Decay 1", flow.decay(obj_vec[1].id()).is_ok(), &flow, aloud);
         if cfg!(debug_assertions) && aloud { println!("Checked."); flow.check() };
         flow
     }

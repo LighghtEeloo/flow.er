@@ -12,6 +12,9 @@ repository = "https://github.com/LighghtEeloo/flow.er"
 default = ["serde1"]
 serde1 = ["serde"]
 
+[dependencies]
+indexmap = "1.6"
+
 [dependencies.serde]
 version = "1"
 features = ["derive"] 
