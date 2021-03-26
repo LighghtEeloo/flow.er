@@ -50,7 +50,7 @@ impl Vessel {
     pub fn entity_get_mut(&mut self, id: &EntityId) -> Option<&mut Entity> {
         self.flow_arena.node_map.get_mut(id).map(|x| &mut x.entity)
     }
-    pub fn node(&self, id: &EntityId) -> Option<&Node<EntityId, Entity>> {
+    pub fn node(&self, id: &EntityId) -> Option<&EntityNode> {
         self.flow_arena.node(id)
     }
     pub fn entity_list(&self, id: &EntityId) -> Vec<&Entity> {

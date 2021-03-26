@@ -7,12 +7,14 @@
   - [ ] lint display
 - [ ] formatted ClauseTree
 - [ ] Dry
-- [ ] Markdown Bubble
+- [ ] ! Markdown-like Bubble + node -> Bubble util.
+- [ ] ! Entity view-block
 
 ## flow_yew
 - [ ] hidable buttons
 - [ ] add vm
 - [ ] swap vms
+- [ ] ! mobile-view single vm (show the last one)
 - [ ] completely replace and remove legacy version
 
 ## flow_cli
