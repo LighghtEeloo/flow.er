@@ -231,20 +231,20 @@ impl ClauseTree {
     pub fn head_id(&self) -> EntityId {
         self.head.id
     }
-    pub fn update_new(mut self, cube: &Cube, vessel: &Vessel) -> CubeView {
+    pub fn update_new(mut self, _cube: &Cube, vessel: &Vessel) -> CubeView {
         let entity_node =  vessel.node(&self.head_id());
         if let Some(entity_node) = entity_node {
             let link = self.head.link.clone();
             let correct = &entity_node.children;
-            // let target = self.nodes.clone();
-            self.nodes = ClauseTree::update_rebuild(correct, link);
-            // self.nodes = ClauseTree::update_iter_impl(target, correct, link);
+            let _target = self.nodes.clone();
+            // self.nodes = ClauseTree::_update_rebuild(correct, link);
+            self.nodes = ClauseTree::_update_iter_impl(_target, correct, link);
             CubeView::ClauseTree { clause: self }
         } else {
             CubeView::default()
         }
     }
-    fn update_rebuild(correct: &Vec<EntityId>, link: ComponentLink<Vase>) -> Vec<ClauseNode> {
+    fn _update_rebuild(correct: &Vec<EntityId>, link: ComponentLink<Vase>) -> Vec<ClauseNode> {
         correct.iter().map(|id| {
             ClauseNode::new_cube(id.clone(), link.clone())
         }).collect()
