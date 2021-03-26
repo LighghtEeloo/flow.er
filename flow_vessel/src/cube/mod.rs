@@ -1,6 +1,7 @@
 use serde::{Serialize, Deserialize};
 use std::time::SystemTime;
-use crate::{EntityId, now, Router};
+use flow_arena::Flow;
+use crate::{EntityFlow, EntityId, Router, now};
 
 mod inkblot;
 mod clause_tree;
@@ -134,6 +135,13 @@ impl Cube {
         } else {
             false
         }
+    }
+    /// if cube.obj is not None and is not in vessel, false; 
+    /// otherwise, true.
+    pub fn is_valid(&self, flow: &EntityFlow) -> bool {
+        if let Some(obj) = self.obj {
+            flow.node(&obj).is_some()
+        } else { true }
     }
 }
 

@@ -156,7 +156,7 @@ Be a king. ".to_owned();
             false
         } else {
             // clean the glass
-            self.vessel.glass.refresh();
+            self.vessel.glass_refresh();
             // if not equal in num then rebuild; else update
             let cubes = self.vessel.get_cube_vec();
             if self.cube_vm_vec.len() != cubes.len() {
@@ -174,7 +174,7 @@ Be a king. ".to_owned();
 
             // save
             // Debug..
-            // log_obj("Vessel saved", &self.vessel);
+            log_obj("Vessel saved", &self.vessel);
             let save_res = futures::executor::block_on(self.vessel.clone().save());
             if save_res.is_err() {
                 log_obj("load err", -1);

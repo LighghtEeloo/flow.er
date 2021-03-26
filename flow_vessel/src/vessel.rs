@@ -3,9 +3,12 @@ use serde::{Serialize, Deserialize};
 
 use super::{Entity, EntityId, EntityIdFactory, Node, Flow, FlowArena, Router, Glass, Cube};
 
+pub type EntityNode = Node<EntityId, Entity>;
+pub type EntityFlow = FlowArena<EntityId, Entity>;
+
 #[derive(Default, Clone, Serialize, Deserialize)]
 pub struct Vessel {
-    flow_arena: FlowArena<EntityId, Entity>,
+    flow_arena: EntityFlow,
     id_factory: EntityIdFactory,
     pub glass: Glass,
     pub router: Router,
@@ -76,11 +79,12 @@ impl Vessel {
     }
 }
 
-pub type EntityNode = Node<EntityId, Entity>;
-
 impl Vessel {
     pub fn get_cube_vec(&self) -> Vec<Cube> {
         self.glass.get_cube_vec(self.router)
+    }
+    pub fn glass_refresh(&mut self) {
+        self.glass.refresh(&self.flow_arena)
     }
 }
 

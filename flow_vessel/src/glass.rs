@@ -1,7 +1,9 @@
 use serde::{Serialize, Deserialize};
 use std::{collections::HashMap};
 
+
 pub use super::cube::{CubeType, CubeMeta, Cube};
+pub use super::{Vessel, EntityFlow};
 
 // Todo: blob export.
 pub mod cubes {
@@ -111,11 +113,13 @@ impl Glass {
         });
     }
     pub fn push_cube(&mut self, cube: Cube, router: Router) {
-        let vec = self.ensured(router);
-        let idx = vec.len();
-        self.map.get_mut(&router).map(|vec|{
-            vec.insert(idx, cube);
-        });
+        let idx = self.ensured(router).len();
+        let meta = CubeMeta { 
+            cube_type: cube.cube_type, 
+            router,
+            idx,
+        };
+        self.insert_cube(cube, meta)
     }
     /// removes a cube within a safe idx
     pub fn remove_cube(&mut self, meta: CubeMeta) -> Cube {
@@ -136,18 +140,19 @@ impl Glass {
         self.insert_cube(cube, meta)
     }
     /// ensure and clean
-    pub fn refresh(&mut self) {
+    pub fn refresh(&mut self, flow: &EntityFlow) {
         let _: Vec<()> = Router::vec_all().iter().map(|&router| {
             self.ensured(router);
         }).collect();
-        self.clean();
+        self.clean(flow);
     }
     fn ensured(&mut self, router: Router) -> Vec<Cube> {
         self.map.entry(router).or_insert(vec![Cube::new(router)]).clone()
     }
-    fn clean(&mut self) {
+    /// is_valid and is_blank check
+    fn clean(&mut self, flow: &EntityFlow) {
         let _: Vec<()> = self.map.iter_mut().map(|(&router, vec)| {
-            vec.retain(|x| !x.is_blank() );
+            vec.retain(|x| !x.is_blank() && x.is_valid(flow) );
             if vec.is_empty() {
                 vec.push(Cube::new(router))
             }
@@ -161,12 +166,10 @@ mod tests {
     use Router::*;
     #[test]
     fn glass_update() {
-        let mut glass = Glass::default();
+        let glass = Glass::default();
         switch(Board, &glass);
-        glass.clean();
-        switch(Board, &glass);
-        glass.refresh();
-        switch(Board, &glass);
+        let mut vessel = Vessel::default();
+        vessel.glass_refresh();
     }
     fn switch(router: Router, glass: &Glass) {
         println!("{:#?}", glass);

@@ -17,4 +17,4 @@ pub use util::{
     json::{from_json, to_json, export_json},
     time::{TimeNote, TimeRep, display, now}
 };
-pub use vessel::{Vessel, EntityNode};
+pub use vessel::{Vessel, EntityNode, EntityFlow};
