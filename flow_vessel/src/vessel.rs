@@ -39,6 +39,13 @@ impl Vessel {
         let entity = Entity::new_time(&self.id_factory);
         self.entity_insert(entity)
     }
+    pub fn entity_devote(&mut self, obj: EntityId, owner: EntityId, idx: usize) {
+        self.flow_arena.devote(&obj, &owner, idx).ok();
+    }
+    pub fn entity_grow_devote(&mut self, owner: EntityId, idx: usize) {
+        let obj = self.entity_grow();
+        self.entity_devote(obj, owner, idx)
+    }
     pub fn entity_insert(&mut self, entity: Entity) -> EntityId {
         let id = entity.id().clone();
         self.flow_arena.grow(Node::from_id(id.clone(), entity)).ok();

@@ -52,6 +52,12 @@ impl Entity {
             TagSet(tf) => { 
                 self.tags.update_tagset(tf)
             }
+            Blocked => {
+                self.blocked = !self.blocked;
+            }
+            SymbolToggle => {
+                self.symbol_toggle = !self.symbol_toggle;
+            }
         }
     }
 }
@@ -72,5 +78,7 @@ pub enum EntityField {
     Face(Face),
     Bubble(Bubble),
     Symbol(Symbol),
-    TagSet(TagSetField)
+    TagSet(TagSetField),
+    Blocked,
+    SymbolToggle,
 }

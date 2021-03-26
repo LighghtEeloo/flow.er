@@ -31,7 +31,11 @@ pub enum Msg {
     },
 
     // entity level
-    UpdateEntity {
+    EntityAdd {
+        owner: EntityId,
+        idx: usize
+    },
+    EntityUpdate {
         id: EntityId,
         field: EntityField
     },
@@ -127,7 +131,12 @@ Be a king. ".to_owned();
                         true
                     }
 
-                    UpdateEntity { id, field } => {
+                    EntityAdd { owner, idx } => {
+                        self.vessel.entity_grow_devote(owner, idx);
+                        true
+                    }
+
+                    EntityUpdate { id, field } => {
                         self.vessel.entity_get_mut(&id).map(|entity| {
                             entity.update_entity(field)
                         });

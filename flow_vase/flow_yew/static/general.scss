@@ -17,6 +17,12 @@ body {
 
 .vm {
     --size-btn-small: 20px;
+
+    button {
+        width: var(--size-button);
+        height: var(--size-button);
+        background-color: rgba(95, 158, 160, 0.904);
+    }
 }
 
 

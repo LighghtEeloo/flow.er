@@ -41,7 +41,7 @@ impl Inkblot {
                         aria-label="Arbitrary Node"
                         value=entity.face
                         oninput=link.callback(move |e: InputData| {
-                            [UpdateEntity{
+                            [EntityUpdate{
                                 id, 
                                 field: EntityField::Face(e.value)
                             }]
@@ -52,7 +52,7 @@ impl Inkblot {
                     value=entity.bubble
                     type="text" 
                     oninput=link.callback(move |e: InputData| {
-                        [UpdateEntity{
+                        [EntityUpdate{
                             id, 
                             field: EntityField::Bubble(e.value)
                         }]

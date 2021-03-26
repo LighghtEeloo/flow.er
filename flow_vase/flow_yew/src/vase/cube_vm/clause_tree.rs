@@ -18,11 +18,27 @@ impl ClauseNode {
             node_ref: NodeRef::default(),
         }
     }
-    pub fn view(&self, idx: usize, entity: &Entity, owner_id: EntityId) -> Html {
+    pub fn view(&self, idx: usize, entity: &Entity, owner: EntityId) -> Html {
+        let btn_add = html! {
+            <button class="btn-add" style="position: absolute; right: 100%"
+                onclick=self.link.callback(move |_| {
+                    [EntityAdd{
+                        owner,
+                        idx: idx + 1
+                    }]
+                })
+            >{"+"}</button>
+        };
+        let btn_del = html! {
+            <button class="btn-del" style="position: absolute; left: 100%"
+            >{"x"}</button>
+        };
         html! {
             <div class="node">
                 { self.symbol_view(idx, &entity) }
-                { self.input_view(idx, &entity, owner_id) }
+                { self.input_view(idx, &entity, owner) }
+                { btn_del }
+                { btn_add }
             </div>
         }
     }
@@ -48,9 +64,7 @@ impl ClauseNode {
     fn input_view(&self, idx: usize, entity: &Entity, owner_id: EntityId) -> Html {
         let indent_base = 0;
         let indent = indent_base + 1;
-        let mut entity = entity.clone();
         let id = entity.id().clone();
-        let is_empty = entity.face.is_empty();
         let style = 
             format!("width: calc(100% - {} * var(--size-button) - var(--horizontal-margin) * 2);", indent);
         html! {
@@ -112,7 +126,7 @@ impl ClauseNode {
                 //     }
                 // })
                 oninput=self.link.callback(move |e: InputData| {
-                    [ UpdateEntity {
+                    [ EntityUpdate {
                         id, 
                         field: EntityField::Face(e.value)
                     } ]
@@ -137,7 +151,7 @@ impl ClauseNode {
                 html! {
                     <div title={des.clone()}
                         onclick=self.link.callback(move |_| {
-                            [ UpdateEntity {
+                            [ EntityUpdate {
                                 id, 
                                 // id: id.clone(), 
                                 field: EntityField::Symbol(Symbol::ProcessTracker(process.clone()))
@@ -278,7 +292,7 @@ impl ClauseTree {
                     aria-label="Arbitrary Node"
                     value=entity.face
                     oninput=link.callback(move |e: InputData| {
-                        [UpdateEntity{
+                        [EntityUpdate{
                             id, 
                             field: EntityField::Face(e.value)
                         }]

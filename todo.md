@@ -1,12 +1,13 @@
 ## flow_arena
-- [ ] (abort) merge_flow
+- [x] (abort) merge_flow
 
 ## flow_vessel
 - [ ] symbol system
   - [ ] auto indent
-  - [ ] lint display
+  - [x] lint display
 - [ ] formatted ClauseTree
 - [ ] Dry
+- [x] (abort) no more is_empty
 - [ ] ! Markdown-like Bubble + node -> Bubble util.
 - [ ] ! Entity view-block
 
