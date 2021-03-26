@@ -39,6 +39,9 @@ pub enum Msg {
         id: EntityId,
         field: EntityField
     },
+    EntityDelete {
+        id: EntityId
+    },
 
     // refresh
     Refresh,
@@ -135,11 +138,14 @@ Be a king. ".to_owned();
                         self.vessel.entity_grow_devote(owner, idx);
                         true
                     }
-
                     EntityUpdate { id, field } => {
                         self.vessel.entity_get_mut(&id).map(|entity| {
                             entity.update_entity(field)
                         });
+                        true
+                    }
+                    EntityDelete { id } => {
+                        self.vessel.entity_decay(&id);
                         true
                     }
 

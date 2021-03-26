@@ -19,8 +19,9 @@ impl ClauseNode {
         }
     }
     pub fn view(&self, idx: usize, entity: &Entity, owner: EntityId) -> Html {
+        let id = entity.id().clone();
         let btn_add = html! {
-            <button class="btn-add" style="position: absolute; right: 100%"
+            <button class="btn-add" style="position: absolute; right: 10%"
                 onclick=self.link.callback(move |_| {
                     [EntityAdd{
                         owner,
@@ -30,7 +31,10 @@ impl ClauseNode {
             >{"+"}</button>
         };
         let btn_del = html! {
-            <button class="btn-del" style="position: absolute; left: 100%"
+            <button class="btn-del" style="position: absolute; left: 90%"
+                onclick=self.link.callback(move |_| {
+                    [EntityDelete{id}]
+                })
             >{"x"}</button>
         };
         html! {
