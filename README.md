@@ -76,7 +76,7 @@ The * directories are important ones.
 ├── flow_vase           * -- user interface part
 │   ├── flow_cli          -- (not implemented) a cli fallback 
 │   ├── flow_iced         -- (deprecated) trying `iced`
-│   ├── flow_yew        * -- a `yew` GUI implementation
+│   └── flow_yew        * -- a `yew` GUI implementation
 ├── flow_vessel         * -- the "flow_core" part, with all the non-UI logic
 └── src                   -- (not implemented) the skeleton of this package
 ```

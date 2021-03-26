@@ -322,7 +322,6 @@ version = "0.3.0"
 dependencies = [
  "flow_cli",
  "flow_yew",
- "flow_yew_legacy",
 ]
 
 [[package]]
@@ -352,19 +351,6 @@ dependencies = [
  "rand",
  "serde",
  "serde_json",
- "yew",
- "yew-services",
-]
-
-[[package]]
-name = "flow_yew_legacy"
-version = "0.2.4"
-dependencies = [
- "chrono",
- "rand",
- "serde",
- "serde_json",
- "wasm-timer",
  "yew",
  "yew-services",
 ]
