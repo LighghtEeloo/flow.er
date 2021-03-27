@@ -1,5 +1,5 @@
 use yew::{ComponentLink, Html, InputData, KeyboardEvent, NodeRef, html};
-use flow_vessel::{Cube, Entity, EntityField, EntityId, EntityNode, Lint, Process, Symbol, Vessel};
+use flow_vessel::{Cube, CubeMeta, Entity, EntityField, EntityId, EntityNode, Lint, Process, Symbol, Vessel};
 use super::{Vase, Msg::*, CubeView};
 
 #[derive(Clone)]
@@ -18,12 +18,13 @@ impl ClauseNode {
             node_ref: NodeRef::default(),
         }
     }
-    pub fn view(&self, idx: usize, entity: &Entity, owner: EntityId) -> Html {
+    pub fn view(&self, idx: usize, entity: &Entity, owner: EntityId, meta: &CubeMeta) -> Html {
         let id = entity.id().clone();
         html! {
             <div class="node">
                 { self.symbol_view(idx, &entity) }
                 { self.input_view(idx, &entity, owner) }
+                { btn_ink(meta.clone(), id, self.link.clone()) }
                 { btn_del(id, self.link.clone()) }
                 { btn_add(idx + 1, owner, self.link.clone()) }
             </div>
@@ -333,24 +334,25 @@ impl ClauseTree {
         target.truncate(correct.len());
         target
     }
-    pub fn view(&self, vessel: &Vessel) -> Html {
+    pub fn view(&self, vessel: &Vessel, meta: &CubeMeta) -> Html {
         let nodes_view: Vec<Html> = self.nodes.iter().enumerate()
             .map(|(idx, node)| {
                 node.view(
                     idx, 
                     vessel.entity_get(&node.id).expect("must exist"), 
-                    self.head.id
+                    self.head.id,
+                    meta
                 )
             }).collect();
         html! {
             <>
-                { self.head_view(vessel) }
+                { self.head_view(vessel, meta) }
                 <div class="node-view"> { nodes_view } </div>
             </>
         }
     }
 
-    fn head_view(&self, vessel: &Vessel) -> Html {
+    fn head_view(&self, vessel: &Vessel, meta: &CubeMeta) -> Html {
         let id = self.head_id();
         let entity = vessel.entity_get(&id).expect("Host doesn't exist.");
         let link = self.head.link.clone();
@@ -399,12 +401,31 @@ impl ClauseTree {
                         }]
                     })
                 />
+                { btn_ink(meta.clone(), id, link.clone()) }
                 { btn_add(0, id, link.clone()) }
             </div>
         }
     }
 }
 
+
+fn btn_ink(meta: CubeMeta, obj: EntityId, link: ComponentLink<Vase>) -> Html {
+    let style = "
+        position: absolute; 
+        top: 1px;
+        right: calc(2 * var(--size-button));
+    ";
+    html! {
+        <button class="btn-ink btn-operate" style=style
+            onclick=link.callback(move |_| {
+                [OpenVM{
+                    cube: flow_vessel::cubes::Inkblot { obj }.into(),
+                    meta
+                }]
+            })
+        >{">"}</button>
+    }
+}
 
 fn btn_add(idx: usize, owner: EntityId, link: ComponentLink<Vase>) -> Html {
     let style = "

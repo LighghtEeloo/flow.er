@@ -59,7 +59,7 @@ impl CubeVM {
         }
     }
     pub fn view_inner(&self, vessel: &Vessel) -> Html {
-        self.view.view(vessel)
+        self.view.view(vessel, &self.meta)
     }
 }
 
@@ -147,7 +147,7 @@ impl CubeView {
             _ => self
         }
     }
-    pub fn view(&self, vessel: &Vessel) -> Html {
+    pub fn view(&self, vessel: &Vessel, meta: &CubeMeta) -> Html {
         match self {
             CubeView::Blank { alt } => {
                 html_uni_vec(format!("blank"), html! {
@@ -161,7 +161,7 @@ impl CubeView {
             }
             CubeView::ClauseTree { clause } => {
                 html_uni_vec(format!("clause-tree"), html! {
-                    <span> { clause.view(vessel) } </span>
+                    <span> { clause.view(vessel, meta) } </span>
                 })
             }
             _ => {
