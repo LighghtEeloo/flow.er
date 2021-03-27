@@ -1,7 +1,12 @@
 # Flow.er ChangeLog
 
+## Ver 0.3.1
+- done! Symbol.
+- done: enter add.
+- fix! cube_vm with obj validfication.
+
 ## Ver 0.3.0
-- done! Completely new Flow, Entity, Cube, CubeVM, Vessel and Vase. 
+- done!! Completely new Flow, Entity, Cube, CubeVM, Vessel and Vase. 
 - memo! Just see the readme.
 
 ## Ver 0.2.4

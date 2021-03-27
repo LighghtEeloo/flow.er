@@ -319,7 +319,7 @@ version = "0.1.0"
 
 [[package]]
 name = "flow_er"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "flow_cli",
  "flow_yew",
@@ -344,7 +344,7 @@ dependencies = [
 
 [[package]]
 name = "flow_yew"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "chrono",
  "flow_arena",
