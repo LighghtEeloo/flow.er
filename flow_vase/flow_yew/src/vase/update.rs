@@ -35,12 +35,12 @@ impl Vase {
                 });
                 true
             }
-            EntityDive { id } => {
-
+            EntityDive { id, idx } => {
+                self.vessel.entity_dive(id, idx);
                 true
             }
-            EntityEmerge { id } => {
-                
+            EntityEmerge { id, idx } => {
+
                 true
             }
             EntityDelete { id } => {

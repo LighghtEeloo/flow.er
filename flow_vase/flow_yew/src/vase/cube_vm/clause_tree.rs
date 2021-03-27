@@ -113,10 +113,10 @@ impl ClauseNode {
                 //         // (false, false, "ArrowLeft") => vec![], 
                 //         // (false, false, "ArrowRight") => vec![], 
                         (true, false, "BracketLeft") => vec![
-                            EntityEmerge { id }
+                            EntityEmerge { id, idx }
                         ], 
                         (true, false, "BracketRight") => vec![
-                            EntityDive { id }
+                            EntityDive { id, idx }
                         ], 
                         _ => vec![]
                     }

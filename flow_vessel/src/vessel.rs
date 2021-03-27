@@ -55,6 +55,9 @@ impl Vessel {
     pub fn entity_devote(&mut self, obj: EntityId, owner: EntityId, idx: usize) {
         self.flow_arena.devote(&obj, &owner, idx).ok();
     }
+    pub fn entity_devote_push(&mut self, obj: EntityId, owner: EntityId) {
+        self.flow_arena.devote_push(&obj, &owner).ok();
+    }
     pub fn entity_grow_devote(&mut self, owner: EntityId, idx: usize) -> EntityId {
         let obj = self.entity_grow();
         self.entity_devote(obj, owner, idx);
@@ -78,6 +81,14 @@ impl Vessel {
     pub fn entity_get_mut(&mut self, id: &EntityId) -> Option<&mut Entity> {
         self.flow_arena.node_map.get_mut(id).map(|x| &mut x.entity)
     }
+    /// ensures that you can get the required entity; 
+    /// inserts if not in place. 
+    pub fn entity_ensure(&mut self, id: &EntityId) -> &mut Entity {
+        if !self.flow_arena.node_map.contains_key(id) {
+            self.entity_insert(Entity::new_id(id));
+        }
+        self.entity_get_mut(id).expect("contains key")
+    }
     pub fn node(&self, id: &EntityId) -> Option<&EntityNode> {
         self.flow_arena.node(id)
     }
@@ -86,12 +97,24 @@ impl Vessel {
         
         vec.into_iter().filter_map(|id| self.flow_arena.node_map.get(&id)).map(|x| &x.entity).collect()
     }
-    pub fn entity_ensure(&mut self, id: &EntityId) -> &mut Entity {
-        if !self.flow_arena.node_map.contains_key(id) {
-            self.entity_insert(Entity::new_id(id));
-        }
-        self.entity_get_mut(id).expect("contains key")
+    /// requires the id and its idx in node.children
+    pub fn entity_dive(&mut self, id: EntityId, idx: usize) {
+        if idx == 0 { return }
+        let owner = {
+            if let Some(owner) = if let Some(node) = self.node(&id) {
+                node.parent
+            } else { return } {
+                owner
+            } else { return }
+        };
+        let des = {
+            if let Some(node) = self.node(&owner) {
+                node.children[idx - 1]
+            } else { return } 
+        };
+        self.entity_devote_push(id, des)
     }
+    /// removes entity from a flow_arena
     pub fn entity_decay(&mut self, id: &EntityId) {
         self.flow_arena.decay(id).ok();
         self.glass_refresh();
