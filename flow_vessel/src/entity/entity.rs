@@ -48,7 +48,10 @@ impl Entity {
             TimeNote(t) => { self.time = Some(t) }
             Face(f) => { self.face = f }
             Bubble(b) => { self.bubble = b }
-            Symbol(s) => { self.symbol = s }
+            Symbol(s) => { 
+                self.symbol_toggle = false;
+                self.symbol = s
+            }
             TagSet(tf) => { 
                 self.tags.update_tagset(tf)
             }

@@ -69,7 +69,40 @@ impl ClauseNode {
                 self.process(id, process),
             (false, Symbol::Linted(lint)) =>
                 self.lint(id, idx, lint),
-            _ => html!{<></>}
+            _ => {
+                // list the toggle options
+                let contents: Html = html! {
+                    <>
+                        <div title="toggle-process-tracker"
+                            onclick=self.link.callback(move |_| {
+                                [ EntityUpdate {
+                                    id, 
+                                    // id: id.clone(), 
+                                    field: EntityField::Symbol(Symbol::ProcessTracker(Process::default()))
+                                } ]
+                            })
+                        >
+                            <img src={Process::type_src(&Process::default())} alt="process" /> 
+                        </div>
+                        <div title="toggle-linted"
+                            onclick=self.link.callback(move |_| {
+                                [ EntityUpdate {
+                                    id, 
+                                    // id: id.clone(), 
+                                    field: EntityField::Symbol(Symbol::Linted(Lint::default()))
+                                } ]
+                            })
+                        >
+                            <span>{Lint::default().display(0)}</span>
+                        </div>
+                    </>
+                };
+                html! {
+                    <div class="dropdown-content" style="display: block">
+                        { contents }
+                    </div>
+                }
+            }
         };
         let style = 
             format!("left: calc({} * var(--size-button) + {}px);", indent, indent);

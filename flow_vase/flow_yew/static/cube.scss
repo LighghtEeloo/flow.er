@@ -179,7 +179,8 @@
     }
 
     .dropbtn img,
-    .dropdown-content div img {
+    .dropdown-content div img,
+    .dropdown-content div span {
         width:  calc(var(--size-button) * 0.6);
         height: calc(var(--size-button) * 0.6);
     }
@@ -198,6 +199,10 @@
             text-decoration: none; 
             display: inline-flex; 
             outline: none;
+
+            span {
+                text-align: center;
+            }
         }
         
         div:hover { 

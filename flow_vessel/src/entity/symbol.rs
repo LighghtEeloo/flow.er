@@ -16,6 +16,12 @@ pub enum Process {
     New,
 }
 
+impl Default for Process {
+    fn default() -> Self {
+        Process::New
+    }
+}
+
 use Process::*;
 impl Process {
     pub fn type_str(&self) -> String {
