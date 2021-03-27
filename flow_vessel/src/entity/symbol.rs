@@ -109,10 +109,10 @@ impl Lint {
             Numberic => {format!("{}", idx+1)}
             Circle => {"○".into()}
             Square => {"▣".into()}
-            Dash => {"-".into()}
+            Dash => {"—".into()}
             UnOrdered(s) => {s.into()}
             Programmatic | Upper | Lower | Greek => {
-                let mut s = String::new();
+                let mut s = String::from("");
                 let (size, chars) = BABEL[self.type_str()];
                 loop {
                     let x = idx % size;
