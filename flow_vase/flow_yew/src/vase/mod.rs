@@ -109,44 +109,7 @@ Be a king. ".to_owned();
         while {
             let next = msg_visitor.next();
             if let Some(msg) = next {
-                use Msg::*;
-                // returns true if non-block, false if needs revisit or finish
-                match msg {
-                    SwitchRouter{ router} => {
-                        self.vessel.router = router;
-                        self.cube_vm_vec = Vec::new();
-                        true
-                    },
-
-                    OpenVM { cube, meta } => {
-                        self.vessel.glass.push_cube(cube.clone(), meta.router);
-                        let idx = meta.idx;
-                        self.cube_vm_vec.push(CubeVM::new(idx, &cube, &self.vessel, self.link.clone()));
-                        true
-                    }
-                    CloseVM { meta } => {
-                        self.vessel.glass.remove_cube(meta);
-                        self.cube_vm_vec.remove(meta.idx);
-                        true
-                    }
-
-                    EntityAdd { owner, idx } => {
-                        self.vessel.entity_grow_devote(owner, idx);
-                        true
-                    }
-                    EntityUpdate { id, field } => {
-                        self.vessel.entity_get_mut(&id).map(|entity| {
-                            entity.update_entity(field)
-                        });
-                        true
-                    }
-                    EntityDelete { id } => {
-                        self.vessel.entity_decay(&id);
-                        true
-                    }
-
-                    Refresh => false,
-                }
+                self.update_msg(msg)
             } else {
                 // quit loop
                 false
@@ -170,10 +133,6 @@ Be a king. ".to_owned();
                     cube_vm.update(idx, cube, &self.vessel)
                 }
             }
-            // let _: Vec<()> = self.cube_vm_vec.iter_mut().zip(cube_vec.iter())
-            //     .map(|(cube_vm, cube)| 
-            //         cube_vm.update(cube, &self.vessel)
-            //     ).collect();
 
             // save
             // Debug..
