@@ -47,7 +47,6 @@ pub enum Msg {
     },
     EntityEmerge {
         id: EntityId,
-        idx: usize,
     },
     EntityDelete {
         id: EntityId

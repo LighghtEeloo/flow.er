@@ -39,7 +39,7 @@ impl Vase {
                 self.vessel.entity_dive(id, idx);
                 true
             }
-            EntityEmerge { id, idx } => {
+            EntityEmerge { id } => {
 
                 true
             }

@@ -112,11 +112,11 @@ impl ClauseNode {
                 //             [Wander(vm_meta, Direction::Descend, true)], 
                 //         // (false, false, "ArrowLeft") => vec![], 
                 //         // (false, false, "ArrowRight") => vec![], 
-                        (true, false, "BracketLeft") => vec![
-                            EntityEmerge { id, idx }
-                        ], 
                         (true, false, "BracketRight") => vec![
                             EntityDive { id, idx }
+                        ], 
+                        (true, false, "BracketLeft") => vec![
+                            EntityEmerge { id }
                         ], 
                         _ => vec![]
                     }
