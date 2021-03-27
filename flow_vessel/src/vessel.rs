@@ -76,6 +76,7 @@ impl Vessel {
     }
     pub fn entity_decay(&mut self, id: &EntityId) {
         self.flow_arena.decay(id).ok();
+        self.glass_refresh();
     }
 }
 
