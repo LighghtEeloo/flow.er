@@ -1,4 +1,4 @@
-use yew::{ComponentLink, Html, NodeRef, html, InputData};
+use yew::{ComponentLink, Html, InputData, KeyboardEvent, NodeRef, html};
 use flow_vessel::{Cube, Entity, EntityField, EntityId, EntityNode, Lint, Process, Symbol, Vessel};
 use super::{Vase, Msg::*, CubeView};
 
@@ -81,7 +81,7 @@ impl ClauseNode {
             </div> 
         }
     }
-    fn input_view(&self, idx: usize, entity: &Entity, owner_id: EntityId) -> Html {
+    fn input_view(&self, idx: usize, entity: &Entity, owner: EntityId) -> Html {
         let indent_base = 0;
         let indent = indent_base + 1;
         let id = entity.id().clone();
@@ -98,9 +98,9 @@ impl ClauseNode {
                 // onfocus=self.link.callback(move |_| {
                 //     vec![SetFocusId(vm_meta, id)]
                 // })
-                // onkeydown=self.link.callback(move |e: KeyboardEvent| {
-                //     let meta = (e.ctrl_key(), e.shift_key(), e.code());
-                //     match (meta.0, meta.1, meta.2.as_str()) { 
+                onkeydown=self.link.callback(move |e: KeyboardEvent| {
+                    let meta = (e.ctrl_key(), e.shift_key(), e.code());
+                    match (meta.0, meta.1, meta.2.as_str()) { 
                 //         (false, false, "ArrowUp") => vec!
                 //             [Wander(vm_meta, Direction::Ascend, false)], 
                 //         (false, false, "ArrowDown") => vec!
@@ -111,17 +111,17 @@ impl ClauseNode {
                 //             [Wander(vm_meta, Direction::Descend, true)], 
                 //         // (false, false, "ArrowLeft") => vec![], 
                 //         // (false, false, "ArrowRight") => vec![], 
-                //         _ => vec![]
-                //     }
-                // })
-                // onkeyup=self.link.callback(move |e: KeyboardEvent| {
-                //     let meta = (e.ctrl_key(), e.shift_key(), e.code());
-                //     match (meta.0, meta.1, meta.2.as_str()) { 
-                //         // enter
-                //         (false, false, "Enter") => vec!
-                //             [ AddEntity(FlowLink::new_descend_index(owner_id, idx + 1))
-                //             , Wander(vm_meta, Direction::Descend, false)
-                //             ],
+                        _ => vec![]
+                    }
+                })
+                onkeyup=self.link.callback(move |e: KeyboardEvent| {
+                    let meta = (e.ctrl_key(), e.shift_key(), e.code());
+                    match (meta.0, meta.1, meta.2.as_str()) { 
+                        // enter
+                        (false, false, "Enter") => vec!
+                            [ EntityAdd { owner, idx: idx+1 }
+                            // , Wander(vm_meta, Direction::Descend, false)
+                            ],
                 //         // // shift+enter
                 //         // (false, true, "Enter") => vec![],
                 //         // backspace
@@ -142,9 +142,9 @@ impl ClauseNode {
                 //         // // ctrl released
                 //         // (true, _, "ControlLeft") => vec![Wander(Direction::Stay, false)],
                 //         // (true, _, "ControlRight") => vec![Wander(Direction::Stay, false)],
-                //         _ => vec![] 
-                //     }
-                // })
+                        _ => vec![] 
+                    }
+                })
                 oninput=self.link.callback(move |e: InputData| {
                     [ EntityUpdate {
                         id, 
@@ -361,6 +361,37 @@ impl ClauseTree {
                     placeholder="An arbitrary node."
                     aria-label="Arbitrary Node"
                     value=entity.face
+                    onkeyup=link.callback(move |e: KeyboardEvent| {
+                        let meta = (e.ctrl_key(), e.shift_key(), e.code());
+                        match (meta.0, meta.1, meta.2.as_str()) { 
+                            // enter
+                            (false, false, "Enter") => vec!
+                                [ EntityAdd { owner: id, idx: 0 }
+                                // , Wander(vm_meta, Direction::Descend, false)
+                                ],
+                    //         // // shift+enter
+                    //         // (false, true, "Enter") => vec![],
+                    //         // backspace
+                    //         (_, _, "Backspace") => {
+                    //             if is_empty { vec!
+                    //                 [ EraseEntity(id)
+                    //                 , Wander(vm_meta, Direction::Descend, false)
+                    //                 ] 
+                    //             } else { vec![] }
+                    //         }
+                    //         // delete
+                    //         (_, _, "Delete") => {
+                    //             if is_empty { vec!
+                    //                 [ EraseEntity(id)
+                    //                 ] 
+                    //             } else { vec![] }
+                    //         }
+                    //         // // ctrl released
+                    //         // (true, _, "ControlLeft") => vec![Wander(Direction::Stay, false)],
+                    //         // (true, _, "ControlRight") => vec![Wander(Direction::Stay, false)],
+                            _ => vec![] 
+                        }
+                    })
                     oninput=link.callback(move |e: InputData| {
                         [EntityUpdate{
                             id, 
