@@ -25,8 +25,8 @@ impl Vase {
                 true
             }
 
-            EntityAdd { owner, idx } => {
-                self.vessel.entity_grow_devote(owner, idx);
+            EntityAdd { dude, owner, idx } => {
+                self.vessel.entity_add(dude, owner, idx);
                 true
             }
             EntityUpdate { id, field } => {

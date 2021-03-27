@@ -42,6 +42,9 @@ impl Entity {
     pub fn id(&self) -> &EntityId {
         &self.id
     }
+    pub fn duplicate_from(&mut self, dude: &Self) {
+        self.symbol = dude.symbol.clone();
+    }
     pub fn update_entity(&mut self, field: EntityField) {
         use EntityField::*;
         match field {

@@ -26,7 +26,7 @@ impl ClauseNode {
                 { self.input_view(idx, &entity, owner) }
                 { btn_ink(meta.incr_new(), id, self.link.clone()) }
                 { btn_del(id, self.link.clone()) }
-                { btn_add(idx + 1, owner, self.link.clone()) }
+                { btn_add(id, owner, idx + 1, self.link.clone()) }
             </div>
         }
     }
@@ -120,7 +120,7 @@ impl ClauseNode {
                     match (meta.0, meta.1, meta.2.as_str()) { 
                         // enter
                         (false, false, "Enter") => vec!
-                            [ EntityAdd { owner, idx: idx+1 }
+                            [ EntityAdd { dude: id, owner, idx: idx+1 }
                             // , Wander(vm_meta, Direction::Descend, false)
                             ],
                 //         // // shift+enter
@@ -368,7 +368,7 @@ impl ClauseTree {
                         match (meta.0, meta.1, meta.2.as_str()) { 
                             // enter
                             (false, false, "Enter") => vec!
-                                [ EntityAdd { owner: id, idx: 0 }
+                                [ EntityAdd { dude: id, owner: id, idx: 0 }
                                 // , Wander(vm_meta, Direction::Descend, false)
                                 ],
                     //         // // shift+enter
@@ -402,7 +402,7 @@ impl ClauseTree {
                     })
                 />
                 { btn_ink(meta.incr_new(), id, link.clone()) }
-                { btn_add(0, id, link.clone()) }
+                { btn_add(id, id, 0, link.clone()) }
             </div>
         }
     }
@@ -427,7 +427,7 @@ fn btn_ink(meta: CubeMeta, obj: EntityId, link: ComponentLink<Vase>) -> Html {
     }
 }
 
-fn btn_add(idx: usize, owner: EntityId, link: ComponentLink<Vase>) -> Html {
+fn btn_add(dude: EntityId, owner: EntityId, idx: usize, link: ComponentLink<Vase>) -> Html {
     let style = "
         position: absolute; 
         top: 1px;
@@ -437,11 +437,12 @@ fn btn_add(idx: usize, owner: EntityId, link: ComponentLink<Vase>) -> Html {
         <button class="btn-add btn-operate" style=style
             onclick=link.callback(move |_| {
                 [EntityAdd{
+                    dude,
                     owner,
                     idx
                 }]
             })
-        >{"＋"}</button>
+        >{"+"}</button>
     }
 }
 

@@ -43,6 +43,11 @@ impl Debug for Vessel {
 }
 
 impl Vessel {
+    pub fn entity_insert(&mut self, entity: Entity) -> EntityId {
+        let id = entity.id().clone();
+        self.flow_arena.grow(Node::from_id(id.clone(), entity)).ok();
+        id
+    }
     pub fn entity_grow(&mut self) -> EntityId {
         let entity = Entity::new_time(&self.id_factory);
         self.entity_insert(entity)
@@ -50,14 +55,22 @@ impl Vessel {
     pub fn entity_devote(&mut self, obj: EntityId, owner: EntityId, idx: usize) {
         self.flow_arena.devote(&obj, &owner, idx).ok();
     }
-    pub fn entity_grow_devote(&mut self, owner: EntityId, idx: usize) {
+    pub fn entity_grow_devote(&mut self, owner: EntityId, idx: usize) -> EntityId {
         let obj = self.entity_grow();
-        self.entity_devote(obj, owner, idx)
+        self.entity_devote(obj, owner, idx);
+        obj
     }
-    pub fn entity_insert(&mut self, entity: Entity) -> EntityId {
-        let id = entity.id().clone();
-        self.flow_arena.grow(Node::from_id(id.clone(), entity)).ok();
-        id
+    pub fn entity_duplicate(&mut self, obj: EntityId, dude: EntityId) {
+        let dude = self.entity_get(&dude).cloned().unwrap_or_default();
+        self.entity_get_mut(&obj).map(|obj| {
+            obj.duplicate_from(&dude)
+        });
+    }
+    /// final product function: entity_add, duplicates its dude 
+    /// and devotes to its owner.
+    pub fn entity_add(&mut self, dude: EntityId , owner: EntityId, idx: usize) {
+        let obj = self.entity_grow_devote(owner, idx);
+        self.entity_duplicate(obj, dude)
     }
     pub fn entity_get(&self, id: &EntityId) -> Option<&Entity> {
         self.flow_arena.node_map.get(id).map(|x| &x.entity)

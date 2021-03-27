@@ -33,6 +33,7 @@ pub enum Msg {
 
     // entity level
     EntityAdd {
+        dude: EntityId,
         owner: EntityId,
         idx: usize
     },
