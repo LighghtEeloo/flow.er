@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 use serde::{Serialize, Deserialize};
 
-use super::{Entity, EntityId, EntityIdFactory, Node, Flow, FlowArena, Router, Glass, Cube};
+use super::{Entity, EntityId, EntityIdFactory, Node, Flow, FlowArena, Router, Glass, Cube, Settings};
 
 pub type EntityNode = Node<EntityId, Entity>;
 pub type EntityFlow = FlowArena<EntityId, Entity>;
@@ -12,6 +12,7 @@ pub struct Vessel {
     id_factory: EntityIdFactory,
     pub glass: Glass,
     pub router: Router,
+    pub settings: Settings
 }
 
 impl Vessel {
@@ -20,7 +21,8 @@ impl Vessel {
             flow_arena: FlowArena::new(),
             id_factory: EntityIdFactory::default(),
             glass: Glass::default(),
-            router: Router::default()
+            router: Router::default(),
+            settings: Settings::default()
         }
     }
 }

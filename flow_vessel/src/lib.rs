@@ -1,6 +1,7 @@
 mod entity;
 mod cube;
 mod glass;
+mod settings;
 mod vessel;
 mod util;
 
@@ -13,6 +14,7 @@ pub use entity::{
 };
 pub use cube::{Cube, CubeType, CubeMeta};
 pub use glass::{Glass, Router, cubes};
+pub use settings::Settings;
 pub use util::{
     json::{from_json, to_json, export_json},
     time::{TimeNote, TimeRep, display, now}

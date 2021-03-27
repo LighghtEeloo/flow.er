@@ -1,3 +1,4 @@
+mod update;
 mod view;
 mod cube_vm;
 
