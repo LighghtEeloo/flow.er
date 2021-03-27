@@ -250,7 +250,7 @@ impl ClauseNode {
                             } ]
                         })
                     > 
-                        <span class="symbol-text"> {text} </span>
+                        <span> {text} </span>
                     </div> 
                 }
             }).collect();

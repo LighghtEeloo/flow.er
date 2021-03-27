@@ -56,7 +56,7 @@ impl Component for Vase {
         let vessel_future = Vessel::load();
         let vessel = futures::executor::block_on(vessel_future).unwrap_or(Vessel::new());
         // Debug..
-        /* */
+        /* *
         let vessel = {
             let mut v = Vessel::default();
             let ids: Vec<EntityId> = (0..7).into_iter().map(|_|{

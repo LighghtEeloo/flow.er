@@ -157,6 +157,7 @@
         height: var(--size-button);
         text-align: center;
         line-height: calc(var(--size-button) - 2px);
+        font-size: calc(var(--size-button) * 0.5);
     }
 
     .dropbtn { 
@@ -205,6 +206,7 @@
                 text-align: center;
                 cursor: default;
                 line-height: calc(var(--size-button) * 0.6);
+                // font-size: calc(var(--size-button) * 0.6);
             }
         }
         
