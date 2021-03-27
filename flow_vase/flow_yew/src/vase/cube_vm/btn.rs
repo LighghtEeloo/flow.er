@@ -1,0 +1,43 @@
+use yew::{ComponentLink, Html, html};
+use flow_vessel::{CubeMeta, EntityId};
+
+use super::{Vase, Msg::*};
+
+
+
+pub fn ink(meta: CubeMeta, obj: EntityId, style: String, link: ComponentLink<Vase>) -> Html {
+    html! {
+        <button class="btn-ink btn-operate" style=style
+            onclick=link.callback(move |_| {
+                [OpenVM{
+                    cube: flow_vessel::cubes::Inkblot { obj }.into(),
+                    meta
+                }]
+            })
+        >{">"}</button>
+    }
+}
+
+pub fn add(dude: EntityId, owner: EntityId, idx: usize, style: String, link: ComponentLink<Vase>) -> Html {
+    html! {
+        <button class="btn-add btn-operate" style=style
+            onclick=link.callback(move |_| {
+                [EntityAdd{
+                    dude,
+                    owner,
+                    idx
+                }]
+            })
+        >{"+"}</button>
+    }
+}
+
+pub fn del(id: EntityId, style: String, link: ComponentLink<Vase>) -> Html {
+    html! {
+        <button class="btn-del btn-operate" style=style
+            onclick=link.callback(move |_| {
+                [EntityDelete{id}]
+            })
+        >{"✕"}</button>
+    }
+}

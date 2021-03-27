@@ -30,7 +30,7 @@ impl Inkblot {
         if let Some(obj) = cube.obj {
             if vessel.entity_get(&obj).is_some() {
                 self.obj = obj;
-                CubeView::Inkblot { inkblot: self }
+                self.into()
             } else {
                 blank
             }

@@ -1,11 +1,13 @@
 use yew::{ComponentLink, Html, html};
 use std::time::SystemTime;
-use flow_vessel::{Cube, CubeMeta, CubeType, EntityId, Vessel};
+use flow_vessel::{Cube, CubeMeta, CubeType, Vessel};
 
 pub use super::{Vase, Msg, Msg::*};
+mod btn;
 
 mod inkblot;
 mod clause_tree;
+mod flow_view;
 
 pub struct CubeVM {
     pub meta: CubeMeta,
@@ -71,10 +73,7 @@ pub enum CubeView {
     /// A single entity and a todo list view
     ClauseTree { clause: clause_tree::ClauseTree },
     PromisedLand,
-    FlowView {
-        obj: EntityId,
-        current: EntityId
-    },
+    FlowView { flow_view: flow_view::FlowView },
     CalendarView {
         current: SystemTime
     },
@@ -115,7 +114,7 @@ impl CubeView {
                 CubeView::_Plain
             }
             CubeType::FlowView => {
-                CubeView::_Plain
+                flow_view::FlowView::new_cube(cube, vessel, link)
             }
             CubeType::CalendarView => {
                 CubeView::_Plain
@@ -144,6 +143,9 @@ impl CubeView {
             CubeView::ClauseTree { clause } => {
                 clause.update_new(cube, vessel)
             }
+            CubeView::FlowView { flow_view } => {
+                flow_view.update_new(cube, vessel)
+            }
             _ => self
         }
     }
@@ -162,6 +164,11 @@ impl CubeView {
             CubeView::ClauseTree { clause } => {
                 html_uni_vec(format!("clause-tree"), html! {
                     <span> { clause.view(vessel, meta) } </span>
+                })
+            }
+            CubeView::FlowView { flow_view } => {
+                html_uni_vec(format!("flow-view"), html! {
+                    <span> { flow_view.view(vessel, meta) } </span>
                 })
             }
             _ => {

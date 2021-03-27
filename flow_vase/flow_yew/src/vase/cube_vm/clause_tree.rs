@@ -1,6 +1,6 @@
 use yew::{ComponentLink, Html, InputData, KeyboardEvent, NodeRef, html};
 use flow_vessel::{Cube, CubeMeta, Entity, EntityField, EntityId, EntityNode, Lint, Process, Symbol, Vessel};
-use super::{Vase, Msg::*, CubeView};
+use super::{Vase, Msg::*, CubeView, btn};
 
 #[derive(Clone)]
 pub struct ClauseNode {
@@ -421,16 +421,7 @@ fn btn_ink(meta: CubeMeta, obj: EntityId, link: ComponentLink<Vase>) -> Html {
         top: 1px;
         right: calc(2 * var(--size-button));
     ";
-    html! {
-        <button class="btn-ink btn-operate" style=style
-            onclick=link.callback(move |_| {
-                [OpenVM{
-                    cube: flow_vessel::cubes::Inkblot { obj }.into(),
-                    meta
-                }]
-            })
-        >{">"}</button>
-    }
+    btn::ink(meta, obj, style.into(), link)
 }
 
 fn btn_add(dude: EntityId, owner: EntityId, idx: usize, link: ComponentLink<Vase>) -> Html {
@@ -439,17 +430,7 @@ fn btn_add(dude: EntityId, owner: EntityId, idx: usize, link: ComponentLink<Vase
         top: 1px;
         right: var(--size-button);
     ";
-    html! {
-        <button class="btn-add btn-operate" style=style
-            onclick=link.callback(move |_| {
-                [EntityAdd{
-                    dude,
-                    owner,
-                    idx
-                }]
-            })
-        >{"+"}</button>
-    }
+    btn::add(dude, owner, idx, style.into(), link)
 }
 
 fn btn_del(id: EntityId, link: ComponentLink<Vase>) -> Html {
@@ -458,13 +439,7 @@ fn btn_del(id: EntityId, link: ComponentLink<Vase>) -> Html {
         top: 1px;
         right: 0;
     ";
-    html! {
-        <button class="btn-del btn-operate" style=style
-            onclick=link.callback(move |_| {
-                [EntityDelete{id}]
-            })
-        >{"✕"}</button>
-    }
+    btn::del(id, style.into(), link)
 }
 
 #[cfg(test)]

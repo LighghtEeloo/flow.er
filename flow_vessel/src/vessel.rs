@@ -97,6 +97,11 @@ impl Vessel {
         
         vec.into_iter().filter_map(|id| self.flow_arena.node_map.get(&id)).map(|x| &x.entity).collect()
     }
+    // Todo: get all entity_ids recrusively.
+
+    pub fn entity_ids(&self, id: &EntityId) -> Vec<EntityId> {
+        Vec::new()
+    }
     /// requires the id and its idx in node.children
     pub fn entity_dive(&mut self, id: EntityId, idx: usize) {
         if idx == 0 { return }
