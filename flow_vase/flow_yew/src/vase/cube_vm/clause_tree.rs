@@ -24,7 +24,7 @@ impl ClauseNode {
             <div class="node">
                 { self.symbol_view(idx, &entity) }
                 { self.input_view(idx, &entity, owner) }
-                { btn_ink(meta.clone(), id, self.link.clone()) }
+                { btn_ink(meta.incr_new(), id, self.link.clone()) }
                 { btn_del(id, self.link.clone()) }
                 { btn_add(idx + 1, owner, self.link.clone()) }
             </div>
@@ -401,7 +401,7 @@ impl ClauseTree {
                         }]
                     })
                 />
-                { btn_ink(meta.clone(), id, link.clone()) }
+                { btn_ink(meta.incr_new(), id, link.clone()) }
                 { btn_add(0, id, link.clone()) }
             </div>
         }

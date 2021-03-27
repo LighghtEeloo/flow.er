@@ -152,3 +152,12 @@ pub struct CubeMeta {
     pub idx: usize,
     pub cube_type: CubeType,
 }
+
+impl CubeMeta {
+    pub fn incr_new(&self) -> Self {
+        Self {
+            idx: self.idx + 1,
+            ..self.clone()
+        }
+    }
+}

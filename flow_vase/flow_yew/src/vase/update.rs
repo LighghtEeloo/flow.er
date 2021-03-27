@@ -16,7 +16,7 @@ impl Vase {
             OpenVM { cube, meta } => {
                 self.vessel.glass.push_cube(cube.clone(), meta.router);
                 let idx = meta.idx;
-                self.cube_vm_vec.push(CubeVM::new(idx, &cube, &self.vessel, self.link.clone()));
+                self.cube_vm_vec.insert(idx,CubeVM::new(idx, &cube, &self.vessel, self.link.clone()));
                 true
             }
             CloseVM { meta } => {
