@@ -10,8 +10,11 @@ pub type EntityFlow = FlowArena<EntityId, Entity>;
 pub struct Vessel {
     flow_arena: EntityFlow,
     id_factory: EntityIdFactory,
+    #[serde(default)]
     pub glass: Glass,
+    #[serde(default)]
     pub router: Router,
+    #[serde(default)]
     pub settings: Settings
 }
 
