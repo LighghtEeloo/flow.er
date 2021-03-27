@@ -35,6 +35,14 @@ impl Vase {
                 });
                 true
             }
+            EntityDive { id } => {
+
+                true
+            }
+            EntityEmerge { id } => {
+                
+                true
+            }
             EntityDelete { id } => {
                 self.vessel.entity_decay(&id);
                 true

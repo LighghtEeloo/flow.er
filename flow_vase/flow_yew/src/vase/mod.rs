@@ -41,6 +41,12 @@ pub enum Msg {
         id: EntityId,
         field: EntityField
     },
+    EntityDive {
+        id: EntityId,
+    },
+    EntityEmerge {
+        id: EntityId,
+    },
     EntityDelete {
         id: EntityId
     },
