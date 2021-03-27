@@ -73,17 +73,6 @@ impl ClauseNode {
                 // list the toggle options
                 let contents: Html = html! {
                     <>
-                        <div title="toggle-process-tracker"
-                            onclick=self.link.callback(move |_| {
-                                [ EntityUpdate {
-                                    id, 
-                                    // id: id.clone(), 
-                                    field: EntityField::Symbol(Symbol::ProcessTracker(Process::default()))
-                                } ]
-                            })
-                        >
-                            <img src={Process::type_src(&Process::default())} alt="process" /> 
-                        </div>
                         <div title="toggle-linted"
                             onclick=self.link.callback(move |_| {
                                 [ EntityUpdate {
@@ -94,6 +83,17 @@ impl ClauseNode {
                             })
                         >
                             <span>{Lint::default().display(0)}</span>
+                        </div>
+                        <div title="toggle-process-tracker"
+                            onclick=self.link.callback(move |_| {
+                                [ EntityUpdate {
+                                    id, 
+                                    // id: id.clone(), 
+                                    field: EntityField::Symbol(Symbol::ProcessTracker(Process::default()))
+                                } ]
+                            })
+                        >
+                            <img src={Process::type_src(&Process::default())} alt="process" /> 
                         </div>
                     </>
                 };
@@ -235,17 +235,42 @@ impl ClauseNode {
     }
     fn lint(&self, id: EntityId, idx: usize, lint: Lint) -> Html {
         let text = lint.display(idx);
+        let lint_meta: Vec<(String, Lint)> = Lint::vec_all().into_iter().map(|x|
+            (x.display(0), x)
+        ).collect();
+        let dropdown: Html = 
+            lint_meta.into_iter().map(|(text, lint)| {
+                html! {
+                    <div title={lint.clone().type_str()}
+                        onclick=self.link.callback(move |_| {
+                            [ EntityUpdate {
+                                id, 
+                                // id: id.clone(), 
+                                field: EntityField::Symbol(Symbol::Linted(lint.clone()))
+                            } ]
+                        })
+                    > 
+                        <span class="symbol-text"> {text} </span>
+                    </div> 
+                }
+            }).collect();
         html! {
-            <button class="dropbtn lint"
-                onclick=self.link.callback(move|_| {
-                    [EntityUpdate{
-                        id,
-                        field: EntityField::SymbolToggle
-                    }]
-                })
-            > 
-                <div class="symbol-text"> {text} </div>
-            </button> 
+            <>
+                <button class="dropbtn lint"
+                    onclick=self.link.callback(move|_| {
+                        [EntityUpdate{
+                            id,
+                            field: EntityField::SymbolToggle
+                        }]
+                    })
+                > 
+                    <div class="symbol-text"> {text} </div>
+                </button> 
+
+                <div class="dropdown-content"> 
+                    {dropdown}
+                </div> 
+            </>
         }
     }
 }

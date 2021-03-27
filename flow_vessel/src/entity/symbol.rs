@@ -84,6 +84,21 @@ impl Lint {
             Lint::UnOrdered(_) => {""}
         }
     }
+    pub fn vec_all() -> Vec<Self> {
+        use Lint::*;
+        vec! [
+            Numberic,
+            Programmatic,
+            Upper,
+            Lower,
+            Greek,
+            // Roman,
+        
+            Circle,
+            Square,
+            Dash,
+        ]
+    }
     pub fn display(&self, mut idx: usize) -> String {
         use Lint::*;
         // Note: Some backups.

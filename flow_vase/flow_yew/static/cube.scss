@@ -201,7 +201,10 @@
             outline: none;
 
             span {
+                position: relative;
                 text-align: center;
+                cursor: default;
+                line-height: calc(var(--size-button) * 0.6);
             }
         }
         
