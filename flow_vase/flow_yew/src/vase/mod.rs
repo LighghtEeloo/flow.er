@@ -94,7 +94,7 @@ Be a king. ".to_owned();
         // */
         let cubes = vessel.get_cube_vec();
         let cube_vm_vec = Self::cube_vm_vec(cubes, &vessel, link.clone());
-        log_obj("Vessel", &vessel);
+        if cfg!(debug_assertions) { log_obj("Vessel", &vessel); }
         Self {
             vessel,
             cube_vm_vec,
@@ -104,7 +104,7 @@ Be a king. ".to_owned();
 
     fn update(&mut self, msg_queue: Self::Message) -> ShouldRender {
         if msg_queue.len() == 0 { return false }
-        log_obj("Update", &msg_queue);
+        if cfg!(debug_assertions) { log_obj("Update", &msg_queue); }
         let mut msg_visitor = msg_queue.into_iter();
         while {
             let next = msg_visitor.next();
@@ -136,10 +136,10 @@ Be a king. ".to_owned();
 
             // save
             // Debug..
-            log_obj("Vessel saved", &self.vessel);
+            if cfg!(debug_assertions) { log_obj("Vessel saved", &self.vessel) }
             let save_res = futures::executor::block_on(self.vessel.clone().save());
             if save_res.is_err() {
-                log_obj("load err", -1);
+                log::error!("load err");
             }
             true
         }

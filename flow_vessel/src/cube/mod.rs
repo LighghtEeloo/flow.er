@@ -145,6 +145,7 @@ impl Cube {
     }
 }
 
+/// generated on site; isn't contained in a Vec<Cube>
 #[derive(Debug, Clone, Copy)]
 pub struct CubeMeta {
     pub router: Router,

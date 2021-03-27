@@ -85,7 +85,8 @@ impl Vessel {
     }
 
     pub async fn load() -> Result<Vessel, LoadError> {
-        web_sys::console::log_1(&"loading...".into());
+        // web_sys::console::log_1(&"loading...".into());
+        log::trace!("loading...");
         let storage = Self::storage().ok_or(LoadError::FileError)?;
 
         let contents = storage
@@ -97,7 +98,8 @@ impl Vessel {
     }
 
     pub async fn save(self) -> Result<(), SaveError> {
-        web_sys::console::log_1(&"saving...".into());
+        // web_sys::console::log_1(&"saving...".into());
+        log::trace!("saving...");
         let storage = Self::storage().ok_or(SaveError::FileError)?;
 
         let json = serde_json::to_string_pretty(&self).map_err(|_| SaveError::FormatError)?;

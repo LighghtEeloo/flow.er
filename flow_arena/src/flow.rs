@@ -28,7 +28,6 @@ impl<Id, Entity> Node<Id, Entity> {
     }
 }
 
-#[cfg(debug_assertions)]
 impl<Id: Debug, Entity: Debug> Debug for Node<Id, Entity> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct(format!("{:?}", self.id()).as_str())
@@ -81,7 +80,6 @@ impl<Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug> FlowArena
         FlowArena { root, node_map }
     }
     /// panics if anything went wrong. Iff in debug state.
-    #[cfg(debug_assertions)]
     pub(crate) fn check(&self) {
         for (id, node) in self.node_map.iter() {
             let current_str = format!(", current: \nid: {:?}, \nnode: {:#?}", id, node);

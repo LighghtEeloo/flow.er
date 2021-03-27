@@ -67,13 +67,9 @@ impl CubeVM {
 #[derive(Clone)]
 pub enum CubeView {
     /// A single entity's notebook.
-    Inkblot {
-        inkblot: inkblot::Inkblot
-    },
+    Inkblot { inkblot: inkblot::Inkblot },
     /// A single entity and a todo list view
-    ClauseTree {
-        clause: clause_tree::ClauseTree
-    },
+    ClauseTree { clause: clause_tree::ClauseTree },
     PromisedLand,
     FlowView {
         obj: EntityId,

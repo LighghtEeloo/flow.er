@@ -334,10 +334,12 @@ dependencies = [
  "directories-next",
  "flow_arena",
  "futures",
+ "log",
  "phf",
  "rand",
  "serde",
  "serde_json",
+ "wasm-logger",
  "wasm-timer",
  "web-sys",
 ]
@@ -350,9 +352,11 @@ dependencies = [
  "flow_arena",
  "flow_vessel",
  "futures",
+ "log",
  "rand",
  "serde",
  "serde_json",
+ "wasm-logger",
  "yew",
  "yew-services",
 ]
@@ -1131,6 +1135,17 @@ name = "wasm-bindgen-shared"
 version = "0.2.72"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b7148f4696fb4960a346eaa60bbfb42a1ac4ebba21f750f75fc1375b098d5ffa"
+
+[[package]]
+name = "wasm-logger"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "074649a66bb306c8f2068c9016395fa65d8e08d2affcbf95acf3c24c3ab19718"
+dependencies = [
+ "log",
+ "wasm-bindgen",
+ "web-sys",
+]
 
 [[package]]
 name = "wasm-timer"
