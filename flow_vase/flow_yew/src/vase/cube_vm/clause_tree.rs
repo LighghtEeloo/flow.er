@@ -20,43 +20,12 @@ impl ClauseNode {
     }
     pub fn view(&self, idx: usize, entity: &Entity, owner: EntityId) -> Html {
         let id = entity.id().clone();
-        let btn_add = {
-            let style = "
-                position: absolute; 
-                top: 1px;
-                right: var(--size-button);
-            ";
-            html! {
-                <button class="btn-add btn-operate" style=style
-                    onclick=self.link.callback(move |_| {
-                        [EntityAdd{
-                            owner,
-                            idx: idx + 1
-                        }]
-                    })
-                >{"＋"}</button>
-            }
-        };
-        let btn_del = {
-            let style = "
-                position: absolute; 
-                top: 1px;
-                right: 0;
-            ";
-            html! {
-                <button class="btn-del btn-operate" style=style
-                    onclick=self.link.callback(move |_| {
-                        [EntityDelete{id}]
-                    })
-                >{"✕"}</button>
-            }
-        };
         html! {
             <div class="node">
                 { self.symbol_view(idx, &entity) }
                 { self.input_view(idx, &entity, owner) }
-                { btn_del }
-                { btn_add }
+                { btn_del(id, self.link.clone()) }
+                { btn_add(idx + 1, owner, self.link.clone()) }
             </div>
         }
     }
@@ -399,8 +368,43 @@ impl ClauseTree {
                         }]
                     })
                 />
+                { btn_add(0, id, link.clone()) }
             </div>
         }
+    }
+}
+
+
+fn btn_add(idx: usize, owner: EntityId, link: ComponentLink<Vase>) -> Html {
+    let style = "
+        position: absolute; 
+        top: 1px;
+        right: var(--size-button);
+    ";
+    html! {
+        <button class="btn-add btn-operate" style=style
+            onclick=link.callback(move |_| {
+                [EntityAdd{
+                    owner,
+                    idx
+                }]
+            })
+        >{"＋"}</button>
+    }
+}
+
+fn btn_del(id: EntityId, link: ComponentLink<Vase>) -> Html {
+    let style = "
+        position: absolute; 
+        top: 1px;
+        right: 0;
+    ";
+    html! {
+        <button class="btn-del btn-operate" style=style
+            onclick=link.callback(move |_| {
+                [EntityDelete{id}]
+            })
+        >{"✕"}</button>
     }
 }
 
