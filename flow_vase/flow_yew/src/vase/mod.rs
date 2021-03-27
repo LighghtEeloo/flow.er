@@ -102,6 +102,7 @@ Be a king. ".to_owned();
     }
 
     fn update(&mut self, msg_queue: Self::Message) -> ShouldRender {
+        if msg_queue.len() == 0 { return false }
         log_obj("Update", &msg_queue);
         let mut msg_visitor = msg_queue.into_iter();
         while {
