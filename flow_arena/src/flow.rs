@@ -234,7 +234,6 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
                 )
             ).flatten().ok_or(())
         };
-        // println!("decay. {:#?} decay.", self);
         if cfg!(debug_assertions) { self.check() };
         res
     }
@@ -267,7 +266,6 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
             h.extend(orphan.into_iter());
             x.children = h.into_iter().collect();
         });
-        // println!("purge. {:#?} purge.", self);
         if cfg!(debug_assertions) { self.check() };
         Ok(())
     }

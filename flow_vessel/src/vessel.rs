@@ -275,7 +275,7 @@ mod tests {
     }
     #[test] 
     fn random_demon_tests() {
-        let length = 20000;
+        let length = 10000;
         let quiet = true;
         let func_set = [
             |(id, vessel): (&mut Vec<EntityId>, &mut Vessel)| {

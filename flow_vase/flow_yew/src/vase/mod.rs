@@ -68,28 +68,28 @@ impl Component for Vase {
         /* */
         let vessel = {
             let mut v = Vessel::default();
-            let ids: Vec<EntityId> = (0..7).map(|_|{
+            let id: Vec<EntityId> = (0..7).map(|_|{
                 v.entity_grow()
             }).collect();
             v.entity_get_mut(&EntityId::default()).map(|x| x.face = "The Ripple of Your Shadow".to_owned());
-            v.entity_get_mut(&ids[0]).map(|x| x.face = "Hi Player, ".to_owned());
-            v.entity_get_mut(&ids[1]).map(|x| x.face = "it has been a while. ".to_owned());
-            v.entity_get_mut(&ids[2]).map(|x| x.face = "I've been watching you, all along the way. ".to_owned());
-            v.entity_get_mut(&ids[3]).map(|x| x.face = "You seem lost. ".to_owned());
-            v.entity_get_mut(&ids[4]).map(|x| x.face = "Nothing but a long, long dream. ".to_owned());
-            v.entity_get_mut(&ids[5]).map(|x| {
+            v.entity_get_mut(&id[0]).map(|x| x.face = "Hi Player, ".to_owned());
+            v.entity_get_mut(&id[1]).map(|x| x.face = "it has been a while. ".to_owned());
+            v.entity_get_mut(&id[2]).map(|x| x.face = "I've been watching you, all along the way. ".to_owned());
+            v.entity_get_mut(&id[3]).map(|x| x.face = "You seem lost. ".to_owned());
+            v.entity_get_mut(&id[4]).map(|x| x.face = "Nothing but a long, long dream. ".to_owned());
+            v.entity_get_mut(&id[5]).map(|x| {
                 x.face = "Wake up now. ".to_owned();
                 x.bubble = 
 "Your life is waiting. 
 Do what you have to do. 
 Be a king. ".to_owned();
             });
-            v.entity_get_mut(&ids[6]).map(|x| x.symbol = Symbol::ProcessTracker(Process::New) );
-            v.entity_get_mut(&ids[6]).map(|x| x.face = "Do your job.".into() );
+            v.entity_get_mut(&id[6]).map(|x| x.symbol = Symbol::ProcessTracker(Process::New) );
+            v.entity_get_mut(&id[6]).map(|x| x.face = "Do your job.".into() );
             let router = Router::Board;
             let cube: Cube = 
                 cubes::Inkblot {
-                    obj: ids[5],
+                    obj: id[5],
                 }.into();
             // let cube = Cube::new(router);
             let cube_type = cube.cube_type;
