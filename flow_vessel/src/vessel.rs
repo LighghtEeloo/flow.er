@@ -136,10 +136,14 @@ impl Vessel {
         };
         let des = {
             if let Some(node) = self.node(&owner) {
-                node.children[idx - 1]
+                node.children.get(idx - 1)
             } else { return } 
         };
-        self.entity_devote_push(id, des)
+        if let Some(&des) = des {
+            if self.flow_arena.purge(&id).is_ok() {
+                self.entity_devote_push(id, des)
+            }
+        }
     }
 
 }
