@@ -145,7 +145,7 @@ Be a king. ".to_owned();
 
             // save
             // Debug..
-            if cfg!(debug_assertions) { log_obj("Vessel saved", &self.vessel) }
+            if cfg!(debug_assertions) { log::debug!("{}", self.vessel.concise_debug_string()) }
             let save_res = futures::executor::block_on(self.vessel.clone().save());
             if save_res.is_err() {
                 log::error!("load err");

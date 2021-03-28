@@ -154,6 +154,7 @@ impl Vessel {
     }
 }
 
+/// flow debug prints
 impl Vessel {
     pub fn concise_debug_string(&self) -> String {
         let obj = self.flow_arena.root;
