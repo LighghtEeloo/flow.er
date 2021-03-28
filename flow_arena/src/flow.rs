@@ -47,7 +47,8 @@ pub trait Flow {
     fn node(&self, obj: &Self::Id) -> Option<&Self::Node>;
     /// inserts obj to node_map; err if exist
     fn grow(&mut self, obj: Self::Node) -> Result<(), ()>;
-    /// link obj as a child of des at the nth place; err if nth > len or no obj / des
+    /// link obj as a child of des at the nth place; 
+    /// err if nth > len or no obj / des
     fn devote(&mut self, obj: &Self::Id, des: &Self::Id, nth: usize) -> Result<(), ()>;
     fn devote_push(&mut self, obj: &Self::Id, des: &Self::Id) -> Result<(), ()>;
     // /// insert a flow and devote to a node; err on id collision
@@ -65,18 +66,23 @@ pub trait Flow {
 pub struct FlowArena<Id: Hash + Eq, Entity> {
     /// root: can be a Nil node or a dummy node, but must be in node_map;    
     /// it could contain title info.
+    /// 
+    /// for now, only Id::default can be root.
     pub root: Id,
     pub node_map: HashMap<Id, Node<Id, Entity>>,
 }
 
 pub type FlowPure<Id> = FlowArena<Id, ()>;
 
-impl<Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug> Default for FlowArena<Id, Entity> {
+impl<Id, Entity> Default for FlowArena<Id, Entity> 
+where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
     fn default() -> Self {
         Self::new()
     }
 }
-impl<Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug> FlowArena<Id, Entity> {
+
+impl<Id, Entity> FlowArena<Id, Entity> 
+where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
     pub fn new() -> Self {
         let node: Node<Id, Entity> = Node::default();
         let root = node.id().clone();
@@ -114,7 +120,8 @@ impl<Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug> FlowArena
     } 
 }
 
-impl<Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug> Flow for FlowArena<Id, Entity> {
+impl<Id, Entity> Flow for FlowArena<Id, Entity> 
+where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
     type Id = Id;
     type Node = Node<Id, Entity>;
 
@@ -205,7 +212,8 @@ impl<Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug> Flow for 
             ).flatten().ok_or(())
         }
     }
-    /// cuts all the links (except root), but doesn't remove.
+    /// cuts all the links related to the obj and resets obj to root, 
+    /// but doesn't remove.
     fn purge(&mut self, obj: &Id) -> Result<(), ()> {
         if cfg!(debug_assertions) { self.check() };
         // Note: move children to parent.
@@ -215,11 +223,11 @@ impl<Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug> Flow for 
             .unwrap_or(self.root.clone());
         for (_, node) in self.node_map.iter_mut() {
             let root = self.root.clone();
-            node.children.retain(|x| *x != *obj);
+            node.children.retain(|x| x != obj);
             node.parent = node
                 .parent
                 .clone()
-                .and_then(|x| if x == *obj { 
+                .and_then(|x| if &x == obj { 
                     orphan.push(node.id.clone());
                     Some(root) 
                 } else { Some(x) });

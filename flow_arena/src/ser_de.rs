@@ -4,9 +4,11 @@ use std::{fmt, hash::Hash};
 #[cfg(feature = "serde1")]
 use serde::ser::{Serialize, Serializer, SerializeStruct};
 #[cfg(feature = "serde1")]
-impl<Id: Serialize + Hash + Eq, Entity: Serialize> Serialize for FlowArena<Id, Entity> {
+impl<Id, Entity> Serialize for FlowArena<Id, Entity> 
+where Id: Serialize + Hash + Eq, Entity: Serialize {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-        let mut flow = serializer.serialize_struct("Flow", 2)?;
+        let mut flow = 
+            serializer.serialize_struct("Flow", 2)?;
         flow.serialize_field("root", &self.root)?;
         let seq: Vec<&Node<Id, Entity>> = self.node_map.values().collect();
         flow.serialize_field("node_map", &seq)?;
@@ -19,7 +21,8 @@ use serde::de::{self, Deserialize, Deserializer, Visitor, SeqAccess, MapAccess};
 #[cfg(feature = "serde1")]
 use std::marker::PhantomData;
 #[cfg(feature = "serde1")]
-impl<'de, Id: Deserialize<'de> + Clone + Hash + Eq, Entity: Deserialize<'de>> Deserialize<'de> for FlowArena<Id, Entity> {
+impl<'de, Id, Entity> Deserialize<'de> for FlowArena<Id, Entity> 
+where Id: Deserialize<'de> + Clone + Hash + Eq, Entity: Deserialize<'de> {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         enum Field { Root, NodeMap }
         impl<'de> Deserialize<'de> for Field {

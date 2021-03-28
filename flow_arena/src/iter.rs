@@ -27,7 +27,8 @@ impl<'a, Id, Entity> Iterator for EntitiesMut<'a, Id, Entity> {
     }
 }
 
-impl<Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug> FlowArena<Id, Entity> {
+impl<Id, Entity> FlowArena<Id, Entity> 
+where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
     /// returns an iterator over all entities.
     pub fn entities(&self) -> Entities<Id, Entity> {
         Entities {
