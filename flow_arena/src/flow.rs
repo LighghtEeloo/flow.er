@@ -60,7 +60,7 @@ pub trait Flow {
 }
 
 
-#[derive(Clone, Default)]
+#[derive(Clone)]
 #[cfg_attr(debug_assertions, derive(PartialEq, Debug))]
 pub struct FlowArena<Id: Hash + Eq, Entity> {
     /// root: can be a Nil node or a dummy node, but must be in node_map;    
@@ -71,6 +71,11 @@ pub struct FlowArena<Id: Hash + Eq, Entity> {
 
 pub type FlowPure<Id> = FlowArena<Id, ()>;
 
+impl<Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug> Default for FlowArena<Id, Entity> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 impl<Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug> FlowArena<Id, Entity> {
     pub fn new() -> Self {
         let node: Node<Id, Entity> = Node::default();
@@ -188,11 +193,17 @@ impl<Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug> Flow for 
     /// removes from node_map and purges.
     fn decay(&mut self, obj: &Id) -> Result<(), ()> {
         if cfg!(debug_assertions) { self.check() };
-        self.purge(obj).ok().map(|_|
-            self.node_map.remove(obj).map(|_|
-                self.root().children.retain(|rooted| rooted != obj)
-            )
-        ).flatten().ok_or(())
+        if &self.root == obj {
+            self.root().children.clear();
+            self.node_map.retain(|k, _| k == obj);
+            Ok(())
+        } else {
+            self.purge(obj).ok().map(|_|
+                self.node_map.remove(obj).map(|_|
+                    self.root().children.retain(|rooted| rooted != obj)
+                )
+            ).flatten().ok_or(())
+        }
     }
     /// cuts all the links (except root), but doesn't remove.
     fn purge(&mut self, obj: &Id) -> Result<(), ()> {
