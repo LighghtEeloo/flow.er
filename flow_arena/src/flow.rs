@@ -228,13 +228,13 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
             .unwrap_or(self.root.clone());
         for (_, node) in self.node_map.iter_mut() {
             let root = self.root.clone();
-            let re_owner = re_owner.clone();
+            // let re_owner = re_owner.clone();
             node.children.retain(|x| x != obj);
             node.parent = node.parent.clone()
                 .and_then(|parent| if &parent == obj { 
                     orphan.push(node.id.clone());
                     Some(root) 
-                } else { Some(re_owner) });
+                } else { Some(parent) });
         }
         // must be in root
         let root = self.root.clone();
