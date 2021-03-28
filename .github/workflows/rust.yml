@@ -20,3 +20,11 @@ jobs:
       run: cargo build --verbose
     - name: Run tests
       run: cargo test --verbose
+    - name: Run flow_arena tests
+      run: cargo test --package flow_arena --verbose
+    - name: Run flow_vessel tests
+      run: cargo test --package flow_vessel --verbose
+    - name: Run flow_yew tests
+      run: cargo test --package flow_yew --verbose
+    - name: Run flow_cli tests
+      run: cargo test --package flow_cli --verbose
