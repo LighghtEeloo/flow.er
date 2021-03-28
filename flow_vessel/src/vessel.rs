@@ -275,7 +275,8 @@ mod tests {
     }
     #[test] 
     fn random_demon_tests() {
-        let length = 100;
+        let length = 20000;
+        let quiet = true;
         let func_set = [
             |(id, vessel): (&mut Vec<EntityId>, &mut Vessel)| {
                 print!("Grow. ");
@@ -317,7 +318,7 @@ mod tests {
         for (i, op) in seq.into_iter().enumerate() {
             print!("#{} ", i);
             func_set[op]((&mut id, &mut vessel));
-            vessel.concise_debug();
+            if !quiet { vessel.concise_debug(); }
         }
     }
 }
