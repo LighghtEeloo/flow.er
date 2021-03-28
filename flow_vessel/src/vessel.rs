@@ -269,7 +269,7 @@ mod tests {
         idx %= id.len();
         id.get(idx).cloned()
     }
-    #[test] 
+    // #[test] 
     fn random_demon_tests() {
         let length = 100;
         let func_set = [
@@ -292,9 +292,9 @@ mod tests {
             },
             |(id, vessel): (&mut Vec<EntityId>, &mut Vessel)| {
                 let obj = retrive_random(&id);
-                println!("Decay. {:?} ", obj);
                 match obj {
                     Some(obj) => {
+                        println!("Decay. {:?} ", obj);
                         vessel.entity_decay(&obj);
                         id.retain(|x| x != &obj);
                     }
