@@ -168,7 +168,7 @@ fn concise_debug_impl(obj: EntityId, vessel: &Vessel, prefix: usize) -> String {
     let id_debug = vessel.entity_get(&obj).map_or(
         "".into(), 
         |x|{
-            format!("{:?}", x.id())
+            format!("{:?}: {:?}", x.id(), x.face)
         }
     );
     let children = vessel.node(&obj).map_or(
@@ -263,10 +263,10 @@ mod tests {
         println!("{:#?}", vessel);
     }
 
-    fn retrive_random(id: &Vec<EntityId>) -> EntityId {
+    fn retrive_random(id: &Vec<EntityId>) -> Option<EntityId> {
         let mut idx: usize = rand::random();
         idx %= id.len();
-        id[idx]
+        id.get(idx).cloned()
     }
     #[test] 
     fn random_demon_tests() {
@@ -281,15 +281,24 @@ mod tests {
             |(id, vessel): (&mut Vec<EntityId>, &mut Vessel)| {
                 let obj = retrive_random(&id);
                 let owner = retrive_random(&id);
-                println!("Devote. {:?} -> {:?}", obj, owner);
-                vessel.entity_devote_push(obj, owner)
+                match (obj, owner) {
+                    (Some(obj), Some(owner)) => {
+                        println!("Devote. {:?} -> {:?}", obj, owner);
+                        vessel.entity_devote_push(obj, owner);
+                    }
+                    _ => ()
+                }
             },
             |(id, vessel): (&mut Vec<EntityId>, &mut Vessel)| {
                 let obj = retrive_random(&id);
                 println!("Decay. {:?} ", obj);
-                vessel.concise_debug();
-                vessel.entity_decay(&obj);
-                id.retain(|x| x != &obj);
+                match obj {
+                    Some(obj) => {
+                        vessel.entity_decay(&obj);
+                        id.retain(|x| x != &obj);
+                    }
+                    _ => ()
+                }
             },
         ];
         let mut id = Vec::new();
@@ -300,8 +309,10 @@ mod tests {
             i %= func_set.len();
             i
         }).collect::<Vec<usize>>());
-        for op in seq {
+        for (i, op) in seq.into_iter().enumerate() {
+            print!("#{} ", i);
             func_set[op]((&mut id, &mut vessel));
+            vessel.concise_debug();
         }
     }
 }
