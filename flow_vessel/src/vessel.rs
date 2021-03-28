@@ -231,4 +231,40 @@ mod tests {
         let vessel: Vessel = serde_json::from_str(&str).expect("failed to deserialize");
         println!("{:#?}", vessel);
     }
+
+    fn retrive_random(id: &Vec<EntityId>) -> EntityId {
+        let mut idx: usize = rand::random();
+        idx %= id.len();
+        id[idx]
+    }
+    #[test] 
+    fn random_demon_tests() {
+        let length = 40;
+        let func_set = [
+            |(id, vessel): (&mut Vec<EntityId>, &mut Vessel)| {
+                id.push(vessel.entity_grow());
+            },
+            |(id, vessel): (&mut Vec<EntityId>, &mut Vessel)| {
+                let obj = retrive_random(&id);
+                let owner = retrive_random(&id);
+                vessel.entity_devote_push(obj, owner)
+            },
+            |(id, vessel): (&mut Vec<EntityId>, &mut Vessel)| {
+                let obj = retrive_random(&id);
+                vessel.entity_decay(&obj);
+                id.retain(|x| x != &obj);
+            },
+        ];
+        let mut id = Vec::new();
+        let mut vessel = Vessel::new();
+        let mut seq: Vec<usize> = vec! [0;10];
+        seq.extend((0..length).map(|_| {
+            let mut i: usize = rand::random();
+            i %= func_set.len();
+            i
+        }).collect::<Vec<usize>>());
+        for op in seq {
+            func_set[op]((&mut id, &mut vessel));
+        }
+    }
 }
