@@ -43,14 +43,22 @@ impl Debug for Vessel {
 }
 
 impl Vessel {
+    pub fn entity_grow(&mut self) -> EntityId {
+        let entity = Entity::new_time(&self.id_factory);
+        self.entity_insert(entity)
+    }
     pub fn entity_insert(&mut self, entity: Entity) -> EntityId {
         let id = entity.id().clone();
         self.flow_arena.grow(Node::from_id(id.clone(), entity)).ok();
         id
     }
-    pub fn entity_grow(&mut self) -> EntityId {
-        let entity = Entity::new_time(&self.id_factory);
-        self.entity_insert(entity)
+    /// ensures that you can get the required entity; 
+    /// inserts if not in place. 
+    pub fn entity_ensure(&mut self, id: &EntityId) -> &mut Entity {
+        if !self.flow_arena.node_map.contains_key(id) {
+            self.entity_insert(Entity::new_id(id));
+        }
+        self.entity_get_mut(id).expect("contains key")
     }
     pub fn entity_devote(&mut self, obj: EntityId, owner: EntityId, idx: usize) {
         self.flow_arena.devote(&obj, &owner, idx).ok();
@@ -75,20 +83,15 @@ impl Vessel {
         let obj = self.entity_grow_devote(owner, idx);
         self.entity_duplicate(obj, dude)
     }
-    pub fn entity_get(&self, id: &EntityId) -> Option<&Entity> {
-        self.flow_arena.node_map.get(id).map(|x| &x.entity)
+    /// removes entity from a flow_arena
+    pub fn entity_decay(&mut self, id: &EntityId) {
+        self.flow_arena.decay(id).ok();
+        self.glass_refresh();
     }
-    pub fn entity_get_mut(&mut self, id: &EntityId) -> Option<&mut Entity> {
-        self.flow_arena.node_map.get_mut(id).map(|x| &mut x.entity)
-    }
-    /// ensures that you can get the required entity; 
-    /// inserts if not in place. 
-    pub fn entity_ensure(&mut self, id: &EntityId) -> &mut Entity {
-        if !self.flow_arena.node_map.contains_key(id) {
-            self.entity_insert(Entity::new_id(id));
-        }
-        self.entity_get_mut(id).expect("contains key")
-    }
+}
+
+/// flow_arena inquiry
+impl Vessel {
     pub fn node(&self, id: &EntityId) -> Option<&EntityNode> {
         self.flow_arena.node(id)
     }
@@ -98,7 +101,7 @@ impl Vessel {
         vec.into_iter().filter_map(|id| self.flow_arena.node_map.get(&id)).map(|x| &x.entity).collect()
     }
     /// get all entity_ids
-    pub fn entity_ids_all(&self) -> Vec<EntityId> {
+    pub fn entity_id_all(&self) -> Vec<EntityId> {
         self.flow_arena.entities().map(|x|x.id().clone()).collect()
     }
     /// Todo: get all entity_ids under id recrusively
@@ -111,6 +114,16 @@ impl Vessel {
             if x.face == face { Some(x.id().clone()) } else { None }
         }).collect()
     }
+    pub fn entity_get(&self, id: &EntityId) -> Option<&Entity> {
+        self.flow_arena.node_map.get(id).map(|x| &x.entity)
+    }
+    pub fn entity_get_mut(&mut self, id: &EntityId) -> Option<&mut Entity> {
+        self.flow_arena.node_map.get_mut(id).map(|x| &mut x.entity)
+    }
+}
+
+/// indents
+impl Vessel {
     /// requires the id and its idx in node.children
     pub fn entity_dive(&mut self, id: EntityId, idx: usize) {
         if idx == 0 { return }
@@ -128,12 +141,9 @@ impl Vessel {
         };
         self.entity_devote_push(id, des)
     }
-    /// removes entity from a flow_arena
-    pub fn entity_decay(&mut self, id: &EntityId) {
-        self.flow_arena.decay(id).ok();
-        self.glass_refresh();
-    }
+
 }
+
 
 impl Vessel {
     pub fn get_cube_vec(&self) -> Vec<Cube> {
