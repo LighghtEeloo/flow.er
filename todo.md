@@ -1,8 +1,11 @@
 ## flow_arena
 - [x] (abort) merge_flow
+- [ ] ! Fix devote.
+- [ ] ! More unit testings required.
 
 ## flow_vessel
 - [ ] Settings
+  - [ ] Saving Options.
 - [ ] formatted ClauseTree
   - [ ] ! Entity view-block
   - [ ] auto indent

@@ -1,8 +1,8 @@
 # Flow.er
 
-A *notebook* and *mind-map* app, integrated with *todo-list* and *calendar* views. And it has *time-capsule* function.
+A *notebook* app integrated with *todo-list* utility.
 
-Flow.er is a Rust WASM app running in browser. Utilizing yew and trunk, it provides good development experience.
+Project *flow.er* is a Rust WASM app running in browser. Taking advantage of Yew and Trunk, it provides good development experience.
 
 ***Notice: this repo is under heavy development, and is currently not usable. To see the demo version, you can try `flower-yew-lock` branch, which is the last version of this software and is already usable, and follow the instructions below.***
 
@@ -64,6 +64,13 @@ For now, this software isn't data-safe. Use at your own risk. This may get bette
 
 ## Todo
 See [todo.md](./todo.md).
+
+
+## Version
+
+The final goal of this project is to create a *notebook* and *mind-map* app with is integrated with *todo-list* and *calendar* views. 
+
+It will be supporting patches to incrementally save your previous work, denoted by *time-capsule* function.
 
 ## Project Technical Detail
 
