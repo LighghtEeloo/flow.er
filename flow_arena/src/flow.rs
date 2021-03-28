@@ -282,7 +282,7 @@ mod tests {
 
     fn make_flow(aloud: bool) -> FlowEntity {
         let mut flow: FlowEntity = FlowArena::new();
-        let obj_vec: Vec<NodeEntity> = (0..21).collect::<Vec<u64>>().iter_mut().map(|x| Node::from_id(x.clone().into(), ())).collect();
+        let obj_vec: Vec<NodeEntity> = (0..21).map(|x| Node::from_id(x.clone().into(), ())).collect();
         wrapper("Grow", flow.grow(obj_vec[1].clone()).is_ok(), &flow, aloud);
         wrapper("Grow", flow.grow(obj_vec[2].clone()).is_ok(), &flow, aloud);
         wrapper("Grow", flow.grow(obj_vec[3].clone()).is_ok(), &flow, aloud);

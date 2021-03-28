@@ -68,7 +68,7 @@ impl Component for Vase {
         /* */
         let vessel = {
             let mut v = Vessel::default();
-            let ids: Vec<EntityId> = (0..7).into_iter().map(|_|{
+            let ids: Vec<EntityId> = (0..7).map(|_|{
                 v.entity_grow()
             }).collect();
             v.entity_get_mut(&EntityId::default()).map(|x| x.face = "The Ripple of Your Shadow".to_owned());

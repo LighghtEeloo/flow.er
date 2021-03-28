@@ -179,7 +179,7 @@ mod tests {
     }
     fn make_vessel(num: usize) -> (Vec<EntityId>, Vessel) {
         let mut vessel = Vessel::new();
-        let id = (0..num).into_iter().map(|_|
+        let id = (0..num).map(|_|
             vessel.entity_grow()
         ).collect();
         (id, vessel)
