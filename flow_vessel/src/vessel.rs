@@ -157,7 +157,7 @@ impl Vessel {
 impl Vessel {
     pub fn concise_debug_string(&self) -> String {
         let obj = self.flow_arena.root;
-        concise_debug_impl(obj, self, 1)
+        concise_debug_impl(obj, self, 0)
     }
     pub fn concise_debug(&self) {
         println!("{}", self.concise_debug_string())
@@ -181,7 +181,8 @@ fn concise_debug_impl(obj: EntityId, vessel: &Vessel, prefix: usize) -> String {
     ).fold(String::new(), |x, y| {
         format!("{}\n{}", x, y)
     });
-    let prefix_debug = "-".repeat(prefix*2);
+    let mut prefix_debug = " ".repeat(prefix*2);
+    prefix_debug.push_str("|--");
     format!{"{}{}{}", prefix_debug, id_debug, children_debug}
 }
 
