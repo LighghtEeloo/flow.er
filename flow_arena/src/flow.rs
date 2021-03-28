@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fmt::{self, Debug}, hash::Hash};
+use std::{collections::{HashMap, HashSet}, fmt::{self, Debug}, hash::Hash};
 use indexmap::IndexSet;
 
 #[cfg(feature = "serde1")]
@@ -90,6 +90,24 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
         node_map.insert(root.clone(), node);
         FlowArena { root, node_map }
     }
+    pub fn node_offspring_list(&self, obj: &Id) -> HashSet<Id> {
+        let mut visit_set = HashSet::new();
+        let mut final_set = HashSet::new();
+        visit_set.insert(obj.clone());
+        while !visit_set.is_empty() {
+            let mut wait_set = HashSet::new();
+            for obj in visit_set.iter() {
+                let children = self.node_map.get(&obj)
+                    .map(|x| x.children.clone() )
+                    .unwrap_or_default();
+                wait_set.extend(children);
+            }
+            final_set.extend(visit_set.iter().cloned());
+            visit_set.clear();
+            visit_set.extend(wait_set);
+        }
+        final_set
+    }
     /// panics if anything went wrong. Iff in debug state.
     pub(crate) fn check(&self) {
         for (id, node) in self.node_map.iter() {
@@ -149,6 +167,9 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
         res
     }
     fn devote(&mut self, obj: &Id, des: &Id, nth: usize) -> Result<(), ()> {
+        // Todo: cycle check.
+        // if obj == des { return Err(()) }
+        if self.node_offspring_list(obj).get(des).is_some() { return Err(()) }
         // Note: no obj in root.
         self.root().children.retain(|x| x != obj);
         let res = if self.node_map.contains_key(obj) {
@@ -215,7 +236,6 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
         };
         // println!("decay. {:#?} decay.", self);
         if cfg!(debug_assertions) { self.check() };
-        println!("decay checked.");
         res
     }
     /// cuts all the links related to the obj and resets obj to root, 
@@ -227,14 +247,13 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
             .map_or(None, |x| x.parent.clone())
             .unwrap_or(self.root.clone());
         for (_, node) in self.node_map.iter_mut() {
-            let root = self.root.clone();
-            // let re_owner = re_owner.clone();
+            let re_owner = re_owner.clone();
             node.children.retain(|x| x != obj);
             node.parent = node.parent.clone()
-                .and_then(|parent| if &parent == obj { 
+                .map(|parent| if &parent == obj { 
                     orphan.push(node.id.clone());
-                    Some(root) 
-                } else { Some(parent) });
+                    re_owner
+                } else { parent });
         }
         // must be in root
         let root = self.root.clone();
@@ -250,7 +269,6 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
         });
         // println!("purge. {:#?} purge.", self);
         if cfg!(debug_assertions) { self.check() };
-        println!("purge checked.");
         Ok(())
     }
 }
@@ -318,6 +336,11 @@ mod tests {
     fn root() {
         let mut flow: FlowEntity = FlowArena::new();
         assert_eq!(flow.root().clone(), Node::default());
+    }
+    #[test]
+    fn offspring() {
+        let flow = make_flow(false);
+        println!("{:?}", flow.node_offspring_list(&flow.root))
     }
 
     #[test]

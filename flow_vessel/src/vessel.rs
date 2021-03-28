@@ -266,10 +266,14 @@ mod tests {
 
     fn retrive_random(id: &Vec<EntityId>) -> Option<EntityId> {
         let mut idx: usize = rand::random();
-        idx %= id.len();
-        id.get(idx).cloned()
+        if id.len() == 0 {
+            None
+        } else {
+            idx %= id.len();
+            id.get(idx).cloned()
+        }
     }
-    // #[test] 
+    #[test] 
     fn random_demon_tests() {
         let length = 100;
         let func_set = [

@@ -1,7 +1,7 @@
 ## flow_arena
 - [x] (abort) merge_flow
-- [ ] !! Fix decay.
-- [ ] !! Fix cycle devote ([[a]] -> [[a]]).
+- [x] !! Fix decay.
+- [x] !! Fix cycle devote ([[a]] -> [[a]]).
 - [ ] ! More unit testings required.
 
 ## flow_vessel
