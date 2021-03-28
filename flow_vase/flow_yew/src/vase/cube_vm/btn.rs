@@ -41,3 +41,23 @@ pub fn del(id: EntityId, style: String, link: ComponentLink<Vase>) -> Html {
         >{"✕"}</button>
     }
 }
+
+pub fn dive(id: EntityId, idx: usize, style: String, link: ComponentLink<Vase>) -> Html {
+    html! {
+        <button class="btn-add btn-operate" style=style
+            onclick=link.callback(move |_| {
+                [EntityDive { id, idx }]
+            })
+        >{"]"}</button>
+    }
+}
+
+pub fn emerge(id: EntityId, style: String, link: ComponentLink<Vase>) -> Html {
+    html! {
+        <button class="btn-add btn-operate" style=style
+            onclick=link.callback(move |_| {
+                [EntityEmerge { id }]
+            })
+        >{"["}</button>
+    }
+}
