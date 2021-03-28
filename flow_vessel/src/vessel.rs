@@ -239,18 +239,23 @@ mod tests {
     }
     #[test] 
     fn random_demon_tests() {
-        let length = 40;
+        let length = 100;
         let func_set = [
             |(id, vessel): (&mut Vec<EntityId>, &mut Vessel)| {
-                id.push(vessel.entity_grow());
+                print!("Grow. ");
+                let obj = vessel.entity_grow();
+                println!("{:?}", obj);
+                id.push(obj);
             },
             |(id, vessel): (&mut Vec<EntityId>, &mut Vessel)| {
                 let obj = retrive_random(&id);
                 let owner = retrive_random(&id);
+                println!("Devote. {:?} -> {:?}", obj, owner);
                 vessel.entity_devote_push(obj, owner)
             },
             |(id, vessel): (&mut Vec<EntityId>, &mut Vessel)| {
                 let obj = retrive_random(&id);
+                println!("Decay. {:?} ", obj);
                 vessel.entity_decay(&obj);
                 id.retain(|x| x != &obj);
             },
