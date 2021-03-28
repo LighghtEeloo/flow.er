@@ -213,7 +213,9 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
                 )
             ).flatten().ok_or(())
         };
+        // println!("decay. {:#?} decay.", self);
         if cfg!(debug_assertions) { self.check() };
+        println!("decay checked.");
         res
     }
     /// cuts all the links related to the obj and resets obj to root, 
@@ -226,27 +228,29 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
             .unwrap_or(self.root.clone());
         for (_, node) in self.node_map.iter_mut() {
             let root = self.root.clone();
+            let re_owner = re_owner.clone();
             node.children.retain(|x| x != obj);
-            node.parent = node
-                .parent
-                .clone()
-                .and_then(|x| if &x == obj { 
+            node.parent = node.parent.clone()
+                .and_then(|parent| if &parent == obj { 
                     orphan.push(node.id.clone());
                     Some(root) 
-                } else { Some(x) });
+                } else { Some(re_owner) });
         }
         // must be in root
         let root = self.root.clone();
         self.node_map.get_mut(obj).map(|node| {
             node.parent = Some(root)
         });
+        self.root().children.retain(|x| x != obj);
         self.root().children.push(obj.clone());
         self.node_map.get_mut(&re_owner).map(|x| {
             let mut h: IndexSet<Id> = x.children.iter().cloned().collect();
             h.extend(orphan.into_iter());
             x.children = h.into_iter().collect();
         });
+        // println!("purge. {:#?} purge.", self);
         if cfg!(debug_assertions) { self.check() };
+        println!("purge checked.");
         Ok(())
     }
 }

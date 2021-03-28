@@ -154,6 +154,37 @@ impl Vessel {
     }
 }
 
+impl Vessel {
+    pub fn concise_debug_string(&self) -> String {
+        let obj = self.flow_arena.root;
+        concise_debug_impl(obj, self, 1)
+    }
+    pub fn concise_debug(&self) {
+        println!("{}", self.concise_debug_string())
+    }
+}
+
+fn concise_debug_impl(obj: EntityId, vessel: &Vessel, prefix: usize) -> String {
+    let id_debug = vessel.entity_get(&obj).map_or(
+        "".into(), 
+        |x|{
+            format!("{:?}", x.id())
+        }
+    );
+    let children = vessel.node(&obj).map_or(
+        Vec::new(), 
+        |node| {
+            node.children.clone()
+        });
+    let children_debug = children.iter().map(|x|
+        concise_debug_impl(x.clone(), vessel, prefix+1)
+    ).fold(String::new(), |x, y| {
+        format!("{}\n{}", x, y)
+    });
+    let prefix_debug = "-".repeat(prefix*2);
+    format!{"{}{}{}", prefix_debug, id_debug, children_debug}
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -256,6 +287,7 @@ mod tests {
             |(id, vessel): (&mut Vec<EntityId>, &mut Vessel)| {
                 let obj = retrive_random(&id);
                 println!("Decay. {:?} ", obj);
+                vessel.concise_debug();
                 vessel.entity_decay(&obj);
                 id.retain(|x| x != &obj);
             },
