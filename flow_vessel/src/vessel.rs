@@ -145,6 +145,20 @@ impl Vessel {
             }
         }
     }
+    pub fn entity_emerge(&mut self, id: EntityId) {
+        let owner = {
+            Some(id)
+            .map(|x| self.node(&x) ).flatten()
+            .map(|x| x.parent ).flatten()
+            .map(|x| self.node(&x) ).flatten()
+            .map(|x| x.parent ).flatten()
+        };
+        if let Some(owner) = owner {
+            if self.flow_arena.purge(&id).is_ok() {
+                self.entity_devote_push(id, owner)
+            }
+        }
+    }
 
 }
 

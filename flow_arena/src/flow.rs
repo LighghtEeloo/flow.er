@@ -167,8 +167,6 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
         res
     }
     fn devote(&mut self, obj: &Id, des: &Id, nth: usize) -> Result<(), ()> {
-        // Todo: cycle check.
-        // if obj == des { return Err(()) }
         if self.node_offspring_list(obj).get(des).is_some() { return Err(()) }
         // Note: no obj in root.
         self.root().children.retain(|x| x != obj);

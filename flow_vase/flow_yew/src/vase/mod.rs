@@ -65,40 +65,9 @@ impl Component for Vase {
         let vessel_future = Vessel::load();
         let vessel = futures::executor::block_on(vessel_future).unwrap_or(Vessel::new());
         // Debug..
-        /* */
-        let vessel = {
-            let mut v = Vessel::default();
-            let id: Vec<EntityId> = (0..7).map(|_|{
-                v.entity_grow()
-            }).collect();
-            v.entity_get_mut(&EntityId::default()).map(|x| x.face = "The Ripple of Your Shadow".to_owned());
-            v.entity_get_mut(&id[0]).map(|x| x.face = "Hi Player, ".to_owned());
-            v.entity_get_mut(&id[1]).map(|x| x.face = "it has been a while. ".to_owned());
-            v.entity_get_mut(&id[2]).map(|x| x.face = "I've been watching you, all along the way. ".to_owned());
-            v.entity_get_mut(&id[3]).map(|x| x.face = "You seem lost. ".to_owned());
-            v.entity_get_mut(&id[4]).map(|x| x.face = "Nothing but a long, long dream. ".to_owned());
-            v.entity_get_mut(&id[5]).map(|x| {
-                x.face = "Wake up now. ".to_owned();
-                x.bubble = 
-"Your life is waiting. 
-Do what you have to do. 
-Be a king. ".to_owned();
-            });
-            v.entity_get_mut(&id[6]).map(|x| x.symbol = Symbol::ProcessTracker(Process::New) );
-            v.entity_get_mut(&id[6]).map(|x| x.face = "Do your job.".into() );
-            let router = Router::Board;
-            let cube: Cube = 
-                cubes::Inkblot {
-                    obj: id[5],
-                }.into();
-            // let cube = Cube::new(router);
-            let cube_type = cube.cube_type;
-            v.glass.insert_cube(
-                cube, 
-                CubeMeta { router, idx: 1 , cube_type }
-            );
-            v
-        };
+        /* *
+        let vessel = _vessel_poet();
+        let vessel = _vessel_incr(10);
         // */
         let cubes = vessel.get_cube_vec();
         let cube_vm_vec = Self::cube_vm_vec(cubes, &vessel, link.clone());
@@ -173,4 +142,53 @@ impl Vase {
                 link.clone()
             )).collect()
     }
+}
+
+fn _vessel_poet() -> Vessel {
+    let mut v = Vessel::default();
+    let id: Vec<EntityId> = (0..7).map(|_|{
+        v.entity_grow()
+    }).collect();
+    v.entity_get_mut(&EntityId::default()).map(|x| x.face = "The Ripple of Your Shadow".to_owned());
+    v.entity_get_mut(&id[0]).map(|x| x.face = "Hi Player, ".to_owned());
+    v.entity_get_mut(&id[1]).map(|x| x.face = "it has been a while. ".to_owned());
+    v.entity_get_mut(&id[2]).map(|x| x.face = "I've been watching you, all along the way. ".to_owned());
+    v.entity_get_mut(&id[3]).map(|x| x.face = "You seem lost. ".to_owned());
+    v.entity_get_mut(&id[4]).map(|x| x.face = "Nothing but a long, long dream. ".to_owned());
+    v.entity_get_mut(&id[5]).map(|x| {
+        x.face = "Wake up now. ".to_owned();
+        x.bubble = 
+"Your life is waiting. 
+Do what you have to do. 
+Be a king. ".to_owned();
+    });
+    v.entity_get_mut(&id[6]).map(|x| x.symbol = Symbol::ProcessTracker(Process::New) );
+    v.entity_get_mut(&id[6]).map(|x| x.face = "Do your job.".into() );
+    let router = Router::Board;
+    let cube: Cube = 
+        cubes::Inkblot {
+            obj: id[5],
+        }.into();
+    // let cube = Cube::new(router);
+    let cube_type = cube.cube_type;
+    v.glass.insert_cube(
+        cube, 
+        CubeMeta { router, idx: 1 , cube_type }
+    );
+    v
+
+}
+
+fn _vessel_incr(num: usize) -> Vessel {
+    let mut v = Vessel::default();
+    let id: Vec<EntityId> = (0..num).map(|_|{
+        v.entity_grow()
+    }).collect();
+    for (i, x )in id.iter().enumerate() {
+        v.entity_get_mut(&x).map(|x| {
+            x.face = ((65 + i) as u8 as char).into();
+            x.symbol = Symbol::Linted(Lint::Greek);
+        });
+    }
+    v
 }

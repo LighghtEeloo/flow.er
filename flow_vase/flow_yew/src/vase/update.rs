@@ -40,7 +40,7 @@ impl Vase {
                 true
             }
             EntityEmerge { id } => {
-
+                self.vessel.entity_emerge(id);
                 true
             }
             EntityDelete { id } => {
