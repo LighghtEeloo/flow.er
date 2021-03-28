@@ -60,14 +60,25 @@ impl Router {
             Settings => "Settings"
         }
     }
+    pub fn src_str(&self) -> &'static str {
+        use Router::*;
+        match self {
+            BirdView => "static/icons/branch.svg",
+            Board => "static/icons/hexagons.svg",
+            Promised => "static/icons/calendar.svg",
+            Calendar => "static/icons/calendar.svg",
+            TimeAnchor => "static/icons/history.svg",
+            Settings => "static/icons/settings.svg",
+        }
+    }
     pub fn vec_all() -> Vec<Self> {
         use Router::*;
         vec! [
             BirdView,
             Board,
             Promised,
-            Calendar,
-            TimeAnchor,
+            // Calendar,
+            // TimeAnchor,
         
             Settings,
         ]

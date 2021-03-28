@@ -17,14 +17,10 @@ impl Vase {
 
     fn sidebar_routers(&self) -> Html {
         use Router::*;
-        let router_meta: Vec<(&str, Router, bool)> = vec! {
-            ("static/icons/branch.svg", BirdView, false),
-            ("static/icons/hexagons.svg", Board, false),
-            ("static/icons/calendar.svg", Promised, false),
-            ("static/icons/calendar.svg", Calendar, false),
-            ("static/icons/history.svg", TimeAnchor, false),
-            ("static/icons/settings.svg", Settings, true),
-        };
+        let router_meta: Vec<(&str, Router, bool)> = Router::vec_all()
+            .into_iter().map(|r| {
+                (r.src_str(), r, r == Settings)
+            }).collect();
         let sidebar_routers: Html = 
             router_meta.into_iter().map(
                 |(src, router, bottom)| {
