@@ -135,23 +135,23 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
         self.node_map.get(obj)
     }
     fn grow(&mut self, mut obj: Node<Id, Entity>) -> Result<(), ()> {
-        if cfg!(debug_assertions) { self.check() };
-        obj.parent = Some(self.root.clone());
-        match self.node_map.get(obj.id()) {
+        let res = match self.node_map.get(obj.id()) {
             Some(_) => Err(()),
             None => {
                 let id = obj.id.clone();
                 self.root().children.push(id.clone());
+                obj.parent = Some(self.root.clone());
                 self.node_map.insert(id, obj);
                 Ok(())
             }
-        }
+        };
+        if cfg!(debug_assertions) { self.check() };
+        res
     }
     fn devote(&mut self, obj: &Id, des: &Id, nth: usize) -> Result<(), ()> {
-        if cfg!(debug_assertions) { self.check() };
         // Note: no obj in root.
         self.root().children.retain(|x| x != obj);
-        if self.node_map.contains_key(obj) {
+        let res = if self.node_map.contains_key(obj) {
             self.node_map.get_mut(des)
                 .map(|owner| {
                     if nth <= owner.children.len() {
@@ -169,14 +169,17 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
                     Some(x)
                 })
                 .flatten()
-        } else { None } .ok_or(())
+        } else { None } .ok_or(());
+        if cfg!(debug_assertions) { self.check() };
+        res
     }
     fn devote_push(&mut self, obj: &Id, des: &Id) -> Result<(), ()> {
-        if cfg!(debug_assertions) { self.check() };
         let nth = self.node_map.get(des).map(|owner| owner.children.len());
-        nth.map(|nth| {
+        let res = nth.map(|nth| {
             self.devote(obj, des, nth)
-        }).unwrap_or(Err(()))
+        }).unwrap_or(Err(()));
+        if cfg!(debug_assertions) { self.check() };
+        res
     }
     // fn merge_flow(&mut self, flow: Self, des: &Self::Id, nth: usize) -> Result<(), ()> {
     //     if cfg!(debug_assertions) { self.check() };
@@ -199,8 +202,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
     // }
     /// removes from node_map and purges.
     fn decay(&mut self, obj: &Id) -> Result<(), ()> {
-        if cfg!(debug_assertions) { self.check() };
-        if &self.root == obj {
+        let res = if &self.root == obj {
             self.root().children.clear();
             self.node_map.retain(|k, _| k == obj);
             Ok(())
@@ -210,12 +212,13 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
                     self.root().children.retain(|rooted| rooted != obj)
                 )
             ).flatten().ok_or(())
-        }
+        };
+        if cfg!(debug_assertions) { self.check() };
+        res
     }
     /// cuts all the links related to the obj and resets obj to root, 
     /// but doesn't remove.
     fn purge(&mut self, obj: &Id) -> Result<(), ()> {
-        if cfg!(debug_assertions) { self.check() };
         // Note: move children to parent.
         let mut orphan: Vec<Id> = Vec::new();
         let re_owner = self.node_map.get(obj)
@@ -243,6 +246,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
             h.extend(orphan.into_iter());
             x.children = h.into_iter().collect();
         });
+        if cfg!(debug_assertions) { self.check() };
         Ok(())
     }
 }
