@@ -54,10 +54,13 @@ pub trait Flow {
     // /// insert a flow and devote to a node; err on id collision
     // fn merge_flow(&mut self, flow: Self, des: &Self::Id, nth: usize) -> Result<(), ()>;
     // fn merge_flow_push(&mut self, flow: Self, des: &Self::Id) -> Result<(), ()>;
+    /// decay the node by removing only its connection between 
+    /// its parent and itself; mounts the node to root.
+    fn decay(&mut self, obj: &Self::Id) -> Result<(), ()>;
+    /// cuts all the links (and mounts only to root), but doesn't remove.
+    fn purge(&mut self, obj: &Self::Id) -> Result<(), ()>;
     /// removes from node_map and purges.
     fn erase(&mut self, obj: &Self::Id) -> Result<(), ()>;
-    /// cuts all the links (except root), but doesn't remove.
-    fn purge(&mut self, obj: &Self::Id) -> Result<(), ()>;
 }
 
 
@@ -219,21 +222,26 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
     //         self.merge_flow(flow, des, nth)
     //     }).unwrap_or(Err(()))
     // }
-    /// removes from node_map and purges.
-    fn erase(&mut self, obj: &Id) -> Result<(), ()> {
-        let res = if &self.root == obj {
-            self.root().children.clear();
-            self.node_map.retain(|k, _| k == obj);
-            Ok(())
-        } else {
-            self.purge(obj).ok().map(|_|
-                self.node_map.remove(obj).map(|_|
-                    self.root().children.retain(|rooted| rooted != obj)
-                )
-            ).flatten().ok_or(())
-        };
-        if cfg!(debug_assertions) { self.check() };
-        res
+    /// decay the node by removing only its connection between 
+    /// its parent and itself; mounts the node to root.
+    fn decay(&mut self, obj: &Id) -> Result<(), ()> {
+        let parent = self.node(obj).map(|node| {
+            node.parent.clone()
+        }).flatten();
+        parent.map(|parent|
+            self.node_map.get_mut(&parent).map(|p_node| {
+                p_node.children.iter().position(|x| x == obj).map(|idx| {
+                    p_node.children.remove(idx)
+                })
+            })
+        ).flatten().map(|_| {
+            let root = self.root.clone();
+            self.root().children.retain(|x| x == obj);
+            self.root().children.push(obj.clone());
+            self.node_map.get_mut(obj).map(|node| {
+                node.parent = Some(root)
+            })
+        }).flatten().ok_or(())
     }
     /// cuts all the links related to the obj and resets obj to root, 
     /// but doesn't remove.
@@ -266,6 +274,22 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
         });
         if cfg!(debug_assertions) { self.check() };
         Ok(())
+    }
+    /// removes from node_map and purges.
+    fn erase(&mut self, obj: &Id) -> Result<(), ()> {
+        let res = if &self.root == obj {
+            self.root().children.clear();
+            self.node_map.retain(|k, _| k == obj);
+            Ok(())
+        } else {
+            self.purge(obj).ok().map(|_|
+                self.node_map.remove(obj).map(|_|
+                    self.root().children.retain(|rooted| rooted != obj)
+                )
+            ).flatten().ok_or(())
+        };
+        if cfg!(debug_assertions) { self.check() };
+        res
     }
 }
 
