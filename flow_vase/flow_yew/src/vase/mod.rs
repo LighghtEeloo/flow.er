@@ -72,6 +72,7 @@ impl Component for Vase {
         let cubes = vessel.get_cube_vec();
         let cube_vm_vec = Self::cube_vm_vec(cubes, &vessel, link.clone());
         if cfg!(debug_assertions) { log_obj("Vessel", &vessel); }
+        if cfg!(debug_assertions) { log::debug!("{}", vessel.concise_debug_string()) }
         Self {
             vessel,
             cube_vm_vec,

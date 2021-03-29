@@ -70,7 +70,7 @@ fn node(id: &EntityId, idx: usize, vessel: &Vessel, prefix: String, link: Compon
     let id = entity.id().clone();
     html! {
         <> 
-            <span>{prefix}{entity.face}</span>
+            <span style="font-family: mono">{prefix}{entity.face}</span>
             {btn::emerge(id, "".into(), link.clone())}
             {btn::dive(id, idx, "".into(), link.clone())}
             {btn::add(dude, owner, idx + 1, "".into(), link.clone())}

@@ -150,12 +150,22 @@ impl Vessel {
             Some(id)
             .map(|x| self.node(&x) ).flatten()
             .map(|x| x.parent ).flatten()
+        };
+        let des = {
+            owner
             .map(|x| self.node(&x) ).flatten()
             .map(|x| x.parent ).flatten()
         };
-        if let Some(owner) = owner {
+        let idx = {
+            des
+            .map(|x| self.node(&x) ).flatten()
+            .map(|x| 
+                x.children.iter().position(|&y| Some(y) == owner )
+            ).flatten().unwrap_or_default() 
+        };
+        if let Some(des) = des {
             if self.flow_arena.purge(&id).is_ok() {
-                self.entity_devote_push(id, owner)
+                self.entity_devote(id, des, idx + 1)
             }
         }
     }
