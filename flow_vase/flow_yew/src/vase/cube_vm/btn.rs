@@ -3,8 +3,6 @@ use flow_vessel::{CubeMeta, EntityId};
 
 use super::{Vase, Msg::*};
 
-
-
 pub fn ink(meta: CubeMeta, obj: EntityId, style: String, link: ComponentLink<Vase>) -> Html {
     html! {
         <button class="btn-ink btn-operate" style=style
@@ -59,5 +57,25 @@ pub fn emerge(id: EntityId, style: String, link: ComponentLink<Vase>) -> Html {
                 [EntityEmerge { id }]
             })
         >{"["}</button>
+    }
+}
+
+pub fn up(id: EntityId, style: String, link: ComponentLink<Vase>) -> Html {
+    html! {
+        <button class="btn-up btn-operate" style=style
+            onclick=link.callback(move |_| {
+                [EntityUp { id }]
+            })
+        >{"u"}</button>
+    }
+}
+
+pub fn down(id: EntityId, style: String, link: ComponentLink<Vase>) -> Html {
+    html! {
+        <button class="btn-down btn-operate" style=style
+            onclick=link.callback(move |_| {
+                [EntityDown { id }]
+            })
+        >{"d"}</button>
     }
 }

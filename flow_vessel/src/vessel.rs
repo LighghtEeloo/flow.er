@@ -122,7 +122,8 @@ impl Vessel {
     }
 }
 
-/// indents
+/// indent & move
+// Todo: unuse purge.
 impl Vessel {
     /// requires the id and its idx in node.children
     pub fn entity_dive(&mut self, id: EntityId, idx: usize) {
@@ -169,7 +170,51 @@ impl Vessel {
             }
         }
     }
-
+    pub fn entity_up(&mut self, id: EntityId) {
+        let owner = {
+            Some(id)
+            .map(|x| self.node(&x) ).flatten()
+            .map(|x| x.parent ).flatten()
+        };
+        let idx = {
+            owner
+            .map(|x| self.node(&x) ).flatten()
+            .map(|x| 
+                x.children.iter().position(|&y| y == id )
+            ).flatten().unwrap_or(0) 
+        };
+        if let Some(owner) = owner {
+            if idx > 0 && self.flow_arena.purge(&id).is_ok() {
+                self.entity_devote(id, owner, idx - 1)
+            }
+        }
+    }
+    pub fn entity_down(&mut self, id: EntityId) {
+        let owner  = {
+            Some(id)
+            .map(|x| self.node(&x) ).flatten()
+            .map(|x| x.parent ).flatten()
+        };
+        let len = {
+            owner
+            .map(|x| self.node(&x) ).flatten()
+            .map(|x| 
+                x.children.len()
+            ).unwrap_or_default() 
+        };
+        let idx = {
+            owner
+            .map(|x| self.node(&x) ).flatten()
+            .map(|x| 
+                x.children.iter().position(|&y| y == id )
+            ).flatten().unwrap_or(0) 
+        };
+        if let Some(owner) = owner {
+            if idx < len - 1 && self.flow_arena.purge(&id).is_ok() {
+                self.entity_devote(id, owner, idx + 1)
+            }
+        }
+    }
 }
 
 

@@ -71,6 +71,8 @@ fn node(id: &EntityId, idx: usize, vessel: &Vessel, prefix: String, link: Compon
     html! {
         <> 
             <span style="font-family: mono">{prefix}{entity.face}</span>
+            {btn::up(id, "".into(), link.clone())}
+            {btn::down(id, "".into(), link.clone())}
             {btn::emerge(id, "".into(), link.clone())}
             {btn::dive(id, idx, "".into(), link.clone())}
             {btn::add(dude, owner, idx + 1, "".into(), link.clone())}

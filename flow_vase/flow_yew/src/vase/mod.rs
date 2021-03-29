@@ -48,6 +48,12 @@ pub enum Msg {
     EntityEmerge {
         id: EntityId,
     },
+    EntityUp {
+        id: EntityId,
+    },
+    EntityDown {
+        id: EntityId,
+    },
     EntityDelete {
         id: EntityId
     },

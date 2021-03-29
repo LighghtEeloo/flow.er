@@ -47,6 +47,14 @@ impl Vase {
                 self.vessel.entity_decay(&id);
                 true
             }
+            EntityUp { id } => {
+                self.vessel.entity_up(id);
+                true
+            }
+            EntityDown { id } => {
+                self.vessel.entity_down(id);
+                true
+            }
 
             Refresh => false,
         }
