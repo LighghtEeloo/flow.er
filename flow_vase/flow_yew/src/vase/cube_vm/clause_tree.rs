@@ -25,8 +25,8 @@ impl ClauseNode {
                 { self.symbol_view(idx, &entity) }
                 { self.input_view(idx, &entity, owner) }
                 { btn_ink(meta.incr_new(), id, self.link.clone()) }
+                // { btn_add(id, owner, idx + 1, self.link.clone()) }
                 { btn_del(id, self.link.clone()) }
-                { btn_add(id, owner, idx + 1, self.link.clone()) }
             </div>
         }
     }
@@ -110,8 +110,12 @@ impl ClauseNode {
                 //             [Wander(vm_meta, Direction::Ascend, true)], 
                 //         (true, false, "ArrowDown") => vec!
                 //             [Wander(vm_meta, Direction::Descend, true)], 
-                //         // (false, false, "ArrowLeft") => vec![], 
-                //         // (false, false, "ArrowRight") => vec![], 
+                        (true, true, "ArrowUp") => vec![
+                            EntityUp { id }
+                        ], 
+                        (true, true, "ArrowDown") => vec![
+                            EntityDown { id }
+                        ], 
                         (true, false, "BracketRight") => vec![
                             EntityDive { id, idx }
                         ], 
@@ -408,7 +412,7 @@ impl ClauseTree {
                     })
                 />
                 { btn_ink(meta.incr_new(), id, link.clone()) }
-                { btn_add(id, id, 0, link.clone()) }
+                // { btn_add(id, id, 0, link.clone()) }
             </div>
         }
     }
@@ -419,7 +423,7 @@ fn btn_ink(meta: CubeMeta, obj: EntityId, link: ComponentLink<Vase>) -> Html {
     let style = "
         position: absolute; 
         top: 1px;
-        right: calc(2 * var(--size-button));
+        right: calc(1 * var(--size-button));
     ";
     btn::ink(meta, obj, style.into(), link)
 }
