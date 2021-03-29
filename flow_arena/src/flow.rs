@@ -48,6 +48,7 @@ pub trait Flow {
     /// inserts obj to node_map; err if exist
     fn grow(&mut self, obj: Self::Node) -> Result<(), ()>;
     /// link obj as a child of des at the nth place; 
+    /// automatically removes it from root.
     /// err if nth > len or no obj / des
     fn devote(&mut self, obj: &Self::Id, des: &Self::Id, nth: usize) -> Result<(), ()>;
     fn devote_push(&mut self, obj: &Self::Id, des: &Self::Id) -> Result<(), ()>;
