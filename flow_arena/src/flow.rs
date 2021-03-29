@@ -55,7 +55,7 @@ pub trait Flow {
     // fn merge_flow(&mut self, flow: Self, des: &Self::Id, nth: usize) -> Result<(), ()>;
     // fn merge_flow_push(&mut self, flow: Self, des: &Self::Id) -> Result<(), ()>;
     /// removes from node_map and purges.
-    fn decay(&mut self, obj: &Self::Id) -> Result<(), ()>;
+    fn erase(&mut self, obj: &Self::Id) -> Result<(), ()>;
     /// cuts all the links (except root), but doesn't remove.
     fn purge(&mut self, obj: &Self::Id) -> Result<(), ()>;
 }
@@ -220,7 +220,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
     //     }).unwrap_or(Err(()))
     // }
     /// removes from node_map and purges.
-    fn decay(&mut self, obj: &Id) -> Result<(), ()> {
+    fn erase(&mut self, obj: &Id) -> Result<(), ()> {
         let res = if &self.root == obj {
             self.root().children.clear();
             self.node_map.retain(|k, _| k == obj);
@@ -316,9 +316,9 @@ mod tests {
         wrapper("Devote 7->1", flow.devote(obj_vec[7].id(), obj_vec[1].id(), 0).is_ok(), &flow, aloud);
         wrapper("Devote 8->1", flow.devote(obj_vec[8].id(), obj_vec[1].id(), 0).is_ok(), &flow, aloud);
         wrapper("Devote 9->1", flow.devote(obj_vec[9].id(), obj_vec[1].id(), 0).is_ok(), &flow, aloud);
-        wrapper("Decay 4", flow.decay(obj_vec[4].id()).is_ok(), &flow, aloud);
+        wrapper("Erase 4", flow.erase(obj_vec[4].id()).is_ok(), &flow, aloud);
         wrapper("Purge 1", flow.purge(obj_vec[1].id()).is_ok(), &flow, aloud);
-        wrapper("Decay 1", flow.decay(obj_vec[1].id()).is_ok(), &flow, aloud);
+        wrapper("Erase 1", flow.erase(obj_vec[1].id()).is_ok(), &flow, aloud);
         if cfg!(debug_assertions) && aloud { println!("Checked."); flow.check() };
         flow
     }

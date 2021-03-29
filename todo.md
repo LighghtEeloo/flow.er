@@ -2,7 +2,8 @@
 - [x] (abort) merge_flow
 - [x] !! Fix decay.
 - [x] !! Fix cycle devote ([[a]] -> [[a]]).
-- [ ] ! More unit testings required.
+- [ ] decay - erase
+- [x] ! More unit testings required.
 
 ## flow_vessel
 - [ ] Settings

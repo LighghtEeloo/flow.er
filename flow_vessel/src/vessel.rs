@@ -84,8 +84,8 @@ impl Vessel {
         self.entity_duplicate(obj, dude)
     }
     /// removes entity from a flow_arena
-    pub fn entity_decay(&mut self, id: &EntityId) {
-        self.flow_arena.decay(id).ok();
+    pub fn entity_erase(&mut self, id: &EntityId) {
+        self.flow_arena.erase(id).ok();
         self.glass_refresh();
     }
 }
@@ -306,7 +306,7 @@ mod tests {
         println!("{:#?}", vessel.entity_list(&id[0]));
     }
     #[test]
-    fn entity_decay() {
+    fn entity_erase() {
         let (id, mut vessel) = make_vessel(5);
         vessel.flow_arena.devote_push(&id[1], &id[0]).ok();
         vessel.flow_arena.devote_push(&id[2], &id[0]).ok();
@@ -317,7 +317,7 @@ mod tests {
         //          `-------`-> id4
         vessel.entity_get_mut(&id[0]).map(|entity| entity.face = format!("Aloha!"));
         vessel.entity_get_mut(&id[1]).map(|entity| entity.face = format!("Bobi."));
-        vessel.entity_decay(&id[0]);
+        vessel.entity_erase(&id[0]);
         println!("{:#?}", vessel);
     }
     #[test]
@@ -373,8 +373,8 @@ mod tests {
                 let obj = retrive_random(&id);
                 match obj {
                     Some(obj) => {
-                        println!("Decay. {:?} ", obj);
-                        vessel.entity_decay(&obj);
+                        println!("Erase. {:?} ", obj);
+                        vessel.entity_erase(&obj);
                         id.retain(|x| x != &obj);
                     }
                     _ => ()
