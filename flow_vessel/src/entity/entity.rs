@@ -3,6 +3,7 @@ use serde::{Serialize, Deserialize};
 use crate::TimeNote;
 use super::identity::*;
 use super::tag::*;
+use super::filter::*;
 use super::symbol::*;
 
 
@@ -16,6 +17,8 @@ pub struct Entity {
     pub bubble: Bubble,
     pub symbol: Symbol,
     pub tags: TagSet,
+    #[serde(default)]
+    pub filter: Filter,
     pub blocked: bool,
     #[serde(skip)]
     pub symbol_toggle: bool,
@@ -36,6 +39,7 @@ impl Entity {
             bubble: Bubble::default(),
             symbol: Symbol::Linted(Lint::default()),
             tags: TagSet::default(),
+            filter: Filter::default(),
             blocked: false,
             symbol_toggle: false,
         }
