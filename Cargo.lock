@@ -306,7 +306,7 @@ dependencies = [
 
 [[package]]
 name = "flow_arena"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "indexmap",
  "serde",
@@ -319,7 +319,7 @@ version = "0.1.0"
 
 [[package]]
 name = "flow_er"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "flow_cli",
  "flow_yew",
@@ -327,7 +327,7 @@ dependencies = [
 
 [[package]]
 name = "flow_vessel"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "async-std",
  "chrono",

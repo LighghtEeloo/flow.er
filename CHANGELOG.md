@@ -1,5 +1,10 @@
 # Flow.er ChangeLog
 
+## Ver 0.3.2
+- fix! flow_arena.
+- test! demon test.
+- fix: better serde defaults.
+
 ## Ver 0.3.1
 - done! Symbol.
 - done: enter add.

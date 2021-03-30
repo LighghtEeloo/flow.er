@@ -4,6 +4,7 @@
 - [x] !! Fix cycle devote ([[a]] -> [[a]]).
 - [ ] decay - erase
 - [x] ! More unit testings required.
+- [ ] !! Get the logic of flow clear.
 
 ## flow_vessel
 - [ ] Settings
@@ -16,6 +17,8 @@
 - [x] (abort) no more is_empty
 - [ ] Markdown-like Bubble + node -> Bubble util.
   - [ ] Dry
+- [ ] more gui logic in vessel
+  - [ ] update & Msg
 
 ## flow_yew
 - [ ] hidable buttons
@@ -25,5 +28,4 @@
 - [x] completely replace and remove legacy version
 
 ## flow_cli
-- [ ] more gui logic in vessel
-
+- [ ] cli interface design

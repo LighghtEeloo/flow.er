@@ -1,6 +1,6 @@
 [package]
 name = "flow_vessel"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["LighghtEeloo <eelooecho@163.com>"]
 edition = "2018"
 repository = "https://github.com/LighghtEeloo/flow.er"
