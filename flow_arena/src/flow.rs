@@ -180,18 +180,14 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
                     if nth <= owner.children.len() {
                         owner.children.insert(nth, obj.clone());
                         Some(())
-                    } else {
-                        None
-                    }
-                })
-                .flatten()
+                    } else { None }
+                }).flatten()
                 .map(|x| {
                     self.node_map.get_mut(obj).map(|obj| {
                         obj.parent = Some(des.clone());
                     });
                     Some(x)
-                })
-                .flatten()
+                }).flatten()
         } else { None } .ok_or(());
         if cfg!(debug_assertions) { self.check() };
         res

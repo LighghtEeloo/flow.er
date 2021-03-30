@@ -39,7 +39,18 @@ impl ClauseNode {
                 self.process(id, process),
             (false, Symbol::Linted(lint)) =>
                 self.lint(id, idx, lint),
-            _ => {
+            (true, old) => {
+                let product = |old, x: Symbol| {
+                    match (old, x.clone()) {
+                        (Symbol::Linted(old), Symbol::Linted(_)) => {
+                            Symbol::Linted(old)
+                        }
+                        (Symbol::ProcessTracker(old), Symbol::ProcessTracker(_)) => {
+                            Symbol::ProcessTracker(old)
+                        }
+                        _ => x
+                    }
+                };
                 // list the toggle options
                 let contents: Html = html! {
                     <>
@@ -48,7 +59,7 @@ impl ClauseNode {
                                 [ EntityUpdate {
                                     id, 
                                     // id: id.clone(), 
-                                    field: EntityField::Symbol(Symbol::Linted(Lint::default()))
+                                    field: EntityField::Symbol(product(old, Symbol::Linted(Lint::default())))
                                 } ]
                             })
                         >
@@ -59,7 +70,7 @@ impl ClauseNode {
                                 [ EntityUpdate {
                                     id, 
                                     // id: id.clone(), 
-                                    field: EntityField::Symbol(Symbol::ProcessTracker(Process::default()))
+                                    field: EntityField::Symbol(product(old, Symbol::ProcessTracker(Process::default())))
                                 } ]
                             })
                         >

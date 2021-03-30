@@ -17,6 +17,7 @@ pub struct Entity {
     pub symbol: Symbol,
     pub tags: TagSet,
     pub blocked: bool,
+    #[serde(skip)]
     pub symbol_toggle: bool,
 }
 

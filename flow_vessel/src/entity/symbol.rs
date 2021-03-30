@@ -1,13 +1,13 @@
 use serde::{Serialize, Deserialize};
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub enum Symbol {
     ProcessTracker(Process),
     Linted(Lint),
-    Innocent
+    // Innocent
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub enum Process {
     Done,
     Marching,
@@ -47,7 +47,7 @@ impl Process {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub enum Lint {
     Numberic,
     Programmatic,
@@ -60,7 +60,7 @@ pub enum Lint {
     Square,
     Dash,
     
-    UnOrdered(String)
+    // UnOrdered(String)
 }
 
 impl Default for Lint {
@@ -81,7 +81,7 @@ impl Lint {
             Lint::Circle => {""}
             Lint::Square => {""}
             Lint::Dash => {""}
-            Lint::UnOrdered(_) => {""}
+            // Lint::UnOrdered(_) => {""}
         }
     }
     pub fn vec_all() -> Vec<Self> {
@@ -110,7 +110,7 @@ impl Lint {
             Circle => {"○".into()}
             Square => {"▣".into()}
             Dash => {"—".into()}
-            UnOrdered(s) => {s.into()}
+            // UnOrdered(s) => {s.into()}
             Programmatic | Upper | Lower | Greek => {
                 let mut s = String::from("");
                 let (size, chars) = BABEL[self.type_str()];
