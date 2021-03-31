@@ -1,4 +1,4 @@
-use super::{Cube, CubeType};
+use super::{Cube, CubeType, CubeView};
 
 pub struct Blank {
     pub alt: String,
@@ -22,3 +22,5 @@ impl From<Cube> for Blank {
         }
     }
 }
+
+impl CubeView for Blank {}

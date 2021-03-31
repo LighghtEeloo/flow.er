@@ -1,4 +1,4 @@
-use std::fmt::Debug;
+use std::{collections::HashSet, fmt::Debug};
 use serde::{Serialize, Deserialize};
 
 use super::{Entity, EntityId, EntityIdFactory, Node, Flow, FlowArena, Router, Glass, Cube, Settings};
@@ -95,18 +95,27 @@ impl Vessel {
     pub fn node(&self, id: &EntityId) -> Option<&EntityNode> {
         self.flow_arena.node(id)
     }
-    pub fn entity_list(&self, id: &EntityId) -> Vec<&Entity> {
-        let vec = self.flow_arena.node_map.get(id).map(|x| x.children.clone()).unwrap_or_default();
-        
-        vec.into_iter().filter_map(|id| self.flow_arena.node_map.get(&id)).map(|x| &x.entity).collect()
-    }
     /// get all entity_ids
     pub fn entity_id_all(&self) -> Vec<EntityId> {
         self.flow_arena.entities().map(|x|x.id().clone()).collect()
     }
-    /// Todo: get all entity_ids under id recrusively
-    pub fn entity_ids(&self, _id: &EntityId) -> Vec<EntityId> {
-        self.flow_arena.entities().map(|x|x.id().clone()).collect()
+    /// get all entity_ids under id directly
+    pub fn entity_id_direct(&self, obj: &EntityId) -> Vec<EntityId> {
+        self.flow_arena.node(obj).map_or(Vec::new(), |x| x.children.clone())
+    }
+    /// get all entity_ids under id recrusively
+    pub fn entity_ids(&self, obj: &EntityId) -> HashSet<EntityId> {
+        let mut set: HashSet<EntityId> = self.entity_id_direct(obj).into_iter().collect();
+        let mut new = set.clone();
+        while {
+            for obj in new.clone() {
+                new.extend(self.entity_id_direct(&obj));
+            }
+            new = new.difference(&set).into_iter().cloned().collect();
+            set.extend(new.iter().cloned());
+            new.is_empty()
+        } {}
+        set
     }
     /// search all entities for "face" match
     pub fn entity_face_filter(&self, face: String) -> Vec<EntityId> {
@@ -289,21 +298,6 @@ mod tests {
             vessel.entity_grow()
         ).collect();
         (id, vessel)
-    }
-    #[test]
-    fn entity_list() {
-        let (id, mut vessel) = make_vessel(5);
-        vessel.flow_arena.devote_push(&id[1], &id[0]).ok();
-        vessel.flow_arena.devote_push(&id[2], &id[0]).ok();
-        vessel.flow_arena.devote_push(&id[3], &id[0]).ok();
-        vessel.flow_arena.devote_push(&id[4], &id[0]).ok();
-        vessel.flow_arena.devote_push(&id[4], &id[1]).ok();
-        // 0_0 --> id --> [id1, id2, id3]
-        //          `-------`-> id4
-        vessel.entity_get_mut(&id[0]).map(|entity| entity.face = format!("Aloha!"));
-        println!("{:#?}", vessel);
-        println!("{:#?}", vessel.entity_get(&id[0]));
-        println!("{:#?}", vessel.entity_list(&id[0]));
     }
     #[test]
     fn entity_erase() {

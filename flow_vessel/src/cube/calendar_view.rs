@@ -1,4 +1,4 @@
-use super::{Cube, CubeType, now, SystemTime};
+use super::{Cube, CubeType, CubeView, SystemTime, now};
 
 pub struct CalendarView {
     pub current: SystemTime,
@@ -21,3 +21,5 @@ impl From<Cube> for CalendarView {
         }
     }
 }
+
+impl CubeView for CalendarView {}

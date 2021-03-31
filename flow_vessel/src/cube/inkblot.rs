@@ -1,5 +1,5 @@
-use crate::EntityId;
-use super::{Cube, CubeType};
+use crate::{EntityId};
+use super::{Cube, CubeType, CubeView};
 
 pub struct Inkblot {
     pub obj: EntityId
@@ -22,3 +22,5 @@ impl From<Cube> for Inkblot {
         }
     }
 }
+
+impl CubeView for Inkblot {}

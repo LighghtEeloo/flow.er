@@ -1,12 +1,12 @@
 use serde::{Serialize, Deserialize};
-use std::time::SystemTime;
+use std::{collections::HashSet, time::SystemTime};
 use flow_arena::Flow;
-use crate::{EntityFlow, EntityId, Router, now};
+use crate::{EntityFlow, EntityId, Router, Vessel, now};
 
 mod inkblot;
 mod clause_tree;
 mod promise_land {
-    use super::{Cube, CubeType};
+    use super::{Cube, CubeType, CubeView};
     pub struct PromisedLand;
     impl Into<Cube> for PromisedLand {
         fn into(self) -> Cube {
@@ -21,11 +21,12 @@ mod promise_land {
             Self
         }
     }
+    impl CubeView for PromisedLand {}
 }
 mod flow_view;
 mod calendar_view;
 mod time_view {
-    use super::{Cube, CubeType};
+    use super::{Cube, CubeType, CubeView};
     pub struct TimeView;
     impl Into<Cube> for TimeView {
         fn into(self) -> Cube {
@@ -40,9 +41,10 @@ mod time_view {
             Self
         }
     }
+    impl CubeView for TimeView {}
 }
 mod setting_view {
-    use super::{Cube, CubeType};
+    use super::{Cube, CubeType, CubeView};
     pub struct SettingView;
     impl Into<Cube> for SettingView {
         fn into(self) -> Cube {
@@ -57,6 +59,7 @@ mod setting_view {
             Self
         }
     }
+    impl CubeView for SettingView {}
 }
 mod blank;
 
@@ -159,5 +162,11 @@ impl CubeMeta {
             idx: self.idx + 1,
             ..self.clone()
         }
+    }
+}
+
+pub trait CubeView {
+    fn member_traverse(&self, _vessel: &Vessel) -> HashSet<EntityId> {
+        HashSet::new()
     }
 }

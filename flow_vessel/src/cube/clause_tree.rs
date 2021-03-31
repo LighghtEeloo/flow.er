@@ -1,5 +1,6 @@
-use super::{Cube, CubeType};
-use crate::EntityId;
+use std::collections::HashSet;
+use crate::{EntityId, Vessel};
+use super::{Cube, CubeType, CubeView};
 
 pub struct ClauseTree {
     pub obj: EntityId,
@@ -23,5 +24,11 @@ impl From<Cube> for ClauseTree {
             obj: cube.obj.unwrap_or_default(),
             current: cube.current_idx,
         }
+    }
+}
+
+impl CubeView for ClauseTree {
+    fn member_traverse(&self, vessel: &Vessel) -> HashSet<EntityId> {
+        vessel.entity_ids(&self.obj)
     }
 }
