@@ -18,7 +18,7 @@ pub struct Entity {
     pub symbol: Symbol,
     pub tags: TagSet,
     #[serde(default)]
-    pub filter: Filter,
+    pub filters: Vec<Filter>,
     pub blocked: bool,
     #[serde(skip)]
     pub symbol_toggle: bool,
@@ -39,7 +39,7 @@ impl Entity {
             bubble: Bubble::default(),
             symbol: Symbol::Linted(Lint::default()),
             tags: TagSet::default(),
-            filter: Filter::default(),
+            filters: Vec::new(),
             blocked: false,
             symbol_toggle: false,
         }
