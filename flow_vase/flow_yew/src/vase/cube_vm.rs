@@ -1,6 +1,6 @@
 use yew::{ComponentLink, Html, NodeRef, html};
 use std::{collections::HashMap};
-use flow_vessel::{Cube, CubeMember, CubeMeta, CubeType, EntityId, Vessel, cubes};
+use flow_vessel::{Cube, CubeMember, CubeMeta, CubeType, EntityId, Vessel, ViewMode, cubes};
 
 pub use super::{Vase, Msg, Msg::*};
 mod btn;
@@ -49,12 +49,13 @@ impl CubeVM {
         //     }).collect();
     }
     pub fn view(&self, vessel: &Vessel, per_width: f64) -> Html {
+        let desktop = ViewMode::Desktop == vessel.settings.view_mode;
         let meta = self.meta;
         let idx = meta.idx;
         let style = {
             format!("position: absolute; height: 100%;") 
             +&format!("width: {}%;", per_width) 
-            +&format!("left: {}%;", per_width * idx as f64) 
+            +&format!("left: {}%;", per_width * if desktop {idx} else {0} as f64) 
             +&{ if idx != 0 { format!("border-left: 2px solid gray;") } else { format!("") } }
         };
         let btn_close: Html = html! {

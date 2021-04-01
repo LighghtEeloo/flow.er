@@ -21,6 +21,9 @@ pub enum Msg {
     SwitchRouter {
         router: Router
     },
+    SettingUpdate {
+        settings: Settings
+    },
 
     // vm level
     OpenVM {

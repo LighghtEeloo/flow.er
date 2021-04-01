@@ -12,6 +12,10 @@ impl Vase {
                 self.cube_vm_vec = Vec::new();
                 true
             },
+            SettingUpdate { settings } => {
+                self.vessel.settings = settings;
+                true
+            }
 
             OpenVM { cube, meta } => {
                 self.vessel.glass.push_cube(cube.clone(), meta.router);
