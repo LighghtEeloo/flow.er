@@ -6,7 +6,7 @@ use super::{CubeView, Vase, Msg::*, btn};
 
 
 impl CubeView for FlowView {
-    fn view(&self, vessel: &Vessel, meta: CubeMeta, link: ComponentLink<Vase>) -> Html {
+    fn view(&self, vessel: &Vessel, meta: CubeMeta, link: ComponentLink<Vase>, ref_map: &HashMap<EntityId, NodeRef>) -> Html {
         node(&self.obj, 0, vessel, "--".into(), link.clone())
     }
 }

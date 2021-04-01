@@ -6,7 +6,7 @@ pub use super::{Vase, Msg, Msg::*};
 mod btn;
 
 mod inkblot;
-// mod clause_tree;
+mod clause_tree;
 mod flow_view;
 
 mod setting_view;
@@ -69,21 +69,36 @@ impl CubeVM {
         }
     }
     pub fn view_inner(&self, vessel: &Vessel) -> Html {
-        self.cube.view(vessel, self.meta, self.link.clone())
+        self.cube.view(vessel, self.meta, self.link.clone(), &self.ref_map)
     }
 }
 
 
 pub trait CubeView {
-    fn view(&self, vessel: &Vessel, meta: CubeMeta, link: ComponentLink<Vase>) -> Html;
+    fn view(&self, vessel: &Vessel, meta: CubeMeta, link: ComponentLink<Vase>, ref_map: &HashMap<EntityId, NodeRef>) -> Html;
 }
 
 impl CubeView for Cube {
-    fn view(&self, vessel: &Vessel, meta: CubeMeta, link: ComponentLink<Vase>) -> Html {
-        match self.cube_type {
+    fn view(&self, vessel: &Vessel, meta: CubeMeta, link: ComponentLink<Vase>, ref_map: &HashMap<EntityId, NodeRef>) -> Html {
+        let cube_type = self.cube_type;
+        let cube_view = match self.cube_type {
+            CubeType::Blank => {
+                let blank: cubes::Blank = self.clone().into();
+                html! {
+                    <div> {blank.alt} </div>
+                }
+            }
+            CubeType::Inkblot => {
+                let ink: cubes::Inkblot = self.clone().into();
+                ink.view(vessel, meta, link, ref_map)
+            }
+            CubeType::ClauseTree => {
+                let clause: cubes::ClauseTree = self.clone().into();
+                clause.view(vessel, meta, link, ref_map)
+            }
             CubeType::FlowView => {
                 let flow: cubes::FlowView = self.clone().into();
-                flow.view(vessel, meta, link.clone())
+                flow.view(vessel, meta, link.clone(), ref_map)
             }
             _ => {
                 html! {
@@ -108,6 +123,11 @@ impl CubeView for Cube {
                     </div>
                 }
             }
+        };
+        html! {
+            <div class={cube_type.type_str()}>
+                { cube_view }
+            </div>
         }
     }
 }

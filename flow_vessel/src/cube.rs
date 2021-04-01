@@ -1,5 +1,5 @@
 use serde::{Serialize, Deserialize};
-use std::{collections::HashSet, convert::TryInto, time::SystemTime};
+use std::{collections::HashSet, time::SystemTime};
 use flow_arena::Flow;
 use crate::{EntityFlow, EntityId, Router, Vessel, now};
 
@@ -97,6 +97,21 @@ pub enum CubeType {
 impl Default for CubeType {
     fn default() -> Self {
         CubeType::Blank 
+    }
+}
+
+impl CubeType {
+    pub fn type_str(&self) -> &'static str {
+        match self {
+            CubeType::Inkblot => "inkblot",
+            CubeType::ClauseTree => "clause-tree",
+            CubeType::PromisedLand => "promised-land",
+            CubeType::FlowView => "flow-view",
+            CubeType::CalendarView => "calendar-view",
+            CubeType::TimeView => "",
+            CubeType::SettingView => "setting-view",
+            CubeType::Blank => "blank",
+        }
     }
 }
 

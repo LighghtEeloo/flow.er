@@ -1,10 +1,11 @@
-use yew::{ComponentLink, Html, html, InputData};
-use flow_vessel::{Cube, CubeMeta, EntityField, EntityId, Vessel, cubes::Inkblot};
+use yew::{ComponentLink, Html, InputData, NodeRef, html};
+use std::collections::HashMap;
+use flow_vessel::{CubeMeta, EntityField, EntityId, Vessel, cubes::Inkblot};
 use super::{CubeView, Vase, Msg::*};
 
 
 impl CubeView for Inkblot {
-    fn view(&self, vessel: &Vessel, _: CubeMeta, link: ComponentLink<Vase>) -> Html {
+    fn view(&self, vessel: &Vessel, _: CubeMeta, link: ComponentLink<Vase>, _ref_map: &HashMap<EntityId, NodeRef>) -> Html {
         let entity = vessel.entity_get(&self.obj).cloned().expect("Host invalid.");
         let id = entity.id().clone();
         let link = link.clone();
