@@ -14,7 +14,7 @@ pub use entity::{
 };
 pub use cube::{Cube, CubeType, CubeMeta, CubeMember};
 pub use glass::{Glass, Router, cubes};
-pub use settings::{Settings, Bridge};
+pub use settings::{Settings, Bridge, ViewMode};
 pub use util::{
     json::{from_json, to_json, export_json},
     time::{TimeNote, TimeRep, display, now}

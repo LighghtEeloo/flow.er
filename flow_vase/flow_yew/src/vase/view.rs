@@ -1,5 +1,5 @@
 use yew::{html, Html};
-use flow_vessel::{Router, export_json};
+use flow_vessel::{Router, ViewMode, export_json};
 // use flow_vessel::display::*;
 use super::{Vase, Msg::*};
 
@@ -88,10 +88,20 @@ impl Vase {
 
 impl Vase {
     fn cube_vm_vec_view(&self) -> Vec<Html> {
-        let per_width = 100.0 / self.cube_vm_vec.len() as f64;
-        self.cube_vm_vec.iter().map(|cv| {
-            cv.view(&self.vessel, per_width)
-        }).collect()
+        match self.vessel.settings.view_mode.clone() {
+            ViewMode::Desktop => {
+                let per_width = 100.0 / self.cube_vm_vec.len() as f64;
+                self.cube_vm_vec.iter().map(|cv| {
+                    cv.view(&self.vessel, per_width)
+                }).collect()
+            }
+            _ => {
+                let last = self.cube_vm_vec.last();
+                if let Some(view) =last.map(|cv| cv.view(&self.vessel, 100.0)) {
+                    vec! [view]
+                } else { Vec::new() }
+            }
+        }
     }
 }
 

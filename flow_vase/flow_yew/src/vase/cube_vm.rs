@@ -105,6 +105,10 @@ impl CubeView for Cube {
                 let flow: cubes::FlowView = self.clone().into();
                 flow.view(vessel, meta, link.clone(), ref_map)
             }
+            CubeType::SettingView => {
+                let setting_view: cubes::SettingView = self.clone().into();
+                setting_view.view(vessel, meta, link, ref_map)
+            }
             _ => {
                 html! {
                     <div class="none">
