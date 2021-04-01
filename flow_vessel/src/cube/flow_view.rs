@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 use crate::{EntityId, Vessel};
-use super::{Cube, CubeType, CubeView};
+use super::{Cube, CubeType, CubeMember};
 
 pub struct FlowView {
     pub obj: EntityId,
@@ -27,7 +27,7 @@ impl From<Cube> for FlowView {
     }
 }
 
-impl CubeView for FlowView {
+impl CubeMember for FlowView {
     fn member_traverse(&self, vessel: &Vessel) -> HashSet<EntityId> {
         vessel.entity_ids(&self.obj)
     }

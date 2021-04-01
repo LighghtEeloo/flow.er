@@ -1,5 +1,6 @@
-use super::{Cube, CubeType, CubeView};
+use super::{Cube, CubeType, CubeMember};
 
+/// Blank with an empty String will be removed
 pub struct Blank {
     pub alt: String,
 }
@@ -23,4 +24,4 @@ impl From<Cube> for Blank {
     }
 }
 
-impl CubeView for Blank {}
+impl CubeMember for Blank {}

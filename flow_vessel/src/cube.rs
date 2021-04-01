@@ -1,12 +1,12 @@
 use serde::{Serialize, Deserialize};
-use std::{collections::HashSet, time::SystemTime};
+use std::{collections::HashSet, convert::TryInto, time::SystemTime};
 use flow_arena::Flow;
 use crate::{EntityFlow, EntityId, Router, Vessel, now};
 
 mod inkblot;
 mod clause_tree;
 mod promise_land {
-    use super::{Cube, CubeType, CubeView};
+    use super::{Cube, CubeType, CubeMember};
     pub struct PromisedLand;
     impl Into<Cube> for PromisedLand {
         fn into(self) -> Cube {
@@ -21,12 +21,12 @@ mod promise_land {
             Self
         }
     }
-    impl CubeView for PromisedLand {}
+    impl CubeMember for PromisedLand {}
 }
 mod flow_view;
 mod calendar_view;
 mod time_view {
-    use super::{Cube, CubeType, CubeView};
+    use super::{Cube, CubeType, CubeMember};
     pub struct TimeView;
     impl Into<Cube> for TimeView {
         fn into(self) -> Cube {
@@ -41,10 +41,10 @@ mod time_view {
             Self
         }
     }
-    impl CubeView for TimeView {}
+    impl CubeMember for TimeView {}
 }
 mod setting_view {
-    use super::{Cube, CubeType, CubeView};
+    use super::{Cube, CubeType, CubeMember};
     pub struct SettingView;
     impl Into<Cube> for SettingView {
         fn into(self) -> Cube {
@@ -59,7 +59,7 @@ mod setting_view {
             Self
         }
     }
-    impl CubeView for SettingView {}
+    impl CubeMember for SettingView {}
 }
 mod blank;
 
@@ -132,9 +132,10 @@ impl Cube {
             Router::Settings => SettingView.into(),
         }
     }
-    pub fn is_blank(&self) -> bool {
+    pub fn is_empty_blank(&self) -> bool {
         if let CubeType::Blank = self.cube_type {
-            true
+            let blank: Blank = self.clone().into();
+            blank.alt.is_empty()
         } else {
             false
         }
@@ -165,8 +166,48 @@ impl CubeMeta {
     }
 }
 
-pub trait CubeView {
+pub trait CubeMember {
     fn member_traverse(&self, _vessel: &Vessel) -> HashSet<EntityId> {
         HashSet::new()
+    }
+}
+
+impl CubeMember for Cube {
+    fn member_traverse(&self, vessel: &Vessel) -> HashSet<EntityId> {
+        let cube = self.clone();
+        match self.cube_type {
+            CubeType::Inkblot => {
+                let cu: Inkblot = cube.into();
+                cu.member_traverse(vessel)
+            }
+            CubeType::ClauseTree => {
+                let cu: ClauseTree = cube.into();
+                cu.member_traverse(vessel)
+            }
+            CubeType::PromisedLand => {
+                let cu: PromisedLand = cube.into();
+                cu.member_traverse(vessel)
+            }
+            CubeType::FlowView => {
+                let cu: FlowView = cube.into();
+                cu.member_traverse(vessel)
+            }
+            CubeType::CalendarView => {
+                let cu: CalendarView = cube.into();
+                cu.member_traverse(vessel)
+            }
+            CubeType::TimeView => {
+                let cu: TimeView = cube.into();
+                cu.member_traverse(vessel)
+            }
+            CubeType::SettingView => {
+                let cu: SettingView = cube.into();
+                cu.member_traverse(vessel)
+            }
+            CubeType::Blank => {
+                let cu: Blank = cube.into();
+                cu.member_traverse(vessel)
+            }
+        }
     }
 }

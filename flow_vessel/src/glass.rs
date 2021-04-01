@@ -163,7 +163,7 @@ impl Glass {
     /// is_valid and is_blank check
     fn clean(&mut self, flow: &EntityFlow) {
         let _: Vec<()> = self.map.iter_mut().map(|(&router, vec)| {
-            vec.retain(|x| !x.is_blank() && x.is_valid(flow) );
+            vec.retain(|x| !x.is_empty_blank() && x.is_valid(flow) );
             if vec.is_empty() {
                 vec.push(Cube::new(router))
             }

@@ -12,7 +12,7 @@ pub use entity::{
     tag::{Tag, TagSet, TagSetField},
     entity::{Entity, EntityField, Face, Bubble},
 };
-pub use cube::{Cube, CubeType, CubeMeta};
+pub use cube::{Cube, CubeType, CubeMeta, CubeMember};
 pub use glass::{Glass, Router, cubes};
 pub use settings::{Settings, Bridge};
 pub use util::{
