@@ -1,6 +1,6 @@
 use yew::{ComponentLink, Html, InputData, KeyboardEvent, NodeRef, html};
 use std::collections::HashMap;
-use flow_vessel::{CubeMeta, Entity, EntityField, EntityId, Lint, Process, Symbol, Vessel, cubes::ClauseTree};
+use flow_vessel::{CubeMeta, Entity, EntityField, EntityId, EntityNode, Lint, Process, Symbol, Vessel, cubes::ClauseTree};
 use super::{CubeView, Msg::*, Vase, btn};
 
 #[derive(Clone)]
@@ -11,21 +11,19 @@ pub struct ClauseNode {
 
 
 impl ClauseNode {
-    pub fn view(&self, idx: usize, entity: &Entity, node_ref: NodeRef, owner: EntityId, meta: CubeMeta) -> Html {
+    pub fn view(&self, idx: usize, entity: &Entity, node_ref: NodeRef, owner: EntityId, meta: CubeMeta, indent: usize) -> Html {
         let id = entity.id().clone();
         html! {
             <div class="node">
-                { self.symbol_view(idx, &entity) }
-                { self.input_view(idx, &entity, node_ref, owner) }
+                { self.symbol_view(idx, &entity, indent) }
+                { self.input_view(idx, &entity, node_ref, owner, indent) }
                 { btn_ink(meta.incr_new(), id, self.link.clone()) }
                 // { btn_add(id, owner, idx + 1, self.link.clone()) }
                 { btn_del(id, self.link.clone()) }
             </div>
         }
     }
-    fn symbol_view(&self, idx: usize, entity: &Entity) -> Html {
-        let indent_base = 0;
-        let indent = indent_base;
+    fn symbol_view(&self, idx: usize, entity: &Entity, indent: usize) -> Html {
         let id = entity.id().clone();
         let symbol = match (entity.symbol_toggle, entity.symbol.clone()) {
             (false, Symbol::ProcessTracker(process)) => 
@@ -86,9 +84,8 @@ impl ClauseNode {
             </div> 
         }
     }
-    fn input_view(&self, idx: usize, entity: &Entity, node_ref: NodeRef, owner: EntityId) -> Html {
-        let indent_base = 0;
-        let indent = indent_base + 1;
+    fn input_view(&self, idx: usize, entity: &Entity, node_ref: NodeRef, owner: EntityId, indent: usize) -> Html {
+        let indent = indent + 1;
         let id = entity.id().clone();
         let style = 
             format!("width: calc(100% - {} * var(--size-button) - var(--horizontal-margin) * 2);", indent);
@@ -321,18 +318,12 @@ impl CubeView for ClauseTree {
         let nodes_view: Vec<Html> = vessel.node(&self.obj).expect("node exists")
             .children.iter().enumerate()
             .map(|(idx, &id)| {
-                let node = ClauseNode {
+                let clause_node = ClauseNode {
                     id,
                     link: link.clone(),
                 };
-                let node_ref = ref_map.get(&id).cloned().unwrap_or_default();
-                node.view(
-                    idx, 
-                    vessel.entity_get(&node.id).expect("must exist"), 
-                    node_ref,
-                    self.obj,
-                    meta
-                )
+                let node = vessel.node(&clause_node.id).expect("must exist");
+                node_view(clause_node, vessel, idx, node, self.obj, ref_map, meta, 0)
             }).collect();
         html! {
             <>
@@ -340,6 +331,43 @@ impl CubeView for ClauseTree {
                 <div class="node-view"> { nodes_view } </div>
             </>
         }
+    }
+}
+
+fn node_view(
+    clause_node: ClauseNode, 
+    vessel: &Vessel,
+    idx: usize, 
+    node: &EntityNode, 
+    owner: EntityId,
+    ref_map: &HashMap<EntityId, NodeRef>, 
+    meta: CubeMeta, 
+    indent: usize
+) -> Html {
+    let node_ref = ref_map.get(node.entity.id()).cloned().unwrap_or_default();
+    let clause_node_view = clause_node.view(
+        idx, 
+        &node.entity, 
+        node_ref,
+        owner,
+        meta,
+        indent,
+    );
+    // Note: no larger than 5.
+    let children_view: Vec<Html> = if indent < 5 {
+        node.children.iter().enumerate().map(|(idx, &id)| {
+            let clause_node = ClauseNode {
+                id,
+                link: clause_node.link.clone(),
+            };
+            let node = vessel.node(&clause_node.id).expect("must exist");
+            node_view(clause_node, vessel, idx, node, owner, ref_map, meta, indent + 1)
+        }).collect() } else { Vec::new() };
+    html! {
+        <>
+            { clause_node_view }
+            { children_view }
+        </>
     }
 }
 
