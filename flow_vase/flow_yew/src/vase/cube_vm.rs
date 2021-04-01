@@ -1,12 +1,12 @@
 use yew::{ComponentLink, Html, NodeRef, html};
 use std::{collections::HashMap};
-use flow_vessel::{Cube, CubeMember, CubeMeta, EntityId, Vessel};
+use flow_vessel::{Cube, CubeMember, CubeMeta, CubeType, EntityId, Vessel, cubes};
 
 pub use super::{Vase, Msg, Msg::*};
 mod btn;
 
 mod inkblot;
-mod clause_tree;
+// mod clause_tree;
 mod flow_view;
 
 mod setting_view;
@@ -69,36 +69,46 @@ impl CubeVM {
         }
     }
     pub fn view_inner(&self, vessel: &Vessel) -> Html {
-        self.cube.view(vessel, self.meta)
+        self.cube.view(vessel, self.meta, self.link.clone())
     }
 }
 
 
 pub trait CubeView {
-    fn view(&self, vessel: &Vessel, meta: CubeMeta) -> Html {
-        html! {
-            <div class="none">
-                <>{"Not implemented."}</>
-                <pre style="
-                    position: absolute;
-                    height: 90%; 
-                    top: 0;
-                    bottom: 0;
-                    width: 60%;
-                    right: 5%;
-                    overflow: scroll;
-                    margin: auto 0;
-                    padding: 12px;
-                    border: solid 6px green;
-                    border-radius: 10px;
-                    // font-family: 
-                ">
-                    {&*format!("{:#?}", vessel)}
-                </pre>
-            </div>
+    fn view(&self, vessel: &Vessel, meta: CubeMeta, link: ComponentLink<Vase>) -> Html;
+}
+
+impl CubeView for Cube {
+    fn view(&self, vessel: &Vessel, meta: CubeMeta, link: ComponentLink<Vase>) -> Html {
+        match self.cube_type {
+            CubeType::FlowView => {
+                let flow: cubes::FlowView = self.clone().into();
+                flow.view(vessel, meta, link.clone())
+            }
+            _ => {
+                html! {
+                    <div class="none">
+                        <>{"Not implemented."}</>
+                        <pre style="
+                            position: absolute;
+                            height: 90%; 
+                            top: 0;
+                            bottom: 0;
+                            width: 60%;
+                            right: 5%;
+                            overflow: scroll;
+                            margin: auto 0;
+                            padding: 12px;
+                            border: solid 6px green;
+                            border-radius: 10px;
+                            // font-family: 
+                        ">
+                            {&*format!("{:#?}", vessel)}
+                        </pre>
+                    </div>
+                }
+            }
         }
     }
 }
-
-impl CubeView for Cube {}
 

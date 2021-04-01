@@ -1,18 +1,13 @@
 use yew::{ComponentLink, Html, html, InputData};
-use flow_vessel::{Cube, CubeMeta, EntityField, EntityId, Vessel};
+use flow_vessel::{Cube, CubeMeta, EntityField, EntityId, Vessel, cubes::Inkblot};
 use super::{CubeView, Vase, Msg::*};
 
-#[derive(Clone)]
-pub struct Inkblot {
-    obj: EntityId,
-    link: ComponentLink<Vase>
-}
 
 impl CubeView for Inkblot {
-    fn view(&self, vessel: &Vessel, _: CubeMeta) -> Html {
+    fn view(&self, vessel: &Vessel, _: CubeMeta, link: ComponentLink<Vase>) -> Html {
         let entity = vessel.entity_get(&self.obj).cloned().expect("Host invalid.");
         let id = entity.id().clone();
-        let link = self.link.clone();
+        let link = link.clone();
         html! {
             <div class="inkblot">
                 <div class="head">

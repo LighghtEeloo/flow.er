@@ -1,19 +1,13 @@
 use std::collections::HashMap;
 
 use yew::{ComponentLink, Html, InputData, NodeRef, html};
-use flow_vessel::{Cube, CubeMeta, EntityField, EntityId, Vessel};
+use flow_vessel::{Cube, CubeMeta, EntityField, EntityId, Vessel, cubes::FlowView};
 use super::{CubeView, Vase, Msg::*, btn};
 
-#[derive(Clone)]
-pub struct FlowView {
-    obj: EntityId,
-    link: ComponentLink<Vase>,
-    node_ref_map: HashMap<EntityId, NodeRef>
-}
 
 impl CubeView for FlowView {
-    fn view(&self, vessel: &Vessel, meta: CubeMeta) -> Html {
-        node(&self.obj, 0, vessel, "--".into(), self.link.clone())
+    fn view(&self, vessel: &Vessel, meta: CubeMeta, link: ComponentLink<Vase>) -> Html {
+        node(&self.obj, 0, vessel, "--".into(), link.clone())
     }
 }
 
