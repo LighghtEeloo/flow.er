@@ -9,6 +9,8 @@ mod inkblot;
 mod clause_tree;
 mod flow_view;
 
+mod setting_view;
+
 pub struct CubeVM {
     pub meta: CubeMeta,
     pub view: CubeView,

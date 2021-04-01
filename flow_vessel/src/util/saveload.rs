@@ -1,14 +1,18 @@
-use crate::Vessel;
+use futures::TryFutureExt;
+
+use crate::{Vessel, Bridge};
 
 #[derive(Debug, Clone)]
 pub enum LoadError {
     FileError,
+    WebError,
     FormatError,
 }
 
 #[derive(Debug, Clone)]
 pub enum SaveError {
     FileError,
+    WebError,
     WriteError,
     FormatError,
 }
@@ -42,7 +46,9 @@ impl Vessel {
             .await
             .map_err(|_| LoadError::FileError)?;
 
-        serde_json::from_str(&contents).map_err(|_| LoadError::FormatError)
+        let vessel = serde_json::from_str(&contents).map_err(|_| LoadError::FormatError)?;
+
+        Ok(vessel)
     }
 
     pub async fn save(self) -> Result<(), SaveError> {
@@ -78,15 +84,13 @@ impl Vessel {
 #[cfg(target_arch = "wasm32")]
 impl Vessel {
     fn storage() -> Option<web_sys::Storage> {
-        // web_sys::console::log_1(&"Storage".into());
         let window = web_sys::window()?;
 
         window.local_storage().ok()?
     }
 
-    pub async fn load() -> Result<Vessel, LoadError> {
-        // web_sys::console::log_1(&"loading...".into());
-        log::trace!("loading...");
+    async fn load_local() -> Result<Vessel, LoadError> {
+        log::debug!("loading...");
         let storage = Self::storage().ok_or(LoadError::FileError)?;
 
         let contents = storage
@@ -95,11 +99,37 @@ impl Vessel {
             .ok_or(LoadError::FileError)?;
 
         serde_json::from_str(&contents).map_err(|_| LoadError::FormatError)
+    } 
+
+    async fn load_linked(addr: String, port: u16) -> Result<Vessel, LoadError> {
+        log::debug!("loading linked...");
+        Err(LoadError::WebError)
+    }
+
+    pub async fn load() -> Result<Vessel, LoadError> {
+        let vessel: Vessel = Self::load_local().await.or_else(|load_error| {
+            if let LoadError::FileError = load_error {
+                Ok(Vessel::default())
+            } else { Err(load_error) }
+        })?;
+
+        let bridge = vessel.settings.bridge.clone();
+
+        let vessel = if let Bridge::Linked { addr, port } = bridge {
+            Self::load_linked(addr, port).await.or_else(|load_error|
+                if let LoadError::WebError = load_error {
+                    Ok(vessel)
+                } else {
+                    Err(load_error)
+                }
+            )?
+        } else { vessel };
+
+        Ok(vessel)
     }
 
     pub async fn save(self) -> Result<(), SaveError> {
-        // web_sys::console::log_1(&"saving...".into());
-        log::trace!("saving...");
+        log::debug!("saving...");
         let storage = Self::storage().ok_or(SaveError::FileError)?;
 
         let json = serde_json::to_string_pretty(&self).map_err(|_| SaveError::FormatError)?;
