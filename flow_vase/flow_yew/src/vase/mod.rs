@@ -106,7 +106,6 @@ impl Component for Vase {
             false
         } else {
             // clean the glass
-            // Todo: deprecated. Auto clean done.
             self.vessel.glass_refresh();
             // if not equal in num then rebuild; else update
             let cubes = self.vessel.get_cube_vec();

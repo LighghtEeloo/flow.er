@@ -17,6 +17,7 @@ impl ClauseNode {
             <div class="node">
                 { self.symbol_view(idx, &entity, indent) }
                 { self.input_view(idx, &entity, node_ref, owner, indent) }
+                { btn_block(id, self.link.clone()) }
                 { btn_ink(meta.incr_new(), id, self.link.clone()) }
                 // { btn_add(id, owner, idx + 1, self.link.clone()) }
                 { btn_del(id, self.link.clone()) }
@@ -354,7 +355,7 @@ fn node_view(
         indent,
     );
     // Note: no larger than 5.
-    let children_view: Vec<Html> = if indent < 5 {
+    let children_view: Vec<Html> = if indent < 5 && !node.entity.blocked {
         node.children.iter().enumerate().map(|(idx, &id)| {
             let clause_node = ClauseNode {
                 id,
@@ -369,6 +370,15 @@ fn node_view(
             { children_view }
         </>
     }
+}
+
+fn btn_block(id: EntityId, link: ComponentLink<Vase>) -> Html {
+    let style = "
+        position: absolute; 
+        top: 1px;
+        right: calc(2 * var(--size-button));
+    ";
+    btn::block(id, style.into(), link)
 }
 
 fn btn_ink(meta: CubeMeta, obj: EntityId, link: ComponentLink<Vase>) -> Html {

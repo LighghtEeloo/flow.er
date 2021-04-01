@@ -9,9 +9,9 @@
 ## flow_vessel
 - [ ] Settings
   - [ ] Saving Options.
-- [ ] formatted ClauseTree
-  - [ ] ! Entity view-block
-  - [ ] auto indent
+- [x] formatted ClauseTree
+  - [x] ! Entity view-block
+  - [x] auto indent
   - [x] symbol system
     - [x] lint display
 - [x] (abort) no more is_empty

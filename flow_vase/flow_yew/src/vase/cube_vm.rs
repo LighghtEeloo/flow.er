@@ -42,6 +42,11 @@ impl CubeVM {
     }
     pub fn update(&mut self, idx: usize, cube: &Cube, vessel: &Vessel) {
         self.meta.idx = idx;
+        // Todo: member_traverse.
+        // self.ref_map = cube.member_traverse(vessel)
+        //     .into_iter().map(|obj| {
+        //         (obj, NodeRef::default())
+        //     }).collect();
     }
     pub fn view(&self, vessel: &Vessel, per_width: f64) -> Html {
         let meta = self.meta;

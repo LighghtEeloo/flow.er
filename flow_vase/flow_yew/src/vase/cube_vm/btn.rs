@@ -1,5 +1,5 @@
 use yew::{ComponentLink, Html, html};
-use flow_vessel::{CubeMeta, EntityId};
+use flow_vessel::{CubeMeta, EntityField, EntityId};
 
 use super::{Vase, Msg::*};
 
@@ -77,5 +77,18 @@ pub fn down(id: EntityId, style: String, link: ComponentLink<Vase>) -> Html {
                 [EntityDown { id }]
             })
         >{"d"}</button>
+    }
+}
+
+pub fn block(id: EntityId, style: String, link: ComponentLink<Vase>) -> Html {
+    html! {
+        <button class="btn-block btn-operate" style=style
+            onclick=link.callback(move |_| {
+                [EntityUpdate {
+                    id,
+                    field: EntityField::Blocked 
+                }]
+            })
+        >{"o"}</button>
     }
 }
