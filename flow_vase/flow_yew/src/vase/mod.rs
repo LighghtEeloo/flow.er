@@ -142,9 +142,9 @@ impl Component for Vase {
 impl Vase {
     fn cube_vm_vec(cubes: Vec<Cube>, vessel: &Vessel, link: ComponentLink<Vase>) -> Vec<CubeVM> {
         cubes.iter().enumerate()
-            .map(|(idx,cube)| CubeVM::new(
+            .map(|(idx, cube)| CubeVM::new(
                 idx, 
-                cube, 
+                cube.clone(), 
                 vessel, 
                 link.clone()
             )).collect()

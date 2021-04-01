@@ -1,6 +1,6 @@
 use yew::{ComponentLink, Html, InputData, KeyboardEvent, NodeRef, html};
 use flow_vessel::{Cube, CubeMeta, Entity, EntityField, EntityId, EntityNode, Lint, Process, Symbol, Vessel};
-use super::{Vase, Msg::*, CubeView, btn};
+use super::{CubeView, Msg::*, Vase, btn};
 
 #[derive(Clone)]
 pub struct ClauseNode {
@@ -18,7 +18,7 @@ impl ClauseNode {
             node_ref: NodeRef::default(),
         }
     }
-    pub fn view(&self, idx: usize, entity: &Entity, owner: EntityId, meta: &CubeMeta) -> Html {
+    pub fn view(&self, idx: usize, entity: &Entity, owner: EntityId, meta: CubeMeta) -> Html {
         let id = entity.id().clone();
         html! {
             <div class="node">
@@ -275,105 +275,10 @@ pub struct ClauseTree {
 }
 
 impl ClauseTree {
-    pub fn new_cube(entity_node: &EntityNode, current: Option<usize>, link: ComponentLink<Vase>) -> CubeView {
-        let mut nodes = Vec::new();
-        let id = entity_node.entity.id();
-        for id in entity_node.children.iter() {
-            nodes.push(ClauseNode::new_cube(id.clone(), link.clone()))
-        }
-        let clause = Self {
-            current,
-            head: ClauseNode::new_cube(id.clone(), link),
-            nodes
-        };
-        CubeView::ClauseTree {
-            clause
-        }
-    }
     pub fn head_id(&self) -> EntityId {
         self.head.id
     }
-    pub fn update_new(mut self, _cube: &Cube, vessel: &Vessel) -> CubeView {
-        let entity_node =  vessel.node(&self.head_id());
-        if let Some(entity_node) = entity_node {
-            let link = self.head.link.clone();
-            let correct = &entity_node.children;
-            let _target = self.nodes.clone();
-            // self.nodes = ClauseTree::_update_rebuild(correct, link);
-            self.nodes = ClauseTree::_update_iter_impl(_target, correct, link);
-            CubeView::ClauseTree { clause: self }
-        } else {
-            CubeView::default()
-        }
-    }
-    fn _update_rebuild(correct: &Vec<EntityId>, link: ComponentLink<Vase>) -> Vec<ClauseNode> {
-        correct.iter().map(|id| {
-            ClauseNode::new_cube(id.clone(), link.clone())
-        }).collect()
-    }
-    fn _update_iter_impl(mut target: Vec<ClauseNode>, correct: &Vec<EntityId>, link: ComponentLink<Vase>) -> Vec<ClauseNode> {
-        // final effect: correct is identical to target
-        for (i, c) in correct.iter().enumerate() {
-            match target.get(i) {
-                Some(node) => {
-                    if &node.id != c {
-                        let mut rest = target.iter().skip(i+1);
-                        if rest.find(|&node| &node.id == c).is_some() {
-                            while {
-                                let res = target.get(i)
-                                    .and_then(|node| {
-                                        if &node.id != c {
-                                            let mut node = node.clone();
-                                            node.id = c.clone();
-                                            Some(node)
-                                        } else {
-                                            None
-                                        }
-                                    }); 
-                                res.is_some()
-                            } {
-                                target.remove(i);
-                            }
-                        }
-                        if let Some(node) = target.get(i) {
-                            if &node.id != c {
-                                let mut node = node.clone();
-                                node.id = c.clone();
-                                target.insert(i, node);
-                            }
-                        }
-                    } else {
-                        ()
-                    }
-                },
-                None => {
-                    let node = ClauseNode::new_cube(c.clone(), link.clone());
-                    target.insert(i, node);
-                }
-            }
-        }
-        target.truncate(correct.len());
-        target
-    }
-    pub fn view(&self, vessel: &Vessel, meta: &CubeMeta) -> Html {
-        let nodes_view: Vec<Html> = self.nodes.iter().enumerate()
-            .map(|(idx, node)| {
-                node.view(
-                    idx, 
-                    vessel.entity_get(&node.id).expect("must exist"), 
-                    self.head.id,
-                    meta
-                )
-            }).collect();
-        html! {
-            <>
-                { self.head_view(vessel, meta) }
-                <div class="node-view"> { nodes_view } </div>
-            </>
-        }
-    }
-
-    fn head_view(&self, vessel: &Vessel, meta: &CubeMeta) -> Html {
+    fn head_view(&self, vessel: &Vessel, meta: CubeMeta) -> Html {
         let id = self.head_id();
         let entity = vessel.entity_get(&id).expect("Host doesn't exist.");
         let link = self.head.link.clone();
@@ -429,6 +334,26 @@ impl ClauseTree {
     }
 }
 
+
+impl CubeView for ClauseTree {
+    fn view(&self, vessel: &Vessel, meta: CubeMeta) -> Html {
+        let nodes_view: Vec<Html> = self.nodes.iter().enumerate()
+            .map(|(idx, node)| {
+                node.view(
+                    idx, 
+                    vessel.entity_get(&node.id).expect("must exist"), 
+                    self.head.id,
+                    meta
+                )
+            }).collect();
+        html! {
+            <>
+                { self.head_view(vessel, meta) }
+                <div class="node-view"> { nodes_view } </div>
+            </>
+        }
+    }
+}
 
 fn btn_ink(meta: CubeMeta, obj: EntityId, link: ComponentLink<Vase>) -> Html {
     let style = "
