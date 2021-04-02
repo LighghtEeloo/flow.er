@@ -2,11 +2,13 @@
 - [x] (abort) merge_flow
 - [x] !! Fix decay.
 - [x] !! Fix cycle devote ([[a]] -> [[a]]).
-- [ ] decay - erase
 - [x] ! More unit testings required.
-- [ ] !! Get the logic of flow clear.
+- [x] !! Get the logic of flow clear.
+- [ ] ! Relation Compiler.
+- [ ] decay - erase
 
 ## flow_vessel
+- [ ] ! Tree Checker.
 - [ ] Settings
   - [ ] Saving Options.
 - [x] formatted ClauseTree
@@ -24,7 +26,7 @@
 - [ ] hidable buttons
 - [ ] add vm
 - [ ] swap vms
-- [ ] ! mobile-view single vm (show the last one)
+- [x] ! mobile-view single vm (show the last one)
 - [x] completely replace and remove legacy version
 
 ## flow_cli
