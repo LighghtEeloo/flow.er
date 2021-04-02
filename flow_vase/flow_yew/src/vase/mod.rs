@@ -1,11 +1,10 @@
+use yew::{Component, ComponentLink, Html, ShouldRender};
+use flow_vessel::*;
+
 mod update;
 mod view;
 mod cube_vm;
 
-use yew::{Component, ComponentLink, Html, ShouldRender};
-use flow_vessel::*;
-
-use super::log_obj;
 use cube_vm::CubeVM;
 
 
@@ -80,7 +79,6 @@ impl Component for Vase {
         // */
         let cubes = vessel.get_cube_vec();
         let cube_vm_vec = Self::cube_vm_vec(cubes, &vessel, link.clone());
-        if cfg!(debug_assertions) { log_obj("Vessel", &vessel); }
         if cfg!(debug_assertions) { log::debug!("{}", vessel.concise_debug_string()) }
         Self {
             vessel,
@@ -91,7 +89,7 @@ impl Component for Vase {
 
     fn update(&mut self, msg_queue: Self::Message) -> ShouldRender {
         if msg_queue.len() == 0 { return false }
-        if cfg!(debug_assertions) { log_obj("Update", &msg_queue); }
+        if cfg!(debug_assertions) { log::debug!("Update: {:#?}", msg_queue); }
         let mut msg_visitor = msg_queue.into_iter();
         while {
             let next = msg_visitor.next();
