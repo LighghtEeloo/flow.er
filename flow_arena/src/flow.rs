@@ -106,7 +106,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
                     .unwrap_or_default();
                 wait_set.extend(children);
             }
-            final_set.extend(visit_set.iter().cloned());
+            final_set.extend(wait_set.iter().cloned());
             visit_set.clear();
             visit_set.extend(wait_set);
         }

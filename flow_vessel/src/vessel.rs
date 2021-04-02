@@ -105,17 +105,7 @@ impl Vessel {
     }
     /// get all entity_ids under id recrusively
     pub fn entity_ids(&self, obj: &EntityId) -> HashSet<EntityId> {
-        let mut set: HashSet<EntityId> = self.entity_id_direct(obj).into_iter().collect();
-        let mut new = set.clone();
-        while {
-            for obj in new.clone() {
-                new.extend(self.entity_id_direct(&obj));
-            }
-            new = new.difference(&set).into_iter().cloned().collect();
-            set.extend(new.iter().cloned());
-            new.is_empty()
-        } {}
-        set
+        self.flow_arena.node_offspring_list(obj)
     }
     /// search all entities for "face" match
     pub fn entity_face_filter(&self, face: String) -> Vec<EntityId> {
@@ -313,6 +303,22 @@ mod tests {
         vessel.entity_get_mut(&id[1]).map(|entity| entity.face = format!("Bobi."));
         vessel.entity_erase(&id[0]);
         println!("{:#?}", vessel);
+    }
+    #[test]
+    fn node_offspring() {
+        let (id, mut vessel) = make_vessel(5);
+        for i in 0..5 {
+            println!("{}: {:?}", i, id[i]);
+        }
+        vessel.flow_arena.devote_push(&id[1], &id[0]).ok();
+        vessel.flow_arena.devote_push(&id[2], &id[0]).ok();
+        vessel.flow_arena.devote_push(&id[3], &id[0]).ok();
+        vessel.flow_arena.devote_push(&id[4], &id[0]).ok();
+        vessel.flow_arena.devote_push(&id[4], &id[1]).ok();
+        vessel.flow_arena.devote_push(&id[3], &id[4]).ok();
+        // 0_0 --> id --> [id1, id2, id3]
+        //          `-------`-> id4 -/
+        println!("{:?}", vessel.flow_arena.node_offspring_list(&id[0]));
     }
     #[test]
     fn serde() {
