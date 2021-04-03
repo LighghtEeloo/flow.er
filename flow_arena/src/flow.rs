@@ -66,6 +66,8 @@ pub trait FlowMap {
     fn root(&mut self) -> &mut Self::Node;
     /// no check
     fn node(&self, obj: &Self::Id) -> Option<&Self::Node>;
+    /// no check
+    fn node_mut(&mut self, obj: &Self::Id) -> Option<&mut Self::Node>;
     /// inserts a node and mounts it to the root; returns err if id exists.
     fn grow(&mut self, obj: Self::Node) -> Result<Self::Id, FlowError>;
     /// removes a node mounted to the root and unmounts it; returns err if id not found under root
@@ -81,10 +83,10 @@ pub trait FlowTree: FlowMap {
     /// 2. owner is root 
     /// 3. nth > len
     /// 4. no obj / owner
-    fn devote(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), ()>;
-    fn devote_push(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), ()>;
+    fn devote(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), FlowError>;
+    fn devote_push(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError>;
     /// deletes all the links of a node and mounts it only to root
-    fn decay(&mut self, obj: &Self::Id) -> Result<(), ()>;
+    fn decay(&mut self, obj: &Self::Id) -> Result<(), FlowError>;
 }
 
 
@@ -101,8 +103,12 @@ pub trait FlowGraph: FlowMap {
 pub enum FlowError {
     NoRoot,
     NotDefaultRoot,
-    NotExist,
+    NotExistObj,
+    NotExistOwner,
+    InValidLen,
     ExistGrow,
+    RootDevote,
+    RootDecay,
     NotUnderRoot,
     /// root children must not be owned by other nodes
     NotOrphaned,
