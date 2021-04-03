@@ -49,7 +49,7 @@ pub struct FlowArena<Id: Hash + Eq, Entity> {
     /// 
     /// for now, only Id::default can be root.
     pub root: Id,
-    pub node_map: HashMap<Id, Node<Id, Entity>>,
+    pub(crate) node_map: HashMap<Id, Node<Id, Entity>>,
 }
 
 pub type FlowPure<Id> = FlowArena<Id, ()>;
@@ -69,6 +69,9 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
         let mut node_map = HashMap::new();
         node_map.insert(root.clone(), node);
         FlowArena { root, node_map }
+    }
+    pub fn node_map(&self) -> &HashMap<Id, Node<Id, Entity>> {
+        &self.node_map
     }
     pub fn node_offspring_list(&self, obj: &Id) -> HashSet<Id> {
         let mut visit_set = HashSet::new();

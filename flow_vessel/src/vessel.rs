@@ -38,7 +38,7 @@ impl Debug for Vessel {
          .field("glass", &self.glass)
          .field("id_factory", &self.id_factory)
          .field("root", &self.flow_arena.root)
-         .field("node_map", &self.flow_arena.node_map)
+         .field("node_map", self.flow_arena.node_map())
          .finish()
     }
 }
@@ -56,18 +56,20 @@ impl Vessel {
     /// ensures that you can get the required entity; 
     /// inserts if not in place. 
     pub fn entity_ensure(&mut self, id: &EntityId) -> &mut Entity {
-        if !self.flow_arena.node_map.contains_key(id) {
+        if self.flow_arena.node(id).is_none() {
             self.entity_insert(Entity::new_id(id));
         }
         self.entity_get_mut(id).expect("contains key")
     }
     pub fn entity_devote(&mut self, obj: EntityId, owner: EntityId, idx: usize) {
-        self.flow_arena.decay(&obj).ok();
-        self.flow_arena.devote(&obj, &owner, idx).ok();
+        if self.flow_arena.decay(&obj).is_ok() {
+            self.flow_arena.devote(&obj, &owner, idx).ok();
+        }
     }
     pub fn entity_devote_push(&mut self, obj: EntityId, owner: EntityId) {
-        self.flow_arena.decay(&obj).ok();
-        self.flow_arena.devote_push(&obj, &owner).ok();
+        if self.flow_arena.decay(&obj).is_ok() {
+            self.flow_arena.devote_push(&obj, &owner).ok();
+        }
     }
     pub fn entity_grow_devote(&mut self, owner: EntityId, idx: usize) -> EntityId {
         let obj = self.entity_grow();
@@ -96,6 +98,9 @@ impl Vessel {
 
 /// flow_arena inquiry
 impl Vessel {
+    pub fn root_id(&self) -> EntityId {
+        self.flow_arena.root.clone()
+    }
     pub fn node(&self, id: &EntityId) -> Option<&EntityNode> {
         self.flow_arena.node(id)
     }
@@ -118,10 +123,10 @@ impl Vessel {
         }).collect()
     }
     pub fn entity_get(&self, id: &EntityId) -> Option<&Entity> {
-        self.flow_arena.node_map.get(id).map(|x| &x.entity)
+        self.flow_arena.node(id).map(|x| &x.entity)
     }
     pub fn entity_get_mut(&mut self, id: &EntityId) -> Option<&mut Entity> {
-        self.flow_arena.node_map.get_mut(id).map(|x| &mut x.entity)
+        self.flow_arena.node_mut(id).map(|x| &mut x.entity)
     }
 }
 
