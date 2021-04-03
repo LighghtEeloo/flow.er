@@ -91,32 +91,47 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
         }
         final_set
     }
-    /// panics if anything went wrong. Iff in debug state.
-    pub(crate) fn check(&self) {
+    pub(crate) fn check(&self) -> Result<(), (FlowError, String)> {
+        // has root
+        if ! self.node_map.contains_key(&self.root) { return Err((FlowError::NoRoot, "".into())) }
+        // root identical with default
+        if self.root != Id::default() { return Err((FlowError::NotDefaultRoot, "".into())) }
+        // root has no parent
+        if let Some(Some(_)) | None = self.node_map.get(&self.root).map(|r| r.parent.clone()) {
+            return Err((FlowError::ParentedRoot, "".into()))
+        }
         for (id, node) in self.node_map.iter() {
             let current_str = format!(", current: \nid: {:?}, \nnode: {:#?}", id, node);
-            assert_eq!(id.clone(), node.id);
-            if id.clone() == self.root {
-                // root identical
-                assert_eq!(Id::default(), self.root, "! root identical {}", current_str);
-                // root has no parent
-                assert_eq!(node.parent, None, "! root non-parent {}", current_str);
-            } else {
+            if id.clone() != node.id { return Err((FlowError::NodeIdUnmatch, current_str)) }
+            if id.clone() != self.root {
                 // nodes must have parent, except for root
-                assert_ne!(node.parent, None, "! nodes must have parent {}", current_str);
+                if node.parent == None { return Err((FlowError::NoParent, current_str)) }
             }
             // children exist
-            node.children.iter().for_each(|id| {
-                assert!(self.node_map.get(id).is_some(), "! children exist {}", current_str)
-            });
+            for id in node.children.iter() {
+                if self.node_map.get(id).is_none() {
+                    return Err((FlowError::NotExistChild, current_str));
+                }
+            }
             // parent exist
             if let Some(parent_id) = node.parent.clone() {
                 let maybe = self.node_map.get(&parent_id);
-                assert!(maybe.is_some(), "! parent exist {}", current_str);
+                if maybe.is_none() {
+                    return Err((FlowError::NotExistParent, current_str));
+                }
                 if let Some(node) = maybe {
-                    assert!(node.children.iter().find(|x| x.clone() == id).is_some(), "! parent has children {}", current_str)
+                    if node.children.iter().find(|x| x.clone() == id).is_none() {
+                        return Err((FlowError::AbandonedChild, current_str))
+                    }
                 }
             }
+        }
+        Ok(())
+    }
+    /// panics if anything went wrong. Iff in debug state.
+    pub(crate) fn check_assert(&self) {
+        if let Err((err, current)) = self.check() {
+            panic!("{:?}{}", err, current)
         }
     } 
 }
@@ -283,6 +298,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
             obj.parent = Some(self.root.clone());
             self.node_map.insert(id.clone(), obj);
             self.root().children.push(id.clone());
+            if cfg!(debug_assertions) { self.check_assert() };
             Ok(id)
         }
     }
@@ -292,7 +308,9 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
             Err(FlowError::NotUnderRoot)
         } else {
             self.root().children.retain(|x| x != obj);
-            self.node_map.remove(obj).ok_or(FlowError::NotExistObj)
+            let res = self.node_map.remove(obj).ok_or(FlowError::NotExistObj); 
+            if cfg!(debug_assertions) { self.check_assert() };
+            res
         }
     }
 }
@@ -321,6 +339,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
                 owner_node.children.insert(nth, obj.clone());
             }
             self.node_mut(obj).expect("checked").parent = Some(owner.clone());
+            if cfg!(debug_assertions) { self.check_assert() };
             Ok(())
         }
     }
@@ -332,7 +351,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
         let res = nth.map(|nth| {
             self.devote(obj, owner, nth)
         }).unwrap_or(Err(FlowError::NotExistObj));
-        // if cfg!(debug_assertions) { self.check() };
+        if cfg!(debug_assertions) { self.check_assert() };
         res
     }
 
@@ -363,7 +382,8 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
             // must be in root
             let root = self.root.clone();
             self.node_mut(obj).map(|node| {
-                node.parent = Some(root)
+                node.parent = Some(root);
+                node.children.clear();
             });
             self.root().children.retain(|x| x != obj);
             self.root().children.push(obj.clone());
@@ -372,7 +392,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
                 h.extend(orphan.into_iter());
                 x.children = h.into_iter().collect();
             });
-            // if cfg!(debug_assertions) { self.check() };
+            if cfg!(debug_assertions) { self.check_assert() };
             Ok(())
         }
     }
@@ -442,16 +462,16 @@ mod tests {
         wrapper("Grow", flow.grow(obj_vec[7].clone()).is_ok(), &flow, aloud);
         wrapper("Grow", flow.grow(obj_vec[8].clone()).is_ok(), &flow, aloud);
         wrapper("Grow", flow.grow(obj_vec[9].clone()).is_ok(), &flow, aloud);
-        wrapper("Devote 4->1", flow.devote(obj_vec[4].id(), obj_vec[1].id(), 0).is_ok(), &flow, aloud);
-        wrapper("Devote 5->1", flow.devote(obj_vec[5].id(), obj_vec[1].id(), 0).is_ok(), &flow, aloud);
-        wrapper("Devote 6->1", flow.devote(obj_vec[6].id(), obj_vec[1].id(), 0).is_ok(), &flow, aloud);
-        wrapper("Devote 7->1", flow.devote(obj_vec[7].id(), obj_vec[1].id(), 0).is_ok(), &flow, aloud);
-        wrapper("Devote 8->1", flow.devote(obj_vec[8].id(), obj_vec[1].id(), 0).is_ok(), &flow, aloud);
-        wrapper("Devote 9->1", flow.devote(obj_vec[9].id(), obj_vec[1].id(), 0).is_ok(), &flow, aloud);
+        wrapper("Devote 4->1", flow.devote_push(obj_vec[4].id(), obj_vec[1].id()).is_ok(), &flow, aloud);
+        wrapper("Devote 5->1", flow.devote_push(obj_vec[5].id(), obj_vec[1].id()).is_ok(), &flow, aloud);
+        wrapper("Devote 6->1", flow.devote_push(obj_vec[6].id(), obj_vec[1].id()).is_ok(), &flow, aloud);
+        wrapper("Devote 7->1", flow.devote_push(obj_vec[7].id(), obj_vec[1].id()).is_ok(), &flow, aloud);
+        wrapper("Devote 8->1", flow.devote_push(obj_vec[8].id(), obj_vec[1].id()).is_ok(), &flow, aloud);
+        wrapper("Devote 9->1", flow.devote_push(obj_vec[9].id(), obj_vec[1].id()).is_ok(), &flow, aloud);
         wrapper("Erase 3", flow.erase(obj_vec[3].id()).is_ok(), &flow, aloud);
         wrapper("Decay 1", flow.decay(obj_vec[1].id()).is_ok(), &flow, aloud);
         wrapper("Erase 1", flow.erase(obj_vec[1].id()).is_ok(), &flow, aloud);
-        if cfg!(debug_assertions) && aloud { println!("Checked."); flow.check() };
+        if cfg!(debug_assertions) && aloud { println!("Checked."); flow.check_assert() };
         flow
     }
 

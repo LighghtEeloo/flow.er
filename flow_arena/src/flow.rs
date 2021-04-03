@@ -100,11 +100,15 @@ pub trait FlowGraph: FlowMap {
     fn defect(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), ()>;
 }
 
+#[derive(Debug)]
 pub enum FlowError {
     NoRoot,
     NotDefaultRoot,
+    ParentedRoot,
+
     NotExistObj,
     NotExistOwner,
+    NodeIdUnmatch,
     InValidLen,
     ExistGrow,
     RootDevote,

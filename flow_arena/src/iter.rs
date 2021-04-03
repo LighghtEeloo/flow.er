@@ -83,7 +83,7 @@ mod tests {
         wrapper("Devote", flow.devote(obj_vec[4].id(), obj_vec[1].id(), 0).is_ok(), &flow, aloud);
         wrapper("Purge", flow.decay(obj_vec[1].id()).is_ok(), &flow, aloud);
         wrapper("Erase", flow.erase(obj_vec[1].id()).is_ok(), &flow, aloud);
-        if cfg!(debug_assertions) && aloud { println!("Checked."); flow.check() };
+        if cfg!(debug_assertions) && aloud { println!("Checked."); flow.check_assert() };
         flow
     }
 
