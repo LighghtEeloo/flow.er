@@ -57,37 +57,7 @@ use std::hash::Hash;
 /// Though the relationship is stored in the relationship graph, a linkage compiler is implemented \[in progress\] to translate it to a non-recrusive format.
 /// 
 /// Waiting for update...
-pub trait Flow: FlowMap + FlowTree + FlowGraph {
-
-
-    // type Id: Default + Hash + Eq + Clone;
-    // type Node: Default;
-    // /// ensures root and returns it; no check
-    // fn root(&mut self) -> &mut Self::Node;
-    // /// no check
-    // fn node(&self, obj: &Self::Id) -> Option<&Self::Node>;
-    // /// inserts a node and mounts it to the root; returns err if id exists.
-    // fn grow(&mut self, obj: Self::Node) -> Result<(), ()>;
-    // /// mounts an orphaned node to a non-root node as the nth child, and unmounts it from root
-    // ///
-    // /// err if:
-    // /// 1. obj not mounted under root 
-    // /// 2. des is root 
-    // /// 3. nth > len
-    // /// 4. no obj / des
-    // fn devote(&mut self, obj: &Self::Id, des: &Self::Id, nth: usize) -> Result<(), ()>;
-    // fn devote_push(&mut self, obj: &Self::Id, des: &Self::Id) -> Result<(), ()>;
-    // /// randomly mounts an *unorphaned* node under a non-root node; the parent of the node will not be changed
-    // fn link(&mut self, obj: &Self::Id, des: &Self::Id, nth: usize) -> Result<(), ()>;
-    // fn link_push(&mut self, obj: &Self::Id, des: &Self::Id) -> Result<(), ()>;
-    // // /// insert a flow and devote to a node; err on id collision
-    // // fn merge_flow(&mut self, flow: Self, des: &Self::Id, nth: usize) -> Result<(), ()>;
-    // // fn merge_flow_push(&mut self, flow: Self, des: &Self::Id) -> Result<(), ()>;
-    // /// deletes all the links of a node and mounts it only to root
-    // fn decay(&mut self, obj: &Self::Id) -> Result<(), ()>;
-    // /// removes a node mounted to the root and unmounts it; returns err if id not found under root
-    // fn erase(&mut self, obj: &Self::Id) -> Result<(), ()>;
-}
+pub trait Flow: FlowMap + FlowTree + FlowGraph {}
 
 pub trait FlowMap {
     type Id: Default + Hash + Eq + Clone;
@@ -97,9 +67,9 @@ pub trait FlowMap {
     /// no check
     fn node(&self, obj: &Self::Id) -> Option<&Self::Node>;
     /// inserts a node and mounts it to the root; returns err if id exists.
-    fn grow(&mut self, obj: Self::Node) -> Result<(), ()>;
+    fn grow(&mut self, obj: Self::Node) -> Result<Self::Id, FlowError>;
     /// removes a node mounted to the root and unmounts it; returns err if id not found under root
-    fn erase(&mut self, obj: &Self::Id) -> Result<(), ()>;
+    fn erase(&mut self, obj: &Self::Id) -> Result<Self::Node, FlowError>;
 }
 
 
@@ -128,5 +98,18 @@ pub trait FlowGraph: FlowMap {
     fn defect(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), ()>;
 }
 
-
+pub enum FlowError {
+    NoRoot,
+    NotDefaultRoot,
+    NotExist,
+    ExistGrow,
+    NotUnderRoot,
+    /// root children must not be owned by other nodes
+    NotOrphaned,
+    NoParent,
+    NotExistParent,
+    NotExistChild,
+    /// potential parent doesn't have the child
+    AbandonedChild,
+}
 

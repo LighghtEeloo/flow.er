@@ -3,7 +3,8 @@ use serde::{Serialize, Deserialize};
 
 use indexmap::IndexSet;
 use std::{collections::{HashMap, HashSet}, fmt::{self, Debug}, hash::Hash};
-use super::{FlowMap, FlowTree, FlowGraph, Flow};
+
+use super::{FlowMap, FlowTree, FlowGraph, Flow, FlowError};
 
 #[derive(Clone, Default)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
@@ -258,20 +259,33 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
 
     type Node = Node<Id, Entity>;
 
-    fn root(&mut self) -> &mut Self::Node {
-        todo!()
+    fn root(&mut self) -> &mut Node<Id, Entity> {
+        // no check because not necessarily clean
+        self.node_map.entry(Id::default()).or_default()
+    }
+    fn node(&self, obj: &Id) -> Option<&Node<Id, Entity>> {
+        // no check because no change
+        self.node_map.get(obj)
     }
 
-    fn node(&self, obj: &Self::Id) -> Option<&Self::Node> {
-        todo!()
+    fn grow(&mut self, obj: Self::Node) -> Result<Self::Id, FlowError> {
+        if self.node_map.get(obj.id()).is_some() {
+            Err(FlowError::ExistGrow)
+        } else {
+            let id = obj.id().clone();
+            self.node_map.insert(id.clone(), obj);
+            self.root().children.push(id.clone());
+            Ok(id)
+        }
     }
 
-    fn grow(&mut self, obj: Self::Node) -> Result<(), ()> {
-        todo!()
-    }
-
-    fn erase(&mut self, obj: &Self::Id) -> Result<(), ()> {
-        todo!()
+    fn erase(&mut self, obj: &Self::Id) -> Result<Self::Node, FlowError> {
+        if self.root().children.iter().find(|&x| x == obj).is_none() {
+            Err(FlowError::NotUnderRoot)
+        } else {
+            self.root().children.retain(|x| x != obj);
+            self.node_map.remove(obj).ok_or(FlowError::NotExist)
+        }
     }
 }
 
