@@ -48,7 +48,7 @@ impl Vase {
                 true
             }
             EntityDelete { id } => {
-                self.vessel.entity_erase(&id);
+                self.vessel.entity_remove(&id);
                 true
             }
             EntityUp { id } => {

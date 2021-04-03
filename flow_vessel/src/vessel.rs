@@ -62,9 +62,11 @@ impl Vessel {
         self.entity_get_mut(id).expect("contains key")
     }
     pub fn entity_devote(&mut self, obj: EntityId, owner: EntityId, idx: usize) {
+        self.flow_arena.decay(&obj).ok();
         self.flow_arena.devote(&obj, &owner, idx).ok();
     }
     pub fn entity_devote_push(&mut self, obj: EntityId, owner: EntityId) {
+        self.flow_arena.decay(&obj).ok();
         self.flow_arena.devote_push(&obj, &owner).ok();
     }
     pub fn entity_grow_devote(&mut self, owner: EntityId, idx: usize) -> EntityId {
@@ -85,8 +87,9 @@ impl Vessel {
         self.entity_duplicate(obj, dude)
     }
     /// removes entity from a flow_arena
-    pub fn entity_erase(&mut self, id: &EntityId) {
-        self.flow_arena.erase(id).ok();
+    pub fn entity_remove(&mut self, obj: &EntityId) {
+        self.flow_arena.decay(&obj).ok();
+        self.flow_arena.erase(obj).ok();
         self.glass_refresh();
     }
 }
@@ -302,7 +305,7 @@ mod tests {
         //          `-------`-> id4
         vessel.entity_get_mut(&id[0]).map(|entity| entity.face = format!("Aloha!"));
         vessel.entity_get_mut(&id[1]).map(|entity| entity.face = format!("Bobi."));
-        vessel.entity_erase(&id[0]);
+        vessel.entity_remove(&id[0]);
         println!("{:#?}", vessel);
     }
     #[test]
@@ -375,7 +378,7 @@ mod tests {
                 match obj {
                     Some(obj) => {
                         println!("Erase. {:?} ", obj);
-                        vessel.entity_erase(&obj);
+                        vessel.entity_remove(&obj);
                         id.retain(|x| x != &obj);
                     }
                     _ => ()
