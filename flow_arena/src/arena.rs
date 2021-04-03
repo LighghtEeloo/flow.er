@@ -3,7 +3,7 @@ use serde::{Serialize, Deserialize};
 
 use indexmap::IndexSet;
 use std::{collections::{HashMap, HashSet}, fmt::{self, Debug}, hash::Hash};
-use super::Flow;
+use super::{FlowMap, FlowTree, FlowGraph, Flow};
 
 #[derive(Clone, Default)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
@@ -117,141 +117,201 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
     } 
 }
 
-impl<Id, Entity> Flow for FlowArena<Id, Entity> 
+// impl<Id, Entity> Flow for FlowArena<Id, Entity> 
+// where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
+//     type Id = Id;
+//     type Node = Node<Id, Entity>;
+
+//     /// ensures root and returns it
+//     fn root(&mut self) -> &mut Node<Id, Entity> {
+//         // no check because not necessarily clean
+//         self.node_map.entry(Id::default()).or_default()
+//     }
+//     fn node(&self, obj: &Id) -> Option<&Node<Id, Entity>> {
+//         // no check because no change
+//         self.node_map.get(obj)
+//     }
+//     fn grow(&mut self, mut obj: Node<Id, Entity>) -> Result<(), ()> {
+//         let res = match self.node_map.get(obj.id()) {
+//             Some(_) => Err(()),
+//             None => {
+//                 let id = obj.id.clone();
+//                 self.root().children.push(id.clone());
+//                 obj.parent = Some(self.root.clone());
+//                 self.node_map.insert(id, obj);
+//                 Ok(())
+//             }
+//         };
+//         if cfg!(debug_assertions) { self.check() };
+//         res
+//     }
+//     fn devote(&mut self, obj: &Id, des: &Id, nth: usize) -> Result<(), ()> {
+//         if self.node_offspring_list(obj).get(des).is_some() { return Err(()) }
+//         // Note: no obj in root.
+//         self.root().children.retain(|x| x != obj);
+//         let res = if self.node_map.contains_key(obj) {
+//             self.node_map.get_mut(des)
+//                 .map(|owner| {
+//                     if nth <= owner.children.len() {
+//                         owner.children.insert(nth, obj.clone());
+//                         Some(())
+//                     } else { None }
+//                 }).flatten()
+//                 .map(|x| {
+//                     self.node_map.get_mut(obj).map(|obj| {
+//                         obj.parent = Some(des.clone());
+//                     });
+//                     Some(x)
+//                 }).flatten()
+//         } else { None } .ok_or(());
+//         if cfg!(debug_assertions) { self.check() };
+//         res
+//     }
+//     fn devote_push(&mut self, obj: &Id, des: &Id) -> Result<(), ()> {
+//         let nth = self.node_map.get(des).map(|owner| owner.children.len());
+//         let res = nth.map(|nth| {
+//             self.devote(obj, des, nth)
+//         }).unwrap_or(Err(()));
+//         if cfg!(debug_assertions) { self.check() };
+//         res
+//     }
+//     // fn merge_flow(&mut self, flow: Self, des: &Self::Id, nth: usize) -> Result<(), ()> {
+//     //     if cfg!(debug_assertions) { self.check() };
+//     //     let collision = self.node_map.keys().any(|id| flow.node_map.contains_key(id));
+//     //     if collision {
+//     //         Err(())
+//     //     } else {
+//     //         let node_map = flow.node_map.into_iter();
+//     //         self.node_map.extend(node_map);
+//     //         // Todo: devote
+//     //         Ok(())
+//     //     }
+//     // }
+//     // fn merge_flow_push(&mut self, flow: Self, des: &Self::Id) -> Result<(), ()> {
+//     //     if cfg!(debug_assertions) { self.check() };
+//     //     let nth = self.node_map.get(des).map(|owner| owner.children.len());
+//     //     nth.map(|nth| {
+//     //         self.merge_flow(flow, des, nth)
+//     //     }).unwrap_or(Err(()))
+//     // }
+//     /// cuts all the links related to the obj and resets obj to root, 
+//     /// but doesn't remove.
+//     fn decay(&mut self, obj: &Id) -> Result<(), ()> {
+//         // Note: move children to parent.
+//         let mut orphan: Vec<Id> = Vec::new();
+//         let re_owner = self.node_map.get(obj)
+//             .map_or(None, |x| x.parent.clone())
+//             .unwrap_or(self.root.clone());
+//         for (_, node) in self.node_map.iter_mut() {
+//             let re_owner = re_owner.clone();
+//             node.children.retain(|x| x != obj);
+//             node.parent = node.parent.clone()
+//                 .map(|parent| if &parent == obj { 
+//                     orphan.push(node.id.clone());
+//                     re_owner
+//                 } else { parent });
+//         }
+//         // must be in root
+//         let root = self.root.clone();
+//         self.node_map.get_mut(obj).map(|node| {
+//             node.parent = Some(root)
+//         });
+//         self.root().children.retain(|x| x != obj);
+//         self.root().children.push(obj.clone());
+//         self.node_map.get_mut(&re_owner).map(|x| {
+//             let mut h: IndexSet<Id> = x.children.iter().cloned().collect();
+//             h.extend(orphan.into_iter());
+//             x.children = h.into_iter().collect();
+//         });
+//         if cfg!(debug_assertions) { self.check() };
+//         Ok(())
+//     }
+//     /// removes from node_map and purges.
+//     fn erase(&mut self, obj: &Id) -> Result<(), ()> {
+//         let res = if &self.root == obj {
+//             self.root().children.clear();
+//             self.node_map.retain(|k, _| k == obj);
+//             Ok(())
+//         } else {
+//             self.decay(obj).ok().map(|_|
+//                 self.node_map.remove(obj).map(|_|
+//                     self.root().children.retain(|rooted| rooted != obj)
+//                 )
+//             ).flatten().ok_or(())
+//         };
+//         if cfg!(debug_assertions) { self.check() };
+//         res
+//     }
+
+//     fn link(&mut self, obj: &Self::Id, des: &Self::Id, nth: usize) -> Result<(), ()> {
+//         unimplemented!()
+//     }
+
+//     fn link_push(&mut self, obj: &Self::Id, des: &Self::Id) -> Result<(), ()> {
+//         unimplemented!()
+//     }
+// }
+
+impl<Id, Entity> FlowMap for FlowArena<Id, Entity> 
 where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
     type Id = Id;
+
     type Node = Node<Id, Entity>;
 
-    /// ensures root and returns it
-    fn root(&mut self) -> &mut Node<Id, Entity> {
-        // no check because not necessarily clean
-        self.node_map.entry(Id::default()).or_default()
-    }
-    fn node(&self, obj: &Id) -> Option<&Node<Id, Entity>> {
-        // no check because no change
-        self.node_map.get(obj)
-    }
-    fn grow(&mut self, mut obj: Node<Id, Entity>) -> Result<(), ()> {
-        let res = match self.node_map.get(obj.id()) {
-            Some(_) => Err(()),
-            None => {
-                let id = obj.id.clone();
-                self.root().children.push(id.clone());
-                obj.parent = Some(self.root.clone());
-                self.node_map.insert(id, obj);
-                Ok(())
-            }
-        };
-        if cfg!(debug_assertions) { self.check() };
-        res
-    }
-    fn devote(&mut self, obj: &Id, des: &Id, nth: usize) -> Result<(), ()> {
-        if self.node_offspring_list(obj).get(des).is_some() { return Err(()) }
-        // Note: no obj in root.
-        self.root().children.retain(|x| x != obj);
-        let res = if self.node_map.contains_key(obj) {
-            self.node_map.get_mut(des)
-                .map(|owner| {
-                    if nth <= owner.children.len() {
-                        owner.children.insert(nth, obj.clone());
-                        Some(())
-                    } else { None }
-                }).flatten()
-                .map(|x| {
-                    self.node_map.get_mut(obj).map(|obj| {
-                        obj.parent = Some(des.clone());
-                    });
-                    Some(x)
-                }).flatten()
-        } else { None } .ok_or(());
-        if cfg!(debug_assertions) { self.check() };
-        res
-    }
-    fn devote_push(&mut self, obj: &Id, des: &Id) -> Result<(), ()> {
-        let nth = self.node_map.get(des).map(|owner| owner.children.len());
-        let res = nth.map(|nth| {
-            self.devote(obj, des, nth)
-        }).unwrap_or(Err(()));
-        if cfg!(debug_assertions) { self.check() };
-        res
-    }
-    // fn merge_flow(&mut self, flow: Self, des: &Self::Id, nth: usize) -> Result<(), ()> {
-    //     if cfg!(debug_assertions) { self.check() };
-    //     let collision = self.node_map.keys().any(|id| flow.node_map.contains_key(id));
-    //     if collision {
-    //         Err(())
-    //     } else {
-    //         let node_map = flow.node_map.into_iter();
-    //         self.node_map.extend(node_map);
-    //         // Todo: devote
-    //         Ok(())
-    //     }
-    // }
-    // fn merge_flow_push(&mut self, flow: Self, des: &Self::Id) -> Result<(), ()> {
-    //     if cfg!(debug_assertions) { self.check() };
-    //     let nth = self.node_map.get(des).map(|owner| owner.children.len());
-    //     nth.map(|nth| {
-    //         self.merge_flow(flow, des, nth)
-    //     }).unwrap_or(Err(()))
-    // }
-    /// cuts all the links related to the obj and resets obj to root, 
-    /// but doesn't remove.
-    fn decay(&mut self, obj: &Id) -> Result<(), ()> {
-        // Note: move children to parent.
-        let mut orphan: Vec<Id> = Vec::new();
-        let re_owner = self.node_map.get(obj)
-            .map_or(None, |x| x.parent.clone())
-            .unwrap_or(self.root.clone());
-        for (_, node) in self.node_map.iter_mut() {
-            let re_owner = re_owner.clone();
-            node.children.retain(|x| x != obj);
-            node.parent = node.parent.clone()
-                .map(|parent| if &parent == obj { 
-                    orphan.push(node.id.clone());
-                    re_owner
-                } else { parent });
-        }
-        // must be in root
-        let root = self.root.clone();
-        self.node_map.get_mut(obj).map(|node| {
-            node.parent = Some(root)
-        });
-        self.root().children.retain(|x| x != obj);
-        self.root().children.push(obj.clone());
-        self.node_map.get_mut(&re_owner).map(|x| {
-            let mut h: IndexSet<Id> = x.children.iter().cloned().collect();
-            h.extend(orphan.into_iter());
-            x.children = h.into_iter().collect();
-        });
-        if cfg!(debug_assertions) { self.check() };
-        Ok(())
-    }
-    /// removes from node_map and purges.
-    fn erase(&mut self, obj: &Id) -> Result<(), ()> {
-        let res = if &self.root == obj {
-            self.root().children.clear();
-            self.node_map.retain(|k, _| k == obj);
-            Ok(())
-        } else {
-            self.decay(obj).ok().map(|_|
-                self.node_map.remove(obj).map(|_|
-                    self.root().children.retain(|rooted| rooted != obj)
-                )
-            ).flatten().ok_or(())
-        };
-        if cfg!(debug_assertions) { self.check() };
-        res
-    }
-
-    fn link(&mut self, obj: &Self::Id, des: &Self::Id, nth: usize) -> Result<(), ()> {
+    fn root(&mut self) -> &mut Self::Node {
         todo!()
     }
 
-    fn link_push(&mut self, obj: &Self::Id, des: &Self::Id) -> Result<(), ()> {
+    fn node(&self, obj: &Self::Id) -> Option<&Self::Node> {
+        todo!()
+    }
+
+    fn grow(&mut self, obj: Self::Node) -> Result<(), ()> {
+        todo!()
+    }
+
+    fn erase(&mut self, obj: &Self::Id) -> Result<(), ()> {
         todo!()
     }
 }
 
+impl<Id, Entity> FlowTree for FlowArena<Id, Entity> 
+where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
+    fn devote(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), ()> {
+        todo!()
+    }
+
+    fn devote_push(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), ()> {
+        todo!()
+    }
+
+    fn decay(&mut self, obj: &Self::Id) -> Result<(), ()> {
+        todo!()
+    }
+}
+
+
+impl<Id, Entity> FlowGraph for FlowArena<Id, Entity> 
+where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
+    fn link(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), ()> {
+        todo!()
+    }
+
+    fn link_push(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), ()> {
+        todo!()
+    }
+
+    fn detach(&self, obj: &Self::Id) -> Result<(), ()> {
+        todo!()
+    }
+
+    fn defect(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), ()> {
+        todo!()
+    }
+}
+
+impl<Id, Entity> Flow for FlowArena<Id, Entity> 
+where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {}
 
 #[cfg(test)]
 mod tests {

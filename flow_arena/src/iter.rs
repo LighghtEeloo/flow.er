@@ -46,7 +46,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::Flow;
+    use crate::{FlowMap, FlowTree};
     use serde::{Serialize, Deserialize};
     type FlowEntity = FlowArena<EntityId, String>;
     type NodeEntity = Node<EntityId, String>;
