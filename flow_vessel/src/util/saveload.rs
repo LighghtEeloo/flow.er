@@ -1,5 +1,3 @@
-use futures::TryFutureExt;
-
 use crate::{Vessel, Bridge};
 
 #[derive(Debug, Clone)]

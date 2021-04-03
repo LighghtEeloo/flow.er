@@ -194,30 +194,9 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
     //         self.merge_flow(flow, des, nth)
     //     }).unwrap_or(Err(()))
     // }
-    /// decay the node by removing only its connection between 
-    /// its parent and itself; mounts the node to root.
-    fn decay(&mut self, obj: &Id) -> Result<(), ()> {
-        let parent = self.node(obj).map(|node| {
-            node.parent.clone()
-        }).flatten();
-        parent.map(|parent|
-            self.node_map.get_mut(&parent).map(|p_node| {
-                p_node.children.iter().position(|x| x == obj).map(|idx| {
-                    p_node.children.remove(idx)
-                })
-            })
-        ).flatten().map(|_| {
-            let root = self.root.clone();
-            self.root().children.retain(|x| x == obj);
-            self.root().children.push(obj.clone());
-            self.node_map.get_mut(obj).map(|node| {
-                node.parent = Some(root)
-            })
-        }).flatten().ok_or(())
-    }
     /// cuts all the links related to the obj and resets obj to root, 
     /// but doesn't remove.
-    fn purge(&mut self, obj: &Id) -> Result<(), ()> {
+    fn decay(&mut self, obj: &Id) -> Result<(), ()> {
         // Note: move children to parent.
         let mut orphan: Vec<Id> = Vec::new();
         let re_owner = self.node_map.get(obj)
@@ -254,7 +233,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
             self.node_map.retain(|k, _| k == obj);
             Ok(())
         } else {
-            self.purge(obj).ok().map(|_|
+            self.decay(obj).ok().map(|_|
                 self.node_map.remove(obj).map(|_|
                     self.root().children.retain(|rooted| rooted != obj)
                 )
@@ -262,6 +241,14 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
         };
         if cfg!(debug_assertions) { self.check() };
         res
+    }
+
+    fn link(&mut self, obj: &Self::Id, des: &Self::Id, nth: usize) -> Result<(), ()> {
+        todo!()
+    }
+
+    fn link_push(&mut self, obj: &Self::Id, des: &Self::Id) -> Result<(), ()> {
+        todo!()
     }
 }
 
@@ -313,7 +300,7 @@ mod tests {
         wrapper("Devote 8->1", flow.devote(obj_vec[8].id(), obj_vec[1].id(), 0).is_ok(), &flow, aloud);
         wrapper("Devote 9->1", flow.devote(obj_vec[9].id(), obj_vec[1].id(), 0).is_ok(), &flow, aloud);
         wrapper("Erase 4", flow.erase(obj_vec[4].id()).is_ok(), &flow, aloud);
-        wrapper("Purge 1", flow.purge(obj_vec[1].id()).is_ok(), &flow, aloud);
+        wrapper("Purge 1", flow.decay(obj_vec[1].id()).is_ok(), &flow, aloud);
         wrapper("Erase 1", flow.erase(obj_vec[1].id()).is_ok(), &flow, aloud);
         if cfg!(debug_assertions) && aloud { println!("Checked."); flow.check() };
         flow

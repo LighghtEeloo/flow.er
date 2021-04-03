@@ -140,7 +140,7 @@ impl Vessel {
             } else { return } 
         };
         if let Some(&des) = des {
-            if self.flow_arena.purge(&id).is_ok() {
+            if self.flow_arena.decay(&id).is_ok() {
                 self.entity_devote_push(id, des)
             }
         }
@@ -164,7 +164,7 @@ impl Vessel {
             ).flatten().unwrap_or_default() 
         };
         if let Some(des) = des {
-            if self.flow_arena.purge(&id).is_ok() {
+            if self.flow_arena.decay(&id).is_ok() {
                 self.entity_devote(id, des, idx + 1)
             }
         }
@@ -183,7 +183,7 @@ impl Vessel {
             ).flatten().unwrap_or(0) 
         };
         if let Some(owner) = owner {
-            if idx > 0 && self.flow_arena.purge(&id).is_ok() {
+            if idx > 0 && self.flow_arena.decay(&id).is_ok() {
                 self.entity_devote(id, owner, idx - 1)
             }
         }
@@ -209,7 +209,7 @@ impl Vessel {
             ).flatten().unwrap_or(0) 
         };
         if let Some(owner) = owner {
-            if idx < len - 1 && self.flow_arena.purge(&id).is_ok() {
+            if idx < len - 1 && self.flow_arena.decay(&id).is_ok() {
                 self.entity_devote(id, owner, idx + 1)
             }
         }
