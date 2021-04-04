@@ -50,7 +50,7 @@ use std::hash::Hash;
 /// 
 /// D.2. Defect
 /// 
-/// defect: switches an *unorphaned* node's owner to be another non-root node which already has access to the node.
+/// defect: switches an *unorphaned* node's owner to be a non-root node which already has access to the node.
 /// 
 /// E. Linkage Complier
 /// 
@@ -95,8 +95,8 @@ pub trait FlowGraph: FlowMap {
     fn link(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), FlowError>;
     fn link_push(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError>;
     /// unmounts an *unorphaned* node from a non-root node; the parent of the node must still own the node
-    fn detach(&self, obj: &Self::Id) -> Result<(), FlowError>;
-    /// switches an *unorphaned* node's owner to be another non-root node which already has access to the node
+    fn detach(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError>;
+    /// switches an *unorphaned* node's owner to be a non-root node which already has access to the node
     fn defect(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError>;
 }
 
@@ -113,6 +113,9 @@ pub enum FlowError {
     RootDevote,
     RootDecay,
     RootLink,
+    RootDetach,
+    OwnerDetach,
+    RootDefect,
     /// certain operations requires node to be orphaned
     NotOrphaned,
     /// certain operations requires node to be unorphaned

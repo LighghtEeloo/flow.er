@@ -16,6 +16,8 @@ pub struct Node<Id, Entity> {
     pub children: Vec<Id>,
 }
 
+pub type NodePure<Id> = Node<Id, ()>;
+
 impl<Id, Entity> Node<Id, Entity> {
     pub fn id(&self) -> &Id {
         &self.id
@@ -440,12 +442,63 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
         res
     }
 
-    fn detach(&self, obj: &Self::Id) -> Result<(), FlowError> {
-        todo!()
+    fn detach(&mut self, obj: &Self::Id, owner: &Self::Id ) -> Result<(), FlowError> {
+        if ! self.node_map.contains_key(obj) {
+            Err(FlowError::NotExistObj)
+        } else 
+        if ! self.node_map.contains_key(owner) {
+            Err(FlowError::NotExistOwner)
+        } else 
+        if self.root().children.contains(obj) {
+            Err(FlowError::IsOrphaned)
+        } else 
+        if &self.root == owner || &self.root == obj {
+            Err(FlowError::RootDetach)
+        } else 
+        {
+            if Some(owner.clone()) == self.node(obj)
+                .map_or(None, |x| x.parent.clone()) 
+            {
+                Err(FlowError::OwnerDetach)
+            } else {
+                let owner = self.node_mut(owner).expect("checked");
+                owner.children.retain(|x| x != obj);
+                Ok(())
+            }
+        }
     }
 
     fn defect(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError> {
-        todo!()
+        if ! self.node_map.contains_key(obj) {
+            Err(FlowError::NotExistObj)
+        } else 
+        if ! self.node_map.contains_key(owner) {
+            Err(FlowError::NotExistOwner)
+        } else 
+        if self.root().children.contains(obj) {
+            Err(FlowError::IsOrphaned)
+        } else 
+        if &self.root == owner || &self.root == obj {
+            Err(FlowError::RootDefect)
+        } else 
+        {
+            if Some(owner.clone()) == self.node(obj)
+                .map_or(None, |x| x.parent.clone()) 
+            {
+                Ok(())
+            } else {
+                {
+                    let owner = self.node(owner).expect("checked");
+                    if ! owner.children.contains(obj) {
+                        return Err(FlowError::AbandonedChild)
+                    }
+                }
+                let obj = self.node_mut(obj).expect("checked");
+                obj.parent = Some(owner.clone());
+                Ok(())
+
+            }
+        }
     }
 }
 
@@ -455,7 +508,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {}
 #[cfg(test)]
 mod tests {
     use super::*;
-    type FlowEntity = FlowArena<EntityId, ()>;
+    type FlowEntity = FlowPure<EntityId>;
     type NodeEntity = Node<EntityId, ()>;
     #[derive(Clone, Default, Hash, PartialEq, Eq)]
     #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
