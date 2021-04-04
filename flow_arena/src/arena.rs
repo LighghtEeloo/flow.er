@@ -30,11 +30,14 @@ impl<Id, Entity> Node<Id, Entity> {
     }
 }
 
-impl<Id: Debug, Entity: Debug> Debug for Node<Id, Entity> {
+impl<Id: Debug + Clone, Entity: Debug> Debug for Node<Id, Entity> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct(format!("{:?}", self.id()).as_str())
-            .field("parent", &self.parent)
-            .field("children", &self.children)
+            .field("<<", &self.parent.clone().map_or(
+                format!("none"), 
+                |x| format!("{:?}", x)
+            ))
+            .field(">>", &self.children)
             .field(":", &self.entity)
             .finish()
     }
@@ -43,7 +46,7 @@ impl<Id: Debug, Entity: Debug> Debug for Node<Id, Entity> {
 
 #[derive(Clone)]
 #[cfg_attr(debug_assertions, derive(PartialEq, Debug))]
-pub struct FlowArena<Id: Hash + Eq, Entity> {
+pub struct FlowArena<Id: Hash + Eq + Clone, Entity> {
     /// root: can be a Nil node or a dummy node, but must be in node_map;    
     /// it could contain title info.
     /// 
@@ -132,7 +135,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
     pub(crate) fn check_assert(&self) {
         if let Err((err, current)) = self.check() {
             panic!("{:?}{}", err, current)
-        }
+        }   
     } 
 }
 

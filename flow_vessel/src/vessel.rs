@@ -299,7 +299,7 @@ mod tests {
         (id, vessel)
     }
     #[test]
-    fn entity_erase() {
+    fn entity_remove() {
         let (id, mut vessel) = make_vessel(5);
         vessel.flow_arena.devote_push(&id[1], &id[0]).ok();
         vessel.flow_arena.devote_push(&id[2], &id[0]).ok();
