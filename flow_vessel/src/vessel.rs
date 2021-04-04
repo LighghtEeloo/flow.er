@@ -1,8 +1,8 @@
 use std::{collections::HashSet, fmt::Debug};
-use flow_arena::{FlowMap, FlowTree};
 use serde::{Serialize, Deserialize};
+use flow_arena::{Node, FlowArena, FlowMap, FlowTree};
 
-use super::{Entity, EntityId, EntityIdFactory, Node, Flow, FlowArena, Router, Glass, Cube, Settings};
+use super::{Entity, EntityId, EntityIdFactory, Router, Glass, Cube, Settings};
 
 pub type EntityNode = Node<EntityId, Entity>;
 pub type EntityFlow = FlowArena<EntityId, Entity>;
@@ -270,6 +270,8 @@ fn concise_debug_impl(obj: EntityId, vessel: &Vessel, prefix: usize) -> String {
 
 #[cfg(test)]
 mod tests {
+    use flow_arena::FlowError;
+
     use super::*;
     #[test]
     fn vessel() {
@@ -298,14 +300,19 @@ mod tests {
         ).collect();
         (id, vessel)
     }
+    fn has_err(fe: Option<FlowError>) {
+        if let Some(e) = fe {
+            println!("error: {:?}", e)
+        }
+    }
     #[test]
     fn entity_remove() {
         let (id, mut vessel) = make_vessel(5);
-        vessel.flow_arena.devote_push(&id[1], &id[0]).ok();
-        vessel.flow_arena.devote_push(&id[2], &id[0]).ok();
-        vessel.flow_arena.devote_push(&id[3], &id[0]).ok();
-        vessel.flow_arena.devote_push(&id[4], &id[0]).ok();
-        vessel.flow_arena.devote_push(&id[4], &id[1]).ok();
+        has_err(vessel.flow_arena.devote_push(&id[1], &id[0]).err());
+        has_err(vessel.flow_arena.devote_push(&id[2], &id[0]).err());
+        has_err(vessel.flow_arena.devote_push(&id[3], &id[0]).err());
+        has_err(vessel.flow_arena.devote_push(&id[4], &id[0]).err());
+        has_err(vessel.flow_arena.devote_push(&id[4], &id[1]).err());
         // 0_0 --> id --> [id1, id2, id3]
         //          `-------`-> id4
         vessel.entity_get_mut(&id[0]).map(|entity| entity.face = format!("Aloha!"));
@@ -319,12 +326,12 @@ mod tests {
         for i in 0..5 {
             println!("{}: {:?}", i, id[i]);
         }
-        vessel.flow_arena.devote_push(&id[1], &id[0]).ok();
-        vessel.flow_arena.devote_push(&id[2], &id[0]).ok();
-        vessel.flow_arena.devote_push(&id[3], &id[0]).ok();
-        vessel.flow_arena.devote_push(&id[4], &id[0]).ok();
-        vessel.flow_arena.devote_push(&id[4], &id[1]).ok();
-        vessel.flow_arena.devote_push(&id[3], &id[4]).ok();
+        has_err(vessel.flow_arena.devote_push(&id[1], &id[0]).err());
+        has_err(vessel.flow_arena.devote_push(&id[2], &id[0]).err());
+        has_err(vessel.flow_arena.devote_push(&id[3], &id[0]).err());
+        has_err(vessel.flow_arena.devote_push(&id[4], &id[0]).err());
+        has_err(vessel.flow_arena.devote_push(&id[4], &id[1]).err());
+        has_err(vessel.flow_arena.devote_push(&id[3], &id[4]).err());
         // 0_0 --> id --> [id1, id2, id3]
         //          `-------`-> id4 -/
         println!("{:?}", vessel.flow_arena.node_offspring_list(&id[0]));

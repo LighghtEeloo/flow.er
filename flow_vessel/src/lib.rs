@@ -5,7 +5,6 @@ mod settings;
 mod vessel;
 mod util;
 
-pub use flow_arena::{Flow, FlowArena, Node};
 pub use entity::{
     identity::{EntityId, EntityIdFactory},
     symbol::{Symbol, Process, Lint, AlphaBet, Babel, BABEL},

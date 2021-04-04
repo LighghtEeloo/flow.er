@@ -349,7 +349,6 @@ name = "flow_yew"
 version = "0.2.1"
 dependencies = [
  "chrono",
- "flow_arena",
  "flow_vessel",
  "futures",
  "log",
