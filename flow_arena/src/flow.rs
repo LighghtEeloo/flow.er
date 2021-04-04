@@ -92,12 +92,12 @@ pub trait FlowTree: FlowMap {
 
 pub trait FlowGraph: FlowMap {
     /// randomly mounts an *unorphaned* node under a non-root node; the parent of the node will not be changed
-    fn link(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), ()>;
-    fn link_push(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), ()>;
+    fn link(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), FlowError>;
+    fn link_push(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError>;
     /// unmounts an *unorphaned* node from a non-root node; the parent of the node must still own the node
-    fn detach(&self, obj: &Self::Id) -> Result<(), ()>;
+    fn detach(&self, obj: &Self::Id) -> Result<(), FlowError>;
     /// switches an *unorphaned* node's owner to be another non-root node which already has access to the node
-    fn defect(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), ()>;
+    fn defect(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError>;
 }
 
 #[derive(Debug)]
@@ -108,14 +108,20 @@ pub enum FlowError {
 
     NotExistObj,
     NotExistOwner,
-    NodeIdUnmatch,
     InValidLen,
     ExistGrow,
     RootDevote,
     RootDecay,
-    NotUnderRoot,
-    /// root children must not be owned by other nodes
+    RootLink,
+    /// certain operations requires node to be orphaned
     NotOrphaned,
+    /// certain operations requires node to be unorphaned
+    IsOrphaned,
+    
+    NodeIdUnmatch,
+    /// root children must not be owned by other nodes
+    NotStrictlyOrphaned,
+    /// non-root nodes must have parent
     NoParent,
     NotExistParent,
     NotExistChild,

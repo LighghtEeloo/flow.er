@@ -308,7 +308,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
 
     fn erase(&mut self, obj: &Self::Id) -> Result<Self::Node, FlowError> {
         if ! self.root().children.contains(obj) {
-            Err(FlowError::NotUnderRoot)
+            Err(FlowError::NotOrphaned)
         } else {
             self.root().children.retain(|x| x != obj);
             let res = self.node_map.remove(obj).ok_or(FlowError::NotExistObj); 
@@ -328,7 +328,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
             Err(FlowError::NotExistOwner)
         } else 
         if ! self.root().children.contains(obj) {
-            Err(FlowError::NotUnderRoot)
+            Err(FlowError::NotOrphaned)
         } else 
         if &self.root == owner || &self.root == obj {
             Err(FlowError::RootDevote)
@@ -363,7 +363,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
             Err(FlowError::NotExistObj)
         } else 
         if ! self.root().children.contains(obj) {
-            Err(FlowError::NotUnderRoot)
+            Err(FlowError::NotOrphaned)
         } else 
         if &self.root == obj {
             Err(FlowError::RootDecay)
@@ -404,19 +404,47 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
 
 impl<Id, Entity> FlowGraph for FlowArena<Id, Entity> 
 where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
-    fn link(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), ()> {
+    fn link(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), FlowError> {
+        if ! self.node_map.contains_key(obj) {
+            Err(FlowError::NotExistObj)
+        } else 
+        if ! self.node_map.contains_key(owner) {
+            Err(FlowError::NotExistOwner)
+        } else 
+        if self.root().children.contains(obj) {
+            Err(FlowError::IsOrphaned)
+        } else 
+        if &self.root == owner || &self.root == obj {
+            Err(FlowError::RootLink)
+        } else 
+        {
+            let owner = self.node_mut(owner)
+                .expect("checked");
+            if nth > owner.children.len() {
+                Err(FlowError::InValidLen)
+            } else {
+                owner.children.insert(nth, obj.clone());
+                Ok(())
+            }
+        }
+    }
+
+    fn link_push(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError> {
+        let nth = self.node(owner).map(|owner_node| 
+            owner_node.children.len()
+        );
+        let res = nth.map(|nth| {
+            self.link(obj, owner, nth)
+        }).unwrap_or(Err(FlowError::NotExistObj));
+        if cfg!(debug_assertions) { self.check_assert() };
+        res
+    }
+
+    fn detach(&self, obj: &Self::Id) -> Result<(), FlowError> {
         todo!()
     }
 
-    fn link_push(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), ()> {
-        todo!()
-    }
-
-    fn detach(&self, obj: &Self::Id) -> Result<(), ()> {
-        todo!()
-    }
-
-    fn defect(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), ()> {
+    fn defect(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError> {
         todo!()
     }
 }
