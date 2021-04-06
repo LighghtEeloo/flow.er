@@ -270,7 +270,7 @@ fn concise_debug_impl(obj: EntityId, vessel: &Vessel, prefix: usize) -> String {
 
 #[cfg(test)]
 mod tests {
-    use flow_arena::FlowError;
+    use flow_arena::{FlowError, FlowGraph};
 
     use super::*;
     #[test]
@@ -300,25 +300,30 @@ mod tests {
         ).collect();
         (id, vessel)
     }
-    fn has_err(fe: Option<FlowError>) {
+    fn has_err(place: &str, fe: Option<FlowError>) {
         if let Some(e) = fe {
-            println!("error: {:?}", e)
+            println!("error at {}: {:?}", place, e)
         }
     }
+
     #[test]
     fn entity_remove() {
         let (id, mut vessel) = make_vessel(5);
-        has_err(vessel.flow_arena.devote_push(&id[1], &id[0]).err());
-        has_err(vessel.flow_arena.devote_push(&id[2], &id[0]).err());
-        has_err(vessel.flow_arena.devote_push(&id[3], &id[0]).err());
-        has_err(vessel.flow_arena.devote_push(&id[4], &id[0]).err());
-        has_err(vessel.flow_arena.devote_push(&id[4], &id[1]).err());
+        has_err("devote 1 -> 0", vessel.flow_arena.devote_push(&id[1], &id[0]).err());
+        has_err("devote 2 -> 0", vessel.flow_arena.devote_push(&id[2], &id[0]).err());
+        has_err("devote 3 -> 0", vessel.flow_arena.devote_push(&id[3], &id[0]).err());
+        has_err("devote 4 -> 0", vessel.flow_arena.devote_push(&id[4], &id[0]).err());
+        has_err("decay 4", vessel.flow_arena.decay(&id[4]).err());
+        vessel.concise_debug();
+        println!("{:#?}", vessel);
+        // has_err("devote 4 -> 1", vessel.flow_arena.devote_push(&id[4], &id[1]).err());
+        has_err("link 4 -> 0", vessel.flow_arena.link_push(&id[4], &id[0]).err());
         // 0_0 --> id --> [id1, id2, id3]
         //          `-------`-> id4
         vessel.entity_get_mut(&id[0]).map(|entity| entity.face = format!("Aloha!"));
         vessel.entity_get_mut(&id[1]).map(|entity| entity.face = format!("Bobi."));
         vessel.entity_remove(&id[0]);
-        println!("{:#?}", vessel);
+        // println!("{:#?}", vessel);
     }
     #[test]
     fn node_offspring() {
@@ -326,12 +331,12 @@ mod tests {
         for i in 0..5 {
             println!("{}: {:?}", i, id[i]);
         }
-        has_err(vessel.flow_arena.devote_push(&id[1], &id[0]).err());
-        has_err(vessel.flow_arena.devote_push(&id[2], &id[0]).err());
-        has_err(vessel.flow_arena.devote_push(&id[3], &id[0]).err());
-        has_err(vessel.flow_arena.devote_push(&id[4], &id[0]).err());
-        has_err(vessel.flow_arena.devote_push(&id[4], &id[1]).err());
-        has_err(vessel.flow_arena.devote_push(&id[3], &id[4]).err());
+        has_err("", vessel.flow_arena.devote_push(&id[1], &id[0]).err());
+        has_err("", vessel.flow_arena.devote_push(&id[2], &id[0]).err());
+        has_err("", vessel.flow_arena.devote_push(&id[3], &id[0]).err());
+        has_err("", vessel.flow_arena.devote_push(&id[4], &id[0]).err());
+        has_err("", vessel.flow_arena.devote_push(&id[4], &id[1]).err());
+        has_err("", vessel.flow_arena.devote_push(&id[3], &id[4]).err());
         // 0_0 --> id --> [id1, id2, id3]
         //          `-------`-> id4 -/
         println!("{:?}", vessel.flow_arena.node_offspring_list(&id[0]));
