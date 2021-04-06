@@ -4,7 +4,7 @@ use serde::{Serialize, Deserialize};
 use indexmap::IndexSet;
 use std::{collections::{HashMap, HashSet}, fmt::{self, Debug}, hash::Hash};
 
-use super::{FlowMap, FlowTree, FlowGraph, Flow, FlowError};
+use super::{FlowMap, FlowLink, FlowMaid, Flow, FlowError};
 
 #[derive(Clone, Default)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
@@ -12,6 +12,7 @@ use super::{FlowMap, FlowTree, FlowGraph, Flow, FlowError};
 pub struct Node<Id, Entity> {
     id: Id,
     pub entity: Entity,
+    /// indicates ownership.
     pub parent: Option<Id>,
     pub children: Vec<Id>,
 }
@@ -49,11 +50,6 @@ impl<Id: Debug + Clone, Entity: Debug> Debug for Node<Id, Entity> {
 #[derive(Clone)]
 #[cfg_attr(debug_assertions, derive(PartialEq, Debug))]
 pub struct FlowArena<Id: Hash + Eq + Clone, Entity> {
-    /// root: can be a Nil node or a dummy node, but must be in node_map;    
-    /// it could contain title info.
-    /// 
-    /// for now, only Id::default can be root.
-    pub root: Id,
     pub(crate) node_map: HashMap<Id, Node<Id, Entity>>,
 }
 
@@ -69,14 +65,8 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
 impl<Id, Entity> FlowArena<Id, Entity> 
 where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
     pub fn new() -> Self {
-        let node: Node<Id, Entity> = Node::default();
-        let root = node.id().clone();
         let mut node_map = HashMap::new();
-        node_map.insert(root.clone(), node);
-        FlowArena { root, node_map }
-    }
-    pub fn node_map(&self) -> &HashMap<Id, Node<Id, Entity>> {
-        &self.node_map
+        FlowArena { node_map }
     }
     pub fn node_offspring_list(&self, obj: &Id) -> HashSet<Id> {
         let mut visit_set = HashSet::new();
@@ -97,21 +87,9 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
         final_set
     }
     pub(crate) fn check(&self) -> Result<(), (FlowError, String)> {
-        // has root
-        if ! self.node_map.contains_key(&self.root) { return Err((FlowError::NoRoot, "".into())) }
-        // root identical with default
-        if self.root != Id::default() { return Err((FlowError::NotDefaultRoot, "".into())) }
-        // root has no parent
-        if let Some(Some(_)) | None = self.node_map.get(&self.root).map(|r| r.parent.clone()) {
-            return Err((FlowError::ParentedRoot, "".into()))
-        }
         for (id, node) in self.node_map.iter() {
             let current_str = format!(", current: \nid: {:?}, \nnode: {:#?}", id, node);
             if id.clone() != node.id { return Err((FlowError::NodeIdUnmatch, current_str)) }
-            if id.clone() != self.root {
-                // nodes must have parent, except for root
-                if node.parent == None { return Err((FlowError::NoParent, current_str)) }
-            }
             // children exist
             for id in node.children.iter() {
                 if self.node_map.get(id).is_none() {
@@ -145,230 +123,60 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
 impl<Id, Entity> FlowMap for FlowArena<Id, Entity> 
 where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
     type Id = Id;
-
     type Node = Node<Id, Entity>;
 
-    fn root(&mut self) -> &mut Node<Id, Entity> {
-        // no check because not necessarily clean
-        self.node_map.entry(Id::default()).or_default()
-    }
-    fn node(&self, obj: &Id) -> Option<&Node<Id, Entity>> {
-        // no check because no change
-        self.node_map.get(obj)
-    }
-    fn node_mut(&mut self, obj: &Id) -> Option<&mut Node<Id, Entity>> {
-        // no check because no change
-        self.node_map.get_mut(obj)
+    fn orphan(&self) -> Vec<Self::Id> {
+        todo!()
     }
 
-    fn grow(&mut self, mut obj: Self::Node) -> Result<Self::Id, FlowError> {
-        if self.node_map.contains_key(obj.id()) {
-            Err(FlowError::ExistGrow)
-        } else {
-            let id = obj.id().clone();
-            obj.parent = Some(self.root.clone());
-            self.node_map.insert(id.clone(), obj);
-            self.root().children.push(id.clone());
-            if cfg!(debug_assertions) { self.check_assert() };
-            Ok(id)
-        }
+    fn node(&self, obj: &Self::Id) -> Option<&Self::Node> {
+        todo!()
     }
 
-    fn erase(&mut self, obj: &Self::Id) -> Result<Self::Node, FlowError> {
-        if ! self.root().children.contains(obj) {
-            Err(FlowError::NotOrphaned)
-        } else {
-            self.root().children.retain(|x| x != obj);
-            // let orphans = self.node(obj).map_or(Vec::new(), |x| x.children.clone());
-            let res = self.node_map.remove(obj).ok_or(FlowError::NotExistObj); 
-            if cfg!(debug_assertions) { self.check_assert() };
-            res
-        }
+    fn node_mut(&mut self, obj: &Self::Id) -> Option<&mut Self::Node> {
+        todo!()
+    }
+
+    fn grow(&mut self, obj: Self::Node) -> Result<Self::Id, FlowError> {
+        todo!()
     }
 }
 
-impl<Id, Entity> FlowTree for FlowArena<Id, Entity> 
-where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
-    fn devote(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), FlowError> {
-        if ! self.node_map.contains_key(obj) {
-            Err(FlowError::NotExistObj)
-        } else 
-        if ! self.node_map.contains_key(owner) {
-            Err(FlowError::NotExistOwner)
-        } else 
-        if ! self.root().children.contains(obj) {
-            Err(FlowError::NotOrphaned)
-        } else 
-        if &self.root == owner || &self.root == obj {
-            Err(FlowError::RootDevote)
-        } else 
-        {
-            self.root().children.retain(|x| x != obj);
-            {
-                let owner_node = self.node_mut(owner).expect("checked");
-                owner_node.children.retain(|x| x != obj);
-                if nth > owner_node.children.len() { return Err(FlowError::InValidLen) }
-                owner_node.children.insert(nth, obj.clone());
-            }
-            self.node_mut(obj).expect("checked").parent = Some(owner.clone());
-            if cfg!(debug_assertions) { self.check_assert() };
-            Ok(())
-        }
-    }
-
-    fn devote_push(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError> {
-        let nth = self.node(owner).map(|owner_node| 
-            owner_node.children.len()
-        );
-        let res = nth.map(|nth| {
-            self.devote(obj, owner, nth)
-        }).unwrap_or(Err(FlowError::NotExistObj));
-        if cfg!(debug_assertions) { self.check_assert() };
-        res
-    }
-
-    fn decay(&mut self, obj: &Self::Id) -> Result<(), FlowError> {
-        if ! self.node_map.contains_key(obj) {
-            Err(FlowError::NotExistObj)
-        } else 
-        if ! self.root().children.contains(obj) {
-            // Ok(())
-            Err(FlowError::NotOrphaned)
-        } else 
-        if &self.root == obj {
-            Err(FlowError::RootDecay)
-        } else 
-        {
-            let mut orphan: Vec<Id> = Vec::new();
-            let re_owner = self.node(obj)
-                .map_or(None, |x| x.parent.clone())
-                .unwrap_or(self.root.clone());
-            for (_, node) in self.node_map.iter_mut() {
-                let re_owner = re_owner.clone();
-                node.children.retain(|x| x != obj);
-                node.parent = node.parent.clone()
-                    .map(|parent| if &parent == obj { 
-                        orphan.push(node.id.clone());
-                        re_owner
-                    } else { parent });
-            }
-            // must be in root
-            let root = self.root.clone();
-            self.node_mut(obj).map(|node| {
-                node.parent = Some(root);
-                node.children.clear();
-            });
-            self.root().children.retain(|x| x != obj);
-            self.root().children.push(obj.clone());
-            self.node_mut(&re_owner).map(|x| {
-                let mut h: IndexSet<Id> = x.children.iter().cloned().collect();
-                h.extend(orphan.into_iter());
-                x.children = h.into_iter().collect();
-            });
-            if cfg!(debug_assertions) { self.check_assert() };
-            Ok(())
-        }
-    }
-}
-
-
-impl<Id, Entity> FlowGraph for FlowArena<Id, Entity> 
+impl<Id, Entity> FlowLink for FlowArena<Id, Entity> 
 where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
     fn link(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), FlowError> {
-        if ! self.node_map.contains_key(obj) {
-            Err(FlowError::NotExistObj)
-        } else 
-        if ! self.node_map.contains_key(owner) {
-            Err(FlowError::NotExistOwner)
-        } else 
-        if self.root().children.contains(obj) {
-            Err(FlowError::IsOrphaned)
-        } else 
-        if &self.root == owner || &self.root == obj {
-            Err(FlowError::RootLink)
-        } else 
-        {
-            let owner = self.node_mut(owner)
-                .expect("checked");
-            if nth > owner.children.len() {
-                Err(FlowError::InValidLen)
-            } else {
-                owner.children.insert(nth, obj.clone());
-                Ok(())
-            }
-        }
+        todo!()
     }
 
     fn link_push(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError> {
-        let nth = self.node(owner).map(|owner_node| 
-            owner_node.children.len()
-        );
-        let res = nth.map(|nth| {
-            self.link(obj, owner, nth)
-        }).unwrap_or(Err(FlowError::NotExistObj));
-        if cfg!(debug_assertions) { self.check_assert() };
-        res
+        todo!()
     }
 
-    fn detach(&mut self, obj: &Self::Id, owner: &Self::Id ) -> Result<(), FlowError> {
-        if ! self.node_map.contains_key(obj) {
-            Err(FlowError::NotExistObj)
-        } else 
-        if ! self.node_map.contains_key(owner) {
-            Err(FlowError::NotExistOwner)
-        } else 
-        if self.root().children.contains(obj) {
-            Err(FlowError::IsOrphaned)
-        } else 
-        if &self.root == owner || &self.root == obj {
-            Err(FlowError::RootDetach)
-        } else 
-        {
-            if Some(owner.clone()) == self.node(obj)
-                .map_or(None, |x| x.parent.clone()) 
-            {
-                Err(FlowError::OwnerDetach)
-            } else {
-                let owner = self.node_mut(owner).expect("checked");
-                owner.children.retain(|x| x != obj);
-                Ok(())
-            }
-        }
-    }
-
-    fn defect(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError> {
-        if ! self.node_map.contains_key(obj) {
-            Err(FlowError::NotExistObj)
-        } else 
-        if ! self.node_map.contains_key(owner) {
-            Err(FlowError::NotExistOwner)
-        } else 
-        if self.root().children.contains(obj) {
-            Err(FlowError::IsOrphaned)
-        } else 
-        if &self.root == owner || &self.root == obj {
-            Err(FlowError::RootDefect)
-        } else 
-        {
-            if Some(owner.clone()) == self.node(obj)
-                .map_or(None, |x| x.parent.clone()) 
-            {
-                Ok(())
-            } else {
-                {
-                    let owner = self.node(owner).expect("checked");
-                    if ! owner.children.contains(obj) {
-                        return Err(FlowError::AbandonedChild)
-                    }
-                }
-                let obj = self.node_mut(obj).expect("checked");
-                obj.parent = Some(owner.clone());
-                Ok(())
-
-            }
-        }
+    fn detach(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError> {
+        todo!()
     }
 }
+
+
+impl<Id, Entity> FlowMaid for FlowArena<Id, Entity> 
+where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
+    fn devote(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), FlowError> {
+        todo!()
+    }
+
+    fn devote_push(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError> {
+        todo!()
+    }
+
+    fn decay(&mut self, obj: &Self::Id) -> Result<(), FlowError> {
+        todo!()
+    }
+    
+    fn erase(&mut self, obj: &Self::Id) -> Result<Self::Node, FlowError> {
+        todo!()
+    }
+}
+
 
 impl<Id, Entity> Flow for FlowArena<Id, Entity> 
 where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {}
@@ -433,14 +241,9 @@ mod tests {
     }
 
     #[test]
-    fn root() {
-        let mut flow: FlowEntity = FlowArena::new();
-        assert_eq!(flow.root().clone(), Node::default());
-    }
-    #[test]
     fn offspring() {
         let flow = make_flow(false);
-        println!("{:?}", flow.node_offspring_list(&flow.root))
+        // println!("{:?}", flow.node_offspring_list(&flow.root))
     }
 
     #[test]

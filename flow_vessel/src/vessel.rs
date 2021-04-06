@@ -1,6 +1,6 @@
 use std::{collections::HashSet, fmt::Debug};
 use serde::{Serialize, Deserialize};
-use flow_arena::{Node, FlowArena, FlowMap, FlowTree};
+use flow_arena::{Node, FlowArena, FlowMap, FlowLink, FlowMaid};
 
 use super::{Entity, EntityId, EntityIdFactory, Router, Glass, Cube, Settings};
 
@@ -37,8 +37,7 @@ impl Debug for Vessel {
          .field("router", &self.router)
          .field("glass", &self.glass)
          .field("id_factory", &self.id_factory)
-         .field("root", &self.flow_arena.root)
-         .field("node_map", self.flow_arena.node_map())
+         .field("flow_arena", &self.flow_arena)
          .finish()
     }
 }
@@ -98,8 +97,8 @@ impl Vessel {
 
 /// flow_arena inquiry
 impl Vessel {
-    pub fn root_id(&self) -> EntityId {
-        self.flow_arena.root.clone()
+    pub fn orphan(&self) -> Vec<EntityId> {
+        self.flow_arena.orphan()
     }
     pub fn node(&self, id: &EntityId) -> Option<&EntityNode> {
         self.flow_arena.node(id)
@@ -238,8 +237,10 @@ impl Vessel {
 /// flow debug prints
 impl Vessel {
     pub fn concise_debug_string(&self) -> String {
-        let obj = self.flow_arena.root;
-        concise_debug_impl(obj, self, 0)
+        let objs = self.flow_arena.orphan();
+        objs.into_iter().fold("".to_owned(), |debug_info, obj| {
+            format!("{}\n{}", debug_info, concise_debug_impl(obj, self, 1))
+        })
     }
     pub fn concise_debug(&self) {
         println!("{}", self.concise_debug_string())
@@ -270,7 +271,7 @@ fn concise_debug_impl(obj: EntityId, vessel: &Vessel, prefix: usize) -> String {
 
 #[cfg(test)]
 mod tests {
-    use flow_arena::{FlowError, FlowGraph};
+    use flow_arena::{FlowError};
 
     use super::*;
     #[test]

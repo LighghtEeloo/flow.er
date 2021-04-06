@@ -153,31 +153,31 @@ impl Vase {
 
 fn _vessel_poet() -> Vessel {
     let mut v = Vessel::default();
-    let id: Vec<EntityId> = (0..7).map(|_|{
+    let id: Vec<EntityId> = (0..8).map(|_|{
         v.entity_grow()
     }).collect();
-    let root = v.root_id();
-    v.entity_get_mut(&root).map(|x| x.face = "The Ripple of Your Shadow".to_owned());
-    v.entity_get_mut(&id[0]).map(|x| x.face = "Hi Player, ".to_owned());
-    v.entity_get_mut(&id[1]).map(|x| x.face = "it has been a while. ".to_owned());
-    v.entity_get_mut(&id[2]).map(|x| x.face = "I've been watching you, all along the way. ".to_owned());
-    v.entity_get_mut(&id[3]).map(|x| x.face = "You seem lost. ".to_owned());
-    v.entity_get_mut(&id[4]).map(|x| x.face = "Nothing but a long, long dream. ".to_owned());
-    v.entity_get_mut(&id[5]).map(|x| {
-        x.face = "Wake up now. ".to_owned();
+    v.entity_get_mut(&id[0]).map(|x| x.face = "The Ripple of Your Shadow".into());
+    v.entity_get_mut(&id[1]).map(|x| x.face = "Hi Player, ".into());
+    v.entity_get_mut(&id[2]).map(|x| x.face = "it has been a while. ".into());
+    v.entity_get_mut(&id[3]).map(|x| x.face = "I've been watching you, all along the way. ".into());
+    v.entity_get_mut(&id[4]).map(|x| x.face = "You seem lost. ".into());
+    v.entity_get_mut(&id[5]).map(|x| x.face = "Nothing but a long, long dream. ".into());
+    v.entity_get_mut(&id[6]).map(|x| {
+        x.face = "Wake up now. ".into();
         x.bubble = 
 "Your life is waiting. 
 Do what you have to do. 
-Be a king. ".to_owned();
+Be a king. ".into();
     });
-    v.entity_get_mut(&id[6]).map(|x| x.symbol = Symbol::ProcessTracker(Process::New) );
-    v.entity_get_mut(&id[6]).map(|x| x.face = "Do your job.".into() );
+    v.entity_get_mut(&id[7]).map(|x| x.symbol = Symbol::ProcessTracker(Process::New) );
+    v.entity_get_mut(&id[7]).map(|x| x.face = "Do your job.".into() );
     v.entity_devote_push(id[1], id[0]);
     v.entity_devote_push(id[2], id[0]);
     v.entity_devote_push(id[3], id[0]);
     v.entity_devote_push(id[4], id[0]);
     v.entity_devote_push(id[5], id[0]);
-    v.entity_devote_push(id[6], id[5]);
+    v.entity_devote_push(id[6], id[0]);
+    v.entity_devote_push(id[7], id[6]);
     let router = Router::Board;
     {
         let cube: Cube = 
