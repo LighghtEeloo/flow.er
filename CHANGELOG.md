@@ -1,5 +1,11 @@
 # Flow.er ChangeLog
 
+## Ver 0.4.0
+- fix!! new flow_arena with clearer effects.
+- done: indent correctly.
+- todo: stable view with None compatibility.
+- todo: new flow_view.
+
 ## Ver 0.3.2
 - fix! flow_arena.
 - test! demon test.
