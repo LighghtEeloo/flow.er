@@ -68,7 +68,26 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
         let mut node_map = HashMap::new();
         FlowArena { node_map }
     }
-    pub fn node_offspring_list(&self, obj: &Id) -> HashSet<Id> {
+    // pub fn spread<F>(&self, obj: &Id, fit: F) -> HashSet<Id> 
+    // where F: Fn(Id) -> Option<Id> {
+    //     let mut visit_set = HashSet::new();
+    //     let mut final_set = HashSet::new();
+    //     visit_set.insert(obj.clone());
+    //     while !visit_set.is_empty() {
+    //         let mut wait_set = HashSet::new();
+    //         for obj in visit_set.iter() {
+    //             let children = self.node_map.get(&obj)
+    //                 .map(|x| x.children.clone() )
+    //                 .unwrap_or_default();
+    //             wait_set.extend(children);
+    //         }
+    //         final_set.extend(wait_set.iter().cloned());
+    //         visit_set.clear();
+    //         visit_set.extend(wait_set);
+    //     }
+    //     final_set
+    // }
+    pub fn node_offspring_set(&self, obj: &Id) -> HashSet<Id> {
         let mut visit_set = HashSet::new();
         let mut final_set = HashSet::new();
         visit_set.insert(obj.clone());
@@ -79,6 +98,34 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
                     .map(|x| x.children.clone() )
                     .unwrap_or_default();
                 wait_set.extend(children);
+            }
+            final_set.extend(wait_set.iter().cloned());
+            visit_set.clear();
+            visit_set.extend(wait_set);
+        }
+        final_set
+    }
+    pub fn node_ownership_set(&self, obj: &Id) -> HashSet<Id> {
+        let mut visit_set = HashSet::new();
+        let mut final_set = HashSet::new();
+        visit_set.insert(obj.clone());
+        final_set.insert(obj.clone());
+        while !visit_set.is_empty() {
+            let mut wait_set = HashSet::new();
+            for obj in visit_set.iter() {
+                let children = self.node_map.get(&obj)
+                    .map(|x|  x.children.clone())
+                    .unwrap_or_default();
+                let set: Vec<Id> = children.into_iter().filter_map(|id| {
+                    self.node(&id).map(|node| {
+                        if node.parent == Some(obj.clone()) {
+                            Some(id)
+                        } else {
+                            None
+                        }
+                    }).flatten()
+                }).collect();
+                wait_set.extend(set);
             }
             final_set.extend(wait_set.iter().cloned());
             visit_set.clear();
@@ -236,7 +283,19 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
     }
 
     fn erase(&mut self, obj: &Self::Id) -> Result<(), FlowError> {
-        todo!()
+        if ! self.node_map.contains_key(obj) {
+            return Err(FlowError::NotExistObj)
+        }
+        let kill_set = self.node_ownership_set(obj);
+        self.node_map.retain(|id, _| {
+            ! kill_set.contains(id)
+        });
+        let () = self.node_map.values_mut().map(|obj| {
+            obj.children.retain(|id| {
+                ! kill_set.contains(id)
+            })
+        }).collect();
+        Ok(())
     }
 }
 

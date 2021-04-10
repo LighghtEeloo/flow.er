@@ -113,7 +113,7 @@ impl Vessel {
     }
     /// get all entity_ids under id recrusively
     pub fn entity_ids(&self, obj: &EntityId) -> HashSet<EntityId> {
-        self.flow_arena.node_offspring_list(obj)
+        self.flow_arena.node_offspring_set(obj)
     }
     /// search all entities for "face" match
     pub fn entity_face_filter(&self, face: String) -> Vec<EntityId> {
@@ -340,7 +340,7 @@ mod tests {
         has_err("", vessel.flow_arena.devote_push(&id[3], &id[4]).err());
         // 0_0 --> id --> [id1, id2, id3]
         //          `-------`-> id4 -/
-        println!("{:?}", vessel.flow_arena.node_offspring_list(&id[0]));
+        println!("{:?}", vessel.flow_arena.node_offspring_set(&id[0]));
     }
     #[test]
     fn serde() {
