@@ -260,7 +260,7 @@ impl ClauseNode {
 
 fn head_view(clause: &ClauseTree, vessel: &Vessel, meta: CubeMeta, link: ComponentLink<Vase>) -> Html {
     let id = clause.obj;
-    let entity = vessel.entity_get(&id).expect("Host doesn't exist.");
+    let entity = vessel.entity(&id).expect("Host doesn't exist.");
     let link = link.clone();
     html! {
         <div class="head">

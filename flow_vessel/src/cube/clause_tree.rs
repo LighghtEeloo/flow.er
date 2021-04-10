@@ -29,6 +29,6 @@ impl From<Cube> for ClauseTree {
 
 impl CubeMember for ClauseTree {
     fn member_traverse(&self, vessel: &Vessel) -> HashSet<EntityId> {
-        vessel.entity_ids(&self.obj)
+        vessel.entity_offspring(&self.obj)
     }
 }

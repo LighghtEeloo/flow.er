@@ -29,6 +29,6 @@ impl From<Cube> for FlowView {
 
 impl CubeMember for FlowView {
     fn member_traverse(&self, vessel: &Vessel) -> HashSet<EntityId> {
-        vessel.entity_ids(&self.obj)
+        vessel.entity_offspring(&self.obj)
     }
 }

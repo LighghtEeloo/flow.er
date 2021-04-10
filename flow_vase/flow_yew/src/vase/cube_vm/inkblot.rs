@@ -6,7 +6,7 @@ use super::{CubeView, Vase, Msg::*};
 
 impl CubeView for Inkblot {
     fn view(&self, vessel: &Vessel, _: CubeMeta, link: ComponentLink<Vase>, _ref_map: &HashMap<EntityId, NodeRef>) -> Html {
-        let entity = vessel.entity_get(&self.obj).cloned().expect("Host invalid.");
+        let entity = vessel.entity(&self.obj).cloned().expect("Host invalid.");
         let id = entity.id().clone();
         let link = link.clone();
         html! {

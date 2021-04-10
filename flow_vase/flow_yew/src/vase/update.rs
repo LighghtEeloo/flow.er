@@ -34,7 +34,7 @@ impl Vase {
                 true
             }
             EntityUpdate { id, field } => {
-                self.vessel.entity_get_mut(&id).map(|entity| {
+                self.vessel.entity_mut(&id).map(|entity| {
                     entity.update_entity(field)
                 });
                 true

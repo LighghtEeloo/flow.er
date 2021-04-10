@@ -18,7 +18,7 @@ fn expand(obj: &EntityId, vessel: &Vessel) -> Vec<EntityId> {
 fn node(id: &EntityId, idx: usize, vessel: &Vessel, prefix: String, link: ComponentLink<Vase>) -> Html {
     let mut next_prefix = prefix.clone();
     next_prefix.push_str("--");
-    let entity = vessel.entity_get(id).cloned().unwrap_or_default();
+    let entity = vessel.entity(id).cloned().unwrap_or_default();
     let owner = vessel.node(id).unwrap().parent.unwrap_or_default();
     let dude = owner;
     let children: Vec<Html> = expand(id, vessel)

@@ -156,21 +156,21 @@ fn _vessel_poet() -> Vessel {
     let id: Vec<EntityId> = (0..8).map(|_|{
         v.entity_grow()
     }).collect();
-    v.entity_get_mut(&id[0]).map(|x| x.face = "The Ripple of Your Shadow".into());
-    v.entity_get_mut(&id[1]).map(|x| x.face = "Hi Player, ".into());
-    v.entity_get_mut(&id[2]).map(|x| x.face = "it has been a while. ".into());
-    v.entity_get_mut(&id[3]).map(|x| x.face = "I've been watching you, all along the way. ".into());
-    v.entity_get_mut(&id[4]).map(|x| x.face = "You seem lost. ".into());
-    v.entity_get_mut(&id[5]).map(|x| x.face = "Nothing but a long, long dream. ".into());
-    v.entity_get_mut(&id[6]).map(|x| {
+    v.entity_mut(&id[0]).map(|x| x.face = "The Ripple of Your Shadow".into());
+    v.entity_mut(&id[1]).map(|x| x.face = "Hi Player, ".into());
+    v.entity_mut(&id[2]).map(|x| x.face = "it has been a while. ".into());
+    v.entity_mut(&id[3]).map(|x| x.face = "I've been watching you, all along the way. ".into());
+    v.entity_mut(&id[4]).map(|x| x.face = "You seem lost. ".into());
+    v.entity_mut(&id[5]).map(|x| x.face = "Nothing but a long, long dream. ".into());
+    v.entity_mut(&id[6]).map(|x| {
         x.face = "Wake up now. ".into();
         x.bubble = 
 "Your life is waiting. 
 Do what you have to do. 
 Be a king. ".into();
     });
-    v.entity_get_mut(&id[7]).map(|x| x.symbol = Symbol::ProcessTracker(Process::New) );
-    v.entity_get_mut(&id[7]).map(|x| x.face = "Do your job.".into() );
+    v.entity_mut(&id[7]).map(|x| x.symbol = Symbol::ProcessTracker(Process::New) );
+    v.entity_mut(&id[7]).map(|x| x.face = "Do your job.".into() );
     v.entity_devote_push(id[1], id[0]);
     v.entity_devote_push(id[2], id[0]);
     v.entity_devote_push(id[3], id[0]);
@@ -214,7 +214,7 @@ fn _vessel_incr(num: usize) -> Vessel {
         v.entity_grow()
     }).collect();
     for (i, x )in id.iter().enumerate() {
-        v.entity_get_mut(&x).map(|x| {
+        v.entity_mut(&x).map(|x| {
             x.face = ((65 + i) as u8 as char).into();
             x.symbol = Symbol::Linted(Lint::Greek);
         });

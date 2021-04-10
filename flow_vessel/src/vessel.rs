@@ -58,7 +58,7 @@ impl Vessel {
         if self.flow_arena.node(id).is_none() {
             self.entity_insert(Entity::new_id(id));
         }
-        self.entity_get_mut(id).expect("contains key")
+        self.entity_mut(id).expect("contains key")
     }
     pub fn entity_devote(&mut self, obj: EntityId, owner: EntityId, idx: usize) {
         if self.flow_arena.decay(&obj).is_ok() {
@@ -76,8 +76,8 @@ impl Vessel {
         obj
     }
     pub fn entity_duplicate(&mut self, obj: EntityId, dude: EntityId) {
-        let dude = self.entity_get(&dude).cloned().unwrap_or_default();
-        self.entity_get_mut(&obj).map(|obj| {
+        let dude = self.entity(&dude).cloned().unwrap_or_default();
+        self.entity_mut(&obj).map(|obj| {
             obj.duplicate_from(&dude)
         });
     }
@@ -112,8 +112,11 @@ impl Vessel {
         self.flow_arena.node(obj).map_or(Vec::new(), |x| x.children.clone())
     }
     /// get all entity_ids under id recrusively
-    pub fn entity_ids(&self, obj: &EntityId) -> HashSet<EntityId> {
+    pub fn entity_offspring(&self, obj: &EntityId) -> HashSet<EntityId> {
         self.flow_arena.node_offspring_set(obj)
+    }
+    pub fn entity_ownership(&self, obj: &EntityId) -> HashSet<EntityId> {
+        self.flow_arena.node_ownership_set(obj)
     }
     /// search all entities for "face" match
     pub fn entity_face_filter(&self, face: String) -> Vec<EntityId> {
@@ -121,10 +124,10 @@ impl Vessel {
             if x.face == face { Some(x.id().clone()) } else { None }
         }).collect()
     }
-    pub fn entity_get(&self, id: &EntityId) -> Option<&Entity> {
+    pub fn entity(&self, id: &EntityId) -> Option<&Entity> {
         self.flow_arena.node(id).map(|x| &x.entity)
     }
-    pub fn entity_get_mut(&mut self, id: &EntityId) -> Option<&mut Entity> {
+    pub fn entity_mut(&mut self, id: &EntityId) -> Option<&mut Entity> {
         self.flow_arena.node_mut(id).map(|x| &mut x.entity)
     }
 }
@@ -248,7 +251,7 @@ impl Vessel {
 }
 
 fn concise_debug_impl(obj: EntityId, vessel: &Vessel, prefix: usize) -> String {
-    let id_debug = vessel.entity_get(&obj).map_or(
+    let id_debug = vessel.entity(&obj).map_or(
         "".into(), 
         |x|{
             format!("{:?}: {:?}", x.id(), x.face)
@@ -284,7 +287,7 @@ mod tests {
         let mut vessel = Vessel::new();
         let id = vessel.entity_grow();
         println!("{:#?}", vessel);
-        println!("{:?}", vessel.entity_get_mut(&id));
+        println!("{:?}", vessel.entity_mut(&id));
     }
     #[test]
     fn entity_ensure() {
@@ -321,8 +324,8 @@ mod tests {
         has_err("link 4 -> 0", vessel.flow_arena.link_push(&id[4], &id[0]).err());
         // 0_0 --> id --> [id1, id2, id3]
         //          `-------`-> id4
-        vessel.entity_get_mut(&id[0]).map(|entity| entity.face = format!("Aloha!"));
-        vessel.entity_get_mut(&id[1]).map(|entity| entity.face = format!("Bobi."));
+        vessel.entity_mut(&id[0]).map(|entity| entity.face = format!("Aloha!"));
+        vessel.entity_mut(&id[1]).map(|entity| entity.face = format!("Bobi."));
         vessel.entity_remove(&id[0]);
         // println!("{:#?}", vessel);
     }
@@ -352,8 +355,8 @@ mod tests {
         vessel.flow_arena.devote_push(&id[4], &id[1]).ok();
         // 0_0 --> id --> [id1, id2, id3]
         //          `-------`-> id4
-        vessel.entity_get_mut(&id[0]).map(|entity| entity.face = format!("Aloha!"));
-        vessel.entity_get_mut(&id[1]).map(|entity| entity.face = format!("Bobi."));
+        vessel.entity_mut(&id[0]).map(|entity| entity.face = format!("Aloha!"));
+        vessel.entity_mut(&id[1]).map(|entity| entity.face = format!("Bobi."));
         let str = serde_json::to_string(&vessel).expect("failed to serialize vessel");
         println!("Serialize: {}", str);
         let vessel: Vessel = serde_json::from_str(&str).expect("failed to deserialize");
