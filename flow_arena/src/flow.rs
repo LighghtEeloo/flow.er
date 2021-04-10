@@ -28,7 +28,7 @@ pub trait FlowMap {
 }
 
 pub trait FlowLink: FlowMap {
-    /// randomly mounts an *unorphaned* node under a non-root node; the parent of the node will not be changed
+    /// randomly ensures the link of a node to another
     fn link(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), FlowError>;
     fn link_push(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError>;
     /// detaches a node from a non-owner link
@@ -36,17 +36,13 @@ pub trait FlowLink: FlowMap {
 }
 
 pub trait FlowMaid: FlowMap + FlowLink {
-    /// appoints and ensures an owner
-    ///
-    /// err if:
-    /// 1. nth > len
-    /// 2. no obj / owner
+    /// appoints and ensures an owner; also links
     fn devote(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), FlowError>;
     fn devote_push(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError>;
-    /// removes ownership
+    /// removes ownership; also detaches
     fn decay(&mut self, obj: &Self::Id) -> Result<(), FlowError>;
     /// removes a node; returns err if id not found under root
-    fn erase(&mut self, obj: &Self::Id) -> Result<Self::Node, FlowError>;
+    fn erase(&mut self, obj: &Self::Id) -> Result<(), FlowError>;
 }
 
 

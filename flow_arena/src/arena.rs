@@ -126,34 +126,68 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
     type Node = Node<Id, Entity>;
 
     fn orphan(&self) -> Vec<Self::Id> {
-        todo!()
+        self.node_map.iter().filter_map(|(id, node)|
+            if node.parent.is_none() {
+                Some(id.clone())
+            } else {
+                None
+            }
+        ).collect()
     }
 
     fn node(&self, obj: &Self::Id) -> Option<&Self::Node> {
-        todo!()
+        self.node_map.get(obj)
     }
 
     fn node_mut(&mut self, obj: &Self::Id) -> Option<&mut Self::Node> {
-        todo!()
+        self.node_map.get_mut(obj)
     }
 
     fn grow(&mut self, obj: Self::Node) -> Result<Self::Id, FlowError> {
-        todo!()
+        if self.node_map.contains_key(obj.id()) {
+            Err(FlowError::ExistGrow)
+        } else {
+            let id = obj.id().clone();
+            self.node_map.insert(obj.id().clone(), obj);
+            Ok(id)
+        }
     }
 }
 
 impl<Id, Entity> FlowLink for FlowArena<Id, Entity> 
 where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
     fn link(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), FlowError> {
-        todo!()
+        if ! self.node_map.contains_key(obj) {
+            return Err(FlowError::NotExistObj)
+        } 
+        self.node_mut(owner).map(|owner| {
+            if owner.children.contains(obj) {
+                return Ok(())
+            } 
+            if nth > owner.children.len() {
+                return Err(FlowError::InValidLen)
+            } 
+            owner.children.insert(nth, obj.clone());
+            Ok(())
+        }).unwrap_or(Err(FlowError::NotExistOwner))
     }
 
     fn link_push(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError> {
-        todo!()
+        let nth = self.node(owner).map_or(0, |node| node.children.len());
+        self.link(obj, owner, nth)
     }
 
     fn detach(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError> {
-        todo!()
+        if ! self.node_map.contains_key(obj) {
+            return Err(FlowError::NotExistObj)
+        } 
+        self.node_mut(owner).map(|owner| {
+            if ! owner.children.contains(obj) {
+                return Err(FlowError::AbandonedChild)
+            }
+            owner.children.retain(|x| x != obj);
+            Ok(())
+        }).unwrap_or(Err(FlowError::NotExistOwner))
     }
 }
 
@@ -161,18 +195,47 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
 impl<Id, Entity> FlowMaid for FlowArena<Id, Entity> 
 where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
     fn devote(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), FlowError> {
-        todo!()
+        self.link(obj, owner, nth).and_then(|_| {
+            self.node_mut(obj).map(|obj| {
+                obj.parent = Some(owner.clone());
+                Ok(())
+            }).unwrap_or(Err(FlowError::NotExistObj))
+        })
     }
 
     fn devote_push(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError> {
-        todo!()
+        self.link_push(obj, owner).and_then(|_| {
+            self.node_mut(obj).map_or(
+                Err(FlowError::NotExistObj), 
+                |obj| {
+                    obj.parent = Some(owner.clone());
+                    Ok(())
+                }
+            )
+        })
     }
 
     fn decay(&mut self, obj: &Self::Id) -> Result<(), FlowError> {
-        todo!()
+        let owner = self.node(obj)
+            .map(|x| x.parent.clone() )
+            .flatten();
+        self.node_mut(obj).map_or(
+            Err(FlowError::NotExistObj),
+            |obj| {
+                obj.parent = None;
+                Ok(())
+            }
+        ).and_then(|_| {
+            owner.map_or(
+                Err(FlowError::NotExistOwner), 
+                |owner| {
+                    self.detach(obj, &owner)
+                }
+            )
+        })
     }
-    
-    fn erase(&mut self, obj: &Self::Id) -> Result<Self::Node, FlowError> {
+
+    fn erase(&mut self, obj: &Self::Id) -> Result<(), FlowError> {
         todo!()
     }
 }
