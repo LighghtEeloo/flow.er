@@ -108,8 +108,10 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
     pub fn node_ownership_set(&self, obj: &Id) -> HashSet<Id> {
         let mut visit_set = HashSet::new();
         let mut final_set = HashSet::new();
-        visit_set.insert(obj.clone());
-        final_set.insert(obj.clone());
+        if self.node_map.contains_key(obj) {
+            visit_set.insert(obj.clone());
+            final_set.insert(obj.clone());
+        }
         while !visit_set.is_empty() {
             let mut wait_set = HashSet::new();
             for obj in visit_set.iter() {
@@ -264,8 +266,14 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
 
     fn decay(&mut self, obj: &Self::Id) -> Result<(), FlowError> {
         let owner = self.node(obj)
-            .map(|x| x.parent.clone() )
-            .flatten();
+            .map(|x| {
+                x.parent.clone() 
+            });
+        // Not owned by anyone
+        if let Some(None) = owner {
+            return Ok(())
+        }
+        let owner = owner.flatten();
         self.node_mut(obj).map_or(
             Err(FlowError::NotExistObj),
             |obj| {
@@ -324,37 +332,48 @@ mod tests {
         }
     }
 
-    fn wrapper(name: &str, res: bool, flow: &FlowEntity, aloud: bool) {
+    fn wrapper<T>(name: &str, res: Result<T, FlowError>, flow: &FlowEntity, aloud: bool) {
         if aloud {
-            println!("{}: {}", name, if res {"success"} else {"error"});
-            assert!(res);
+            let is_ok = res.is_ok();
+            println!("{}: {}", name, if res.is_ok() {format!("success")} else {format!("{:?}", res.err())});
+            assert!(is_ok);
             println!("{:#?}", flow);
         }
     }
 
-    fn make_flow(aloud: bool) -> FlowEntity {
+    fn make_flow(aloud: bool) -> (FlowEntity, Vec<EntityId>) {
         let mut flow: FlowEntity = FlowArena::new();
-        let obj_vec: Vec<NodeEntity> = (0..21).map(|x| Node::from_id(x.clone().into(), ())).collect();
-        wrapper("Grow", flow.grow(obj_vec[1].clone()).is_ok(), &flow, aloud);
-        wrapper("Grow", flow.grow(obj_vec[2].clone()).is_ok(), &flow, aloud);
-        wrapper("Grow", flow.grow(obj_vec[3].clone()).is_ok(), &flow, aloud);
-        wrapper("Grow", flow.grow(obj_vec[4].clone()).is_ok(), &flow, aloud);
-        wrapper("Grow", flow.grow(obj_vec[5].clone()).is_ok(), &flow, aloud);
-        wrapper("Grow", flow.grow(obj_vec[6].clone()).is_ok(), &flow, aloud);
-        wrapper("Grow", flow.grow(obj_vec[7].clone()).is_ok(), &flow, aloud);
-        wrapper("Grow", flow.grow(obj_vec[8].clone()).is_ok(), &flow, aloud);
-        wrapper("Grow", flow.grow(obj_vec[9].clone()).is_ok(), &flow, aloud);
-        wrapper("Devote 4->1", flow.devote_push(obj_vec[4].id(), obj_vec[1].id()).is_ok(), &flow, aloud);
-        wrapper("Devote 5->1", flow.devote_push(obj_vec[5].id(), obj_vec[1].id()).is_ok(), &flow, aloud);
-        wrapper("Devote 6->1", flow.devote_push(obj_vec[6].id(), obj_vec[1].id()).is_ok(), &flow, aloud);
-        wrapper("Devote 7->1", flow.devote_push(obj_vec[7].id(), obj_vec[1].id()).is_ok(), &flow, aloud);
-        wrapper("Devote 8->1", flow.devote_push(obj_vec[8].id(), obj_vec[1].id()).is_ok(), &flow, aloud);
-        wrapper("Devote 9->1", flow.devote_push(obj_vec[9].id(), obj_vec[1].id()).is_ok(), &flow, aloud);
-        wrapper("Erase 3", flow.erase(obj_vec[3].id()).is_ok(), &flow, aloud);
-        wrapper("Decay 1", flow.decay(obj_vec[1].id()).is_ok(), &flow, aloud);
-        wrapper("Erase 1", flow.erase(obj_vec[1].id()).is_ok(), &flow, aloud);
+        let obj_vec: Vec<NodeEntity> = (0..21).map(|x| 
+            Node::from_id(x.clone().into(), ())
+        ).collect();
+        wrapper("Grow", flow.grow(obj_vec[0].clone()), &flow, aloud);
+        wrapper("Grow", flow.grow(obj_vec[1].clone()), &flow, aloud);
+        wrapper("Grow", flow.grow(obj_vec[2].clone()), &flow, aloud);
+        wrapper("Grow", flow.grow(obj_vec[3].clone()), &flow, aloud);
+        wrapper("Grow", flow.grow(obj_vec[4].clone()), &flow, aloud);
+        wrapper("Grow", flow.grow(obj_vec[5].clone()), &flow, aloud);
+        wrapper("Grow", flow.grow(obj_vec[6].clone()), &flow, aloud);
+        wrapper("Grow", flow.grow(obj_vec[7].clone()), &flow, aloud);
+        wrapper("Grow", flow.grow(obj_vec[8].clone()), &flow, aloud);
+        wrapper("Grow", flow.grow(obj_vec[9].clone()), &flow, aloud);
+        wrapper("Devote 2->0", flow.devote_push(obj_vec[2].id(), obj_vec[0].id()), &flow, aloud);
+        wrapper("Devote 3->0", flow.devote_push(obj_vec[3].id(), obj_vec[0].id()), &flow, aloud);
+        wrapper("Devote 4->0", flow.devote_push(obj_vec[4].id(), obj_vec[0].id()), &flow, aloud);
+        wrapper("Devote 5->1", flow.devote_push(obj_vec[5].id(), obj_vec[1].id()), &flow, aloud);
+        wrapper("Devote 6->1", flow.devote_push(obj_vec[6].id(), obj_vec[1].id()), &flow, aloud);
+        wrapper("Devote 7->1", flow.devote_push(obj_vec[7].id(), obj_vec[1].id()), &flow, aloud);
+        wrapper("Devote 8->1", flow.devote_push(obj_vec[8].id(), obj_vec[1].id()), &flow, aloud);
+        wrapper("Devote 9->1", flow.devote_push(obj_vec[9].id(), obj_vec[1].id()), &flow, aloud);
+        wrapper("Erase 3", flow.erase(obj_vec[3].id()), &flow, aloud);
+        wrapper("Decay 1", flow.decay(obj_vec[1].id()), &flow, aloud);
+        wrapper("Erase 1", flow.erase(obj_vec[1].id()), &flow, aloud);
         if cfg!(debug_assertions) && aloud { println!("Checked."); flow.check_assert() };
-        flow
+        (
+            flow, 
+            obj_vec.into_iter()
+            .map(|node| node.id().clone())
+            .collect()
+        )
     }
 
     #[test]
@@ -363,9 +382,10 @@ mod tests {
     }
 
     #[test]
-    fn offspring() {
-        let flow = make_flow(false);
-        // println!("{:?}", flow.node_offspring_list(&flow.root))
+    fn ownership_offspring() {
+        let (flow, obj_vec) = make_flow(true);
+        println!("{:?}", flow.node_offspring_set(&obj_vec[0]));
+        println!("{:?}", flow.node_ownership_set(&obj_vec[0]));
     }
 
     #[test]
@@ -379,7 +399,7 @@ mod tests {
         print_wrapper(&serde_json::to_string(&id).unwrap(), false);
         let node: NodeEntity = Node::from_id(1.into(), ());
         print_wrapper(&serde_json::to_string(&node).unwrap(), false);
-        let flow = make_flow(false);
+        let (flow, _) = make_flow(false);
         let str = serde_json::to_string(&flow).unwrap();
         print_wrapper(&str, true);
         let _flow: FlowEntity = serde_json::from_str(&str).unwrap();
