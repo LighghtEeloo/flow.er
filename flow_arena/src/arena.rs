@@ -1,7 +1,6 @@
 #[cfg(feature = "serde1")]
 use serde::{Serialize, Deserialize};
 
-use indexmap::IndexSet;
 use std::{collections::{HashMap, HashSet}, fmt::{self, Debug}, hash::Hash};
 
 use super::{FlowMap, FlowLink, FlowMaid, Flow, FlowError};
@@ -65,7 +64,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
 impl<Id, Entity> FlowArena<Id, Entity> 
 where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
     pub fn new() -> Self {
-        let mut node_map = HashMap::new();
+        let node_map = HashMap::new();
         FlowArena { node_map }
     }
     // pub fn spread<F>(&self, obj: &Id, fit: F) -> HashSet<Id> 
@@ -311,6 +310,49 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
 impl<Id, Entity> Flow for FlowArena<Id, Entity> 
 where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {}
 
+
+#[derive(Clone)]
+pub struct Entities<'a, Id: 'a, Entity: 'a> {
+    iter: std::collections::hash_map::Values<'a, Id, Node<Id, Entity>>
+}
+
+impl<'a, Id, Entity> Iterator for Entities<'a, Id, Entity> {
+    type Item = &'a Entity;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let x = self.iter.next();
+        x.map(|node| &node.entity)
+    }
+}
+pub struct EntitiesMut<'a, Id: 'a, Entity: 'a> {
+    iter: std::collections::hash_map::ValuesMut<'a, Id, Node<Id, Entity>>
+}
+
+impl<'a, Id, Entity> Iterator for EntitiesMut<'a, Id, Entity> {
+    type Item = &'a Entity;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let x = self.iter.next();
+        x.map(|node| &node.entity)
+    }
+}
+
+impl<Id, Entity> FlowArena<Id, Entity> 
+where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
+    /// returns an iterator over all entities.
+    pub fn entities(&self) -> Entities<Id, Entity> {
+        Entities {
+            iter: self.node_map.values()
+        }
+    }
+    /// returns an iterator over all entities.
+    pub fn entities_mut(&mut self) -> EntitiesMut<Id, Entity> {
+        EntitiesMut {
+            iter: self.node_map.values_mut()
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -386,6 +428,16 @@ mod tests {
         let (flow, obj_vec) = make_flow(true);
         println!("{:?}", flow.node_offspring_set(&obj_vec[0]));
         println!("{:?}", flow.node_ownership_set(&obj_vec[0]));
+    }
+
+
+    #[test]
+    fn iter() {
+        let (flow, _) = make_flow(false);
+        wrapper("Print", Ok(()), &flow, true);
+        let entities: Vec<()> = flow.entities().cloned().collect();
+        println!("{:?}", entities);
+        assert_eq!(entities, flow.node_map.values().map(|x| x.entity.clone()).collect::<Vec<()>>())
     }
 
     #[test]
