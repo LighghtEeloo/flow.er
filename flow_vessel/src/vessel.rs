@@ -42,6 +42,44 @@ impl Debug for Vessel {
     }
 }
 
+/// flow_arena inquiry
+impl Vessel {
+    pub fn orphan(&self) -> Vec<EntityId> {
+        self.flow_arena.orphan()
+    }
+    pub fn node(&self, id: &EntityId) -> Option<&EntityNode> {
+        self.flow_arena.node(id)
+    }
+    /// get all entity_ids
+    pub fn entity_id_all(&self) -> Vec<EntityId> {
+        self.flow_arena.entities().map(|x|x.id().clone()).collect()
+    }
+    /// get all entity_ids under id directly
+    pub fn entity_id_direct(&self, obj: &EntityId) -> Vec<EntityId> {
+        self.flow_arena.node(obj).map_or(Vec::new(), |x| x.children.clone())
+    }
+    /// get all entity_ids under id recrusively
+    pub fn entity_offspring(&self, obj: &EntityId) -> HashSet<EntityId> {
+        self.flow_arena.node_offspring_set(obj)
+    }
+    pub fn entity_ownership(&self, obj: &EntityId) -> HashSet<EntityId> {
+        self.flow_arena.node_ownership_set(obj)
+    }
+    /// search all entities for "face" match
+    pub fn entity_face_filter(&self, face: String) -> Vec<EntityId> {
+        self.flow_arena.entities().filter_map(|x| {
+            if x.face == face { Some(x.id().clone()) } else { None }
+        }).collect()
+    }
+    pub fn entity(&self, id: &EntityId) -> Option<&Entity> {
+        self.flow_arena.node(id).map(|x| &x.entity)
+    }
+    pub fn entity_mut(&mut self, id: &EntityId) -> Option<&mut Entity> {
+        self.flow_arena.node_mut(id).map(|x| &mut x.entity)
+    }
+}
+
+/// flow_arena flow operation
 impl Vessel {
     pub fn entity_grow(&mut self) -> EntityId {
         let entity = Entity::new_time(&self.id_factory);
@@ -92,43 +130,6 @@ impl Vessel {
         self.flow_arena.decay(&obj).ok();
         self.flow_arena.erase(obj).ok();
         self.glass_refresh();
-    }
-}
-
-/// flow_arena inquiry
-impl Vessel {
-    pub fn orphan(&self) -> Vec<EntityId> {
-        self.flow_arena.orphan()
-    }
-    pub fn node(&self, id: &EntityId) -> Option<&EntityNode> {
-        self.flow_arena.node(id)
-    }
-    /// get all entity_ids
-    pub fn entity_id_all(&self) -> Vec<EntityId> {
-        self.flow_arena.entities().map(|x|x.id().clone()).collect()
-    }
-    /// get all entity_ids under id directly
-    pub fn entity_id_direct(&self, obj: &EntityId) -> Vec<EntityId> {
-        self.flow_arena.node(obj).map_or(Vec::new(), |x| x.children.clone())
-    }
-    /// get all entity_ids under id recrusively
-    pub fn entity_offspring(&self, obj: &EntityId) -> HashSet<EntityId> {
-        self.flow_arena.node_offspring_set(obj)
-    }
-    pub fn entity_ownership(&self, obj: &EntityId) -> HashSet<EntityId> {
-        self.flow_arena.node_ownership_set(obj)
-    }
-    /// search all entities for "face" match
-    pub fn entity_face_filter(&self, face: String) -> Vec<EntityId> {
-        self.flow_arena.entities().filter_map(|x| {
-            if x.face == face { Some(x.id().clone()) } else { None }
-        }).collect()
-    }
-    pub fn entity(&self, id: &EntityId) -> Option<&Entity> {
-        self.flow_arena.node(id).map(|x| &x.entity)
-    }
-    pub fn entity_mut(&mut self, id: &EntityId) -> Option<&mut Entity> {
-        self.flow_arena.node_mut(id).map(|x| &mut x.entity)
     }
 }
 

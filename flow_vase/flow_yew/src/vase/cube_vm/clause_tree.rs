@@ -362,7 +362,12 @@ fn node_view(
                 link: clause_node.link.clone(),
             };
             let node = vessel.node(&clause_node.id).expect("must exist");
-            node_view(clause_node, vessel, idx, node, owner, ref_map, meta, indent + 1)
+            let owner = node.parent;
+            if let Some(owner) = owner {
+                node_view(clause_node, vessel, idx, node, owner, ref_map, meta, indent + 1)
+            } else {
+                html! {}
+            }
         }).collect() } else { Vec::new() };
     html! {
         <>
