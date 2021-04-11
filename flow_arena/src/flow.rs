@@ -23,6 +23,8 @@ pub trait FlowMap {
     fn node(&self, obj: &Self::Id) -> Option<&Self::Node>;
     /// no check
     fn node_mut(&mut self, obj: &Self::Id) -> Option<&mut Self::Node>;
+    fn parent(&self, obj: &Self::Id) -> Option<Self::Id>;
+    fn children(&self, obj: &Self::Id) -> Vec<Self::Id>;
     /// inserts a node; returns err if id exists.
     fn grow(&mut self, obj: Self::Node) -> Result<Self::Id, FlowError>;
 }

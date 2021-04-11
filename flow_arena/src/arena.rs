@@ -193,6 +193,13 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
         self.node_map.get_mut(obj)
     }
 
+    fn parent(&self, obj: &Self::Id) -> Option<Self::Id> {
+        self.node(obj).map_or(None, |node| node.parent.clone())
+    }
+
+    fn children(&self, obj: &Self::Id) -> Vec<Self::Id> {
+        self.node(obj).map_or(Vec::new(), |node| node.children.clone())
+    }
     fn grow(&mut self, obj: Self::Node) -> Result<Self::Id, FlowError> {
         let res = if self.node_map.contains_key(obj.id()) {
             Err(FlowError::ExistGrow)
