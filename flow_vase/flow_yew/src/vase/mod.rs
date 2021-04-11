@@ -74,7 +74,7 @@ impl Component for Vase {
         let vessel = futures::executor::block_on(vessel_future).unwrap_or(Vessel::new());
         // Debug..
         /* */
-        let vessel = _vessel_poet();
+        // let vessel = _vessel_poet();
         // let vessel = _vessel_incr(10);
         // */
         let cubes = vessel.get_cube_vec();

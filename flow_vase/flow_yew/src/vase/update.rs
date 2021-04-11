@@ -60,7 +60,11 @@ impl Vase {
                 true
             }
 
-            Refresh => false,
+            Refresh => {
+                let cubes = self.vessel.get_cube_vec();
+                self.cube_vm_vec = Self::cube_vm_vec(cubes, &self.vessel, self.link.clone());
+                false
+            }
         }
     }
 }

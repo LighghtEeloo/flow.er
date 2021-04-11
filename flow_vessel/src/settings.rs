@@ -34,3 +34,20 @@ impl Default for ViewMode {
         ViewMode::Desktop
     }
 }
+
+impl ViewMode {
+    pub fn switch(self) -> Self {
+        use ViewMode::*;
+        match self {
+            Desktop => Mobile,
+            Mobile => Desktop
+        }
+    }
+    pub fn display(&self) -> &str {
+        use ViewMode::*;
+        match self {
+            Desktop => "Desktop",
+            Mobile => "Mobile"
+        }
+    }
+}

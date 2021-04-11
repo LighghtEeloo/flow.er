@@ -74,7 +74,7 @@ impl Router {
     pub fn vec_all() -> Vec<Self> {
         use Router::*;
         vec! [
-            BirdView,
+            // BirdView,
             Board,
             Promised,
             // Calendar,
