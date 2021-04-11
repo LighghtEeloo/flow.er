@@ -42,6 +42,7 @@ impl CubeVM {
     }
     pub fn update(&mut self, idx: usize, cube: &Cube, vessel: &Vessel) {
         self.meta.idx = idx;
+        self.cube = cube.clone();
         // Todo: member_traverse.
         self.ref_map = cube.member_traverse(vessel)
             .into_iter().map(|obj| {

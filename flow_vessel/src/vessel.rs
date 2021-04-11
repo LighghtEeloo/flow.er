@@ -1,6 +1,6 @@
 use std::{collections::HashSet, fmt::Debug};
 use serde::{Serialize, Deserialize};
-use flow_arena::{Node, FlowArena, FlowMap, FlowLink, FlowMaid};
+use flow_arena::{Node, FlowArena, FlowMap, FlowMaid};
 
 use super::{Entity, EntityId, EntityIdFactory, Router, Glass, Cube, Settings};
 
@@ -275,7 +275,7 @@ fn concise_debug_impl(obj: EntityId, vessel: &Vessel, prefix: usize) -> String {
 
 #[cfg(test)]
 mod tests {
-    use flow_arena::{FlowError};
+    use flow_arena::{FlowError, FlowLink};
 
     use super::*;
     #[test]
@@ -375,7 +375,7 @@ mod tests {
     }
     #[test] 
     fn random_demon_tests() {
-        let length = 2000;
+        let length = 6400;
         let quiet = true;
         let func_set = [
             |(id, vessel): (&mut Vec<EntityId>, &mut Vessel)| {

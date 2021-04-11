@@ -1,12 +1,12 @@
 use std::collections::HashMap;
 
-use yew::{ComponentLink, Html, InputData, NodeRef, html};
-use flow_vessel::{Cube, CubeMeta, EntityField, EntityId, Vessel, cubes::FlowView};
-use super::{CubeView, Vase, Msg::*, btn};
+use yew::{ComponentLink, Html, NodeRef, html};
+use flow_vessel::{CubeMeta, EntityId, Vessel, cubes::FlowView};
+use super::{CubeView, Vase, btn};
 
 
 impl CubeView for FlowView {
-    fn view(&self, vessel: &Vessel, meta: CubeMeta, link: ComponentLink<Vase>, ref_map: &HashMap<EntityId, NodeRef>) -> Html {
+    fn view(&self, vessel: &Vessel, _meta: CubeMeta, link: ComponentLink<Vase>, _ref_map: &HashMap<EntityId, NodeRef>) -> Html {
         node(&self.obj, 0, vessel, "--".into(), link.clone())
     }
 }

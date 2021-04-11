@@ -110,13 +110,8 @@ impl Component for Vase {
             self.vessel.glass_refresh();
             // if not equal in num then rebuild; else update
             let cubes = self.vessel.get_cube_vec();
-            if self.cube_vm_vec.len() != cubes.len() {
-                self.cube_vm_vec = Self::cube_vm_vec(cubes, &self.vessel, self.link.clone());
-            } else {
-                // Test: non-invasively update cube_vm_vec.
-                for (idx,(cube_vm, cube)) in self.cube_vm_vec.iter_mut().zip(cubes.iter()).enumerate() {
-                    cube_vm.update(idx, cube, &self.vessel)
-                }
+            for (idx,(cube_vm, cube)) in self.cube_vm_vec.iter_mut().zip(cubes.iter()).enumerate() {
+                cube_vm.update(idx, cube, &self.vessel)
             }
 
             // save

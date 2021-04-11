@@ -134,10 +134,10 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
         }
         final_set
     }
-    pub(crate) fn check(&self) -> Result<(), (FlowError, String)> {
+    fn check(&self) -> Result<(), (FlowError, String)> {
         for (id, node) in self.node_map.iter() {
             let current_str = format!(", current: \nid: {:?}, \nnode: {:#?}", id, node);
-            if id.clone() != node.id { return Err((FlowError::NodeIdUnmatch, current_str)) }
+            if id.clone() != node.id { return Err((FlowError::NodeIdNotMatch, current_str)) }
             // children exist
             for id in node.children.iter() {
                 if self.node_map.get(id).is_none() {
@@ -160,10 +160,12 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
         Ok(())
     }
     /// panics if anything went wrong. Iff in debug state.
-    pub(crate) fn check_assert(&self) {
-        if let Err((err, current)) = self.check() {
-            panic!("{:?}{}", err, current)
-        }   
+    fn check_assert(&self) {
+        if cfg!(debug_assertions) {
+            if let Err((err, current)) = self.check() {
+                panic!("{:?}{}", err, current)
+            }   
+        } 
     } 
 }
 
@@ -192,13 +194,15 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
     }
 
     fn grow(&mut self, obj: Self::Node) -> Result<Self::Id, FlowError> {
-        if self.node_map.contains_key(obj.id()) {
+        let res = if self.node_map.contains_key(obj.id()) {
             Err(FlowError::ExistGrow)
         } else {
             let id = obj.id().clone();
             self.node_map.insert(obj.id().clone(), obj);
             Ok(id)
-        }
+        };
+        self.check_assert();
+        res
     }
 }
 
@@ -208,7 +212,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
         if ! self.node_map.contains_key(obj) {
             return Err(FlowError::NotExistObj)
         } 
-        self.node_mut(owner).map(|owner| {
+        let res = self.node_mut(owner).map(|owner| {
             if owner.children.contains(obj) {
                 return Ok(())
             } 
@@ -217,25 +221,31 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
             } 
             owner.children.insert(nth, obj.clone());
             Ok(())
-        }).unwrap_or(Err(FlowError::NotExistOwner))
+        }).unwrap_or(Err(FlowError::NotExistOwner));
+        self.check_assert();
+        res
     }
 
     fn link_push(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError> {
         let nth = self.node(owner).map_or(0, |node| node.children.len());
-        self.link(obj, owner, nth)
+        let res = self.link(obj, owner, nth);
+        self.check_assert();
+        res
     }
 
     fn detach(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError> {
         if ! self.node_map.contains_key(obj) {
             return Err(FlowError::NotExistObj)
         } 
-        self.node_mut(owner).map(|owner| {
+        let res = self.node_mut(owner).map(|owner| {
             if ! owner.children.contains(obj) {
                 return Err(FlowError::AbandonedChild)
             }
             owner.children.retain(|x| x != obj);
             Ok(())
-        }).unwrap_or(Err(FlowError::NotExistOwner))
+        }).unwrap_or(Err(FlowError::NotExistOwner));
+        self.check_assert();
+        res
     }
 }
 
@@ -243,16 +253,18 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
 impl<Id, Entity> FlowMaid for FlowArena<Id, Entity> 
 where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
     fn devote(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), FlowError> {
-        self.link(obj, owner, nth).and_then(|_| {
+        let res = self.link(obj, owner, nth).and_then(|_| {
             self.node_mut(obj).map(|obj| {
                 obj.parent = Some(owner.clone());
                 Ok(())
             }).unwrap_or(Err(FlowError::NotExistObj))
-        })
+        });
+        self.check_assert();
+        res
     }
 
     fn devote_push(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError> {
-        self.link_push(obj, owner).and_then(|_| {
+        let res = self.link_push(obj, owner).and_then(|_| {
             self.node_mut(obj).map_or(
                 Err(FlowError::NotExistObj), 
                 |obj| {
@@ -260,7 +272,9 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
                     Ok(())
                 }
             )
-        })
+        });
+        self.check_assert();
+        res
     }
 
     fn decay(&mut self, obj: &Self::Id) -> Result<(), FlowError> {
@@ -273,7 +287,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
             return Ok(())
         }
         let owner = owner.flatten();
-        self.node_mut(obj).map_or(
+        let res = self.node_mut(obj).map_or(
             Err(FlowError::NotExistObj),
             |obj| {
                 obj.parent = None;
@@ -286,7 +300,9 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
                     self.detach(obj, &owner)
                 }
             )
-        })
+        });
+        self.check_assert();
+        res
     }
 
     fn erase(&mut self, obj: &Self::Id) -> Result<(), FlowError> {
@@ -302,6 +318,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
                 ! kill_set.contains(id)
             })
         }).collect();
+        self.check_assert();
         Ok(())
     }
 }

@@ -100,7 +100,7 @@ impl Vessel {
     } 
 
     async fn load_linked(addr: String, port: u16) -> Result<Vessel, LoadError> {
-        log::debug!("loading linked...");
+        log::debug!("loading linked: {}:{}", addr, port);
         Err(LoadError::WebError)
     }
 

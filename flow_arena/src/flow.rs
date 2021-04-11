@@ -59,7 +59,7 @@ pub enum FlowError {
     /// certain operations requires node to be unorphaned
     IsOrphaned,
     
-    NodeIdUnmatch,
+    NodeIdNotMatch,
     NotExistParent,
     NotExistChild,
     /// potential parent doesn't have the child

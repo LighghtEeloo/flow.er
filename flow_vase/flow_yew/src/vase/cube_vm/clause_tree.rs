@@ -395,7 +395,7 @@ fn btn_ink(meta: CubeMeta, obj: EntityId, link: ComponentLink<Vase>) -> Html {
     btn::ink(meta, obj, style.into(), link)
 }
 
-fn btn_add(dude: EntityId, owner: EntityId, idx: usize, link: ComponentLink<Vase>) -> Html {
+fn _btn_add(dude: EntityId, owner: EntityId, idx: usize, link: ComponentLink<Vase>) -> Html {
     let style = "
         position: absolute; 
         top: 1px;
