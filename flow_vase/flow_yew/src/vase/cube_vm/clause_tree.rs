@@ -1,6 +1,6 @@
 use yew::{ComponentLink, Html, InputData, KeyboardEvent, NodeRef, html};
 use std::collections::HashMap;
-use flow_vessel::{CubeMeta, Entity, EntityField, EntityId, EntityNode, Lint, Process, Symbol, Vessel, cubes::ClauseTree};
+use flow_vessel::{CubeMeta, Entity, EntityField, EntityId, EntityNode, Lint, Process, Symbol, Vessel, cubes::ClauseTreeCube};
 use super::{CubeView, Msg::*, Vase, btn};
 
 #[derive(Clone)]
@@ -262,7 +262,7 @@ impl ClauseNode {
 }
 
 
-fn head_view(clause: &ClauseTree, vessel: &Vessel, meta: CubeMeta, link: ComponentLink<Vase>) -> Html {
+fn head_view(clause: &ClauseTreeCube, vessel: &Vessel, meta: CubeMeta, link: ComponentLink<Vase>) -> Html {
     let id = clause.obj;
     let entity = vessel.entity(&id).expect("Host doesn't exist.");
     let link = link.clone();
@@ -318,7 +318,7 @@ fn head_view(clause: &ClauseTree, vessel: &Vessel, meta: CubeMeta, link: Compone
 }
 
 
-impl CubeView for ClauseTree {
+impl CubeView for ClauseTreeCube {
     fn view(&self, vessel: &Vessel, meta: CubeMeta, link: ComponentLink<Vase>, ref_map: &HashMap<EntityId, NodeRef>) -> Html {
         let nodes_view: Vec<Html> = vessel.node(&self.obj).expect("node exists")
             .children.iter().enumerate()

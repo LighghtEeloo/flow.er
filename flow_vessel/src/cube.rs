@@ -64,7 +64,7 @@ mod setting_view {
 mod blank;
 
 pub use inkblot::Inkblot;
-pub use clause_tree::ClauseTree;
+pub use clause_tree::ClauseTreeCube;
 pub use flow_view::FlowView;
 pub use promise_land::PromisedLand;
 pub use calendar_view::CalendarView;
@@ -136,7 +136,7 @@ impl Cube {
                 }.into(),
             Router::Board => 
                 // Debug..
-                ClauseTree { 
+                ClauseTreeCube { 
                     obj: EntityId::default(),
                     current: None
                 }.into(),
@@ -196,7 +196,7 @@ impl CubeMember for Cube {
                 cu.member_traverse(vessel)
             }
             CubeType::ClauseTree => {
-                let cu: ClauseTree = cube.into();
+                let cu: ClauseTreeCube = cube.into();
                 cu.member_traverse(vessel)
             }
             CubeType::PromisedLand => {

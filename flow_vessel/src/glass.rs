@@ -9,7 +9,7 @@ pub use super::{Vessel, EntityFlow};
 pub mod cubes {
     pub use crate::cube::{
         Inkblot,
-        ClauseTree,
+        ClauseTreeCube,
         PromisedLand,
         FlowView,
         CalendarView,

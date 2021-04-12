@@ -128,7 +128,7 @@ Be a king. ".into();
     let router = Router::Board;
     {
         let cube: Cube = 
-            cubes::ClauseTree {
+            cubes::ClauseTreeCube {
                 obj: id[0],
                 current: None,
             }.into();

@@ -100,7 +100,7 @@ impl CubeView for Cube {
                 ink.view(vessel, meta, link, ref_map)
             }
             CubeType::ClauseTree => {
-                let clause: cubes::ClauseTree = self.clone().into();
+                let clause: cubes::ClauseTreeCube = self.clone().into();
                 clause.view(vessel, meta, link, ref_map)
             }
             CubeType::FlowView => {
