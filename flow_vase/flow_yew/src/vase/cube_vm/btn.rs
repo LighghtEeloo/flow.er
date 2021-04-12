@@ -89,6 +89,6 @@ pub fn block(id: EntityId, style: String, link: ComponentLink<Vase>) -> Html {
                     field: EntityField::Blocked 
                 }]
             })
-        >{"o"}</button>
+        >{"*"}</button>
     }
 }

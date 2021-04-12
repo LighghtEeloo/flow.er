@@ -59,6 +59,7 @@ pub enum Lint {
     Circle,
     Square,
     Dash,
+    // Diamond ◆
     
     // UnOrdered(String)
 }

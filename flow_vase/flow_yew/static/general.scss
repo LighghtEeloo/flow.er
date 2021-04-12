@@ -21,6 +21,7 @@ body {
     .btn-operate {
         width: calc(var(--size-button) - 2px);
         height: calc(var(--size-button) - 2px);
+        border-radius: 4px;
         margin: 1px;
         background-color: rgba(129, 191, 216, 0.904);
         border: 1px;

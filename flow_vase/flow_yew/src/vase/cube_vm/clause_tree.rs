@@ -16,7 +16,7 @@ impl ClauseNode {
         html! {
             <div class="node">
                 { self.symbol_view(idx, &entity, indent) }
-                { self.input_view(idx, &entity, node_ref, owner, indent) }
+                { self.input_view(idx, &entity, node_ref, owner, meta, indent) }
                 { btn_block(id, self.link.clone()) }
                 { btn_ink(meta.incr_new(), id, self.link.clone()) }
                 // { btn_add(id, owner, idx + 1, self.link.clone()) }
@@ -85,7 +85,7 @@ impl ClauseNode {
             </div> 
         }
     }
-    fn input_view(&self, idx: usize, entity: &Entity, node_ref: NodeRef, owner: EntityId, indent: usize) -> Html {
+    fn input_view(&self, idx: usize, entity: &Entity, node_ref: NodeRef, owner: EntityId, meta: CubeMeta, indent: usize) -> Html {
         let indent = indent + 1;
         let id = entity.id().clone();
         let style = 
@@ -102,8 +102,8 @@ impl ClauseNode {
                 //     vec![SetFocusId(vm_meta, id)]
                 // })
                 onkeydown=self.link.callback(move |e: KeyboardEvent| {
-                    let meta = (e.ctrl_key(), e.shift_key(), e.code());
-                    match (meta.0, meta.1, meta.2.as_str()) { 
+                    let key = (e.ctrl_key(), e.shift_key(), e.code());
+                    match (key.0, key.1, key.2.as_str()) { 
                 //         (false, false, "ArrowUp") => vec!
                 //             [Wander(vm_meta, Direction::Ascend, false)], 
                 //         (false, false, "ArrowDown") => vec!
@@ -113,23 +113,27 @@ impl ClauseNode {
                 //         (true, false, "ArrowDown") => vec!
                 //             [Wander(vm_meta, Direction::Descend, true)], 
                         (true, true, "ArrowUp") => vec![
-                            EntityUp { id }
+                            EntityUp { id },
+                            Focus { meta, id }
                         ], 
                         (true, true, "ArrowDown") => vec![
-                            EntityDown { id }
+                            EntityDown { id },
+                            Focus { meta, id }
                         ], 
-                        (true, false, "BracketRight") => vec![
-                            EntityDive { id, idx }
+                        (true, true, "BracketRight") => vec![
+                            EntityDive { id, idx },
+                            Focus { meta, id }
                         ], 
-                        (true, false, "BracketLeft") => vec![
-                            EntityEmerge { id }
+                        (true, true, "BracketLeft") => vec![
+                            EntityEmerge { id },
+                            Focus { meta, id }
                         ], 
                         _ => vec![]
                     }
                 })
                 onkeyup=self.link.callback(move |e: KeyboardEvent| {
-                    let meta = (e.ctrl_key(), e.shift_key(), e.code());
-                    match (meta.0, meta.1, meta.2.as_str()) { 
+                    let key = (e.ctrl_key(), e.shift_key(), e.code());
+                    match (key.0, key.1, key.2.as_str()) { 
                         // enter
                         (false, false, "Enter") => vec!
                             [ EntityAdd { dude: id, owner, idx: idx+1 }

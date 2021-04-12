@@ -6,6 +6,7 @@ mod view;
 mod cube_vm;
 
 use cube_vm::CubeVM;
+pub use update::Msg;
 
 
 pub struct Vase {
@@ -14,55 +15,6 @@ pub struct Vase {
     link: ComponentLink<Self>,
 }
 
-#[derive(Debug, Clone)]
-pub enum Msg {
-    // router level
-    SwitchRouter {
-        router: Router
-    },
-    SettingUpdate {
-        settings: Settings
-    },
-
-    // vm level
-    OpenVM {
-        cube: Cube,
-        meta: CubeMeta
-    },
-    CloseVM {
-        meta: CubeMeta
-    },
-
-    // entity level
-    EntityAdd {
-        dude: EntityId,
-        owner: EntityId,
-        idx: usize
-    },
-    EntityUpdate {
-        id: EntityId,
-        field: EntityField
-    },
-    EntityDive {
-        id: EntityId,
-        idx: usize,
-    },
-    EntityEmerge {
-        id: EntityId,
-    },
-    EntityUp {
-        id: EntityId,
-    },
-    EntityDown {
-        id: EntityId,
-    },
-    EntityDelete {
-        id: EntityId
-    },
-
-    // refresh
-    Refresh,
-}
 
 impl Component for Vase {
     // a conditional queue.

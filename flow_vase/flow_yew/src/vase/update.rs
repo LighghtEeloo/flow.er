@@ -1,6 +1,61 @@
-use yew::ShouldRender;
+use yew::{ShouldRender, web_sys::HtmlInputElement as InputElement};
+use flow_vessel::{Cube, CubeMeta, EntityField, EntityId, Router, Settings};
 
-use super::{Msg, Vase, CubeVM};
+use super::{Vase, CubeVM};
+
+#[derive(Debug, Clone)]
+pub enum Msg {
+    // router level
+    SwitchRouter {
+        router: Router
+    },
+    SettingUpdate {
+        settings: Settings
+    },
+
+    // vm level
+    OpenVM {
+        cube: Cube,
+        meta: CubeMeta
+    },
+    CloseVM {
+        meta: CubeMeta
+    },
+
+    // entity level
+    EntityAdd {
+        dude: EntityId,
+        owner: EntityId,
+        idx: usize
+    },
+    EntityUpdate {
+        id: EntityId,
+        field: EntityField
+    },
+    EntityDive {
+        id: EntityId,
+        idx: usize,
+    },
+    EntityEmerge {
+        id: EntityId,
+    },
+    EntityUp {
+        id: EntityId,
+    },
+    EntityDown {
+        id: EntityId,
+    },
+    EntityDelete {
+        id: EntityId
+    },
+
+    // vase level
+    Focus {
+        meta: CubeMeta,
+        id: EntityId
+    },
+    Refresh,
+}
 
 impl Vase {
     pub fn update_msg(&mut self, msg: Msg) -> ShouldRender {
@@ -60,6 +115,15 @@ impl Vase {
                 true
             }
 
+            Focus { meta, id } => {
+                self.cube_vm_vec.get_mut(meta.idx).map(|vm| {
+                    vm.cube.current_id = Some(id);
+                    vm.ref_map.get(&id)
+                }).flatten().unwrap().cast::<InputElement>().map(|x|
+                    x.focus().unwrap()
+                );
+                true
+            }
             Refresh => {
                 let cubes = self.vessel.get_cube_vec();
                 self.cube_vm_vec = Self::cube_vm_vec(cubes, &self.vessel, self.link.clone());
