@@ -50,7 +50,8 @@ pub enum Tube {
 
 /// Echo implies the side-effect after the Tube update.
 pub enum Echo {
-    Rebuild,
+    RebuildVM,
+    RebuildRef,
     Standby
 }
 
@@ -60,51 +61,51 @@ impl Vessel {
         match tube {
             SwitchRouter{ router} => {
                 self.router = router;
-                Echo::Rebuild
+                Echo::RebuildVM
             },
             SettingUpdate { settings } => {
                 self.settings = settings;
-                Echo::Rebuild
+                Echo::Standby
             }
 
             OpenVM { cube, meta } => {
                 self.glass.push_cube(cube.clone(), meta.router);
-                Echo::Rebuild
+                Echo::RebuildVM
             }
             CloseVM { meta } => {
                 self.glass.remove_cube(meta);
-                Echo::Rebuild
+                Echo::RebuildVM
             }
 
             EntityAdd { dude, owner, idx } => {
                 self.entity_add(dude, owner, idx);
-                Echo::Rebuild
+                Echo::RebuildRef
             }
             EntityUpdate { id, field } => {
                 self.entity_mut(&id).map(|entity| {
                     entity.update_entity(field)
                 });
-                Echo::Rebuild
+                Echo::RebuildRef
             }
             EntityDive { id, idx } => {
                 self.entity_dive(id, idx);
-                Echo::Rebuild
+                Echo::RebuildRef
             }
             EntityEmerge { id } => {
                 self.entity_emerge(id);
-                Echo::Rebuild
+                Echo::RebuildRef
             }
             EntityDelete { id } => {
                 self.entity_remove(&id);
-                Echo::Rebuild
+                Echo::RebuildRef
             }
             EntityUp { id } => {
                 self.entity_up(id);
-                Echo::Rebuild
+                Echo::RebuildRef
             }
             EntityDown { id } => {
                 self.entity_down(id);
-                Echo::Rebuild
+                Echo::RebuildRef
             }
 
         }
