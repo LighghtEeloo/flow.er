@@ -3,7 +3,7 @@ mod cube;
 mod glass;
 mod settings;
 mod vessel;
-mod echo;
+mod tube;
 mod util;
 
 pub use entity::{
@@ -20,3 +20,4 @@ pub use util::{
     time::{TimeNote, TimeRep, display, now}
 };
 pub use vessel::{Vessel, EntityNode, EntityFlow};
+pub use tube::{Tube, Echo};
