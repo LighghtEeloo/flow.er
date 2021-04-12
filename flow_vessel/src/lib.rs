@@ -3,6 +3,7 @@ mod cube;
 mod glass;
 mod settings;
 mod vessel;
+mod echo;
 mod util;
 
 pub use entity::{
