@@ -5,11 +5,11 @@ use flow_vessel::{Cube, CubeMember, CubeMeta, CubeType, EntityId, Vessel, ViewMo
 pub use super::{Vase, Msg, Msg::*};
 mod btn;
 
-mod inkblot;
+// mod inkblot;
 mod clause_tree;
-mod flow_view;
-
-mod setting_view;
+mod clause_tree_alt;
+// mod flow_view;
+// mod setting_view;
 
 pub struct CubeVM {
     pub meta: CubeMeta,
@@ -62,7 +62,6 @@ impl CubeVM {
         let btn_close: Html = html! {
             <button class="btn-close"
                 onclick=self.link.callback(move |_| {
-                    // Todo: close vm.
                     [ CloseVM { meta } ]
                 })
             > { "✕" } </button>
@@ -95,22 +94,22 @@ impl CubeView for Cube {
                     <div> {blank.alt} </div>
                 }
             }
-            CubeType::Inkblot => {
-                let ink: cubes::Inkblot = self.clone().into();
-                ink.view(vessel, meta, link, ref_map)
-            }
-            CubeType::ClauseTree => {
-                let clause: cubes::ClauseTreeCube = self.clone().into();
-                clause.view(vessel, meta, link, ref_map)
-            }
-            CubeType::FlowView => {
-                let flow: cubes::FlowView = self.clone().into();
-                flow.view(vessel, meta, link.clone(), ref_map)
-            }
-            CubeType::SettingView => {
-                let setting_view: cubes::SettingView = self.clone().into();
-                setting_view.view(vessel, meta, link, ref_map)
-            }
+            // CubeType::Inkblot => {
+            //     let ink: cubes::Inkblot = self.clone().into();
+            //     ink.view(vessel, meta, link, ref_map)
+            // }
+            // CubeType::ClauseTree => {
+            //     let clause: cubes::ClauseTreeCube = self.clone().into();
+            //     clause.view(vessel, meta, link, ref_map)
+            // }
+            // CubeType::FlowView => {
+            //     let flow: cubes::FlowView = self.clone().into();
+            //     flow.view(vessel, meta, link.clone(), ref_map)
+            // }
+            // CubeType::SettingView => {
+            //     let setting_view: cubes::SettingView = self.clone().into();
+            //     setting_view.view(vessel, meta, link, ref_map)
+            // }
             _ => {
                 html! {
                     <div class="none">

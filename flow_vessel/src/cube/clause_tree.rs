@@ -35,8 +35,8 @@ impl CubeMember for ClauseTreeCube {
 
 #[derive(Default, Clone)]
 pub struct ClauseTreeCore {
-    cube: Cube,
-    node_map: HashMap<EntityId, EntityNode>
+    pub cube: Cube,
+    pub node_map: HashMap<EntityId, EntityNode>
 }
 
 impl ClauseTreeCore {

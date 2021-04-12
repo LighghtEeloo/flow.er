@@ -13,6 +13,9 @@ pub use entity::{
     entity::{Entity, EntityField, Face, Bubble},
 };
 pub use cube::{Cube, CubeType, CubeMeta, CubeMember};
+pub use cube::{
+    ClauseTreeCore
+};
 pub use glass::{Glass, Router, cubes};
 pub use settings::{Settings, Bridge, ViewMode};
 pub use util::{
