@@ -119,8 +119,7 @@ impl CubeType {
 pub struct Cube {
     pub cube_type: CubeType,
     pub obj: Option<EntityId>,
-    pub current_id: Option<EntityId>,
-    pub current_idx: Option<usize>,
+    pub current: Option<EntityId>,
     pub time: Option<SystemTime>,
     pub alt: Option<String>,
 }

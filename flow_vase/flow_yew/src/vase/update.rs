@@ -117,7 +117,7 @@ impl Vase {
 
             Focus { meta, id } => {
                 self.cube_vm_vec.get_mut(meta.idx).map(|vm| {
-                    vm.cube.current_id = Some(id);
+                    vm.cube.current = Some(id);
                     vm.ref_map.get(&id)
                 }).flatten().unwrap().cast::<InputElement>().map(|x|
                     x.focus().unwrap()

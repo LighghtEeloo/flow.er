@@ -12,7 +12,7 @@ impl Into<Cube> for FlowView {
         Cube {
             cube_type: CubeType::FlowView,
             obj: Some(self.obj),
-            current_id: self.current,
+            current: self.current,
             ..Cube::default()
         }
     }
@@ -22,7 +22,7 @@ impl From<Cube> for FlowView {
     fn from(cube: Cube) -> Self {
         Self {
             obj: cube.obj.unwrap_or_default(),
-            current: cube.current_id,
+            current: cube.current,
         }
     }
 }
