@@ -138,11 +138,10 @@ checksum = "cdb031dd78e28731d87d56cc8ffef4a8f36ca26c38fe2de700543e627f8a464a"
 
 [[package]]
 name = "bincode"
-version = "1.3.2"
+version = "1.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d175dfa69e619905c4c3cdb7c3c203fa3bdd5d51184e3afdb2742c0280493772"
+checksum = "b1f45e9417d87227c7a56d22e471c6206462cba514c7590c09aff4cf6d1ddcad"
 dependencies = [
- "byteorder",
  "serde",
 ]
 
@@ -177,12 +176,6 @@ name = "bumpalo"
 version = "3.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "63396b8a4b9de3f4fdfb320ab6080762242f66a8ef174c49d8e19b674db4cdbe"
-
-[[package]]
-name = "byteorder"
-version = "1.3.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "08c48aae112d48ed9f069b33538ea9e3e90aa263cfa3d1c24309612b1f7472de"
 
 [[package]]
 name = "bytes"
@@ -305,6 +298,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "flow_acc"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "flow_vessel",
+ "futures",
+ "log",
+ "rand",
+ "serde",
+ "serde_json",
+ "wasm-logger",
+ "yew",
+ "yew-services",
+]
+
+[[package]]
 name = "flow_arena"
 version = "0.3.0"
 dependencies = [
@@ -321,8 +330,8 @@ version = "0.1.0"
 name = "flow_er"
 version = "0.4.0"
 dependencies = [
+ "flow_acc",
  "flow_cli",
- "flow_yew",
 ]
 
 [[package]]
@@ -342,22 +351,6 @@ dependencies = [
  "wasm-logger",
  "wasm-timer",
  "web-sys",
-]
-
-[[package]]
-name = "flow_yew"
-version = "0.2.2"
-dependencies = [
- "chrono",
- "flow_vessel",
- "futures",
- "log",
- "rand",
- "serde",
- "serde_json",
- "wasm-logger",
- "yew",
- "yew-services",
 ]
 
 [[package]]
@@ -570,9 +563,9 @@ dependencies = [
 
 [[package]]
 name = "http"
-version = "0.2.3"
+version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7245cd7449cc792608c3c8a9eaf69bd4eabbabf802713748fd739c98b82f0747"
+checksum = "527e8c9ac747e28542699a951517aa9a6945af506cd1f2e1b53a576c17b6cc11"
 dependencies = [
  "bytes",
  "fnv",
@@ -833,9 +826,9 @@ dependencies = [
 
 [[package]]
 name = "pure-rust-locales"
-version = "0.5.5"
+version = "0.5.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3eb81e527b237b54f32eee2dd4cff98527c4a4f6368f0a87aa9b513027abae3e"
+checksum = "b45c49fc4f91f35bae654f85ebb3a44d60ac64f11b3166ffa609def390c732d8"
 
 [[package]]
 name = "quote"

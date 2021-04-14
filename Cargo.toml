@@ -9,7 +9,8 @@ repository = "https://github.com/LighghtEeloo/flow.er"
 [features]
 cli = ["flow_cli"]
 iced = []
-yew = ["flow_yew"]
+# yew = ["flow_yew"]
+acc = ["flow_acc"]
 
 [workspace]
 members = [
@@ -17,13 +18,18 @@ members = [
 	"flow_vessel",
 	"flow_vase/flow_cli",
 	# "flow_vase/flow_iced",
-	"flow_vase/flow_yew",
+	# "flow_vase/flow_yew",
+	"flow_vase/flow_acc",
 ]
 
 [dependencies.flow_cli]
 path = "flow_vase/flow_cli"
 optional = true
 
-[dependencies.flow_yew]
-path = "flow_vase/flow_yew"
+# [dependencies.flow_yew]
+# path = "flow_vase/flow_yew"
+# optional = true
+
+[dependencies.flow_acc]
+path = "flow_vase/flow_acc"
 optional = true
