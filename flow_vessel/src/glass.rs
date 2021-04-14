@@ -126,7 +126,6 @@ impl Glass {
     pub fn push_cube(&mut self, cube: Cube, router: Router) {
         let idx = self.ensured(router).len();
         let meta = CubeMeta { 
-            cube_type: cube.cube_type, 
             router,
             idx,
         };

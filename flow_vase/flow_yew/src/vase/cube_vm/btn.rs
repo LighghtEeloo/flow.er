@@ -1,7 +1,7 @@
 use yew::{ComponentLink, Html, html};
-use flow_vessel::{CubeMeta, EntityField, EntityId};
+use flow_vessel::{CubeMeta, EntityField, EntityId, Tube::*};
 
-use super::{Vase, Msg::*};
+use super::{Vase};
 
 pub fn ink(meta: CubeMeta, obj: EntityId, style: String, link: ComponentLink<Vase>) -> Html {
     html! {

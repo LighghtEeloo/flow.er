@@ -1,13 +1,15 @@
 use yew::{ComponentLink, Html, NodeRef, html};
 use std::{collections::HashMap};
-use flow_vessel::{Cube, CubeMember, CubeMeta, CubeType, EntityId, Vessel, ViewMode, cubes};
+use flow_vessel::{Cube, CubeMember, CubeMeta, CubeType, EntityId, Tube::*, Vessel, ViewMode, cubes};
+use flow_vessel::ClauseTreeCore;
 
-pub use super::{Vase, Msg, Msg::*};
+pub use super::{Vase};
 mod btn;
 
 // mod inkblot;
 mod clause_tree;
-mod clause_tree_alt;
+use clause_tree::ClauseTree;
+// mod clause_tree_alt;
 // mod flow_view;
 // mod setting_view;
 
@@ -25,7 +27,6 @@ impl CubeVM {
                 // origin: cube.clone(),
                 router: vessel.router,
                 idx,
-                cube_type: cube.cube_type
             };
         // Todo: member_traverse.
         let ref_map = cube.member_traverse(vessel)
@@ -98,10 +99,14 @@ impl CubeView for Cube {
             //     let ink: cubes::Inkblot = self.clone().into();
             //     ink.view(vessel, meta, link, ref_map)
             // }
-            // CubeType::ClauseTree => {
-            //     let clause: cubes::ClauseTreeCube = self.clone().into();
+            CubeType::ClauseTree => {
+                // let clause: cubes::ClauseTreeCube = self.clone().into();
+                let core = ClauseTreeCore::new(self.clone(), &vessel, meta);
             //     clause.view(vessel, meta, link, ref_map)
-            // }
+                html! {
+                    <ClauseTree core=core meta=meta link_tube=link />
+                }
+            }
             // CubeType::FlowView => {
             //     let flow: cubes::FlowView = self.clone().into();
             //     flow.view(vessel, meta, link.clone(), ref_map)

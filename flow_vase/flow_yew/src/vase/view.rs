@@ -1,7 +1,7 @@
 use yew::{html, Html};
-use flow_vessel::{Router, ViewMode, export_json};
+use flow_vessel::{Router, Tube::*, ViewMode, export_json};
 // use flow_vessel::display::*;
-use super::{Vase, Msg::*};
+use super::{Vase};
 
 impl Vase {
     pub fn main_view(&self) -> Html {
@@ -117,7 +117,7 @@ impl Vase {
                 // })
                 // Debug: refresh onclick.
                 onclick=self.link.callback(move |_| {
-                    [Refresh]
+                    []
                 })
             >
                 <img src="static/icons/StatusBar/src-code.svg" alt="code_pic"/>

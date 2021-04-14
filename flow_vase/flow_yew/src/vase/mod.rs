@@ -18,7 +18,7 @@ pub struct Vase {
 
 impl Component for Vase {
     // a conditional queue.
-    type Message = Vec<Msg>;
+    type Message = Vec<Tube>;
     type Properties = ();
 
     fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
@@ -47,13 +47,15 @@ impl Component for Vase {
             let next = msg_visitor.next();
             if let Some(msg) = next {
                 // update msg here
-                self.update_msg(msg)
+                // Todo: deal with echo
+                self.vessel.update_tube(msg);
+                true
             } else {
                 // quit loop
                 false
             }
         } {}
-        let left: Vec<Msg> = msg_visitor.collect();
+        let left: Self::Message = msg_visitor.collect();
         if !left.is_empty() {
             self.link.callback(move |()| left.clone()).emit(());
             false
@@ -136,7 +138,7 @@ Be a king. ".into();
         let cube_type = cube.cube_type;
         v.glass.replace_cube(
             cube, 
-            CubeMeta { router, idx: 0 , cube_type }
+            CubeMeta { router, idx: 0 }
         );
     }
     {
@@ -148,7 +150,7 @@ Be a king. ".into();
         let cube_type = cube.cube_type;
         v.glass.insert_cube(
             cube, 
-            CubeMeta { router, idx: 1 , cube_type }
+            CubeMeta { router, idx: 1 }
         );
     }
     v

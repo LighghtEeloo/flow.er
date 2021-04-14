@@ -1,6 +1,6 @@
-use yew::{Component, ComponentLink, NodeRef, Properties, html, Html};
+use yew::{Component, ComponentLink, NodeRef, Properties, html, Html, *};
 use std::collections::HashMap;
-use flow_vessel::{ClauseTreeCore, EntityId, Tube};
+use flow_vessel::{ClauseTreeCore, CubeMeta, EntityId, EntityNode, Tube::{self, *}, *};
 use super::{Vase, btn};
 
 
@@ -13,8 +13,9 @@ pub struct ClauseTree {
 
 #[derive(Properties, Clone)]
 pub struct Props {
-    core: ClauseTreeCore,
-    link_tube: ComponentLink<Vase>
+    pub core: ClauseTreeCore,
+    pub meta: CubeMeta,
+    pub link_tube: ComponentLink<Vase>
 }
 
 pub enum Msg {
@@ -42,6 +43,7 @@ impl Component for ClauseTree {
             Msg::Tube(tube) => {
                 // Todo: tube callback.
                 // self.props.link_tube.callback(|_| tube).emit(());
+                todo!()
             }
         }
         true
@@ -53,27 +55,85 @@ impl Component for ClauseTree {
     }
 
     fn view(&self) -> yew::Html {
-        // let core = self.props.core;
-        // let root = core.head();
-        // let nodes_view: Vec<Html> = root
-        //     .children.iter().enumerate()
-        //     .map(|(idx, &id)| {
-        //         let clause_node = ClauseNode {
-        //             id,
-        //             node_ref: self.ref_map.get(&id).cloned().unwrap_or_default(),
-        //             link: self.props.link_tube.clone(),
-        //         };
-        //         let node = core.node(&clause_node.id);
-        //         node_view(clause_node, vessel, idx, node, self.obj, ref_map, meta, 0)
-        //     }).collect();
-        // html! {
-        //     <>
-        //         { head_view(self, vessel, meta, link.clone()) }
-        //         <div class="node-view"> { nodes_view } </div>
-        //     </>
-        // }
-        todo!()
+        let core = &self.props.core;
+        let arg_head = (self.props.meta, self.props.link_tube.clone());
+        let arg_node = (self.props.meta, self.props.link_tube.clone());
+        html! {
+            <>
+                { core.head_view(head_view, arg_head) }
+                <div class="node-view"> { core.node_view(node_view, combinator, arg_node, |x| {x}) } </div>
+            </>
+        }
     }
+}
+
+fn combinator(h: Html, vec: Vec<Html>) -> Html {
+    html! {
+        <>
+            { h }
+            { vec }
+        </>
+    }
+}
+
+
+fn head_view(node: &EntityNode, (meta, link): (CubeMeta, ComponentLink<Vase>)) -> Html {
+    let id = node.id().clone();
+    let entity = node.entity.clone();
+    let link = link.clone();
+    html! {
+        <div class="head">
+            <input
+                type="Text"
+                placeholder="An arbitrary node."
+                aria-label="Arbitrary Node"
+                value=entity.face
+                onkeyup=link.callback(move |e: KeyboardEvent| {
+                    let key = (e.ctrl_key(), e.shift_key(), e.code());
+                    match (key.0, key.1, key.2.as_str()) { 
+                        // enter
+                        (false, false, "Enter") => vec!
+                            [ EntityAdd { dude: id, owner: id, idx: 0 }
+                            // , Wander(vm_meta, Direction::Descend, false)
+                            ],
+                //         // // shift+enter
+                //         // (false, true, "Enter") => vec![],
+                //         // backspace
+                //         (_, _, "Backspace") => {
+                //             if is_empty { vec!
+                //                 [ EraseEntity(id)
+                //                 , Wander(vm_meta, Direction::Descend, false)
+                //                 ] 
+                //             } else { vec![] }
+                //         }
+                //         // delete
+                //         (_, _, "Delete") => {
+                //             if is_empty { vec!
+                //                 [ EraseEntity(id)
+                //                 ] 
+                //             } else { vec![] }
+                //         }
+                //         // // ctrl released
+                //         // (true, _, "ControlLeft") => vec![Wander(Direction::Stay, false)],
+                //         // (true, _, "ControlRight") => vec![Wander(Direction::Stay, false)],
+                        _ => vec![] 
+                    }
+                })
+                oninput=link.callback(move |e: InputData| {
+                    [EntityUpdate{
+                        id, 
+                        field: EntityField::Face(e.value)
+                    }]
+                })
+            />
+            { btn_ink(meta.incr_new(), id, link.clone()) }
+            // { btn_add(id, id, 0, link.clone()) }
+        </div>
+    }
+}
+
+fn node_view(node: &EntityNode, (meta, link): (CubeMeta, ComponentLink<Vase>)) -> Html {
+    todo!()
 }
 
 #[derive(Clone)]
@@ -336,105 +396,6 @@ pub struct ClauseNode {
 // }
 
 
-// fn head_view(clause: &ClauseTreeCube, vessel: &Vessel, meta: CubeMeta, link: ComponentLink<Vase>) -> Html {
-//     let id = clause.obj;
-//     let entity = vessel.entity(&id).expect("Host doesn't exist.");
-//     let link = link.clone();
-//     html! {
-//         <div class="head">
-//             <input
-//                 type="Text"
-//                 placeholder="An arbitrary node."
-//                 aria-label="Arbitrary Node"
-//                 value=entity.face
-//                 onkeyup=link.callback(move |e: KeyboardEvent| {
-//                     let meta = (e.ctrl_key(), e.shift_key(), e.code());
-//                     match (meta.0, meta.1, meta.2.as_str()) { 
-//                         // enter
-//                         (false, false, "Enter") => vec!
-//                             [ EntityAdd { dude: id, owner: id, idx: 0 }
-//                             // , Wander(vm_meta, Direction::Descend, false)
-//                             ],
-//                 //         // // shift+enter
-//                 //         // (false, true, "Enter") => vec![],
-//                 //         // backspace
-//                 //         (_, _, "Backspace") => {
-//                 //             if is_empty { vec!
-//                 //                 [ EraseEntity(id)
-//                 //                 , Wander(vm_meta, Direction::Descend, false)
-//                 //                 ] 
-//                 //             } else { vec![] }
-//                 //         }
-//                 //         // delete
-//                 //         (_, _, "Delete") => {
-//                 //             if is_empty { vec!
-//                 //                 [ EraseEntity(id)
-//                 //                 ] 
-//                 //             } else { vec![] }
-//                 //         }
-//                 //         // // ctrl released
-//                 //         // (true, _, "ControlLeft") => vec![Wander(Direction::Stay, false)],
-//                 //         // (true, _, "ControlRight") => vec![Wander(Direction::Stay, false)],
-//                         _ => vec![] 
-//                     }
-//                 })
-//                 oninput=link.callback(move |e: InputData| {
-//                     [EntityUpdate{
-//                         id, 
-//                         field: EntityField::Face(e.value)
-//                     }]
-//                 })
-//             />
-//             { btn_ink(meta.incr_new(), id, link.clone()) }
-//             // { btn_add(id, id, 0, link.clone()) }
-//         </div>
-//     }
-// }
-
-
-
-// fn node_view(
-//     clause_node: ClauseNode, 
-//     vessel: &Vessel,
-//     idx: usize, 
-//     node: &EntityNode, 
-//     owner: EntityId,
-//     ref_map: &HashMap<EntityId, NodeRef>, 
-//     meta: CubeMeta, 
-//     indent: usize
-// ) -> Html {
-//     let node_ref = ref_map.get(node.entity.id()).cloned().unwrap_or_default();
-//     let clause_node_view = clause_node.view(
-//         idx, 
-//         &node.entity, 
-//         node_ref,
-//         owner,
-//         meta,
-//         indent,
-//     );
-//     // Note: no larger than 5.
-//     let children_view: Vec<Html> = if indent < 5 && !node.entity.blocked {
-//         node.children.iter().enumerate().map(|(idx, &id)| {
-//             let clause_node = ClauseNode {
-//                 id,
-//                 node_ref: ref_map.get(&id).cloned().unwrap_or_default(),
-//                 link: clause_node.link.clone(),
-//             };
-//             let node = vessel.node(&clause_node.id).expect("must exist");
-//             let owner = node.parent;
-//             if let Some(owner) = owner {
-//                 node_view(clause_node, vessel, idx, node, owner, ref_map, meta, indent + 1)
-//             } else {
-//                 html! {}
-//             }
-//         }).collect() } else { Vec::new() };
-//     html! {
-//         <>
-//             { clause_node_view }
-//             { children_view }
-//         </>
-//     }
-// }
 
 // fn btn_block(id: EntityId, link: ComponentLink<Vase>) -> Html {
 //     let style = "
@@ -445,14 +406,14 @@ pub struct ClauseNode {
 //     btn::block(id, style.into(), link)
 // }
 
-// fn btn_ink(meta: CubeMeta, obj: EntityId, link: ComponentLink<Vase>) -> Html {
-//     let style = "
-//         position: absolute; 
-//         top: 1px;
-//         right: calc(1 * var(--size-button));
-//     ";
-//     btn::ink(meta, obj, style.into(), link)
-// }
+fn btn_ink(meta: CubeMeta, obj: EntityId, link: ComponentLink<Vase>) -> Html {
+    let style = "
+        position: absolute; 
+        top: 1px;
+        right: calc(1 * var(--size-button));
+    ";
+    btn::ink(meta, obj, style.into(), link)
+}
 
 // fn _btn_add(dude: EntityId, owner: EntityId, idx: usize, link: ComponentLink<Vase>) -> Html {
 //     let style = "

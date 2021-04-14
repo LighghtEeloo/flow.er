@@ -168,7 +168,6 @@ impl Cube {
 pub struct CubeMeta {
     pub router: Router,
     pub idx: usize,
-    pub cube_type: CubeType,
 }
 
 impl CubeMeta {

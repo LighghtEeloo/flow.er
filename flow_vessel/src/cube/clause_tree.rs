@@ -1,6 +1,6 @@
 use std::collections::{HashMap, HashSet};
 use crate::{EntityId, EntityNode, Vessel};
-use super::{Cube, CubeType, CubeMember};
+use super::{Cube, CubeType, CubeMember, CubeMeta};
 
 pub struct ClauseTreeCube {
     pub obj: EntityId,
@@ -33,15 +33,16 @@ impl CubeMember for ClauseTreeCube {
     }
 }
 
-#[derive(Default, Clone)]
+#[derive(Clone)]
 pub struct ClauseTreeCore {
     pub head: EntityId,
     pub current: Option<EntityId>,
-    pub node_map: HashMap<EntityId, EntityNode>
+    pub node_map: HashMap<EntityId, EntityNode>,
+    pub meta: CubeMeta
 }
 
 impl ClauseTreeCore {
-    pub fn new(cube: Cube, vessel: &Vessel) -> Self {
+    pub fn new(cube: Cube, vessel: &Vessel, meta: CubeMeta) -> Self {
         let cube = ClauseTreeCube::from(cube.clone());
         let head = cube.obj;
         let current = cube.current;
@@ -54,7 +55,8 @@ impl ClauseTreeCore {
         Self {
             head,
             current,
-            node_map
+            node_map,
+            meta
         }
     }
     pub fn head(&self) -> &EntityNode {
@@ -68,14 +70,14 @@ impl ClauseTreeCore {
         f(self.head(), args)
     }
     pub fn node_view<F, View, Combinator, Args, FnArgs>
-    (&self, f: F, combinator: Combinator, args: Args, f_args: FnArgs) -> Vec<View>
+    (&self, f: F, combinator: Combinator, args: Args, fn_args: FnArgs) -> Vec<View>
     where 
         F: Clone + Fn(&EntityNode, Args) -> View, 
         Combinator: Clone + Fn(View, Vec<View>) -> View,
         Args: Clone, 
         FnArgs: Clone + Fn(Args) -> Args 
     {
-        self.node_view_impl(self.head, f, combinator, args, f_args)
+        self.node_view_impl(self.head, f, combinator, args, fn_args)
     }
     fn node_view_impl<F, View, Combinator, Args, FnArgs>
     (&self, id: EntityId, f: F, combinator: Combinator, args: Args, f_args: FnArgs) -> Vec<View>

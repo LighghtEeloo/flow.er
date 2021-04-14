@@ -1,7 +1,7 @@
 use yew::{ComponentLink, Html, InputData, KeyboardEvent, NodeRef, html};
 use std::collections::HashMap;
-use flow_vessel::{CubeMeta, Entity, EntityField, EntityId, EntityNode, Lint, Process, Symbol, Vessel, cubes::ClauseTreeCube};
-use super::{CubeView, Msg::*, Vase, btn};
+use flow_vessel::{CubeMeta, Entity, EntityField, EntityId, EntityNode, Lint, Process, Symbol, Tube::*, Vessel, cubes::ClauseTreeCube};
+use super::{CubeView, Vase, btn};
 
 #[derive(Clone)]
 pub struct ClauseNode {
@@ -114,19 +114,15 @@ impl ClauseNode {
                 //             [Wander(vm_meta, Direction::Descend, true)], 
                         (true, true, "ArrowUp") => vec![
                             EntityUp { id },
-                            Focus { meta, id }
                         ], 
                         (true, true, "ArrowDown") => vec![
                             EntityDown { id },
-                            Focus { meta, id }
                         ], 
                         (true, true, "BracketRight") => vec![
                             EntityDive { id, idx },
-                            Focus { meta, id }
                         ], 
                         (true, true, "BracketLeft") => vec![
                             EntityEmerge { id },
-                            Focus { meta, id }
                         ], 
                         _ => vec![]
                     }
