@@ -1,4 +1,4 @@
-use super::{Node, FlowArena};
+use super::{Node, FlowNode, FlowArena};
 use std::{fmt, hash::Hash};
 
 #[cfg(feature = "serde1")]

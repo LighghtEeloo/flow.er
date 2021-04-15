@@ -19,9 +19,6 @@ pub struct Node<Id, Entity> {
 pub type NodePure<Id> = Node<Id, ()>;
 
 impl<Id, Entity> Node<Id, Entity> {
-    pub fn id(&self) -> &Id {
-        &self.id
-    }
     pub fn from_id(id: Id, entity: Entity) -> Self {
         Node {
             id,
@@ -42,6 +39,22 @@ impl<Id: Debug + Clone, Entity: Debug> Debug for Node<Id, Entity> {
             .field(">>", &self.children)
             .field("::", &self.entity)
             .finish()
+    }
+}
+
+impl<Id: Clone, Entity> FlowNode for Node<Id, Entity> {
+    type Id = Id;
+
+    fn id(&self) -> &Id {
+        &self.id
+    }
+
+    fn parent(&self) -> Option<Self::Id> {
+        self.parent.clone()
+    }
+
+    fn children(&self) -> Vec<&Self::Id> {
+        self.children.iter().collect()
     }
 }
 

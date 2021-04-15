@@ -1,4 +1,6 @@
 use std::collections::{HashMap, HashSet};
+use flow_arena::FlowNode;
+
 use crate::{EntityId, EntityNode, Vessel};
 use super::{Cube, CubeType, CubeMember, CubeMeta};
 

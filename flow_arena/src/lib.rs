@@ -3,6 +3,7 @@ mod ser_de;
 mod arena;
 
 pub use flow::{
+    FlowNode,
     FlowBase, 
     FlowLink, 
     FlowMaid, 

@@ -1,8 +1,15 @@
 use std::{collections::HashSet, hash::Hash};
 
+pub trait FlowNode {
+    type Id: Clone;
+    fn id(&self) -> &Self::Id;
+    fn parent(&self) -> Option<Self::Id>;
+    fn children(&self) -> Vec<&Self::Id>;
+}
+
 pub trait FlowBase {
     type Id: Default + Hash + Eq + Clone;
-    type Node: Default;
+    type Node: Default + FlowNode;
     /// ensures root and returns it; no check
     fn orphan(&self) -> Vec<Self::Id>;
     /// no check hereafter
