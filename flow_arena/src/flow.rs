@@ -13,6 +13,16 @@ pub trait FlowBase {
     fn node_mut(&mut self, obj: &Self::Id) -> Option<&mut Self::Node>;
     fn parent(&self, obj: &Self::Id) -> Option<Self::Id>;
     fn children(&self, obj: &Self::Id) -> Vec<Self::Id>;
+    /// returns owned children
+    fn children_owned(&self, obj: &Self::Id) -> Vec<Self::Id> {
+        self.children(obj).into_iter().filter_map(|id| {
+            if self.parent(&id) == Some(obj.clone()) {
+                Some(id)
+            } else {
+                None
+            }
+        }).collect()
+    }
     /// returns parent's children
     fn friends(&self, obj: &Self::Id) -> Vec<Self::Id> {
         self.parent(obj).map_or(Vec::new(), |obj| {
@@ -108,6 +118,7 @@ pub enum FlowError {
 /// 
 /// FlowArena implements an arena-like data structure, but it has integrated the data map and the relationship graph, since both of them require an Id to visit. 
 /// 
+// Todo..
 pub trait Flow: FlowBase + FlowLink + FlowMaid + FlowDock + FlowShift {
     fn check(&self) -> Result<(), (FlowError, String)>;
         /// panics if anything went wrong. Iff in debug state.
