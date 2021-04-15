@@ -3,7 +3,10 @@ use std::{collections::HashSet, hash::Hash};
 pub trait FlowNode<Id> {
     fn id(&self) -> &Id;
     fn parent(&self) -> Option<Id>;
+    fn parent_set(&mut self, id: Id);
+    fn parent_set_none(&mut self);
     fn children(&self) -> Vec<Id>;
+    fn children_ref(&self) -> Vec<&Id>;
 }
 
 pub trait FlowBase {
@@ -45,16 +48,112 @@ pub trait FlowBase {
             }
         }).collect()
     }
-    fn node_offspring_set(&self, obj: &Self::Id) -> HashSet<Self::Id>;
-    fn node_ownership_set(&self, obj: &Self::Id) -> HashSet<Self::Id>;
+    /// returns all the offspring of a node, not including itself
+    fn node_offspring_set(&self, obj: &Self::Id) -> HashSet<Self::Id> {
+        let mut visit_set = HashSet::new();
+        let mut final_set = HashSet::new();
+        visit_set.insert(obj.clone());
+        while !visit_set.is_empty() {
+            let mut wait_set = HashSet::new();
+            for obj in visit_set.iter() {
+                let children = self.node(&obj)
+                    .map(|x| x.children() )
+                    .unwrap_or_default();
+                wait_set.extend(children);
+            }
+            final_set.extend(wait_set.iter().cloned());
+            visit_set.clear();
+            visit_set.extend(wait_set);
+        }
+        final_set
+    }
+    /// returns all the nodes owned by a node, including itself
+    fn node_ownership_set(&self, obj: &Self::Id) -> HashSet<Self::Id> {
+        let mut visit_set = HashSet::new();
+        let mut final_set = HashSet::new();
+        if self.contains_node(obj) {
+            visit_set.insert(obj.clone());
+            final_set.insert(obj.clone());
+        }
+        while !visit_set.is_empty() {
+            let mut wait_set = HashSet::new();
+            for obj in visit_set.iter() {
+                let children = self.node(&obj)
+                    .map(|x|  x.children())
+                    .unwrap_or_default();
+                let set: Vec<Self::Id> = children.into_iter().filter_map(|id| {
+                    self.node(&id).map(|node| {
+                        if node.parent() == Some(obj.clone()) {
+                            Some(id)
+                        } else {
+                            None
+                        }
+                    }).flatten()
+                }).collect();
+                wait_set.extend(set);
+            }
+            final_set.extend(wait_set.iter().cloned());
+            visit_set.clear();
+            visit_set.extend(wait_set);
+        }
+        final_set
+    }
 }
 
-pub trait FlowLink: FlowBase {
+pub trait FlowCheck {
+
+    fn check(&self) -> Result<(), (FlowError, String)>;
+        /// panics if anything went wrong. Iff in debug state.
+    fn check_assert(&self) {
+        if cfg!(debug_assertions) {
+            if let Err((err, current)) = self.check() {
+                panic!("{:?}{}", err, current)
+            }   
+        } 
+    } 
+}
+
+pub trait FlowLink: FlowBase + FlowCheck {
     /// randomly ensures the link of a node to another
-    fn link(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), FlowError>;
-    fn link_push(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError>;
+    fn link(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), FlowError> {
+        if ! self.contains_node(obj) {
+            return Err(FlowError::NotExistObj)
+        } 
+        let res = self.node_mut(owner).map(|owner| {
+            if owner.children().contains(obj) {
+                return Ok(())
+            } 
+            if nth > owner.children().len() {
+                return Err(FlowError::InValidLen)
+            } 
+            owner.children().insert(nth, obj.clone());
+            Ok(())
+        }).unwrap_or(Err(FlowError::NotExistOwner));
+        self.check_assert();
+        res
+    }
+
+    fn link_push(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError> {
+        let nth = self.node(owner).map_or(0, |node| node.children().len());
+        let res = self.link(obj, owner, nth);
+        self.check_assert();
+        res
+    }
     /// detaches a node from a non-owner link
-    fn detach(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError>;
+    fn detach(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError> {
+        if ! self.contains_node(obj) {
+            return Err(FlowError::NotExistObj)
+        } 
+        let res = self.node_mut(owner).map(|owner| {
+            if ! owner.children().contains(obj) {
+                return Err(FlowError::AbandonedChild)
+            }
+            owner.children().retain(|x| x != obj);
+            Ok(())
+        }).unwrap_or(Err(FlowError::NotExistOwner));
+        self.check_assert();
+        res
+    }
 }
 
 pub trait FlowMaid: FlowBase + FlowLink {
@@ -137,14 +236,4 @@ pub enum FlowError {
 /// FlowArena implements an arena-like data structure, but it has integrated the data map and the relationship graph, since both of them require an Id to visit. 
 /// 
 // Todo..
-pub trait Flow: FlowBase + FlowLink + FlowMaid + FlowDock + FlowShift {
-    fn check(&self) -> Result<(), (FlowError, String)>;
-        /// panics if anything went wrong. Iff in debug state.
-    fn check_assert(&self) {
-        if cfg!(debug_assertions) {
-            if let Err((err, current)) = self.check() {
-                panic!("{:?}{}", err, current)
-            }   
-        } 
-    } 
-}
+pub trait Flow: FlowBase + FlowLink + FlowMaid + FlowDock + FlowShift {}

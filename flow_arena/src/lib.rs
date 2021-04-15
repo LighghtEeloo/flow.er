@@ -5,6 +5,7 @@ mod arena;
 pub use flow::{
     FlowNode,
     FlowBase, 
+    FlowCheck,
     FlowLink, 
     FlowMaid, 
     FlowDock, 

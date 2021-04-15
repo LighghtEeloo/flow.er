@@ -51,8 +51,20 @@ impl<Id: Clone, Entity> FlowNode<Id> for Node<Id, Entity> {
         self.parent.clone()
     }
 
+    fn parent_set(&mut self, id: Id) {
+        self.parent = Some(id)
+    }
+
+    fn parent_set_none(&mut self) {
+        self.parent = None
+    }
+
     fn children(&self) -> Vec<Id> {
-        self.children.iter().cloned().collect()
+        self.children.clone()
+    }
+
+    fn children_ref(&self) -> Vec<&Id> {
+        self.children.iter().collect()
     }
 }
 
@@ -125,99 +137,39 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
     fn node_mut(&mut self, obj: &Self::Id) -> Option<&mut Self::Node> {
         self.node_map.get_mut(obj)
     }
+}
 
-    fn node_offspring_set(&self, obj: &Id) -> HashSet<Id> {
-        let mut visit_set = HashSet::new();
-        let mut final_set = HashSet::new();
-        visit_set.insert(obj.clone());
-        while !visit_set.is_empty() {
-            let mut wait_set = HashSet::new();
-            for obj in visit_set.iter() {
-                let children = self.node(&obj)
-                    .map(|x| x.children.clone() )
-                    .unwrap_or_default();
-                wait_set.extend(children);
+impl<Id, Entity> FlowCheck for FlowArena<Id, Entity>
+where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
+    fn check(&self) -> Result<(), (FlowError, String)> {
+        for (id, node) in self.node_map.iter() {
+            let current_str = format!(", current: \nid: {:?}, \nnode: {:#?}", id, node);
+            if id.clone() != node.id { return Err((FlowError::NodeIdNotMatch, current_str)) }
+            // children exist
+            for id in node.children.iter() {
+                if self.node_map.get(id).is_none() {
+                    return Err((FlowError::NotExistChild, current_str));
+                }
             }
-            final_set.extend(wait_set.iter().cloned());
-            visit_set.clear();
-            visit_set.extend(wait_set);
-        }
-        final_set
-    }
-
-    fn node_ownership_set(&self, obj: &Id) -> HashSet<Id> {
-        let mut visit_set = HashSet::new();
-        let mut final_set = HashSet::new();
-        if self.contains_node(obj) {
-            visit_set.insert(obj.clone());
-            final_set.insert(obj.clone());
-        }
-        while !visit_set.is_empty() {
-            let mut wait_set = HashSet::new();
-            for obj in visit_set.iter() {
-                let children = self.node(&obj)
-                    .map(|x|  x.children.clone())
-                    .unwrap_or_default();
-                let set: Vec<Id> = children.into_iter().filter_map(|id| {
-                    self.node(&id).map(|node| {
-                        if node.parent == Some(obj.clone()) {
-                            Some(id)
-                        } else {
-                            None
-                        }
-                    }).flatten()
-                }).collect();
-                wait_set.extend(set);
+            // parent exist
+            if let Some(parent_id) = node.parent.clone() {
+                let maybe = self.node_map.get(&parent_id);
+                if maybe.is_none() {
+                    return Err((FlowError::NotExistParent, current_str));
+                }
+                if let Some(node) = maybe {
+                    if node.children.iter().find(|x| x.clone() == id).is_none() {
+                        return Err((FlowError::AbandonedChild, current_str))
+                    }
+                }
             }
-            final_set.extend(wait_set.iter().cloned());
-            visit_set.clear();
-            visit_set.extend(wait_set);
         }
-        final_set
+        Ok(())
     }
 }
 
 impl<Id, Entity> FlowLink for FlowArena<Id, Entity> 
 where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
-    fn link(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), FlowError> {
-        if ! self.contains_node(obj) {
-            return Err(FlowError::NotExistObj)
-        } 
-        let res = self.node_mut(owner).map(|owner| {
-            if owner.children.contains(obj) {
-                return Ok(())
-            } 
-            if nth > owner.children.len() {
-                return Err(FlowError::InValidLen)
-            } 
-            owner.children.insert(nth, obj.clone());
-            Ok(())
-        }).unwrap_or(Err(FlowError::NotExistOwner));
-        self.check_assert();
-        res
-    }
-
-    fn link_push(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError> {
-        let nth = self.node(owner).map_or(0, |node| node.children.len());
-        let res = self.link(obj, owner, nth);
-        self.check_assert();
-        res
-    }
-
-    fn detach(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError> {
-        if ! self.contains_node(obj) {
-            return Err(FlowError::NotExistObj)
-        } 
-        let res = self.node_mut(owner).map(|owner| {
-            if ! owner.children.contains(obj) {
-                return Err(FlowError::AbandonedChild)
-            }
-            owner.children.retain(|x| x != obj);
-            Ok(())
-        }).unwrap_or(Err(FlowError::NotExistOwner));
-        self.check_assert();
-        res
-    }
 }
 
 
@@ -238,7 +190,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
     fn devote(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), FlowError> {
         let res = self.link(obj, owner, nth).and_then(|_| {
             self.node_mut(obj).map(|obj| {
-                obj.parent = Some(owner.clone());
+                obj.parent_set(owner.clone());
                 Ok(())
             }).unwrap_or(Err(FlowError::NotExistObj))
         });
@@ -251,7 +203,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
             self.node_mut(obj).map_or(
                 Err(FlowError::NotExistObj), 
                 |obj| {
-                    obj.parent = Some(owner.clone());
+                    obj.parent_set(owner.clone());
                     Ok(())
                 }
             )
@@ -263,7 +215,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
     fn decay(&mut self, obj: &Self::Id) -> Result<(), FlowError> {
         let owner = self.node(obj)
             .map(|x| {
-                x.parent.clone() 
+                x.parent() 
             });
         // Not owned by anyone
         if let Some(None) = owner {
@@ -273,7 +225,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
         let res = self.node_mut(obj).map_or(
             Err(FlowError::NotExistObj),
             |obj| {
-                obj.parent = None;
+                obj.parent_set_none();
                 Ok(())
             }
         ).and_then(|_| {
@@ -297,7 +249,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
             ! kill_set.contains(id)
         });
         let () = self.node_map.values_mut().map(|obj| {
-            obj.children.retain(|id| {
+            obj.children().retain(|id| {
                 ! kill_set.contains(id)
             })
         }).collect();
@@ -338,33 +290,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
 
 
 impl<Id, Entity> Flow for FlowArena<Id, Entity> 
-where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
-    fn check(&self) -> Result<(), (FlowError, String)> {
-        for (id, node) in self.node_map.iter() {
-            let current_str = format!(", current: \nid: {:?}, \nnode: {:#?}", id, node);
-            if id.clone() != node.id { return Err((FlowError::NodeIdNotMatch, current_str)) }
-            // children exist
-            for id in node.children.iter() {
-                if self.node_map.get(id).is_none() {
-                    return Err((FlowError::NotExistChild, current_str));
-                }
-            }
-            // parent exist
-            if let Some(parent_id) = node.parent.clone() {
-                let maybe = self.node_map.get(&parent_id);
-                if maybe.is_none() {
-                    return Err((FlowError::NotExistParent, current_str));
-                }
-                if let Some(node) = maybe {
-                    if node.children.iter().find(|x| x.clone() == id).is_none() {
-                        return Err((FlowError::AbandonedChild, current_str))
-                    }
-                }
-            }
-        }
-        Ok(())
-    }
-}
+where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {}
 
 
 #[derive(Clone)]
