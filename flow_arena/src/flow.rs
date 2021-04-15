@@ -32,12 +32,14 @@ pub trait FlowBase {
             node.children()
         })
     }
+    
     /// returns parent's children
     fn friends(&self, obj: &Self::Id) -> Vec<Self::Id> {
         self.parent(obj).map_or(Vec::new(), |obj| {
             self.children(&obj)
         })
     }
+    
     /// returns owned children
     fn children_owned(&self, obj: &Self::Id) -> Vec<Self::Id> {
         self.children(obj).into_iter().filter_map(|id| {
@@ -48,6 +50,7 @@ pub trait FlowBase {
             }
         }).collect()
     }
+
     /// returns all the offspring of a node, not including itself
     fn node_offspring_set(&self, obj: &Self::Id) -> HashSet<Self::Id> {
         let mut visit_set = HashSet::new();
@@ -67,6 +70,7 @@ pub trait FlowBase {
         }
         final_set
     }
+
     /// returns all the nodes owned by a node, including itself
     fn node_ownership_set(&self, obj: &Self::Id) -> HashSet<Self::Id> {
         let mut visit_set = HashSet::new();
@@ -159,11 +163,61 @@ pub trait FlowLink: FlowBase + FlowCheck {
 pub trait FlowMaid: FlowBase + FlowLink {
     /// inserts a node; returns err if id exists.
     fn grow(&mut self, obj: Self::Node) -> Result<Self::Id, FlowError>;
-    /// appoints and ensures an owner; also links
-    fn devote(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), FlowError>;
-    fn devote_push(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError>;
+
+    /// appoints and ensures an owner; also links to owner
+    fn devote(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), FlowError> {
+        let res = self.link(obj, owner, nth).and_then(|_| {
+            self.node_mut(obj).map(|obj| {
+                obj.parent_set(owner.clone());
+                Ok(())
+            }).unwrap_or(Err(FlowError::NotExistObj))
+        });
+        self.check_assert();
+        res
+    }
+
+    fn devote_push(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError> {
+        let res = self.link_push(obj, owner).and_then(|_| {
+            self.node_mut(obj).map_or(
+                Err(FlowError::NotExistObj), 
+                |obj| {
+                    obj.parent_set(owner.clone());
+                    Ok(())
+                }
+            )
+        });
+        self.check_assert();
+        res
+    }
+
     /// removes ownership; also detaches
-    fn decay(&mut self, obj: &Self::Id) -> Result<(), FlowError>;
+    fn decay(&mut self, obj: &Self::Id) -> Result<(), FlowError> {
+        let owner = self.node(obj)
+            .map(|x| {
+                x.parent() 
+            });
+        // Not owned by anyone
+        if let Some(None) = owner {
+            return Ok(())
+        }
+        let owner = owner.flatten();
+        let res = self.node_mut(obj).map_or(
+            Err(FlowError::NotExistObj),
+            |obj| {
+                obj.parent_set_none();
+                Ok(())
+            }
+        ).and_then(|_| {
+            owner.map_or(
+                Err(FlowError::NotExistOwner), 
+                |owner| {
+                    self.detach(obj, &owner)
+                }
+            )
+        });
+        self.check_assert();
+        res
+    }
     /// removes a node; returns err if id not found under root
     fn erase(&mut self, obj: &Self::Id) -> Result<(), FlowError>;
 }
