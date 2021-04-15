@@ -12,7 +12,7 @@ use std::hash::Hash;
 /// 
 /// FlowArena implements an arena-like data structure, but it has integrated the data map and the relationship graph, since both of them require an Id to visit. 
 /// 
-pub trait Flow: FlowMap + FlowLink + FlowMaid {}
+pub trait Flow: FlowMap + FlowLink + FlowMaid + FlowDock {}
 
 pub trait FlowMap {
     type Id: Default + Hash + Eq + Clone;
@@ -47,7 +47,25 @@ pub trait FlowMaid: FlowMap + FlowLink {
     fn erase(&mut self, obj: &Self::Id) -> Result<(), FlowError>;
 }
 
-
+pub trait FlowDock: FlowMaid + Sized {
+    /// adds all the nodes in another flow to self and mounts all orphan nodes to the designated node
+    ///
+    /// Err if:
+    /// 1. Owner not found.
+    /// 2. Node exists in current flow.
+    fn dock(&mut self, owner: &Self::Id, flow: Self) -> Result<(), FlowError>;
+    /// moves all the nodes under the designated node out of the current flow and unmounts them
+    /// 
+    /// Err if:
+    /// 1. Obj not found.
+    /// 2. Node linked by other nodes.
+    fn undock(&mut self, obj: &Self::Id) -> Result<Self, FlowError>;
+    /// clones all the nodes under the designated node and unmounts them
+    /// 
+    /// Err if:
+    /// 1. Obj not found.
+    fn snap(&self, obj: &Self::Id) -> Result<Self, FlowError>;
+}
 
 #[derive(Debug)]
 pub enum FlowError {
