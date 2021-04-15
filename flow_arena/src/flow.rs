@@ -6,7 +6,7 @@ pub trait FlowNode<Id> {
     fn parent_set(&mut self, id: Id);
     fn parent_set_none(&mut self);
     fn children(&self) -> Vec<Id>;
-    fn children_ref(&self) -> Vec<&Id>;
+    fn children_ref_mut(&mut self) -> &mut Vec<Id>;
 }
 
 pub trait FlowBase {
@@ -32,14 +32,14 @@ pub trait FlowBase {
             node.children()
         })
     }
-    
+
     /// returns parent's children
     fn friends(&self, obj: &Self::Id) -> Vec<Self::Id> {
         self.parent(obj).map_or(Vec::new(), |obj| {
             self.children(&obj)
         })
     }
-    
+
     /// returns owned children
     fn children_owned(&self, obj: &Self::Id) -> Vec<Self::Id> {
         self.children(obj).into_iter().filter_map(|id| {
@@ -130,7 +130,7 @@ pub trait FlowLink: FlowBase + FlowCheck {
             if nth > owner.children().len() {
                 return Err(FlowError::InValidLen)
             } 
-            owner.children().insert(nth, obj.clone());
+            owner.children_ref_mut().insert(nth, obj.clone());
             Ok(())
         }).unwrap_or(Err(FlowError::NotExistOwner));
         self.check_assert();
@@ -152,7 +152,7 @@ pub trait FlowLink: FlowBase + FlowCheck {
             if ! owner.children().contains(obj) {
                 return Err(FlowError::AbandonedChild)
             }
-            owner.children().retain(|x| x != obj);
+            owner.children_ref_mut().retain(|x| x != obj);
             Ok(())
         }).unwrap_or(Err(FlowError::NotExistOwner));
         self.check_assert();

@@ -1,7 +1,7 @@
 #[cfg(feature = "serde1")]
 use serde::{Serialize, Deserialize};
 
-use std::{collections::{HashMap, HashSet}, fmt::{self, Debug}, hash::Hash};
+use std::{collections::HashMap, fmt::{self, Debug}, hash::Hash};
 
 use super::*;
 
@@ -33,7 +33,7 @@ impl<Id: Debug + Clone, Entity: Debug> Debug for Node<Id, Entity> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct(format!("{:?}", self.id()).as_str())
             .field("<<", &self.parent.clone().map_or(
-                format!("none"), 
+                format!(""), 
                 |x| format!("{:?}", x)
             ))
             .field(">>", &self.children)
@@ -63,8 +63,8 @@ impl<Id: Clone, Entity> FlowNode<Id> for Node<Id, Entity> {
         self.children.clone()
     }
 
-    fn children_ref(&self) -> Vec<&Id> {
-        self.children.iter().collect()
+    fn children_ref_mut(&mut self) -> &mut Vec<Id> {
+        &mut self.children
     }
 }
 
@@ -176,7 +176,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
             ! kill_set.contains(id)
         });
         let () = self.node_map.values_mut().map(|obj| {
-            obj.children().retain(|id| {
+            obj.children_ref_mut().retain(|id| {
                 ! kill_set.contains(id)
             })
         }).collect();
@@ -307,6 +307,7 @@ mod tests {
         wrapper("Grow", flow.grow(obj_vec[7].clone()), &flow, aloud);
         wrapper("Grow", flow.grow(obj_vec[8].clone()), &flow, aloud);
         wrapper("Grow", flow.grow(obj_vec[9].clone()), &flow, aloud);
+        wrapper("Link 2->0", flow.link_push(obj_vec[2].id(), obj_vec[0].id()), &flow, aloud);
         wrapper("Devote 2->0", flow.devote_push(obj_vec[2].id(), obj_vec[0].id()), &flow, aloud);
         wrapper("Devote 3->0", flow.devote_push(obj_vec[3].id(), obj_vec[0].id()), &flow, aloud);
         wrapper("Devote 4->0", flow.devote_push(obj_vec[4].id(), obj_vec[0].id()), &flow, aloud);
