@@ -86,54 +86,6 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
     //     }
     //     final_set
     // }
-    pub fn node_offspring_set(&self, obj: &Id) -> HashSet<Id> {
-        let mut visit_set = HashSet::new();
-        let mut final_set = HashSet::new();
-        visit_set.insert(obj.clone());
-        while !visit_set.is_empty() {
-            let mut wait_set = HashSet::new();
-            for obj in visit_set.iter() {
-                let children = self.node_map.get(&obj)
-                    .map(|x| x.children.clone() )
-                    .unwrap_or_default();
-                wait_set.extend(children);
-            }
-            final_set.extend(wait_set.iter().cloned());
-            visit_set.clear();
-            visit_set.extend(wait_set);
-        }
-        final_set
-    }
-    pub fn node_ownership_set(&self, obj: &Id) -> HashSet<Id> {
-        let mut visit_set = HashSet::new();
-        let mut final_set = HashSet::new();
-        if self.contains_node(obj) {
-            visit_set.insert(obj.clone());
-            final_set.insert(obj.clone());
-        }
-        while !visit_set.is_empty() {
-            let mut wait_set = HashSet::new();
-            for obj in visit_set.iter() {
-                let children = self.node_map.get(&obj)
-                    .map(|x|  x.children.clone())
-                    .unwrap_or_default();
-                let set: Vec<Id> = children.into_iter().filter_map(|id| {
-                    self.node(&id).map(|node| {
-                        if node.parent == Some(obj.clone()) {
-                            Some(id)
-                        } else {
-                            None
-                        }
-                    }).flatten()
-                }).collect();
-                wait_set.extend(set);
-            }
-            final_set.extend(wait_set.iter().cloned());
-            visit_set.clear();
-            visit_set.extend(wait_set);
-        }
-        final_set
-    }
 }
 
 
@@ -169,6 +121,56 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
 
     fn children(&self, obj: &Self::Id) -> Vec<Self::Id> {
         self.node(obj).map_or(Vec::new(), |node| node.children.clone())
+    }
+
+    fn node_offspring_set(&self, obj: &Id) -> HashSet<Id> {
+        let mut visit_set = HashSet::new();
+        let mut final_set = HashSet::new();
+        visit_set.insert(obj.clone());
+        while !visit_set.is_empty() {
+            let mut wait_set = HashSet::new();
+            for obj in visit_set.iter() {
+                let children = self.node(&obj)
+                    .map(|x| x.children.clone() )
+                    .unwrap_or_default();
+                wait_set.extend(children);
+            }
+            final_set.extend(wait_set.iter().cloned());
+            visit_set.clear();
+            visit_set.extend(wait_set);
+        }
+        final_set
+    }
+
+    fn node_ownership_set(&self, obj: &Id) -> HashSet<Id> {
+        let mut visit_set = HashSet::new();
+        let mut final_set = HashSet::new();
+        if self.contains_node(obj) {
+            visit_set.insert(obj.clone());
+            final_set.insert(obj.clone());
+        }
+        while !visit_set.is_empty() {
+            let mut wait_set = HashSet::new();
+            for obj in visit_set.iter() {
+                let children = self.node(&obj)
+                    .map(|x|  x.children.clone())
+                    .unwrap_or_default();
+                let set: Vec<Id> = children.into_iter().filter_map(|id| {
+                    self.node(&id).map(|node| {
+                        if node.parent == Some(obj.clone()) {
+                            Some(id)
+                        } else {
+                            None
+                        }
+                    }).flatten()
+                }).collect();
+                wait_set.extend(set);
+            }
+            final_set.extend(wait_set.iter().cloned());
+            visit_set.clear();
+            visit_set.extend(wait_set);
+        }
+        final_set
     }
 }
 

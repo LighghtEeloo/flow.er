@@ -1,4 +1,4 @@
-use std::hash::Hash;
+use std::{collections::HashSet, hash::Hash};
 
 pub trait FlowBase {
     type Id: Default + Hash + Eq + Clone;
@@ -13,6 +13,12 @@ pub trait FlowBase {
     fn node_mut(&mut self, obj: &Self::Id) -> Option<&mut Self::Node>;
     fn parent(&self, obj: &Self::Id) -> Option<Self::Id>;
     fn children(&self, obj: &Self::Id) -> Vec<Self::Id>;
+    /// returns parent's children
+    fn friends(&self, obj: &Self::Id) -> Vec<Self::Id> {
+        self.parent(obj).map_or(Vec::new(), |obj| {
+            self.children(&obj)
+        })
+    }
     /// returns owned children
     fn children_owned(&self, obj: &Self::Id) -> Vec<Self::Id> {
         self.children(obj).into_iter().filter_map(|id| {
@@ -23,12 +29,8 @@ pub trait FlowBase {
             }
         }).collect()
     }
-    /// returns parent's children
-    fn friends(&self, obj: &Self::Id) -> Vec<Self::Id> {
-        self.parent(obj).map_or(Vec::new(), |obj| {
-            self.children(&obj)
-        })
-    }
+    fn node_offspring_set(&self, obj: &Self::Id) -> HashSet<Self::Id>;
+    fn node_ownership_set(&self, obj: &Self::Id) -> HashSet<Self::Id>;
 }
 
 pub trait FlowLink: FlowBase {
