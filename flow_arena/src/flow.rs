@@ -1,15 +1,14 @@
 use std::{collections::HashSet, hash::Hash};
 
-pub trait FlowNode {
-    type Id: Clone;
-    fn id(&self) -> &Self::Id;
-    fn parent(&self) -> Option<Self::Id>;
-    fn children(&self) -> Vec<&Self::Id>;
+pub trait FlowNode<Id> {
+    fn id(&self) -> &Id;
+    fn parent(&self) -> Option<Id>;
+    fn children(&self) -> Vec<Id>;
 }
 
 pub trait FlowBase {
     type Id: Default + Hash + Eq + Clone;
-    type Node: Default + FlowNode;
+    type Node: Default + FlowNode<Self::Id>;
     /// ensures root and returns it; no check
     fn orphan(&self) -> Vec<Self::Id>;
     /// no check hereafter
@@ -18,8 +17,18 @@ pub trait FlowBase {
     }
     fn node(&self, obj: &Self::Id) -> Option<&Self::Node>;
     fn node_mut(&mut self, obj: &Self::Id) -> Option<&mut Self::Node>;
-    fn parent(&self, obj: &Self::Id) -> Option<Self::Id>;
-    fn children(&self, obj: &Self::Id) -> Vec<Self::Id>;
+    fn parent(&self, obj: &Self::Id) -> Option<Self::Id> {
+        self.node(obj).map_or(None, 
+        |node| {
+            node.parent()
+        })
+    }
+    fn children(&self, obj: &Self::Id) -> Vec<Self::Id> {
+        self.node(obj).map_or(Vec::new(), 
+        |node| {
+            node.children()
+        })
+    }
     /// returns parent's children
     fn friends(&self, obj: &Self::Id) -> Vec<Self::Id> {
         self.parent(obj).map_or(Vec::new(), |obj| {

@@ -42,19 +42,17 @@ impl<Id: Debug + Clone, Entity: Debug> Debug for Node<Id, Entity> {
     }
 }
 
-impl<Id: Clone, Entity> FlowNode for Node<Id, Entity> {
-    type Id = Id;
-
+impl<Id: Clone, Entity> FlowNode<Id> for Node<Id, Entity> {
     fn id(&self) -> &Id {
         &self.id
     }
 
-    fn parent(&self) -> Option<Self::Id> {
+    fn parent(&self) -> Option<Id> {
         self.parent.clone()
     }
 
-    fn children(&self) -> Vec<&Self::Id> {
-        self.children.iter().collect()
+    fn children(&self) -> Vec<Id> {
+        self.children.iter().cloned().collect()
     }
 }
 
@@ -126,14 +124,6 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
 
     fn node_mut(&mut self, obj: &Self::Id) -> Option<&mut Self::Node> {
         self.node_map.get_mut(obj)
-    }
-
-    fn parent(&self, obj: &Self::Id) -> Option<Self::Id> {
-        self.node(obj).map_or(None, |node| node.parent.clone())
-    }
-
-    fn children(&self, obj: &Self::Id) -> Vec<Self::Id> {
-        self.node(obj).map_or(Vec::new(), |node| node.children.clone())
     }
 
     fn node_offspring_set(&self, obj: &Id) -> HashSet<Id> {
