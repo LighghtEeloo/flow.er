@@ -311,8 +311,8 @@ mod tests {
         wrapper("Devote 2->0", flow.devote_push(obj_vec[2].id(), obj_vec[0].id()), &flow, aloud);
         wrapper("Devote 3->0", flow.devote_push(obj_vec[3].id(), obj_vec[0].id()), &flow, aloud);
         wrapper("Devote 4->0", flow.devote_push(obj_vec[4].id(), obj_vec[0].id()), &flow, aloud);
-        wrapper("Devote 5->1", flow.devote_push(obj_vec[5].id(), obj_vec[1].id()), &flow, aloud);
-        wrapper("Devote 6->1", flow.devote_push(obj_vec[6].id(), obj_vec[1].id()), &flow, aloud);
+        wrapper("Devote 5->3", flow.devote_push(obj_vec[5].id(), obj_vec[3].id()), &flow, aloud);
+        wrapper("Link 6->3", flow.link_push(obj_vec[6].id(), obj_vec[3].id()), &flow, aloud);
         wrapper("Devote 7->1", flow.devote_push(obj_vec[7].id(), obj_vec[1].id()), &flow, aloud);
         wrapper("Devote 8->1", flow.devote_push(obj_vec[8].id(), obj_vec[1].id()), &flow, aloud);
         wrapper("Devote 9->1", flow.devote_push(obj_vec[9].id(), obj_vec[1].id()), &flow, aloud);
