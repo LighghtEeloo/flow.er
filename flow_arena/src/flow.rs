@@ -1,19 +1,5 @@
 use std::hash::Hash;
 
-/// Flow: the underlying trait for flow.er.
-/// 
-/// Let's start with some key concepts.
-/// 
-/// A. Arena
-/// 
-/// An arena is a typical data structure which has:
-/// 1. A map / vec to store the data.
-/// 2. A relationship graph which only tracks after the keys / indices.
-/// 
-/// FlowArena implements an arena-like data structure, but it has integrated the data map and the relationship graph, since both of them require an Id to visit. 
-/// 
-pub trait Flow: FlowMap + FlowLink + FlowMaid + FlowDock {}
-
 pub trait FlowMap {
     type Id: Default + Hash + Eq + Clone;
     type Node: Default;
@@ -67,6 +53,22 @@ pub trait FlowDock: FlowMaid + Sized {
     fn snap(&self, obj: &Self::Id) -> Result<Self, FlowError>;
 }
 
+pub enum Direction {
+    Forward,
+    Backward,
+    Ascend,
+    Descent,
+}
+
+pub trait FlowShift: FlowMap {
+    /// returns the obj in the corresponding relative position
+    fn shuttle(&self, obj: &Self::Id, dir: Direction) -> Result<Self::Id, FlowError>;
+    /// alters the node position by the corresponding relative position, within a single node
+    fn migrate(&self, obj: &Self::Id, dir: Direction) -> Result<(), FlowError>;
+    /// alters the node position by the corresponding relative position, iteratively within the flow
+    fn migrate_iter(&self, obj: &Self::Id, dir: Direction) -> Result<(), FlowError>;
+}
+
 #[derive(Debug)]
 pub enum FlowError {
     NotExistObj,
@@ -86,3 +88,16 @@ pub enum FlowError {
     AbandonedChild,
 }
 
+/// Flow: the underlying trait for flow.er.
+/// 
+/// Let's start with some key concepts.
+/// 
+/// A. Arena
+/// 
+/// An arena is a typical data structure which has:
+/// 1. A map / vec to store the data.
+/// 2. A relationship graph which only tracks after the keys / indices.
+/// 
+/// FlowArena implements an arena-like data structure, but it has integrated the data map and the relationship graph, since both of them require an Id to visit. 
+/// 
+pub trait Flow: FlowMap + FlowLink + FlowMaid + FlowDock + FlowShift {}

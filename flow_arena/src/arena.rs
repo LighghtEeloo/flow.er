@@ -3,7 +3,7 @@ use serde::{Serialize, Deserialize};
 
 use std::{collections::{HashMap, HashSet}, fmt::{self, Debug}, hash::Hash};
 
-use super::{FlowMap, FlowLink, FlowMaid, FlowDock, Flow, FlowError};
+use super::*;
 
 #[derive(Clone, Default)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
@@ -341,6 +341,21 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
     }
 
     fn snap(&self, obj: &Self::Id) -> Result<Self, FlowError> {
+        todo!()
+    }
+}
+
+impl<Id, Entity> FlowShift for FlowArena <Id, Entity>
+where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
+    fn shuttle(&self, obj: &Self::Id, dir: Direction) -> Result<Self::Id, FlowError> {
+        todo!()
+    }
+
+    fn migrate(&self, obj: &Self::Id, dir: Direction) -> Result<(), FlowError> {
+        todo!()
+    }
+
+    fn migrate_iter(&self, obj: &Self::Id, dir: Direction) -> Result<(), FlowError> {
         todo!()
     }
 }

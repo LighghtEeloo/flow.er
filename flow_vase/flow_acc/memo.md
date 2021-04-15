@@ -36,9 +36,9 @@ enum Direction {
 
 `shuttle` returns the obj in the corresponding relative position.
 
-`move` alters the node position by the corresponding relative position, within a single node.
+`migrate` alters the node position by the corresponding relative position, within a single node.
 
-`move_iter` alters the node position by the corresponding relative position, iteratively within the flow.
+`migrate_iter` alters the node position by the corresponding relative position, iteratively within the flow.
 
 
 ## Vessel
