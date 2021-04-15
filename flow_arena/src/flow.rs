@@ -1,21 +1,27 @@
 use std::hash::Hash;
 
-pub trait FlowMap {
+pub trait FlowBase {
     type Id: Default + Hash + Eq + Clone;
     type Node: Default;
     /// ensures root and returns it; no check
     fn orphan(&self) -> Vec<Self::Id>;
-    /// no check
+    /// no check hereafter
+    fn contains_node(&self, obj: &Self::Id) -> bool {
+        self.node(obj).is_some()
+    }
     fn node(&self, obj: &Self::Id) -> Option<&Self::Node>;
-    /// no check
     fn node_mut(&mut self, obj: &Self::Id) -> Option<&mut Self::Node>;
     fn parent(&self, obj: &Self::Id) -> Option<Self::Id>;
     fn children(&self, obj: &Self::Id) -> Vec<Self::Id>;
-    /// inserts a node; returns err if id exists.
-    fn grow(&mut self, obj: Self::Node) -> Result<Self::Id, FlowError>;
+    /// returns parent's children
+    fn friends(&self, obj: &Self::Id) -> Vec<Self::Id> {
+        self.parent(obj).map_or(Vec::new(), |obj| {
+            self.children(&obj)
+        })
+    }
 }
 
-pub trait FlowLink: FlowMap {
+pub trait FlowLink: FlowBase {
     /// randomly ensures the link of a node to another
     fn link(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), FlowError>;
     fn link_push(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError>;
@@ -23,7 +29,9 @@ pub trait FlowLink: FlowMap {
     fn detach(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError>;
 }
 
-pub trait FlowMaid: FlowMap + FlowLink {
+pub trait FlowMaid: FlowBase + FlowLink {
+    /// inserts a node; returns err if id exists.
+    fn grow(&mut self, obj: Self::Node) -> Result<Self::Id, FlowError>;
     /// appoints and ensures an owner; also links
     fn devote(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), FlowError>;
     fn devote_push(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError>;
@@ -60,7 +68,7 @@ pub enum Direction {
     Descent,
 }
 
-pub trait FlowShift: FlowMap {
+pub trait FlowShift: FlowBase {
     /// returns the obj in the corresponding relative position
     fn shuttle(&self, obj: &Self::Id, dir: Direction) -> Result<Self::Id, FlowError>;
     /// alters the node position by the corresponding relative position, within a single node
@@ -100,4 +108,14 @@ pub enum FlowError {
 /// 
 /// FlowArena implements an arena-like data structure, but it has integrated the data map and the relationship graph, since both of them require an Id to visit. 
 /// 
-pub trait Flow: FlowMap + FlowLink + FlowMaid + FlowDock + FlowShift {}
+pub trait Flow: FlowBase + FlowLink + FlowMaid + FlowDock + FlowShift {
+    fn check(&self) -> Result<(), (FlowError, String)>;
+        /// panics if anything went wrong. Iff in debug state.
+    fn check_assert(&self) {
+        if cfg!(debug_assertions) {
+            if let Err((err, current)) = self.check() {
+                panic!("{:?}{}", err, current)
+            }   
+        } 
+    } 
+}

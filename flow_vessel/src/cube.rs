@@ -1,6 +1,6 @@
 use serde::{Serialize, Deserialize};
 use std::{collections::HashSet, time::SystemTime};
-use flow_arena::FlowMap;
+use flow_arena::FlowBase;
 use crate::{EntityFlow, EntityId, Router, Vessel, now};
 
 mod inkblot;
