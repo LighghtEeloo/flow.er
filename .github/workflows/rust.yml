@@ -2,7 +2,7 @@ name: Rust
 
 on:
   push:
-    branches: [ dev ]
+    branches: [ dev, dev-Acc ]
   pull_request:
     branches: [ dev ]
 
@@ -22,8 +22,8 @@ jobs:
       run: cargo test --package flow_arena
     - name: Run flow_vessel tests
       run: cargo test --package flow_vessel
-    - name: Run flow_yew tests
-      run: cargo test --package flow_yew
+    - name: Run flow_acc tests
+      run: cargo test --package flow_acc
     - name: Run flow_cli tests
       run: cargo test --package flow_cli
     - name: Run tests
