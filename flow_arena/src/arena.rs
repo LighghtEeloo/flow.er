@@ -210,7 +210,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug + Clone {
             Err(FlowError::NotExistOwner)
         } else {
             self.node_mut(owner).map(|node| {
-                node.children().extend(vec)
+                node.children_ref_mut().extend(vec)
             });
             let _: Vec<()> = flow.node_map.iter_mut().map(|(_, node)| {
                 node.parent_set(owner.clone())
@@ -225,23 +225,28 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug + Clone {
         let set: HashSet<Self::Id> = flow.node_map.keys().cloned().collect();
         for id in set.iter() {
             let filter: Vec<()> = self.node_map.values()
-            .filter(|node| {
-                set.contains(node.id())
-            })
-            // node means current nodes without set_to_remove hereafter
-            .filter_map(|node| {
-                let ch_ft = node.children().iter().find(|&x| x == id).map(|_| ());
-                let pa_ft = node.parent().map(|x| { 
-                    if &x == id { Some(()) } else { None }
-                }).flatten();
-                ch_ft.or(pa_ft)
-            }).collect();
+                .filter(|node| {
+                    ! set.contains(node.id()) && ! (node.id() == obj)
+                })
+                // node means current nodes excluding set_to_remove hereafter
+                .filter_map(|node| {
+                    // println!("set_id:{:?}, node_children:{:?}", id, node.children());
+                    let ch_ft = node.children().iter()
+                        .find(|&x| x == id).map(|_| ());
+                    let pa_ft = node.parent().map(|x| { 
+                        if &x == id { Some(()) } else { None }
+                    }).flatten();
+                    ch_ft.or(pa_ft)
+                }).collect();
             if ! filter.is_empty() {
                 return Err(FlowError::LinkedUndock)
             }
         }
         self.node_map.retain(|id, _| {
             ! set.contains(id)
+        });
+        self.node_mut(obj).map(|node| {
+            node.children_ref_mut().clear()
         });
         Ok((flow, vec))
     }
@@ -251,9 +256,13 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug + Clone {
         let vec = self.children(obj);
         let set = self.node_offspring_set(obj);
         let mut flow = FlowArena::new();
-        let node_map: HashMap<Self::Id, Self::Node> = set.into_iter().filter_map(|id| {
+        let node_map: HashMap<Self::Id, Self::Node> = set.iter().cloned().filter_map(|id| {
             self.node_map.get(&id).cloned()
-        }).map(|node| {
+        }).map(|mut node| {
+            if Some(obj.clone()) == node.parent 
+            || node.parent.clone().map_or(false, |id| ! set.contains(&id)) {
+                node.parent_set_none()
+            }
             (node.id().clone(), node)
         }).collect();
         flow.node_map.extend(node_map);
@@ -263,11 +272,11 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug + Clone {
 
 impl<Id, Entity> FlowShift for FlowArena <Id, Entity>
 where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug + Clone {
-    // fn migrate(&self, obj: &Self::Id, dir: Direction) -> Result<(), FlowError> {
+    // fn migrate(&mut self, obj: &Self::Id, dir: Direction) -> Result<(), FlowError> {
     //     todo!()
     // }
 
-    // fn migrate_iter(&self, obj: &Self::Id, dir: Direction) -> Result<(), FlowError> {
+    // fn migrate_iter(&mut self, obj: &Self::Id, dir: Direction) -> Result<(), FlowError> {
     //     todo!()
     // }
 }
@@ -324,7 +333,7 @@ mod tests {
     use super::*;
     type FlowEntity = FlowPure<EntityId>;
     type NodeEntity = Node<EntityId, ()>;
-    #[derive(Clone, Default, Hash, PartialEq, Eq)]
+    #[derive(Clone, Copy, Default, Hash, PartialEq, Eq)]
     #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
     struct EntityId {
         idx: u64,
@@ -349,6 +358,27 @@ mod tests {
         }
     }
 
+    /// before: 
+    ///
+    /// 0 - {2, 3 - {5, (6)}, 4}
+    ///
+    /// 1 - {7, 8, 9}
+    ///
+    /// after erase:
+    /// 
+    /// 0 - {2, 4}
+    ///
+    /// 6
+    ///
+    /// complex devote:
+    ///
+    /// 0 - {2, 4}
+    ///
+    /// 6 - {10, 11 - {12 - (14), (13)}, (12)}
+    ///
+    /// 13
+    ///
+    /// 14
     fn make_flow(aloud: bool) -> (FlowEntity, Vec<EntityId>) {
         let mut flow: FlowEntity = FlowArena::new();
         let obj_vec: Vec<NodeEntity> = (0..21).map(|x| 
@@ -373,9 +403,22 @@ mod tests {
         wrapper("Devote 7->1", flow.devote_push(obj_vec[7].id(), obj_vec[1].id()), &flow, aloud);
         wrapper("Devote 8->1", flow.devote_push(obj_vec[8].id(), obj_vec[1].id()), &flow, aloud);
         wrapper("Devote 9->1", flow.devote_push(obj_vec[9].id(), obj_vec[1].id()), &flow, aloud);
+        // erase
         wrapper("Erase 3", flow.erase(obj_vec[3].id()), &flow, aloud);
         wrapper("Decay 1", flow.decay(obj_vec[1].id()), &flow, aloud);
         wrapper("Erase 1", flow.erase(obj_vec[1].id()), &flow, aloud);
+        // complex
+        wrapper("Grow", flow.grow(obj_vec[10].clone()), &flow, aloud);
+        wrapper("Grow", flow.grow(obj_vec[11].clone()), &flow, aloud);
+        wrapper("Grow", flow.grow(obj_vec[12].clone()), &flow, aloud);
+        wrapper("Grow", flow.grow(obj_vec[13].clone()), &flow, aloud);
+        wrapper("Grow", flow.grow(obj_vec[14].clone()), &flow, aloud);
+        wrapper("Devote 10->6", flow.devote_push(obj_vec[10].id(), obj_vec[6].id()), &flow, aloud);
+        wrapper("Devote 11->6", flow.devote_push(obj_vec[11].id(), obj_vec[6].id()), &flow, aloud);
+        wrapper("Devote 12->11", flow.devote_push(obj_vec[12].id(), obj_vec[11].id()), &flow, aloud);
+        wrapper("Link 12->6", flow.link_push(obj_vec[12].id(), obj_vec[6].id()), &flow, aloud);
+        wrapper("Link 13->11", flow.link_push(obj_vec[13].id(), obj_vec[11].id()), &flow, aloud);
+        wrapper("Link 14->12", flow.link_push(obj_vec[14].id(), obj_vec[12].id()), &flow, aloud);
         if cfg!(debug_assertions) && aloud { println!("Checked."); flow.check_assert() };
         (
             flow, 
@@ -391,12 +434,71 @@ mod tests {
     }
 
     #[test]
-    fn ownership_offspring() {
+    fn offspring_ownership() {
         let (flow, obj_vec) = make_flow(true);
-        println!("{:?}", flow.node_offspring_set(&obj_vec[0]));
-        println!("{:?}", flow.node_ownership_set(&obj_vec[0]));
+        
+        let offspring_impl = flow.node_offspring_set(&obj_vec[0]);
+        let ownership_impl = flow.node_ownership_set(&obj_vec[0]);
+        println!("offspring[0]: {:?}", offspring_impl);
+        println!("ownership[0]: {:?}", ownership_impl);
+        let offspring: HashSet<EntityId> = [
+            obj_vec[2], 
+            obj_vec[4]
+        ].iter().cloned().collect();
+        let ownership: HashSet<EntityId> = [
+            obj_vec[0], 
+            obj_vec[2], 
+            obj_vec[4]
+        ].iter().cloned().collect();
+        assert_eq!(offspring, offspring_impl);
+        assert_eq!(ownership, ownership_impl);
+
+        let offspring_impl = flow.node_offspring_set(&obj_vec[6]);
+        let ownership_impl = flow.node_ownership_set(&obj_vec[6]);
+        println!("offspring[6]: {:?}", offspring_impl);
+        println!("ownership[6]: {:?}", ownership_impl);
+        let offspring: HashSet<EntityId> = [
+            obj_vec[10], 
+            obj_vec[11], 
+            obj_vec[12], 
+            obj_vec[13], 
+            obj_vec[14], 
+        ].iter().cloned().collect();
+        let ownership: HashSet<EntityId> = [
+            obj_vec[6], 
+            obj_vec[10], 
+            obj_vec[11], 
+            obj_vec[12], 
+        ].iter().cloned().collect();
+        assert_eq!(offspring, offspring_impl);
+        assert_eq!(ownership, ownership_impl);
     }
 
+    #[test]
+    fn flow_dock() {
+        let (mut flow, obj_vec) = make_flow(false);
+        let flow_ = flow.clone();
+
+        let (sub_, vec_) = flow.snap(&obj_vec[6]).expect("snap error");
+        println!("sub_flow[6]: {:#?}", sub_);
+        println!("sub_vec[6]: {:?}", vec_);
+        let mut flow_6 = flow_.clone();
+        // flow.undock(&obj_vec[6]).expect_err("shouldn't undock because LinkedUndock");
+        let (sub, vec) = flow_6.undock(&obj_vec[6]).expect("undock error");
+        assert_eq!(sub, sub_);
+        assert_eq!(vec, vec_);
+        
+        let (sub_, vec_) = flow.snap(&obj_vec[0]).expect("snap error");
+        println!("sub_flow[0]: {:#?}", sub_);
+        println!("sub_vec[0]: {:?}", vec_);
+        let (sub, vec) = flow.undock(&obj_vec[0]).expect("undock error");
+        assert_eq!(sub, sub_);
+        assert_eq!(vec, vec_);
+        flow.dock(&obj_vec[0], vec, sub).expect("dock error");
+        // println!("current flow: {:#?}", flow);
+        // println!("original flow: {:#?}", flow_);
+        assert_eq!(flow, flow_);
+    }
 
     #[test]
     fn iter() {

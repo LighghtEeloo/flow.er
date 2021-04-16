@@ -312,12 +312,12 @@ pub trait FlowShift: FlowBase {
     }
 
     /// alters the node position by the corresponding relative position, within a single node
-    fn migrate(&self, obj: &Self::Id, dir: Direction) -> Result<(), FlowError> {
+    fn migrate(&mut self, obj: &Self::Id, dir: Direction) -> Result<(), FlowError> {
         todo!()
     }
 
     /// alters the node position by the corresponding relative position, iteratively within the flow
-    fn migrate_iter(&self, obj: &Self::Id, dir: Direction) -> Result<(), FlowError> {
+    fn migrate_iter(&mut self, obj: &Self::Id, dir: Direction) -> Result<(), FlowError> {
         todo!()
     }
 }
