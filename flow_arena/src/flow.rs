@@ -10,8 +10,8 @@ pub trait FlowNode<Id> {
 }
 
 pub trait FlowBase {
-    type Id: Default + Hash + Eq + Clone;
-    type Node: Default + FlowNode<Self::Id>;
+    type Id: Default + Clone + Hash + Eq;
+    type Node: Default + Clone + FlowNode<Self::Id>;
     /// ensures root and returns it; no check
     fn orphan(&self) -> Vec<Self::Id>;
     /// no check hereafter
@@ -228,34 +228,98 @@ pub trait FlowDock: FlowMaid + Sized {
     /// Err if:
     /// 1. Owner not found.
     /// 2. Node exists in current flow.
-    fn dock(&mut self, owner: &Self::Id, flow: Self) -> Result<(), FlowError>;
+    fn dock_unordered(&mut self, owner: &Self::Id, flow: Self) -> Result<(), FlowError> {
+        self.dock(owner, flow.orphan(), flow)
+    }
+    fn dock(&mut self, owner: &Self::Id, vec: Vec<Self::Id>, flow: Self) -> Result<(), FlowError>;
     /// moves all the nodes under the designated node out of the current flow and unmounts them
     /// 
     /// Err if:
     /// 1. Obj not found.
     /// 2. Node linked by other nodes.
-    fn undock(&mut self, obj: &Self::Id) -> Result<Self, FlowError>;
+    fn undock(&mut self, obj: &Self::Id) -> Result<(Self, Vec<Self::Id>), FlowError>;
     /// clones all the nodes under the designated node and unmounts them
     /// 
     /// Err if:
     /// 1. Obj not found.
-    fn snap(&self, obj: &Self::Id) -> Result<Self, FlowError>;
+    fn snap(&self, obj: &Self::Id) -> Result<(Self, Vec<Self::Id>), FlowError>;
 }
 
+#[derive(Debug, Copy, Clone)]
 pub enum Direction {
     Forward,
     Backward,
     Ascend,
-    Descent,
+    Descend,
+}
+
+impl Direction {
+    fn shift(&self) -> isize {
+        use Direction::*;
+        match self {
+            Forward => 1,
+            Backward => -1,
+            _ => 0
+        }
+    }
+
+    /// bounded in [0, len)
+    fn walk(&self, nth: usize, len: usize) -> usize {
+        let pos = nth as isize + self.shift();
+        if pos < 0 {
+            0
+        } else if (pos as usize) < len {
+            pos as usize
+        } else {
+            len - 1
+        }
+        
+    }
 }
 
 pub trait FlowShift: FlowBase {
     /// returns the obj in the corresponding relative position
-    fn shuttle(&self, obj: &Self::Id, dir: Direction) -> Result<Self::Id, FlowError>;
+    fn shuttle(&self, obj: &Self::Id, dir: Direction) -> Result<Self::Id, FlowError> {
+        use Direction::*;
+        match dir {
+            Forward | Backward => {
+                let friends = self.friends(obj);
+                let nth = if let Some(nth) = friends.iter()
+                    .position(|id| {
+                        id == obj
+                    }) 
+                { nth } else { return Err(FlowError::AbandonedChild) };
+                let len = friends.len();
+                Ok(friends[dir.walk(nth, len)].clone())
+            }
+            Ascend => {
+                let candidate = self.parent(obj);
+                let res = candidate
+                    .map_or(obj.clone(), |id| {
+                        id
+                    });
+                Ok(res)
+            }
+            Descend => {
+                let candidate = self.children(obj).get(0).cloned();
+                let res = candidate
+                    .map_or(obj.clone(), |id| {
+                        id
+                    });
+                Ok(res)
+            }
+        }
+    }
+
     /// alters the node position by the corresponding relative position, within a single node
-    fn migrate(&self, obj: &Self::Id, dir: Direction) -> Result<(), FlowError>;
+    fn migrate(&self, obj: &Self::Id, dir: Direction) -> Result<(), FlowError> {
+        todo!()
+    }
+
     /// alters the node position by the corresponding relative position, iteratively within the flow
-    fn migrate_iter(&self, obj: &Self::Id, dir: Direction) -> Result<(), FlowError>;
+    fn migrate_iter(&self, obj: &Self::Id, dir: Direction) -> Result<(), FlowError> {
+        todo!()
+    }
 }
 
 #[derive(Debug)]
@@ -264,7 +328,9 @@ pub enum FlowError {
     NotExistOwner,
     InValidLen,
     ExistGrow,
+    ExistDock,
     OwnerDetach,
+    LinkedUndock,
     /// certain operations requires node to be orphaned
     NotOrphaned,
     /// certain operations requires node to be unorphaned

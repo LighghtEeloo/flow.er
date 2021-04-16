@@ -5,7 +5,7 @@ use std::{fmt, hash::Hash};
 use serde::ser::{Serialize, Serializer, SerializeStruct};
 #[cfg(feature = "serde1")]
 impl<Id, Entity> Serialize for FlowArena<Id, Entity> 
-where Id: Serialize + Hash + Eq + Clone, Entity: Serialize {
+where Id: Serialize + Hash + Eq + Clone, Entity: Serialize + Clone {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         let mut flow = 
             serializer.serialize_struct("Flow", 2)?;
@@ -21,7 +21,7 @@ use serde::de::{self, Deserialize, Deserializer, Visitor, SeqAccess, MapAccess};
 use std::marker::PhantomData;
 #[cfg(feature = "serde1")]
 impl<'de, Id, Entity> Deserialize<'de> for FlowArena<Id, Entity> 
-where Id: Deserialize<'de> + Clone + Hash + Eq, Entity: Deserialize<'de> {
+where Id: Deserialize<'de> + Clone + Hash + Eq, Entity: Deserialize<'de> + Clone {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         enum Field { NodeMap }
         impl<'de> Deserialize<'de> for Field {
@@ -50,11 +50,11 @@ where Id: Deserialize<'de> + Clone + Hash + Eq, Entity: Deserialize<'de> {
             }
         }
 
-        struct FlowVisitor<Id: Hash + Eq + Clone, Entity> {
+        struct FlowVisitor<Id: Hash + Eq + Clone, Entity: Clone> {
             marker: PhantomData<fn() -> FlowArena<Id, Entity>>
         }
 
-        impl<'de, Id: Deserialize<'de> + Clone + Hash + Eq, Entity: Deserialize<'de>> Visitor<'de> for FlowVisitor<Id, Entity> {
+        impl<'de, Id: Deserialize<'de> + Clone + Hash + Eq, Entity: Deserialize<'de> + Clone> Visitor<'de> for FlowVisitor<Id, Entity> {
             type Value = FlowArena<Id, Entity>;
 
             fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {

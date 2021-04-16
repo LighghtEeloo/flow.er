@@ -1,7 +1,11 @@
 #[cfg(feature = "serde1")]
 use serde::{Serialize, Deserialize};
 
-use std::{collections::HashMap, fmt::{self, Debug}, hash::Hash};
+use std::{
+    collections::{HashMap, HashSet}, 
+    fmt::{self, Debug}, 
+    hash::Hash
+};
 
 use super::*;
 
@@ -71,21 +75,21 @@ impl<Id: Clone, Entity> FlowNode<Id> for Node<Id, Entity> {
 
 #[derive(Clone)]
 #[cfg_attr(debug_assertions, derive(PartialEq, Debug))]
-pub struct FlowArena<Id: Hash + Eq + Clone, Entity> {
+pub struct FlowArena<Id: Hash + Eq + Clone, Entity: Clone> {
     pub(crate) node_map: HashMap<Id, Node<Id, Entity>>,
 }
 
 pub type FlowPure<Id> = FlowArena<Id, ()>;
 
 impl<Id, Entity> Default for FlowArena<Id, Entity> 
-where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
+where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug + Clone {
     fn default() -> Self {
         Self::new()
     }
 }
 
 impl<Id, Entity> FlowArena<Id, Entity> 
-where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
+where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug + Clone {
     pub fn new() -> Self {
         let node_map = HashMap::new();
         FlowArena { node_map }
@@ -94,7 +98,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
 
 
 impl<Id, Entity> FlowBase for FlowArena<Id, Entity> 
-where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
+where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug + Clone {
     type Id = Id;
     type Node = Node<Id, Entity>;
 
@@ -121,7 +125,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
 }
 
 impl<Id, Entity> FlowCheck for FlowArena<Id, Entity>
-where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
+where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug + Clone {
     fn check(&self) -> Result<(), (FlowError, String)> {
         for (id, node) in self.node_map.iter() {
             let current_str = format!(", current: \nid: {:?}, \nnode: {:#?}", id, node);
@@ -150,11 +154,11 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
 }
 
 impl<Id, Entity> FlowLink for FlowArena<Id, Entity> 
-where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {}
+where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug + Clone {}
 
 
 impl<Id, Entity> FlowMaid for FlowArena<Id, Entity> 
-where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
+where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug + Clone {
     fn grow(&mut self, obj: Self::Node) -> Result<Self::Id, FlowError> {
         let res = if self.contains_node(obj.id()) {
             Err(FlowError::ExistGrow)
@@ -186,38 +190,91 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
 }
 
 impl<Id, Entity> FlowDock for FlowArena <Id, Entity>
-where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
-    fn dock(&mut self, owner: &Self::Id, flow: Self) -> Result<(), FlowError> {
-        todo!()
+where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug + Clone {
+    fn dock(&mut self, owner: &Self::Id, mut vec: Vec<Self::Id>, mut flow: Self) -> Result<(), FlowError> {
+        // check vec contains all flow.orphan()
+        if vec.is_empty() {
+            vec = flow.orphan()
+        } else {
+            let set: HashSet<Self::Id> = vec.iter().cloned().collect();
+            if ! flow.orphan().iter().fold(true, |is_in, id| {
+                is_in && set.contains(id)
+            }) {
+                return Err(FlowError::AbandonedChild)
+            }
+        }
+        if flow.node_map.keys().fold(false, |is, id| {
+            is || self.contains_node(id)
+        }) { Err(FlowError::ExistDock) } else
+        if ! self.contains_node(owner) {
+            Err(FlowError::NotExistOwner)
+        } else {
+            self.node_mut(owner).map(|node| {
+                node.children().extend(vec)
+            });
+            let _: Vec<()> = flow.node_map.iter_mut().map(|(_, node)| {
+                node.parent_set(owner.clone())
+            }).collect();
+            self.node_map.extend(flow.node_map);
+            Ok(())
+        }
     }
 
-    fn undock(&mut self, obj: &Self::Id) -> Result<Self, FlowError> {
-        todo!()
+    fn undock(&mut self, obj: &Self::Id) -> Result<(Self, Vec<Self::Id>), FlowError> {
+        let (flow, vec) = self.snap(obj)?;
+        let set: HashSet<Self::Id> = flow.node_map.keys().cloned().collect();
+        for id in set.iter() {
+            let filter: Vec<()> = self.node_map.values()
+            .filter(|node| {
+                set.contains(node.id())
+            })
+            // node means current nodes without set_to_remove hereafter
+            .filter_map(|node| {
+                let ch_ft = node.children().iter().find(|&x| x == id).map(|_| ());
+                let pa_ft = node.parent().map(|x| { 
+                    if &x == id { Some(()) } else { None }
+                }).flatten();
+                ch_ft.or(pa_ft)
+            }).collect();
+            if ! filter.is_empty() {
+                return Err(FlowError::LinkedUndock)
+            }
+        }
+        self.node_map.retain(|id, _| {
+            ! set.contains(id)
+        });
+        Ok((flow, vec))
     }
 
-    fn snap(&self, obj: &Self::Id) -> Result<Self, FlowError> {
-        todo!()
+    fn snap(&self, obj: &Self::Id) -> Result<(Self, Vec<Self::Id>), FlowError> {
+        if ! self.contains_node(obj) { return Err(FlowError::NotExistObj) }
+        let vec = self.children(obj);
+        let set = self.node_offspring_set(obj);
+        let mut flow = FlowArena::new();
+        let node_map: HashMap<Self::Id, Self::Node> = set.into_iter().filter_map(|id| {
+            self.node_map.get(&id).cloned()
+        }).map(|node| {
+            (node.id().clone(), node)
+        }).collect();
+        flow.node_map.extend(node_map);
+        Ok((flow, vec))
     }
 }
 
 impl<Id, Entity> FlowShift for FlowArena <Id, Entity>
-where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
-    fn shuttle(&self, obj: &Self::Id, dir: Direction) -> Result<Self::Id, FlowError> {
-        todo!()
-    }
+where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug + Clone {
+    // fn migrate(&self, obj: &Self::Id, dir: Direction) -> Result<(), FlowError> {
+    //     todo!()
+    // }
 
-    fn migrate(&self, obj: &Self::Id, dir: Direction) -> Result<(), FlowError> {
-        todo!()
-    }
-
-    fn migrate_iter(&self, obj: &Self::Id, dir: Direction) -> Result<(), FlowError> {
-        todo!()
-    }
+    // fn migrate_iter(&self, obj: &Self::Id, dir: Direction) -> Result<(), FlowError> {
+    //     todo!()
+    // }
 }
 
 
 impl<Id, Entity> Flow for FlowArena<Id, Entity> 
-where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {}
+where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug + Clone {}
 
 
 #[derive(Clone)]
@@ -247,7 +304,7 @@ impl<'a, Id, Entity> Iterator for EntitiesMut<'a, Id, Entity> {
 }
 
 impl<Id, Entity> FlowArena<Id, Entity> 
-where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug {
+where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug + Clone {
     /// returns an iterator over all entities.
     pub fn entities(&self) -> Entities<Id, Entity> {
         Entities {
