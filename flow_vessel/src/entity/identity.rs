@@ -53,7 +53,7 @@ pub struct EntityIdFactory {
 impl EntityIdFactory {
     /// generate id by increment
     pub fn incr_id(&mut self) -> EntityId {
-        self.cnt += 1;
+        Self::rotate_add(&mut self.cnt);
         EntityId {
             time: UNIX_EPOCH,
             unique: self.cnt
@@ -66,11 +66,14 @@ impl EntityIdFactory {
         }
     }
     pub fn rotate_id(&mut self) -> EntityId {
-        self.cnt += 1;
+        Self::rotate_add(&mut self.cnt);
         EntityId {
             time: now(),
             unique: self.cnt
         }
+    }
+    fn rotate_add(cnt: &mut u64) {
+        *cnt = cnt.checked_add(1).map_or(1, |x| x)
     }
 }
 
