@@ -77,6 +77,8 @@ impl Router {
 /// A overall layer of routers and cubes.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Glass {
+    #[serde(default)]
+    pub router: Router,
     map: HashMap<Router, Vec<Cube>>,
     factory: CubeIdFactory,
 }
@@ -89,6 +91,7 @@ impl Default for Glass {
                 (router, vec![Cube::new_router(router, &mut factory)])
             }).collect();
         Self {
+            router: Router::default(),
             map,
             factory
         }
@@ -96,9 +99,9 @@ impl Default for Glass {
 }
 
 impl Glass {
-    pub fn get_cube_vec(&self, router: Router) -> Vec<Cube> {
+    pub fn get_cube_vec(&self) -> Vec<Cube> {
         let vec = 
-            self.map.get(&router).cloned()
+            self.map.get(&self.router).cloned()
             .unwrap_or(Vec::new());
         if vec.is_empty() {
             vec![Cube::default()]
@@ -187,13 +190,14 @@ mod tests {
     use Router::*;
     #[test]
     fn glass_update() {
-        let glass = Glass::default();
-        switch(Workspace, &glass);
+        let mut glass = Glass::default();
+        switch(Workspace, &mut glass);
         let mut vessel = Vessel::default();
         vessel.glass_refresh();
     }
-    fn switch(router: Router, glass: &Glass) {
+    fn switch(router: Router, glass: &mut Glass) {
+        glass.router = router;
         println!("{:#?}", glass);
-        println!("{:?}: {:?}", router, glass.get_cube_vec(router));
+        println!("{:?}: {:?}", router, glass.get_cube_vec());
     }
 }

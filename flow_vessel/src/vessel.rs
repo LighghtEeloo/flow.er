@@ -2,7 +2,7 @@ use std::{collections::HashSet, fmt::Debug};
 use serde::{Serialize, Deserialize};
 use flow_arena::{Node, FlowArena, FlowBase, FlowMaid};
 
-use super::{Entity, EntityId, EntityIdFactory, Router, Glass, Cube, Settings};
+use super::{Entity, EntityId, EntityIdFactory, Glass, Cube, Settings};
 
 pub type EntityNode = Node<EntityId, Entity>;
 pub type EntityFlow = FlowArena<EntityId, Entity>;
@@ -10,11 +10,9 @@ pub type EntityFlow = FlowArena<EntityId, Entity>;
 #[derive(Default, Clone, Serialize, Deserialize)]
 pub struct Vessel {
     flow_arena: EntityFlow,
-    id_factory: EntityIdFactory,
+    factory: EntityIdFactory,
     #[serde(default)]
     pub glass: Glass,
-    #[serde(default)]
-    pub router: Router,
     #[serde(default)]
     pub settings: Settings
 }
@@ -23,9 +21,8 @@ impl Vessel {
     pub fn new() -> Self {
         Self {
             flow_arena: FlowArena::new(),
-            id_factory: EntityIdFactory::default(),
+            factory: EntityIdFactory::default(),
             glass: Glass::default(),
-            router: Router::default(),
             settings: Settings::default()
         }
     }
@@ -34,9 +31,8 @@ impl Vessel {
 impl Debug for Vessel {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Vessel")
-         .field("router", &self.router)
          .field("glass", &self.glass)
-         .field("id_factory", &self.id_factory)
+         .field("id_factory", &self.factory)
          .field("flow_arena", &self.flow_arena)
          .finish()
     }
@@ -82,7 +78,7 @@ impl Vessel {
 /// flow_arena flow operation
 impl Vessel {
     pub fn entity_grow(&mut self) -> EntityId {
-        let entity = Entity::new_rotate(&mut self.id_factory);
+        let entity = Entity::new_rotate(&mut self.factory);
         self.entity_insert(entity)
     }
     pub fn entity_insert(&mut self, entity: Entity) -> EntityId {
@@ -231,7 +227,7 @@ impl Vessel {
 
 impl Vessel {
     pub fn get_cube_vec(&self) -> Vec<Cube> {
-        self.glass.get_cube_vec(self.router)
+        self.glass.get_cube_vec()
     }
     pub fn glass_refresh(&mut self) {
         self.glass.refresh(&self.flow_arena)
@@ -294,7 +290,7 @@ mod tests {
     fn entity_ensure() {
         let mut vessel = Vessel::new();
         let _id = vessel.entity_grow();
-        let id1 = vessel.id_factory.incr_id();
+        let id1 = vessel.factory.incr_id();
         vessel.entity_ensure(&id1);
         println!("{:#?}", vessel);
     }

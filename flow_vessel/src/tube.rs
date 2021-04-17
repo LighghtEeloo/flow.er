@@ -60,7 +60,7 @@ impl Vessel {
         use Tube::*;
         match tube {
             SwitchRouter{ router} => {
-                self.router = router;
+                self.glass.router = router;
                 Echo::RebuildVM
             },
             SettingUpdate { settings } => {
@@ -69,11 +69,11 @@ impl Vessel {
             }
 
             OpenVM { cube, meta } => {
-                self.glass.push_cube(cube.clone(), meta.router);
+                self.glass.push_cube(cube.clone(), meta.router).ok();
                 Echo::RebuildVM
             }
             CloseVM { meta } => {
-                self.glass.remove_cube(meta);
+                self.glass.remove_cube(meta).ok();
                 Echo::RebuildVM
             }
 
