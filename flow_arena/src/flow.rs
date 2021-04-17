@@ -9,12 +9,12 @@ pub trait FlowNode<Id> {
     fn children_ref_mut(&mut self) -> &mut Vec<Id>;
 }
 
+/// no check in FlowBase
 pub trait FlowBase {
     type Id: Default + Clone + Hash + Eq;
     type Node: Default + Clone + FlowNode<Self::Id>;
-    /// ensures root and returns it; no check
+    /// ensures root and returns it
     fn orphan(&self) -> Vec<Self::Id>;
-    /// no check hereafter
     fn contains_node(&self, obj: &Self::Id) -> bool {
         self.node(obj).is_some()
     }
@@ -411,17 +411,4 @@ pub enum FlowError {
     AbandonedChild,
 }
 
-/// Flow: the underlying trait for flow.er.
-/// 
-/// Let's start with some key concepts.
-/// 
-/// A. Arena
-/// 
-/// An arena is a typical data structure which has:
-/// 1. A map / vec to store the data.
-/// 2. A relationship graph which only tracks after the keys / indices.
-/// 
-/// FlowArena implements an arena-like data structure, but it has integrated the data map and the relationship graph, since both of them require an Id to visit. 
-/// 
-// Todo: Finish Flow docs.
 pub trait Flow: FlowBase + FlowLink + FlowMaid + FlowDock + FlowShift {}
