@@ -1,13 +1,19 @@
 use serde::{Serialize, Deserialize};
 
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[derive(Clone, Copy, PartialEq, Debug, Serialize, Deserialize)]
 pub enum Symbol {
     ProcessTracker(Process),
     Linted(Lint),
     // Innocent
 }
 
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+impl Default for Symbol {
+    fn default() -> Self {
+        Symbol::Linted(Lint::default())
+    }
+}
+
+#[derive(Clone, Copy, PartialEq, Debug, Serialize, Deserialize)]
 pub enum Process {
     Done,
     Marching,
@@ -47,7 +53,7 @@ impl Process {
     }
 }
 
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[derive(Clone, Copy, PartialEq, Debug, Serialize, Deserialize)]
 pub enum Lint {
     Numberic,
     Programmatic,

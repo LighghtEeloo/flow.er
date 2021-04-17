@@ -22,7 +22,6 @@ pub struct Entity {
     pub symbol: Symbol,
     pub tags: TagSet,
     #[serde(default)]
-    pub filters: Vec<Filter>,
     pub blocked: bool,
     #[serde(skip)]
     pub symbol_toggle: bool,
@@ -41,9 +40,8 @@ impl Entity {
             time_note: None,
             face: Face::default(),
             bubble: Bubble::default(),
-            symbol: Symbol::Linted(Lint::default()),
+            symbol: Symbol::default(),
             tags: TagSet::default(),
-            filters: Vec::new(),
             blocked: false,
             symbol_toggle: false,
         }
@@ -54,8 +52,15 @@ impl Entity {
     pub fn duplicate_from(&mut self, dude: &Self) {
         self.symbol = dude.symbol.clone();
     }
-    pub fn contains_tag(&self, tag: &Tag) -> bool {
-        self.tags.contains(tag)
+    pub fn filter_out(&self, filters: Vec<Filter>) -> bool {
+        filters.into_iter().fold(false, |is, filter| {
+            let matching = match filter {
+                Filter::Symbol(s) => self.symbol == s,
+                Filter::Tag(t) => self.tags.contains(&t),
+                Filter::All => false
+            };
+            is || matching
+        })
     }
     pub fn update_entity(&mut self, field: EntityField) {
         use EntityField::*;
