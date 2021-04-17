@@ -1,13 +1,11 @@
-use std::{fmt::Debug, hash::Hash};
+use std::fmt::Debug;
 use std::time::{SystemTime, UNIX_EPOCH};
 use serde::{Serialize, Deserialize};
 
-use crate::{TimeRep, now};
+use crate::{Identity, TimeRep, now};
 
 const LEN: usize = 5;
 
-pub trait Identity: Default + Debug + Clone + Hash + PartialEq + Eq {
-}
 
 #[derive(Clone, Copy, Hash, PartialEq, Eq, Serialize, Deserialize)]
 pub struct EntityId {

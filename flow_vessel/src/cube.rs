@@ -3,7 +3,9 @@ use std::time::SystemTime;
 use flow_arena::FlowBase;
 use crate::{EntityFlow, EntityId, Router};
 
-mod clause_tree;
+pub mod identity;
+
+use identity::{CubeId, CubeIdFactory};
 
 /// The basic unit of view, containing minimum info for rendering.
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]

@@ -1,3 +1,4 @@
+mod identity;
 mod entity;
 mod cube;
 mod glass;
@@ -6,13 +7,17 @@ mod vessel;
 mod tube;
 mod util;
 
+pub use identity::Identity;
 pub use entity::{
     identity::{EntityId, EntityIdFactory},
     symbol::{Symbol, Process, Lint, AlphaBet, Babel, BABEL},
     tag::{Tag, TagSet, TagSetField},
-    entity::{Entity, EntityField, Face, Bubble},
+    {Entity, EntityField, Face, Bubble},
 };
-pub use cube::{Cube, CubeType, CubeMeta, cubes};
+pub use cube::{
+    identity::{CubeId, CubeIdFactory},
+    {Cube, CubeType, CubeMeta, cubes}
+};
 pub use glass::{Glass, Router};
 pub use settings::{Settings, Bridge, ViewMode};
 pub use util::{
