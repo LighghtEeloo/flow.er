@@ -359,8 +359,11 @@ pub trait FlowShift: FlowBase + FlowMaid {
                 self.devote(obj, &owner, walk)?
             }
             Ascend => { 
-                // Todo: Ascend migrate.
-                todo!() 
+                let parent = self.parent(obj).ok_or(FlowError::NotExistObj)?;
+                let owner = self.parent(&parent).ok_or(FlowError::IsOrphaned)?;
+                let nth = self.nth_friend(&parent).ok_or(FlowError::AbandonedChild)? + 1;
+                self.decay(obj)?;
+                self.devote(obj, &owner, nth)?
             }
             Descend => { Err(FlowError::InvalidDir)? }
         }
@@ -369,7 +372,20 @@ pub trait FlowShift: FlowBase + FlowMaid {
 
     /// alters the node position by the corresponding relative position, iteratively within the flow
     fn migrate_iter(&mut self, obj: &Self::Id, dir: Direction) -> Result<(), FlowError> {
-        todo!()
+        use Direction::*;
+        match dir {
+            Forward | Backward => {
+                self.migrate(obj, dir).map_or_else(
+                    |e| {
+                        if let FlowError::InvalidLen = e {
+                            self.migrate(obj, Ascend)
+                        } else { Err(e) }
+                    }, 
+                    |v| Ok(v)
+                )
+            }
+            Ascend | Descend => self.migrate(obj, dir)
+        }
     }
 }
 
