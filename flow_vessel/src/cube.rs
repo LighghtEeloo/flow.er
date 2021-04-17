@@ -1,7 +1,7 @@
 use serde::{Serialize, Deserialize};
 use std::time::SystemTime;
 use flow_arena::FlowBase;
-use crate::{EntityFlow, EntityId, Router};
+use crate::{EntityFlow, EntityId, Filter, Router};
 
 pub mod identity;
 
@@ -64,6 +64,7 @@ pub struct Cube {
     /// obj & current are first used if requirements are already satisfied; 
     /// if more are needed, profile is then used.
     pub profile: Option<Profile>,
+    pub filters: Vec<Filter>,
 }
 
 

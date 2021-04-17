@@ -52,6 +52,20 @@ impl Entity {
     pub fn duplicate_from(&mut self, dude: &Self) {
         self.symbol = dude.symbol.clone();
     }
+
+    /// true if all filter matches
+    pub fn pick_by(&self, filters: Vec<Filter>) -> bool {
+        filters.into_iter().fold(true, |is, filter| {
+            let matching = match filter {
+                Filter::Symbol(s) => self.symbol == s,
+                Filter::Tag(t) => self.tags.contains(&t),
+                Filter::All => true
+            };
+            is && matching
+        })
+    }
+
+    /// false if any filter matches
     pub fn filter_out(&self, filters: Vec<Filter>) -> bool {
         filters.into_iter().fold(false, |is, filter| {
             let matching = match filter {
