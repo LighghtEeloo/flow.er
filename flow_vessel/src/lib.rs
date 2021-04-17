@@ -12,6 +12,7 @@ pub use entity::{
     identity::{EntityId, EntityIdFactory},
     symbol::{Symbol, Process, Lint, AlphaBet, Babel, BABEL},
     tag::{Tag, TagSet, TagSetField},
+    filter::Filter,
     {Entity, EntityField, Face, Bubble},
 };
 pub use cube::{

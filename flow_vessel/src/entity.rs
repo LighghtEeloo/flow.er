@@ -1,10 +1,10 @@
 use serde::{Serialize, Deserialize};
 
-use crate::TimeNote;
+use super::TimeNote;
 use identity::*;
+use symbol::*;
 use tag::*;
 use filter::*;
-use symbol::*;
 
 pub mod identity;
 pub mod symbol;
@@ -16,7 +16,7 @@ pub mod filter;
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Entity {
     id: EntityId,
-    pub time: Option<TimeNote>,
+    pub time_note: Option<TimeNote>,
     pub face: Face,
     pub bubble: Bubble,
     pub symbol: Symbol,
@@ -38,7 +38,7 @@ impl Entity {
     pub fn new_id(id: &EntityId) -> Self {
         Entity {
             id: id.clone(),
-            time: None,
+            time_note: None,
             face: Face::default(),
             bubble: Bubble::default(),
             symbol: Symbol::Linted(Lint::default()),
@@ -54,10 +54,13 @@ impl Entity {
     pub fn duplicate_from(&mut self, dude: &Self) {
         self.symbol = dude.symbol.clone();
     }
+    pub fn contains_tag(&self, tag: &Tag) -> bool {
+        self.tags.contains(tag)
+    }
     pub fn update_entity(&mut self, field: EntityField) {
         use EntityField::*;
         match field {
-            TimeNote(t) => { self.time = Some(t) }
+            TimeNote(t) => { self.time_note = Some(t) }
             Face(f) => { self.face = f }
             Bubble(b) => { self.bubble = b }
             Symbol(s) => { 

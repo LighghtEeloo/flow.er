@@ -296,15 +296,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug + Clone {
 }
 
 impl<Id, Entity> FlowShift for FlowArena <Id, Entity>
-where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug + Clone {
-    // fn migrate(&mut self, obj: &Self::Id, dir: Direction) -> Result<(), FlowError> {
-    //     todo!()
-    // }
-
-    // fn migrate_iter(&mut self, obj: &Self::Id, dir: Direction) -> Result<(), FlowError> {
-    //     todo!()
-    // }
-}
+where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug + Clone {}
 
 
 impl<Id, Entity> Flow for FlowArena<Id, Entity> 

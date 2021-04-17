@@ -17,7 +17,7 @@ impl TagSet {
     pub fn position(&self, tag: &Tag) -> Option<usize> {
         self.into_iter().position(|x| x.clone() == tag.clone())
     }
-    fn contains(&self, tag: &Tag) -> bool {
+    pub fn contains(&self, tag: &Tag) -> bool {
         self.position(&tag).is_some()
     }
     pub fn insert(&mut self, index: usize, tag: Tag) -> bool {
