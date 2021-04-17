@@ -70,7 +70,6 @@ impl Default for Lint {
     }
 }
 
-// Todo: impl Lint.
 impl Lint {
     pub fn type_str(&self) -> &str {
         match self {
@@ -102,7 +101,7 @@ impl Lint {
     }
     pub fn display(&self, mut idx: usize) -> String {
         use Lint::*;
-        // Note: Some backups.
+        // Some backups.
         "small: ⚬";
         "machine: ⚉";
         "solid: ●";

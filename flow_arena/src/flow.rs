@@ -423,5 +423,5 @@ pub enum FlowError {
 /// 
 /// FlowArena implements an arena-like data structure, but it has integrated the data map and the relationship graph, since both of them require an Id to visit. 
 /// 
-// Todo..
+// Todo: Finish Flow docs.
 pub trait Flow: FlowBase + FlowLink + FlowMaid + FlowDock + FlowShift {}
