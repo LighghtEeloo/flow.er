@@ -108,15 +108,18 @@ impl Glass {
         vec.get(idx).cloned()
     }
     /// inserts a cube within a safe idx
-    pub fn insert_cube(&mut self, cube: Cube, meta: CubeMeta) {
+    pub fn insert_cube(&mut self, cube: Cube, meta: CubeMeta) -> Result<(),()> {
         let router = meta.router;
         let vec = self.ensured(router);
-        let idx = meta.idx.min(vec.len());
+        let idx = if meta.idx > vec.len() {
+            return Err(())
+        } else { meta.idx };
         self.map.get_mut(&router).map(|vec|{
             vec.insert(idx, cube);
         });
+        Ok(())
     }
-    pub fn push_cube(&mut self, cube: Cube, router: Router) {
+    pub fn push_cube(&mut self, cube: Cube, router: Router) -> Result<(),()> {
         let idx = self.ensured(router).len();
         let meta = CubeMeta { 
             router,
@@ -125,26 +128,30 @@ impl Glass {
         self.insert_cube(cube, meta)
     }
     /// removes a cube within a safe idx
-    pub fn remove_cube(&mut self, meta: CubeMeta) -> Cube {
+    pub fn remove_cube(&mut self, meta: CubeMeta) -> Result<Cube,()> {
         let router = meta.router;
         let vec = self.ensured(router);
-        let idx = meta.idx.min(vec.len());
-        self.map.get_mut(&router).map(|vec|{
+        let idx = if meta.idx >= vec.len() {
+            return Err(())
+        } else { meta.idx };
+        let cube = self.map.get_mut(&router).map(|vec|{
             vec.remove(idx)
-        }).expect("glass.ensured() failed.")
+        }).expect("glass.ensured() failed.");
+        Ok(cube)
     }
-    pub fn swap_cube(&mut self, meta_1: CubeMeta, meta_2: CubeMeta) {
+    pub fn swap_cube(&mut self, meta_1: CubeMeta, meta_2: CubeMeta) -> Result<(),()> {
         let cube = if let Some(cube) = self.get_cube(meta_2) {
             cube
-        } else { return };
-        let cube = self.replace_cube(cube, meta_1);
-        self.replace_cube(cube, meta_2);
+        } else { return Err(()) };
+        let cube = self.replace_cube(cube, meta_1)?;
+        self.replace_cube(cube, meta_2)?;
+        Ok(())
     }
     /// replaces the cube at meta with a new one
-    pub fn replace_cube(&mut self, cube: Cube, meta: CubeMeta) -> Cube {
-        let cube_ = self.remove_cube(meta);
-        self.insert_cube(cube, meta);
-        cube_
+    pub fn replace_cube(&mut self, cube: Cube, meta: CubeMeta) -> Result<Cube,()> {
+        let cube_ = self.remove_cube(meta)?;
+        self.insert_cube(cube, meta)?;
+        Ok(cube_)
     }
     /// ensure and clean
     pub fn refresh(&mut self, flow: &EntityFlow) {
@@ -153,8 +160,8 @@ impl Glass {
         }).collect();
         self.clean(flow);
     }
-    fn ensured(&mut self, router: Router) -> Vec<Cube> {
-        self.map.entry(router).or_insert(vec![Cube::new_router(router)]).clone()
+    fn ensured(&mut self, router: Router) -> &mut Vec<Cube> {
+        self.map.entry(router).or_insert(vec![Cube::new_router(router)])
     }
     /// is_valid and is_blank check
     fn clean(&mut self, flow: &EntityFlow) {

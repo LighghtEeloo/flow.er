@@ -1,7 +1,7 @@
 use serde::{Serialize, Deserialize};
-use std::{collections::HashSet, time::SystemTime};
+use std::time::SystemTime;
 use flow_arena::FlowBase;
-use crate::{EntityFlow, EntityId, Router, Vessel, now};
+use crate::{EntityFlow, EntityId, Router};
 
 mod clause_tree;
 
@@ -72,6 +72,7 @@ impl Cube {
             ..Self::default()
         }
     }
+
     pub fn new_router(router: Router) -> Self {
         use CubeType::*;
         match router {
@@ -83,6 +84,7 @@ impl Cube {
             Router::Settings => Cube::new(SettingView),
         }
     }
+    
     /// if cube.obj is not None and is not in vessel, false; 
     /// otherwise, true.
     pub fn is_valid(&self, flow: &EntityFlow) -> bool {
@@ -90,6 +92,7 @@ impl Cube {
             flow.contains_node(&obj)
         )
     }
+    
     /// fix a cube to a legal state if it's not already.
     pub fn ensure(&mut self, flow: &EntityFlow) -> Option<&mut Self> {
         // current -> Some(<Exist>) | None
