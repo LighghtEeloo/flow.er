@@ -220,8 +220,10 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug + Clone {
         }
     }
 
-    fn undock(&mut self, obj: &Self::Id) -> Result<(Self, Vec<Self::Id>), FlowError> {
-        let (flow, vec) = self.snap(obj)?;
+    fn undock_impl(&mut self, obj: &Self::Id, owned: bool) -> Result<(Self, Vec<Self::Id>), FlowError> {
+        let (flow, vec) = if owned {
+            self.snap_owned(obj)?
+        } else { self.snap(obj)? };
         let set: HashSet<Self::Id> = flow.node_map.keys().cloned().collect();
         for id in set.iter() {
             let filter: Vec<()> = self.node_map.values()
@@ -255,6 +257,25 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug + Clone {
         if ! self.contains_node(obj) { return Err(FlowError::NotExistObj) }
         let vec = self.children(obj);
         let set = self.node_offspring_set(obj);
+        let mut flow = FlowArena::new();
+        let node_map: HashMap<Self::Id, Self::Node> = set.iter().cloned().filter_map(|id| {
+            self.node_map.get(&id).cloned()
+        }).map(|mut node| {
+            if Some(obj.clone()) == node.parent 
+            || node.parent.clone().map_or(false, |id| ! set.contains(&id)) {
+                node.parent_set_none()
+            }
+            (node.id().clone(), node)
+        }).collect();
+        flow.node_map.extend(node_map);
+        Ok((flow, vec))
+    }
+
+    fn snap_owned(&self, obj: &Self::Id) -> Result<(Self, Vec<Self::Id>), FlowError> {
+        if ! self.contains_node(obj) { return Err(FlowError::NotExistObj) }
+        let vec = self.children(obj);
+        let mut set = self.node_ownership_set(obj);
+        set.remove(obj); let set = set;
         let mut flow = FlowArena::new();
         let node_map: HashMap<Self::Id, Self::Node> = set.iter().cloned().filter_map(|id| {
             self.node_map.get(&id).cloned()
@@ -483,14 +504,14 @@ mod tests {
         println!("sub_flow[6]: {:#?}", sub_);
         println!("sub_vec[6]: {:?}", vec_);
         let mut flow_6 = flow_.clone();
-        let (sub, vec) = flow_6.undock(&obj_vec[6]).expect("undock error");
+        let (sub, vec) = flow_6.undock_impl(&obj_vec[6], false).expect("undock error");
         assert_eq!(sub, sub_);
         assert_eq!(vec, vec_);
         
         let (sub_, vec_) = flow.snap(&obj_vec[0]).expect("snap error");
         println!("sub_flow[0]: {:#?}", sub_);
         println!("sub_vec[0]: {:?}", vec_);
-        let (sub, vec) = flow.undock(&obj_vec[0]).expect("undock error");
+        let (sub, vec) = flow.undock_impl(&obj_vec[0], false).expect("undock error");
         assert_eq!(sub, sub_);
         assert_eq!(vec, vec_);
         flow.dock(&obj_vec[0], vec, sub).expect("dock error");

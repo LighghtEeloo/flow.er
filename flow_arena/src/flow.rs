@@ -237,12 +237,23 @@ pub trait FlowDock: FlowMaid + Sized {
     /// Err if:
     /// 1. Obj not found.
     /// 2. Node linked by other nodes.
-    fn undock(&mut self, obj: &Self::Id) -> Result<(Self, Vec<Self::Id>), FlowError>;
-    /// clones all the nodes under the designated node and unmounts them
+    fn undock_impl(&mut self, obj: &Self::Id, owned: bool) -> Result<(Self, Vec<Self::Id>), FlowError>;
+    fn undock(&mut self, obj: &Self::Id) -> Result<(Self, Vec<Self::Id>), FlowError> {
+        self.undock_impl(obj, false)
+    }
+    fn undock_owned(&mut self, obj: &Self::Id) -> Result<(Self, Vec<Self::Id>), FlowError> {
+        self.undock_impl(obj, true)
+    }
+    /// clones all the nodes linked under the designated node and unmounts the clone
     /// 
     /// Err if:
     /// 1. Obj not found.
     fn snap(&self, obj: &Self::Id) -> Result<(Self, Vec<Self::Id>), FlowError>;
+    /// clones all the nodes owned under the designated node and unmounts the clone
+    /// 
+    /// Err if:
+    /// 1. Obj not found.
+    fn snap_owned(&self, obj: &Self::Id) -> Result<(Self, Vec<Self::Id>), FlowError>;
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -308,6 +319,13 @@ pub trait FlowShift: FlowBase {
                     });
                 Ok(res)
             }
+        }
+    }
+    fn shuttle_iter(&self, obj: &Self::Id, dir: Direction) -> Result<Self::Id, FlowError> {
+        use Direction::*;
+        match dir {
+            Ascend | Descend => self.shuttle(obj, dir),
+            _ => todo!(),
         }
     }
 
