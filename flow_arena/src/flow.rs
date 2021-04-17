@@ -40,6 +40,12 @@ pub trait FlowBase {
         })
     }
 
+    /// returns nth position in friends; None if not found in either way
+    fn nth_friend(&self, obj: &Self::Id) -> Option<usize> {
+        self.friends(obj).into_iter()
+        .position(|id| &id == obj)
+    }
+
     /// returns owned children
     fn children_owned(&self, obj: &Self::Id) -> Vec<Self::Id> {
         self.children(obj).into_iter().filter_map(|id| {
@@ -121,14 +127,14 @@ pub trait FlowLink: FlowBase + FlowCheck {
     /// randomly ensures the link of a node to another
     fn link(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), FlowError> {
         if ! self.contains_node(obj) {
-            return Err(FlowError::NotExistObj)
+            Err(FlowError::NotExistObj)?
         } 
         let res = self.node_mut(owner).map(|owner| {
             if owner.children().contains(obj) {
                 return Ok(())
             } 
             if nth > owner.children().len() {
-                return Err(FlowError::InValidLen)
+                Err(FlowError::InvalidLen)?
             } 
             owner.children_ref_mut().insert(nth, obj.clone());
             Ok(())
@@ -146,11 +152,11 @@ pub trait FlowLink: FlowBase + FlowCheck {
     /// detaches a node from a non-owner link
     fn detach(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError> {
         if ! self.contains_node(obj) {
-            return Err(FlowError::NotExistObj)
+            Err(FlowError::NotExistObj)?
         } 
         let res = self.node_mut(owner).map(|owner| {
             if ! owner.children().contains(obj) {
-                return Err(FlowError::AbandonedChild)
+                Err(FlowError::AbandonedChild)?
             }
             owner.children_ref_mut().retain(|x| x != obj);
             Ok(())
@@ -275,20 +281,20 @@ impl Direction {
     }
 
     /// bounded in [0, len)
-    fn walk(&self, nth: usize, len: usize) -> usize {
+    fn walk(&self, nth: usize, len: usize) -> Result<usize,()> {
         let pos = nth as isize + self.shift();
         if pos < 0 {
-            0
+            Err(())
         } else if (pos as usize) < len {
-            pos as usize
+            Ok(pos as usize)
         } else {
-            len - 1
+            Err(())
         }
         
     }
 }
 
-pub trait FlowShift: FlowBase {
+pub trait FlowShift: FlowBase + FlowMaid {
     /// returns the obj in the corresponding relative position
     fn shuttle(&self, obj: &Self::Id, dir: Direction) -> Result<Self::Id, FlowError> {
         use Direction::*;
@@ -299,9 +305,11 @@ pub trait FlowShift: FlowBase {
                     .position(|id| {
                         id == obj
                     }) 
-                { nth } else { return Err(FlowError::AbandonedChild) };
+                { nth } else { Err(FlowError::AbandonedChild)? };
                 let len = friends.len();
-                Ok(friends[dir.walk(nth, len)].clone())
+                let walk = dir.walk(nth, len)
+                    .map_err(|_| FlowError::InvalidLen)?;
+                Ok(friends[walk].clone())
             }
             Ascend => {
                 let candidate = self.parent(obj);
@@ -324,14 +332,39 @@ pub trait FlowShift: FlowBase {
     fn shuttle_iter(&self, obj: &Self::Id, dir: Direction) -> Result<Self::Id, FlowError> {
         use Direction::*;
         match dir {
+            Forward | Backward => {
+                self.shuttle(obj, dir).map_or_else(
+                    |_| {
+                        Ok(self.parent(obj).unwrap_or(obj.clone()))
+                    }, 
+                    |id| Ok(id)
+                )
+            }
             Ascend | Descend => self.shuttle(obj, dir),
-            _ => todo!(),
         }
     }
 
     /// alters the node position by the corresponding relative position, within a single node
     fn migrate(&mut self, obj: &Self::Id, dir: Direction) -> Result<(), FlowError> {
-        todo!()
+        use Direction::*;
+        if ! self.contains_node(obj) { Err(FlowError::NotExistObj)? }
+        match dir {
+            Forward | Backward => {
+                let owner = self.parent(obj).ok_or(FlowError::NotExistObj)?;
+                let nth = self.nth_friend(obj).ok_or(FlowError::AbandonedChild)?;
+                let len = self.friends(&owner).len();
+                let walk = dir.walk(nth, len)
+                    .map_err(|_| FlowError::InvalidLen)?;
+                self.decay(obj)?;
+                self.devote(obj, &owner, walk)?
+            }
+            Ascend => { 
+                // Todo: Ascend migrate.
+                todo!() 
+            }
+            Descend => { Err(FlowError::InvalidDir)? }
+        }
+        Ok(())
     }
 
     /// alters the node position by the corresponding relative position, iteratively within the flow
@@ -344,11 +377,12 @@ pub trait FlowShift: FlowBase {
 pub enum FlowError {
     NotExistObj,
     NotExistOwner,
-    InValidLen,
+    InvalidLen,
     ExistGrow,
     ExistDock,
     OwnerDetach,
     LinkedUndock,
+    InvalidDir,
     /// certain operations requires node to be orphaned
     NotOrphaned,
     /// certain operations requires node to be unorphaned
