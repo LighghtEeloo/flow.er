@@ -7,7 +7,7 @@ mod vessel;
 mod tube;
 mod util;
 
-pub use identity::Identity;
+pub use identity::{Identity, TimeUnique, IdFactory};
 pub use entity::{
     identity::{EntityId, EntityIdFactory},
     symbol::{Symbol, Process, Lint, AlphaBet, Babel, BABEL},

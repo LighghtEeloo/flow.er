@@ -1,4 +1,4 @@
-use crate::{EntityId, EntityIdFactory};
+use crate::{TimeUnique, IdFactory};
 
-pub type CubeId = EntityId;
-pub type CubeIdFactory = EntityIdFactory;
+pub type CubeId = TimeUnique;
+pub type CubeIdFactory = IdFactory;
