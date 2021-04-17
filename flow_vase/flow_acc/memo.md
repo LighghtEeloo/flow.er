@@ -30,7 +30,7 @@ enum Direction {
     Forward,
     Backward,
     Ascend,
-    Descent,
+    Descend,
 }
 ```
 

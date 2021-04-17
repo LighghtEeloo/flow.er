@@ -144,6 +144,8 @@ impl Cube {
                 CalendarView { current: now() }.into(),
             Router::TimeAnchor => TimeView.into(),
             Router::Settings => SettingView.into(),
+
+            Router::Buffer => Cube::default()
         }
     }
     pub fn is_empty_blank(&self) -> bool {

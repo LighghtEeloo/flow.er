@@ -6,6 +6,7 @@ pub struct Settings {
     pub bridge: Bridge,
     pub timezone: i8,
     pub view_mode: ViewMode,
+    pub buffer_mode: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

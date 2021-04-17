@@ -29,6 +29,8 @@ pub enum Router {
     TimeAnchor,
 
     Settings,
+
+    Buffer,
 }
 
 impl Default for Router {
@@ -46,7 +48,8 @@ impl Router {
             Promised => "promised",
             Calendar => "calendar",
             TimeAnchor => "time-capsule",
-            Settings => "settings"
+            Settings => "settings",
+            Buffer => ""
         }
     }
     pub fn display_str(&self) -> &'static str {
@@ -57,7 +60,8 @@ impl Router {
             Promised => "Promised",
             Calendar => "Calendar",
             TimeAnchor => "TimeAnchor",
-            Settings => "Settings"
+            Settings => "Settings",
+            Buffer => ""
         }
     }
     pub fn src_str(&self) -> &'static str {
@@ -69,6 +73,7 @@ impl Router {
             Calendar => "static/icons/calendar.svg",
             TimeAnchor => "static/icons/history.svg",
             Settings => "static/icons/settings.svg",
+            Buffer => "",
         }
     }
     pub fn vec_all() -> Vec<Self> {
@@ -114,6 +119,12 @@ impl Glass {
             vec
         }
     }
+    pub fn get_cube(&mut self, meta: CubeMeta) -> Option<Cube> {
+        let router = meta.router;
+        let vec = self.ensured(router);
+        let idx = meta.idx;
+        vec.get(idx).cloned()
+    }
     /// inserts a cube within a safe idx
     pub fn insert_cube(&mut self, cube: Cube, meta: CubeMeta) {
         let router = meta.router;
@@ -141,13 +152,17 @@ impl Glass {
         }).expect("glass.ensured() failed.")
     }
     pub fn swap_cube(&mut self, meta_1: CubeMeta, meta_2: CubeMeta) {
-        let cube = self.remove_cube(meta_2);
-        self.insert_cube(cube, meta_1);
+        let cube = if let Some(cube) = self.get_cube(meta_2) {
+            cube
+        } else { return };
+        let cube = self.replace_cube(cube, meta_1);
+        self.replace_cube(cube, meta_2);
     }
     /// replaces the cube at meta with a new one
-    pub fn replace_cube(&mut self, cube: Cube, meta: CubeMeta) {
-        self.remove_cube(meta);
-        self.insert_cube(cube, meta)
+    pub fn replace_cube(&mut self, cube: Cube, meta: CubeMeta) -> Cube {
+        let cube_ = self.remove_cube(meta);
+        self.insert_cube(cube, meta);
+        cube_
     }
     /// ensure and clean
     pub fn refresh(&mut self, flow: &EntityFlow) {
