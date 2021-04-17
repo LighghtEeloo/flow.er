@@ -2,7 +2,7 @@ use std::collections::{HashMap, HashSet};
 use flow_arena::FlowNode;
 
 use crate::{EntityId, EntityNode, Vessel};
-use super::{Cube, CubeType, CubeMember, CubeMeta};
+use super::{Cube, CubeType, CubeMeta};
 
 pub struct ClauseTreeCube {
     pub obj: EntityId,
@@ -29,75 +29,70 @@ impl From<Cube> for ClauseTreeCube {
     }
 }
 
-impl CubeMember for ClauseTreeCube {
-    fn member_traverse(&self, vessel: &Vessel) -> HashSet<EntityId> {
-        vessel.entity_ownership(&self.obj)
-    }
-}
 
-#[derive(Clone)]
-pub struct ClauseTreeCore {
-    pub head: EntityId,
-    pub current: Option<EntityId>,
-    pub node_map: HashMap<EntityId, EntityNode>,
-    pub meta: CubeMeta
-}
+// #[derive(Clone)]
+// pub struct ClauseTreeCore {
+//     pub head: EntityId,
+//     pub current: Option<EntityId>,
+//     pub node_map: HashMap<EntityId, EntityNode>,
+//     pub meta: CubeMeta
+// }
 
-impl ClauseTreeCore {
-    pub fn new(cube: Cube, vessel: &Vessel, meta: CubeMeta) -> Self {
-        let cube = ClauseTreeCube::from(cube.clone());
-        let head = cube.obj;
-        let current = cube.current;
-        let set = cube.member_traverse(vessel);
-        let node_map = 
-            set.into_iter()
-            .filter_map(|x| vessel.node(&x).cloned())
-            .map(|x| (x.id().clone(), x))
-            .collect();
-        Self {
-            head,
-            current,
-            node_map,
-            meta
-        }
-    }
-    pub fn head(&self) -> &EntityNode {
-        self.node_map.get(&self.head).expect("root exists")
-    }
-    pub fn node(&self, id: &EntityId) -> &EntityNode {
-        self.node_map.get(id).expect("child node exists")
-    }
-    pub fn head_view<F, Args, View>(&self, f: F, args: Args) -> View
-    where F: Fn(&EntityNode, Args) -> View {
-        f(self.head(), args)
-    }
-    pub fn node_view<F, View, Combinator, Args, FnArgs>
-    (&self, f: F, combinator: Combinator, args: Args, fn_args: FnArgs) -> Vec<View>
-    where 
-        F: Clone + Fn(&EntityNode, Args) -> View, 
-        Combinator: Clone + Fn(View, Vec<View>) -> View,
-        Args: Clone, 
-        FnArgs: Clone + Fn(Args) -> Args 
-    {
-        self.node_view_impl(self.head, f, combinator, args, fn_args)
-    }
-    fn node_view_impl<F, View, Combinator, Args, FnArgs>
-    (&self, id: EntityId, f: F, combinator: Combinator, args: Args, f_args: FnArgs) -> Vec<View>
-    where 
-        F: Clone + Fn(&EntityNode, Args) -> View, 
-        Combinator: Clone + Fn(View, Vec<View>) -> View,
-        Args: Clone, 
-        FnArgs: Clone + Fn(Args) -> Args 
-    {
-        let args = f_args(args);
-        self.node(&id).children.iter().map(|id| {
-            combinator (
-                f(self.node(id), args.clone()),
-                self.node_view_impl(id.clone(), f.clone(), combinator.clone(), args.clone(), f_args.clone())
-            )
-        }).collect()
-    }
-}
+// impl ClauseTreeCore {
+//     pub fn new(cube: Cube, vessel: &Vessel, meta: CubeMeta) -> Self {
+//         let cube = ClauseTreeCube::from(cube.clone());
+//         let head = cube.obj;
+//         let current = cube.current;
+//         let set = cube.member_traverse(vessel);
+//         let node_map = 
+//             set.into_iter()
+//             .filter_map(|x| vessel.node(&x).cloned())
+//             .map(|x| (x.id().clone(), x))
+//             .collect();
+//         Self {
+//             head,
+//             current,
+//             node_map,
+//             meta
+//         }
+//     }
+//     pub fn head(&self) -> &EntityNode {
+//         self.node_map.get(&self.head).expect("root exists")
+//     }
+//     pub fn node(&self, id: &EntityId) -> &EntityNode {
+//         self.node_map.get(id).expect("child node exists")
+//     }
+//     pub fn head_view<F, Args, View>(&self, f: F, args: Args) -> View
+//     where F: Fn(&EntityNode, Args) -> View {
+//         f(self.head(), args)
+//     }
+//     pub fn node_view<F, View, Combinator, Args, FnArgs>
+//     (&self, f: F, combinator: Combinator, args: Args, fn_args: FnArgs) -> Vec<View>
+//     where 
+//         F: Clone + Fn(&EntityNode, Args) -> View, 
+//         Combinator: Clone + Fn(View, Vec<View>) -> View,
+//         Args: Clone, 
+//         FnArgs: Clone + Fn(Args) -> Args 
+//     {
+//         self.node_view_impl(self.head, f, combinator, args, fn_args)
+//     }
+//     fn node_view_impl<F, View, Combinator, Args, FnArgs>
+//     (&self, id: EntityId, f: F, combinator: Combinator, args: Args, f_args: FnArgs) -> Vec<View>
+//     where 
+//         F: Clone + Fn(&EntityNode, Args) -> View, 
+//         Combinator: Clone + Fn(View, Vec<View>) -> View,
+//         Args: Clone, 
+//         FnArgs: Clone + Fn(Args) -> Args 
+//     {
+//         let args = f_args(args);
+//         self.node(&id).children.iter().map(|id| {
+//             combinator (
+//                 f(self.node(id), args.clone()),
+//                 self.node_view_impl(id.clone(), f.clone(), combinator.clone(), args.clone(), f_args.clone())
+//             )
+//         }).collect()
+//     }
+// }
 
 /*
 fn node_view(

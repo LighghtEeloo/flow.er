@@ -483,7 +483,6 @@ mod tests {
         println!("sub_flow[6]: {:#?}", sub_);
         println!("sub_vec[6]: {:?}", vec_);
         let mut flow_6 = flow_.clone();
-        // flow.undock(&obj_vec[6]).expect_err("shouldn't undock because LinkedUndock");
         let (sub, vec) = flow_6.undock(&obj_vec[6]).expect("undock error");
         assert_eq!(sub, sub_);
         assert_eq!(vec, vec_);

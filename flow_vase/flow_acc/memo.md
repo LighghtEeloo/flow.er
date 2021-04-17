@@ -56,7 +56,8 @@ Note that a `Buffer` will be used according to the setting.
 ```rust
 enum Profile {
     Where (Option<EntityId>),
-    When (Time)
+    When (Time),
+    Why (String)
 }
 ```
 

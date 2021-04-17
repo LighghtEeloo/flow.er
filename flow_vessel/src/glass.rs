@@ -5,19 +5,6 @@ use std::{collections::HashMap};
 pub use super::cube::{CubeType, CubeMeta, Cube};
 pub use super::{Vessel, EntityFlow};
 
-// Todo: blob export.
-pub mod cubes {
-    pub use crate::cube::{
-        Inkblot,
-        ClauseTreeCube,
-        PromisedLand,
-        FlowView,
-        CalendarView,
-        TimeView,
-        SettingView,
-        Blank
-    };
-}
 
 /// Describes the app router.
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, Deserialize, Serialize)]
@@ -100,7 +87,7 @@ impl Default for Glass {
     fn default() -> Self {
         let map = Router::vec_all().iter()
             .map(|&router| {
-                (router, vec![Cube::new(router)])
+                (router, vec![Cube::new_router(router)])
             }).collect();
         Self {
             map
@@ -172,14 +159,14 @@ impl Glass {
         self.clean(flow);
     }
     fn ensured(&mut self, router: Router) -> Vec<Cube> {
-        self.map.entry(router).or_insert(vec![Cube::new(router)]).clone()
+        self.map.entry(router).or_insert(vec![Cube::new_router(router)]).clone()
     }
     /// is_valid and is_blank check
     fn clean(&mut self, flow: &EntityFlow) {
         let _: Vec<()> = self.map.iter_mut().map(|(&router, vec)| {
             vec.retain(|x| !x.is_empty_blank() && x.is_valid(flow) );
             if vec.is_empty() {
-                vec.push(Cube::new(router))
+                vec.push(Cube::new_router(router))
             }
         }).collect();
     }

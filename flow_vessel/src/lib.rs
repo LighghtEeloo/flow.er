@@ -12,11 +12,8 @@ pub use entity::{
     tag::{Tag, TagSet, TagSetField},
     entity::{Entity, EntityField, Face, Bubble},
 };
-pub use cube::{Cube, CubeType, CubeMeta, CubeMember};
-pub use cube::{
-    ClauseTreeCore
-};
-pub use glass::{Glass, Router, cubes};
+pub use cube::{Cube, CubeType, CubeMeta, cubes};
+pub use glass::{Glass, Router};
 pub use settings::{Settings, Bridge, ViewMode};
 pub use util::{
     json::{from_json, to_json, export_json},
