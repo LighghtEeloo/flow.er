@@ -40,6 +40,7 @@ enum Direction {
 
 `migrate_iter` alters the node position by the corresponding relative position, iteratively within the flow.
 
+// Todo: Test Arena.
 
 ## Vessel
 
@@ -59,8 +60,18 @@ enum Profile {
     When (Time),
     Why (String)
 }
+struct Cube {
+    cube_type: CubeType,
+    obj: Option<EntityId>,
+    current: Option<EntityId>,
+    /// obj & current are first used if requirements are already satisfied; 
+    /// if more are needed, profile is then used.
+    profile: Option<Profile>,
+}
 ```
 
-A profile describing the core info of the cube pane. 
+A cube is a ghost of its corresponding cube pane: combined with a flow_arena, a cube can restore its pane. 
 
+The main info is kept in obj and current; A profile records the extra info of a cube pane. 
 
+// Todo: CubeId.
