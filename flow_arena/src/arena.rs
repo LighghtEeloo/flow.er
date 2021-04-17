@@ -216,6 +216,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug + Clone {
                 node.parent_set(owner.clone())
             }).collect();
             self.node_map.extend(flow.node_map);
+            self.check_assert();
             Ok(())
         }
     }
@@ -250,6 +251,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug + Clone {
         self.node_mut(obj).map(|node| {
             node.children_ref_mut().clear()
         });
+        self.check_assert();
         Ok((flow, vec))
     }
 
@@ -268,6 +270,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug + Clone {
             (node.id().clone(), node)
         }).collect();
         flow.node_map.extend(node_map);
+        self.check_assert();
         Ok((flow, vec))
     }
 
@@ -287,6 +290,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug + Clone {
             (node.id().clone(), node)
         }).collect();
         flow.node_map.extend(node_map);
+        self.check_assert();
         Ok((flow, vec))
     }
 }

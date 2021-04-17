@@ -166,7 +166,7 @@ pub trait FlowLink: FlowBase + FlowCheck {
     }
 }
 
-pub trait FlowMaid: FlowBase + FlowLink {
+pub trait FlowMaid: FlowBase + FlowLink + FlowCheck {
     /// inserts a node; returns err if id exists.
     fn grow(&mut self, obj: Self::Node) -> Result<Self::Id, FlowError>;
 
@@ -228,7 +228,7 @@ pub trait FlowMaid: FlowBase + FlowLink {
     fn erase(&mut self, obj: &Self::Id) -> Result<(), FlowError>;
 }
 
-pub trait FlowDock: FlowMaid + Sized {
+pub trait FlowDock: FlowMaid + FlowCheck + Sized {
     /// adds all the nodes in another flow to self and mounts all orphan nodes to the designated node
     ///
     /// Err if:
@@ -367,6 +367,7 @@ pub trait FlowShift: FlowBase + FlowMaid {
             }
             Descend => { Err(FlowError::InvalidDir)? }
         }
+        self.check_assert();
         Ok(())
     }
 
