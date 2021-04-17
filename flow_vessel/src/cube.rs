@@ -86,8 +86,6 @@ impl Cube {
             Router::Calendar => Cube::new(CalendarView),
             Router::TimeAnchor => Cube::new(TimeView),
             Router::Settings => Cube::new(SettingView),
-
-            Router::Buffer => Cube::default()
         }
     }
     pub fn is_empty_blank(&self) -> bool {

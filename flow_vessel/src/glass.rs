@@ -16,8 +16,6 @@ pub enum Router {
     TimeAnchor,
 
     Settings,
-
-    Buffer,
 }
 
 impl Default for Router {
@@ -36,7 +34,6 @@ impl Router {
             Calendar => "calendar",
             TimeAnchor => "time-capsule",
             Settings => "settings",
-            Buffer => ""
         }
     }
     pub fn display_str(&self) -> &'static str {
@@ -48,7 +45,6 @@ impl Router {
             Calendar => "Calendar",
             TimeAnchor => "TimeAnchor",
             Settings => "Settings",
-            Buffer => ""
         }
     }
     pub fn src_str(&self) -> &'static str {
@@ -60,7 +56,6 @@ impl Router {
             Calendar => "static/icons/calendar.svg",
             TimeAnchor => "static/icons/history.svg",
             Settings => "static/icons/settings.svg",
-            Buffer => "",
         }
     }
     pub fn vec_all() -> Vec<Self> {
