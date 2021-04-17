@@ -24,7 +24,6 @@ impl Component for Vase {
     fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
         let vessel_future = Vessel::load();
         let vessel = futures::executor::block_on(vessel_future).unwrap_or(Vessel::new());
-        // Debug..
         /* */
         // let vessel = _vessel_poet();
         // let vessel = _vessel_incr(10);
@@ -47,7 +46,7 @@ impl Component for Vase {
             let next = msg_visitor.next();
             if let Some(msg) = next {
                 // update msg here
-                // Todo: deal with echo
+                // Todo:: deal with echo
                 self.vessel.update_tube(msg);
                 true
             } else {
@@ -69,7 +68,6 @@ impl Component for Vase {
             }
 
             // save
-            // Debug..
             if cfg!(debug_assertions) { log::debug!("{}", self.vessel.concise_debug_string()) }
             let save_res = futures::executor::block_on(self.vessel.clone().save());
             if save_res.is_err() {

@@ -44,7 +44,11 @@ impl Vessel {
             .await
             .map_err(|_| LoadError::FileError)?;
 
-        let vessel = serde_json::from_str(&contents).map_err(|_| LoadError::FormatError)?;
+        let vessel: Vessel = serde_json::from_str(&contents).map_err(|_| LoadError::FormatError)?;
+
+        if let Bridge::Linked{..} = vessel.settings.bridge {
+            // Todo: link and save.
+        }
 
         Ok(vessel)
     }
@@ -70,6 +74,10 @@ impl Vessel {
             file.write_all(json.as_bytes())
                 .await
                 .map_err(|_| SaveError::WriteError)?;
+        }
+
+        if let Bridge::Linked{..} = self.settings.bridge {
+            // Todo: link and save.
         }
 
         // This is a simple way to save at most once every couple seconds

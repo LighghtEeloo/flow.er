@@ -41,7 +41,7 @@ impl Component for ClauseTree {
     fn update(&mut self, msg: Self::Message) -> yew::ShouldRender {
         match msg {
             Msg::Tube(tube) => {
-                // Todo: tube callback.
+                // Todo:: tube callback.
                 // self.props.link_tube.callback(|_| tube).emit(());
                 todo!()
             }

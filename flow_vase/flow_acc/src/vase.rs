@@ -9,11 +9,11 @@ impl Component for Vase {
 
     type Properties = ();
 
-    fn create(props: Self::Properties, link: yew::ComponentLink<Self>) -> Self {
+    fn create(_props: Self::Properties, _link: yew::ComponentLink<Self>) -> Self {
         todo!()
     }
 
-    fn update(&mut self, msg: Self::Message) -> yew::ShouldRender {
+    fn update(&mut self, _msg: Self::Message) -> yew::ShouldRender {
         todo!()
     }
 

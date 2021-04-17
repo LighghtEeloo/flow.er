@@ -111,11 +111,6 @@ impl Vase {
         html! {
             <button class="status-bar-button" id="src-button"
                 title="The source code of the cube."
-                // view_status=self.src_view_status()
-                // onclick=self.link.callback(move |_| {
-                //     Message::Global(vec![GlobalMessage::SrcHit])
-                // })
-                // Debug: refresh onclick.
                 onclick=self.link.callback(move |_| {
                     []
                 })
@@ -136,7 +131,7 @@ impl Vase {
             </button>
         }
     }
-    // Note: Clock not available yet.
+    // Note:: Clock not available yet.
     // fn status_bar_clock(&self) -> Html {
     //     let time = format!("{}", TimeClockLocal::from(flow_vessel::now()));
     //     html! {

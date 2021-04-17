@@ -354,7 +354,7 @@ fn node_view(
         meta,
         indent,
     );
-    // Note: no larger than 5.
+    // Note:: no larger than 5.
     let children_view: Vec<Html> = if indent < 5 && !node.entity.blocked {
         node.children.iter().enumerate().map(|(idx, &id)| {
             let clause_node = ClauseNode {
