@@ -40,7 +40,7 @@ impl CubeType {
             CubeType::PromisedLand => "promised-land",
             CubeType::FlowView => "flow-view",
             CubeType::CalendarView => "calendar-view",
-            CubeType::TimeView => "",
+            CubeType::TimeView => "time-view",
             CubeType::SettingView => "setting-view",
             CubeType::Blank => "blank",
         }
@@ -52,13 +52,6 @@ pub enum Profile {
     Where (Option<EntityId>),
     When (SystemTime),
     Why (String),
-    None
-}
-
-impl Default for Profile {
-    fn default() -> Self {
-        Profile::None
-    }
 }
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
@@ -66,7 +59,9 @@ pub struct Cube {
     pub cube_type: CubeType,
     pub obj: Option<EntityId>,
     pub current: Option<EntityId>,
-    pub profile: Profile,
+    /// obj & current are first used if requirements are already satisfied; 
+    /// if more are needed, profile is then used.
+    pub profile: Option<Profile>,
 }
 
 
@@ -80,29 +75,34 @@ impl Cube {
     pub fn new_router(router: Router) -> Self {
         use CubeType::*;
         match router {
-            Router::BirdView => Cube::new(FlowView),
-            Router::Board => Cube::new(ClauseTree),
+            Router::Birdsight => Cube::new(FlowView),
+            Router::Workspace => Cube::new(ClauseTree),
             Router::Promised => Cube::new(PromisedLand),
             Router::Calendar => Cube::new(CalendarView),
             Router::TimeAnchor => Cube::new(TimeView),
             Router::Settings => Cube::new(SettingView),
         }
     }
-    pub fn is_empty_blank(&self) -> bool {
-        // if let CubeType::Blank = self.cube_type {
-        //     let blank: Blank = self.clone().into();
-        //     blank.alt.is_empty()
-        // } else {
-        //     false
-        // }
-        false
-    }
     /// if cube.obj is not None and is not in vessel, false; 
     /// otherwise, true.
     pub fn is_valid(&self, flow: &EntityFlow) -> bool {
-        if let Some(obj) = self.obj {
-            flow.node(&obj).is_some()
-        } else { true }
+        self.obj.map_or(true, |obj| 
+            flow.contains_node(&obj)
+        )
+    }
+    /// fix a cube to a legal state if it's not already.
+    pub fn ensure(&mut self, flow: &EntityFlow) -> Option<&mut Self> {
+        // current -> Some(<Exist>) | None
+        if ! self.current.map_or(false, |cur| 
+            flow.contains_node(&cur)
+        ) { self.current = None }
+        // obj = Some(<Not Exist>) -> clean
+        // obj = None | Some(<Exist>) -> keep
+        if self.is_valid(flow) {
+            Some(self)
+        } else {
+            None
+        }
     }
 }
 

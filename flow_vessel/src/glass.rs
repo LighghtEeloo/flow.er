@@ -9,8 +9,8 @@ pub use super::{Vessel, EntityFlow};
 /// Describes the app router.
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, Deserialize, Serialize)]
 pub enum Router {
-    BirdView,
-    Board,
+    Birdsight,
+    Workspace,
     Promised,
     Calendar,
     TimeAnchor,
@@ -20,7 +20,7 @@ pub enum Router {
 
 impl Default for Router {
     fn default() -> Self {
-        Router::Board
+        Router::Workspace
     }
 }
 
@@ -28,8 +28,8 @@ impl Router {
     pub fn type_str(&self) -> &'static str {
         use Router::*;
         match self {
-            BirdView => "bird-view",
-            Board => "board",
+            Birdsight => "birdsight",
+            Workspace => "workspace",
             Promised => "promised",
             Calendar => "calendar",
             TimeAnchor => "time-capsule",
@@ -39,8 +39,8 @@ impl Router {
     pub fn display_str(&self) -> &'static str {
         use Router::*;
         match self {
-            BirdView => "BirdView",
-            Board => "Board",
+            Birdsight => "Birdsight",
+            Workspace => "Workspace",
             Promised => "Promised",
             Calendar => "Calendar",
             TimeAnchor => "TimeAnchor",
@@ -50,8 +50,8 @@ impl Router {
     pub fn src_str(&self) -> &'static str {
         use Router::*;
         match self {
-            BirdView => "static/icons/branch.svg",
-            Board => "static/icons/hexagons.svg",
+            Birdsight => "static/icons/branch.svg",
+            Workspace => "static/icons/hexagons.svg",
             Promised => "static/icons/calendar.svg",
             Calendar => "static/icons/calendar.svg",
             TimeAnchor => "static/icons/history.svg",
@@ -62,7 +62,7 @@ impl Router {
         use Router::*;
         vec! [
             // BirdView,
-            Board,
+            Workspace,
             Promised,
             // Calendar,
             // TimeAnchor,
@@ -159,7 +159,7 @@ impl Glass {
     /// is_valid and is_blank check
     fn clean(&mut self, flow: &EntityFlow) {
         let _: Vec<()> = self.map.iter_mut().map(|(&router, vec)| {
-            vec.retain(|x| !x.is_empty_blank() && x.is_valid(flow) );
+            vec.retain(|x| x.is_valid(flow) );
             if vec.is_empty() {
                 vec.push(Cube::new_router(router))
             }
@@ -174,7 +174,7 @@ mod tests {
     #[test]
     fn glass_update() {
         let glass = Glass::default();
-        switch(Board, &glass);
+        switch(Workspace, &glass);
         let mut vessel = Vessel::default();
         vessel.glass_refresh();
     }
