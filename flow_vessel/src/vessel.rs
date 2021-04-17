@@ -82,7 +82,7 @@ impl Vessel {
 /// flow_arena flow operation
 impl Vessel {
     pub fn entity_grow(&mut self) -> EntityId {
-        let entity = Entity::new_time(&self.id_factory);
+        let entity = Entity::new_rotate(&mut self.id_factory);
         self.entity_insert(entity)
     }
     pub fn entity_insert(&mut self, entity: Entity) -> EntityId {

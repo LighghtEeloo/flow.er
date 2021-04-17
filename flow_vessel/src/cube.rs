@@ -58,33 +58,35 @@ pub enum Profile {
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct Cube {
+    pub id: CubeId,
     pub cube_type: CubeType,
     pub obj: Option<EntityId>,
     pub current: Option<EntityId>,
     /// obj & current are first used if requirements are already satisfied; 
-    /// if more are needed, profile is then used.
+    /// if more info is needed, profile is then used.
     pub profile: Option<Profile>,
     pub filters: Vec<Filter>,
 }
 
 
 impl Cube {
-    pub fn new(cube_type: CubeType) -> Self {
+    pub fn new(cube_type: CubeType, id_factory: &mut CubeIdFactory) -> Self {
         Self {
+            id: id_factory.rotate_id(),
             cube_type,
             ..Self::default()
         }
     }
 
-    pub fn new_router(router: Router) -> Self {
+    pub fn new_router(router: Router, id_factory: &mut CubeIdFactory) -> Self {
         use CubeType::*;
         match router {
-            Router::Birdsight => Cube::new(FlowView),
-            Router::Workspace => Cube::new(ClauseTree),
-            Router::Promised => Cube::new(PromisedLand),
-            Router::Calendar => Cube::new(CalendarView),
-            Router::TimeAnchor => Cube::new(TimeView),
-            Router::Settings => Cube::new(SettingView),
+            Router::Birdsight => Cube::new(FlowView, id_factory),
+            Router::Workspace => Cube::new(ClauseTree, id_factory),
+            Router::Promised => Cube::new(PromisedLand, id_factory),
+            Router::Calendar => Cube::new(CalendarView, id_factory),
+            Router::TimeAnchor => Cube::new(TimeView, id_factory),
+            Router::Settings => Cube::new(SettingView, id_factory),
         }
     }
     

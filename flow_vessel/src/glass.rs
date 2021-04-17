@@ -2,6 +2,8 @@ use serde::{Serialize, Deserialize};
 use std::{collections::HashMap};
 
 
+use crate::CubeIdFactory;
+
 pub use super::cube::{CubeType, CubeMeta, Cube};
 pub use super::{Vessel, EntityFlow};
 
@@ -75,17 +77,20 @@ impl Router {
 /// A overall layer of routers and cubes.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Glass {
-    map: HashMap<Router, Vec<Cube>>
+    map: HashMap<Router, Vec<Cube>>,
+    factory: CubeIdFactory,
 }
 
 impl Default for Glass {
     fn default() -> Self {
+        let mut factory = CubeIdFactory::default();
         let map = Router::vec_all().iter()
             .map(|&router| {
-                (router, vec![Cube::new_router(router)])
+                (router, vec![Cube::new_router(router, &mut factory)])
             }).collect();
         Self {
-            map
+            map,
+            factory
         }
     }
 }
@@ -161,16 +166,18 @@ impl Glass {
         self.clean(flow);
     }
     fn ensured(&mut self, router: Router) -> &mut Vec<Cube> {
-        self.map.entry(router).or_insert(vec![Cube::new_router(router)])
+        self.map.entry(router).or_insert(vec![Cube::new_router(router, &mut self.factory)])
     }
     /// is_valid and is_blank check
     fn clean(&mut self, flow: &EntityFlow) {
+        let mut factory = self.factory.clone();
         let _: Vec<()> = self.map.iter_mut().map(|(&router, vec)| {
             vec.retain(|x| x.is_valid(flow) );
             if vec.is_empty() {
-                vec.push(Cube::new_router(router))
+                vec.push(Cube::new_router(router, &mut factory))
             }
         }).collect();
+        self.factory = factory;
     }
 }
 

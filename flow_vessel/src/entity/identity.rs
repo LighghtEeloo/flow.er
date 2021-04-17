@@ -65,6 +65,13 @@ impl EntityIdFactory {
             unique: rand::random()
         }
     }
+    pub fn rotate_id(&mut self) -> EntityId {
+        self.cnt += 1;
+        EntityId {
+            time: now(),
+            unique: self.cnt
+        }
+    }
 }
 
 #[cfg(test)]

@@ -34,6 +34,9 @@ impl Entity {
     pub fn new_incr(id_factory: &mut EntityIdFactory) -> Self {
         Self::new_id(&id_factory.incr_id())
     }
+    pub fn new_rotate(id_factory: &mut EntityIdFactory) -> Self {
+        Self::new_id(&id_factory.rotate_id())
+    }
     pub fn new_id(id: &EntityId) -> Self {
         Entity {
             id: id.clone(),
