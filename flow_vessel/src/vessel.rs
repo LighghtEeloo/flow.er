@@ -2,7 +2,7 @@ use std::{collections::HashSet, fmt::Debug};
 use serde::{Serialize, Deserialize};
 use flow_arena::{Node, FlowArena, FlowBase, FlowMaid};
 
-use super::{Entity, EntityId, EntityIdFactory, Glass, Cube, Settings};
+use super::{Entity, EntityId, EntityIdFactory, Glass, Settings};
 
 pub type EntityNode = Node<EntityId, Entity>;
 pub type EntityFlow = FlowArena<EntityId, Entity>;
@@ -226,11 +226,8 @@ impl Vessel {
 
 
 impl Vessel {
-    pub fn get_cube_vec(&self) -> Vec<Cube> {
-        self.glass.get_cube_vec()
-    }
     pub fn glass_refresh(&mut self) {
-        self.glass.refresh(&self.flow_arena)
+        self.glass.refresh(&self.flow_arena, self.settings.pure_workspace.clone())
     }
 }
 

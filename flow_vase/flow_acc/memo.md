@@ -48,9 +48,9 @@ Vessel holds a collection of all the information that should be stored during se
 
 ### Glass
 
-Stores all the session buffers with a `HashMap` of `Router`s and `Vec<Cube>`s. Ensures all the `Router`s exist with at least a default `Cube`.
+Stores all the session buffers with a `HashMap` of `Router`s and `Vec<CubeId>`s. Ensures all the `Router`s exist with at least a fallback valid `CubeId` corresponding to a `Cube`.
 
-Note that a `Buffer` will be used according to the setting.
+Note that the `Workspace` will be used according to the setting: if `workspace_mode` is pure, then Router::vec_router() only contains `Workspace`.
 
 ### Cube
 
@@ -61,6 +61,7 @@ enum Profile {
     Why (String)
 }
 struct Cube {
+    id: CubeId,
     cube_type: CubeType,
     obj: Option<EntityId>,
     current: Option<EntityId>,

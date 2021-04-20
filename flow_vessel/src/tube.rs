@@ -69,11 +69,11 @@ impl Vessel {
             }
 
             OpenVM { cube, meta } => {
-                self.glass.push_cube(cube.clone(), meta.router).ok();
+                // self.glass.push_cube(cube.clone(), meta.router).ok();
                 Echo::RebuildVM
             }
             CloseVM { meta } => {
-                self.glass.remove_cube(meta).ok();
+                // self.glass.remove_cube(meta).ok();
                 Echo::RebuildVM
             }
 

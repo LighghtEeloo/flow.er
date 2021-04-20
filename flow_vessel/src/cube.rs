@@ -7,24 +7,24 @@ pub mod identity;
 
 use identity::{CubeId, CubeIdFactory};
 
-/// The basic unit of view, containing minimum info for rendering.
+/// The basic unit of view, containing minimum info for rendering. Note that all use cases are strict.
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum CubeType {
-    /// A single entity's notebook.
+    /// A single entity's notebook. Uses obj & ?current.
     Inkblot,
-    /// A single entity  view.
+    /// A single entity view. Uses obj & ?current.
     ClauseTree,
-    /// A todo-oriented pool view.
+    /// A todo-oriented pool view. Uses ?obj and ?current.
     PromisedLand,
-    /// A flow view from a point.
+    /// A flow view from a point. Uses obj & ?current.
     FlowView,
-    /// A calendar with agenda.
+    /// A calendar with agenda. Uses profile.
     CalendarView,
     /// A version control panel.
     TimeView,
     /// A setting panel.
     SettingView,
-    /// Blank Page with simple notes.
+    /// Blank Page with simple notes. Uses ?obj & profile.
     Blank
 }
 
@@ -69,7 +69,12 @@ pub struct Cube {
 }
 
 
+/// new Cube
 impl Cube {
+    pub fn id(&self) -> &CubeId {
+        &self.id
+    }
+
     pub fn new(cube_type: CubeType, id_factory: &mut CubeIdFactory) -> Self {
         Self {
             id: id_factory.rotate_id(),
@@ -89,13 +94,37 @@ impl Cube {
             Router::Settings => Cube::new(SettingView, id_factory),
         }
     }
-    
-    /// if cube.obj is not None and is not in vessel, false; 
+}
+
+/// validating
+impl Cube {
+    /// if cube.obj is Some but not in vessel, false; so does cube.current
+    ///
+    /// if cube_type doesn't allow, false
+    ///
     /// otherwise, true.
-    pub fn is_valid(&self, flow: &EntityFlow) -> bool {
-        self.obj.map_or(true, |obj| 
+    pub fn is_valid_obj(&self, flow: &EntityFlow) -> bool {
+        use CubeType::*;
+        let legal = match (self.cube_type, self.obj, self.current, self.profile.clone()) {
+            (Inkblot,Some(_),_,None) |
+            (ClauseTree,Some(_),_,None) |
+            (PromisedLand,_,_,None) |
+            (FlowView,Some(_),_,None) |
+            (CalendarView,None,None,Some(Profile::Where(_))) |
+            (CalendarView,None,None,Some(Profile::When(_))) |
+            (TimeView,None,None,None) |
+            (SettingView,None,None,None) |
+            (Blank,_,None,Some(Profile::Why(_))) => true,
+            _ => false
+        };
+        let legal = self.current.map_or(legal, |current| 
+            flow.contains_node(&current)
+        );
+        // if obj is Some, perform contain check
+        let legal = self.obj.map_or(legal, |obj| 
             flow.contains_node(&obj)
-        )
+        );
+        legal
     }
     
     /// fix a cube to a legal state if it's not already.
@@ -103,16 +132,58 @@ impl Cube {
         // current -> Some(<Exist>) | None
         if ! self.current.map_or(false, |cur| 
             flow.contains_node(&cur)
-        ) { self.current = None }
+        ) { self.clear_current(); }
         // obj = Some(<Not Exist>) -> clean
         // obj = None | Some(<Exist>) -> keep
-        if self.is_valid(flow) {
+        if self.is_valid_obj(flow) {
             Some(self)
         } else {
             None
         }
     }
 }
+
+
+/// obj, current & profile
+impl Cube {
+    pub fn with_obj(mut self, obj: EntityId) -> Self {
+        self.obj = Some(obj);
+        self
+    }
+    pub fn set_obj(&mut self, obj: EntityId) -> &mut Self {
+        self.obj = Some(obj);
+        self
+    }
+    pub fn clear_obj(&mut self) -> &mut Self {
+        self.obj = None;
+        self
+    }
+    pub fn with_current(mut self, current: EntityId) -> Self {
+        self.current = Some(current);
+        self
+    }
+    pub fn set_current(&mut self, current: EntityId) -> &mut Self {
+        self.current = Some(current);
+        self
+    }
+    pub fn clear_current(&mut self) -> &mut Self {
+        self.current = None;
+        self
+    }
+    pub fn with_profile(mut self, profile: Profile) -> Self {
+        self.profile = Some(profile);
+        self
+    }
+    pub fn set_profile(&mut self, profile: Profile) -> &mut Self {
+        self.profile = Some(profile);
+        self
+    }
+    pub fn clear_profile(&mut self) -> &mut Self {
+        self.profile = None;
+        self
+    }
+}
+
 
 /// generated on site; isn't contained in a Vec<Cube>
 #[derive(Debug, Clone, Copy)]
@@ -133,4 +204,22 @@ impl CubeMeta {
 pub mod cubes {
     pub use crate::cube::{
     };
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{Entity, EntityIdFactory};
+    use super::*;
+
+    #[test]
+    fn cube_create() {
+        let mut entity_factory = EntityIdFactory::default();
+        let entitys: Vec<Entity> = (0..20).map(|_| Entity::new_rotate(&mut entity_factory)).collect();
+        println!("{:?}", entitys.iter().map(|x| x.id()).collect::<Vec<&EntityId>>());
+        let mut cube_factory = CubeIdFactory::default();
+        let mut cube = Cube::new_router(Router::Workspace, &mut cube_factory).with_obj(entitys[0].id().clone());
+        println!("{:#?}", cube.obj);
+        cube.set_obj(entitys[2].id().clone());
+        println!("{:#?}", cube.obj);
+    }
 }
