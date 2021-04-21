@@ -224,6 +224,19 @@ pub trait FlowMaid: FlowBase + FlowLink + FlowCheck {
         self.check_assert();
         res
     }
+
+    /// decay before devote
+    fn devote_loyal(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), FlowError> {
+        self.decay(&obj)?;
+        self.devote(&obj, &owner, nth)
+    }
+
+    /// decay before devote
+    fn devote_loyal_push(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError> {
+        self.decay(&obj)?;
+        self.devote_push(&obj, &owner)
+    }
+
     /// removes a node; returns err if id not found under root
     fn erase(&mut self, obj: &Self::Id) -> Result<(), FlowError>;
 }

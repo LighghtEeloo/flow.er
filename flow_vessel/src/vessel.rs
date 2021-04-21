@@ -61,10 +61,10 @@ impl Vessel {
     pub fn entity_ownership(&self, obj: &EntityId) -> HashSet<EntityId> {
         self.flow.node_ownership_set(obj)
     }
-    /// search all entities for "face" match
-    pub fn entity_face_filter(&self, face: String) -> Vec<EntityId> {
+    /// match all entities for vague "face" match
+    pub fn entity_face_match(&self, face: String) -> Vec<EntityId> {
         self.flow.entities().filter_map(|x| {
-            if x.face == face { Some(x.id().clone()) } else { None }
+            if x.face.contains(&face) { Some(x.id().clone()) } else { None }
         }).collect()
     }
     pub fn entity(&self, id: &EntityId) -> Option<&Entity> {
@@ -100,24 +100,15 @@ impl Vessel {
     //     }
     //     self.entity_mut(id).expect("contains key")
     // }
-    pub fn entity_devote(&mut self, obj: EntityId, owner: EntityId, idx: usize) -> Result<(), FlowError> {
-        // if self.flow.decay(&obj).is_ok() {
-        //     self.flow.devote(&obj, &owner, idx).ok();
-        // }
+    fn entity_devote(&mut self, obj: EntityId, owner: EntityId, idx: usize) -> Result<(), FlowError> {
         self.flow.devote(&obj, &owner, idx)
     }
-    pub fn entity_devote_push(&mut self, obj: EntityId, owner: EntityId) -> Result<(), FlowError> {
-        // if self.flow.decay(&obj).is_ok() {
-        //     self.flow.devote_push(&obj, &owner).ok();
-        // }
-        self.flow.devote_push(&obj, &owner)
-    }
-    pub fn entity_grow_devote(&mut self, owner: EntityId, idx: usize) -> Result<EntityId, FlowError> {
+    fn entity_grow_devote(&mut self, owner: EntityId, idx: usize) -> Result<EntityId, FlowError> {
         let obj = self.entity_grow()?;
         self.entity_devote(obj, owner, idx)?;
         Ok(obj)
     }
-    pub fn entity_duplicate(&mut self, obj: EntityId, dude: EntityId) {
+    fn entity_duplicate(&mut self, obj: EntityId, dude: EntityId) {
         let dude = self.entity(&dude).cloned().unwrap_or_default();
         self.entity_mut(&obj).map(|obj| {
             obj.duplicate_from(&dude)
@@ -319,13 +310,13 @@ mod tests {
                 id.push(obj);
                 Ok(())
             },
-            // devote_push
+            // devote
             |(id, vessel): (&mut Vec<EntityId>, &mut Vessel)|  -> Result<(), FlowError>{
                 let obj_owner = retrive_random_2(&id).map(|(i, j)| (id[i],id[j]));
                 match obj_owner {
                     Some((obj, owner)) => {
                         println!("Devote. {:?} -> {:?}", obj, owner);
-                        vessel.entity_devote_push(obj, owner)?;
+                        vessel.entity_devote(obj, owner, 0)?;
                     }
                     _ => ()
                 }
