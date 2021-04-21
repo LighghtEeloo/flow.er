@@ -5,8 +5,6 @@ use crate::{EntityFlow, EntityId, Filter, Router};
 
 pub mod identity;
 
-use identity::{CubeId, CubeIdFactory};
-
 /// The basic unit of view, containing minimum info for rendering. Note that all use cases are strict.
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum CubeType {
@@ -58,7 +56,6 @@ pub enum Profile {
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct Cube {
-    pub id: CubeId,
     pub cube_type: CubeType,
     pub obj: Option<EntityId>,
     pub current: Option<EntityId>,
@@ -71,27 +68,23 @@ pub struct Cube {
 
 /// new Cube
 impl Cube {
-    pub fn id(&self) -> &CubeId {
-        &self.id
-    }
 
-    pub fn new(cube_type: CubeType, id_factory: &mut CubeIdFactory) -> Self {
+    pub fn new(cube_type: CubeType) -> Self {
         Self {
-            id: id_factory.rotate_id(),
             cube_type,
             ..Self::default()
         }
     }
 
-    pub fn new_router(router: Router, id_factory: &mut CubeIdFactory) -> Self {
+    pub fn new_router(router: Router) -> Self {
         use CubeType::*;
         match router {
-            Router::Birdsight => Cube::new(FlowView, id_factory),
-            Router::Workspace => Cube::new(ClauseTree, id_factory),
-            Router::Promised => Cube::new(PromisedLand, id_factory),
-            Router::Calendar => Cube::new(CalendarView, id_factory),
-            Router::TimeAnchor => Cube::new(TimeView, id_factory),
-            Router::Settings => Cube::new(SettingView, id_factory),
+            Router::Birdsight => Cube::new(FlowView),
+            Router::Workspace => Cube::new(ClauseTree),
+            Router::Promised => Cube::new(PromisedLand),
+            Router::Calendar => Cube::new(CalendarView),
+            Router::TimeAnchor => Cube::new(TimeView),
+            Router::Settings => Cube::new(SettingView),
         }
     }
 }
@@ -216,8 +209,7 @@ mod tests {
         let mut entity_factory = EntityIdFactory::default();
         let entitys: Vec<Entity> = (0..20).map(|_| Entity::new_rotate(&mut entity_factory)).collect();
         println!("{:?}", entitys.iter().map(|x| x.id()).collect::<Vec<&EntityId>>());
-        let mut cube_factory = CubeIdFactory::default();
-        let mut cube = Cube::new_router(Router::Workspace, &mut cube_factory).with_obj(entitys[0].id().clone());
+        let mut cube = Cube::new_router(Router::Workspace).with_obj(entitys[0].id().clone());
         println!("{:#?}", cube.obj);
         cube.set_obj(entitys[2].id().clone());
         println!("{:#?}", cube.obj);

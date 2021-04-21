@@ -2,7 +2,7 @@ use serde::{Serialize, Deserialize};
 use std::{collections::{HashMap, HashSet}};
 
 
-use crate::{Cube, CubeId, CubeIdFactory, CubeType, EntityFlow, settings::WorkSpaceMode};
+use crate::{Cube, CubeId, CubeIdFactory, CubeMeta, EntityFlow, settings::WorkSpaceMode};
 
 
 /// Describes the app router.
@@ -78,12 +78,20 @@ impl Router {
 }
 
 /// A overall layer of routers and cubes.
+/// 
+/// Heavily relies refresh() to keep the router_map and cube_map in correct state.
+/// 
+/// (e.g. delete by simply removing from either map)
+/// 
+/// So please call glass.refresh() after flow / glass alteration!
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Glass {
     #[serde(default)]
     pub router: Router,
     factory: CubeIdFactory,
+    /// each space in `router_map` (a `Vec<CubeId>`) holds no same id within this vec.
     router_map: HashMap<Router, Vec<CubeId>>,
+    /// `CubeId` can always find one and only one `Cube` in `cube_map`.
     cube_map: HashMap<CubeId, Cube>,
 }
 
@@ -104,98 +112,83 @@ impl Default for Glass {
     }
 }
 
+/// cube-based operations
 impl Glass {
-    /// return a new cube with id
-    ///
-    /// ```
-    /// # use flow_vessel::*;
-    /// let mut glass = Glass::default();
-    ///
-    /// // use with_... to create:
-    /// let cube = glass.new_cube(CubeType::FlowView)
-    ///     .with_obj(EntityId::default());
-    ///
-    /// // verifying:
-    /// let cube_made = Cube {
-    ///     id: cube.id().clone(),
-    ///     obj: Some(EntityId::default()),
-    ///     ..Cube::default()
-    /// };
-    ///
-    /// assert_eq!(cube.id, cube_made.id);
-    /// assert_eq!(cube.obj, cube_made.obj);
-    /// 
-    /// ```
-    pub fn new_cube(&mut self, cube_type: CubeType) -> Cube {
-        Cube {
-            ..Cube::new(cube_type, &mut self.factory)   
-        }
+    fn locate_cube_id(&self, meta: CubeMeta) -> Option<CubeId> {
+        self.router_map.get(&meta.router)
+        .map(|vec| vec.get(meta.idx))
+        .flatten().cloned()
     }
-//     pub fn get_cube_vec(&self) -> Vec<Cube> {
-//         let vec = 
-//             self.map.get(&self.router).cloned()
-//             .unwrap_or(Vec::new());
-//         if vec.is_empty() {
-//             vec![Cube::default()]
-//         } else {
-//             vec
-//         }
-//     }
-//     pub fn get_cube(&mut self, meta: CubeMeta) -> Option<Cube> {
-//         let router = meta.router;
-//         let vec = self.ensured(router);
-//         let idx = meta.idx;
-//         vec.get(idx).cloned()
-//     }
-//     /// inserts a cube within a safe idx
-//     pub fn insert_cube(&mut self, cube: Cube, meta: CubeMeta) -> Result<(),()> {
-//         let router = meta.router;
-//         let vec = self.ensured(router);
-//         let idx = if meta.idx > vec.len() {
-//             return Err(())
-//         } else { meta.idx };
-//         self.map.get_mut(&router).map(|vec|{
-//             vec.insert(idx, cube);
-//         });
-//         Ok(())
-//     }
-//     pub fn push_cube(&mut self, cube: Cube, router: Router) -> Result<(),()> {
-//         let idx = self.ensured(router).len();
-//         let meta = CubeMeta { 
-//             router,
-//             idx,
-//         };
-//         self.insert_cube(cube, meta)
-//     }
-//     /// removes a cube within a safe idx
-//     pub fn remove_cube(&mut self, meta: CubeMeta) -> Result<Cube,()> {
-//         let router = meta.router;
-//         let vec = self.ensured(router);
-//         let idx = if meta.idx >= vec.len() {
-//             return Err(())
-//         } else { meta.idx };
-//         let cube = self.map.get_mut(&router).map(|vec|{
-//             vec.remove(idx)
-//         }).expect("glass.ensured() failed.");
-//         Ok(cube)
-//     }
-//     pub fn swap_cube(&mut self, meta_1: CubeMeta, meta_2: CubeMeta) -> Result<(),()> {
-//         let cube = if let Some(cube) = self.get_cube(meta_2) {
-//             cube
-//         } else { return Err(()) };
-//         let cube = self.replace_cube(cube, meta_1)?;
-//         self.replace_cube(cube, meta_2)?;
-//         Ok(())
-//     }
-//     /// replaces the cube at meta with a new one
-//     pub fn replace_cube(&mut self, cube: Cube, meta: CubeMeta) -> Result<Cube,()> {
-//         let cube_ = self.remove_cube(meta)?;
-//         self.insert_cube(cube, meta)?;
-//         Ok(cube_)
-//     }
+    pub fn locate_cube(&self, meta: CubeMeta) -> Option<Cube> {
+        let id = self.locate_cube_id(meta);
+        id.map(|id| 
+            self.cube_map.get(&id)
+        ).flatten().cloned()
+    }
+    pub fn get_cube(&self, id: CubeId) -> Option<Cube> {
+        self.cube_map.get(&id).cloned()
+    }
+    pub fn show_router_cubes(&self) -> Vec<(CubeMeta, CubeId, Cube)> {
+        let vec = 
+            self.router_map
+            .get(&self.router).cloned()
+            .unwrap_or_default();
+        vec.into_iter()
+        .filter_map(|id| 
+            self.cube_map.get(&id).cloned().map(|c| (id, c))
+        ).enumerate().map(|(idx, (id, cube))| 
+            (CubeMeta { router: self.router, idx }, id , cube)
+        ).collect()
+    }
 
+    pub fn add_cube(&mut self, cube: Cube) -> CubeId {
+        let id = self.factory.rotate_id();
+        self.cube_map.insert(id, cube);
+        id
+    }
+    pub fn del_cube(&mut self, id: CubeId) -> Result<Cube, ()> {
+        self.cube_map.remove(&id).ok_or(())
+    }
+}
+
+/// cube_id-based operations
+impl Glass {
+    /// places a cube within a safe idx
+    pub fn place_cube(&mut self, cube: CubeId, meta: CubeMeta) -> Result<(),()> {
+        let router = meta.router;
+        let vec = self.ensured_router(router);
+        vec.retain(|id| id != &cube);
+        let idx = if meta.idx > vec.len() {
+            return Err(())
+        } else { meta.idx };
+        vec.insert(idx, cube);
+        Ok(())
+    }
+
+    // pub fn push_cube(&mut self, cube: CubeId, router: Router) -> Result<(),()> {
+    //     let idx = self.ensured_router(router).len();
+    //     let meta = CubeMeta { 
+    //         router,
+    //         idx,
+    //     };
+    //     self.place_cube(cube, meta)
+    // }
+
+    /// removes a cube within a safe idx
+    pub fn remove_cube(&mut self, meta: CubeMeta) -> Result<CubeId,()> {
+        let router = meta.router;
+        let vec = self.ensured_router(router);
+        let idx = if meta.idx >= vec.len() {
+            return Err(())
+        } else { meta.idx };
+        Ok(vec.remove(idx))
+    }
+}
+
+/// ensuring operations
+impl Glass {
     /// get cube_ids of a router ensured
-    fn ensured_router(&mut self, router: Router) -> &mut Vec<CubeId> {
+    pub fn ensured_router(&mut self, router: Router) -> &mut Vec<CubeId> {
         self.router_map.entry(router).or_default()
     }
 
@@ -241,9 +234,10 @@ impl Glass {
         let mut cubes = Vec::new();
         for (&router, vec) in self.router_map.iter_mut() {
             if vec.is_empty() {
-                let cube = Cube::new_router(router, &mut factory);
-                vec.push(cube.id().clone());
-                cubes.push((cube.id().clone(), cube));
+                let cube = Cube::new_router(router);
+                let id = factory.rotate_id();
+                vec.push(id);
+                cubes.push((id, cube));
             }
         }
         self.factory = factory;
@@ -251,20 +245,22 @@ impl Glass {
     }
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-//     use Router::*;
-//     #[test]
-//     fn glass_update() {
-//         let mut glass = Glass::default();
-//         switch(Workspace, &mut glass);
-//         let mut vessel = Vessel::default();
-//         vessel.glass_refresh();
-//     }
-//     fn switch(router: Router, glass: &mut Glass) {
-//         glass.router = router;
-//         println!("{:#?}", glass);
-//         println!("{:?}: {:?}", router, glass.get_cube_vec());
-//     }
-// }
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use Router::*;
+    fn make_glass() {
+
+    }
+    #[test]
+    fn glass_insert_delete() {
+
+    }
+    #[test]
+    fn glass_refresh() {
+
+    }
+    fn glass_fallback() {
+
+    }
+}

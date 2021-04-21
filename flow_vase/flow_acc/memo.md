@@ -48,7 +48,20 @@ Vessel holds a collection of all the information that should be stored during se
 
 ### Glass
 
+```rust
+struct Glass {
+    router: Router,
+    factory: CubeIdFactory,
+    router_map: HashMap<Router, Vec<CubeId>>,
+    cube_map: HashMap<CubeId, Cube>,
+}
+```
+
 Stores all the session buffers with a `HashMap` of `Router`s and `Vec<CubeId>`s. Ensures all the `Router`s exist with at least a fallback valid `CubeId` corresponding to a `Cube`.
+
+Two isomorphisms of `CubeId` are maintained by glass:
+1. each space in `router_map` (a `Vec<CubeId>`) holds no same id within this vec.
+2. `CubeId` can always find one and only one `Cube` in `cube_map`.
 
 Note that the `Workspace` will be used according to the setting: if `workspace_mode` is pure, then Router::vec_router() only contains `Workspace`.
 
@@ -61,7 +74,6 @@ enum Profile {
     Why (String)
 }
 struct Cube {
-    id: CubeId,
     cube_type: CubeType,
     obj: Option<EntityId>,
     current: Option<EntityId>,
@@ -75,4 +87,3 @@ A cube is a ghost of its corresponding cube pane: combined with a flow_arena, a 
 
 The main info is kept in obj and current; A profile records the extra info of a cube pane. 
 
-// Todo: CubeId.
