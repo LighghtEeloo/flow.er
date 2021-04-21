@@ -72,7 +72,13 @@ impl Router {
                 
                 Settings,
             ],
-            Manual(vec) => vec.clone()
+            Manual(vec) => {
+                if vec.is_empty() {
+                    vec! [ Router::default() ]
+                } else {
+                    vec.clone()
+                }
+            }
         }
     }
 }
@@ -192,7 +198,7 @@ impl Glass {
         self.router_map.entry(router).or_default()
     }
 
-    /// ensure and clean all invalid cubes.
+    /// ensure and clean all invalid cubes; ensure valid router.
     pub fn refresh(&mut self, flow: &EntityFlow, workspace_mode: &WorkSpaceMode) {
         self.ensure_router(workspace_mode);
         // Todo: decide whether it stays.
@@ -203,9 +209,13 @@ impl Glass {
 
     fn ensure_router(&mut self, workspace_mode: &WorkSpaceMode) {
         let router_vec = Router::vec_router(workspace_mode);
-        router_vec.into_iter().for_each(|router| {
+        router_vec.iter().for_each(|&router| {
             self.ensured_router(router);
         });
+        if ! (router_vec.contains(&self.router)) {
+            self.router = router_vec.get(0).cloned()
+                .expect("At least one router should be shown.");
+        }
     }
 
     /// removes not_desired router; not generally desired, kept here just in case
@@ -313,15 +323,17 @@ mod tests {
         (flow, workspace_mode, glass)
     }
     #[test]
-    fn glass_basic() {
+    fn glass_all() {
         println!("{:#?}", make_glass());
     }
     #[test]
     fn glass_refresh() {
-        
+        // Todo: test glass.
+        let (_flow, _mode, _glass) = make_glass();
     }
     #[test]
     fn glass_fallback() {
-
+        // Todo: test glass.
+        let (_flow, _mode, _glass) = make_glass();
     }
 }
