@@ -18,7 +18,7 @@ pub use self::{
     },
     cube::{
         identity::{CubeId, CubeIdFactory},
-        {Cube, CubeType, CubeMeta, cubes}
+        {Cube, CubeType, Profile, CubeMeta, cubes}
     },
     glass::{Glass, Router},
     settings::{Settings, Bridge, ViewMode},

@@ -83,7 +83,23 @@ struct Cube {
 }
 ```
 
-A cube is a ghost of its corresponding cube pane: combined with a flow_arena, a cube can restore its pane. 
+A `Cube` is a ghost of its corresponding cube pane: combined with a flow_arena, a cube can restore its pane. 
 
 The main info is kept in obj and current; A profile records the extra info of a cube pane. 
 
+A `Cube` can have illegal states:
+
+```rust
+let legal = match (self.cube_type, self.obj, self.current, self.profile.clone()) {
+   (Inkblot,Some(_),_,None) |
+   (ClauseTree,Some(_),_,None) |
+   (PromisedLand,_,_,None) |
+   (FlowView,Some(_),_,None) |
+   (CalendarView,None,None,Some(Profile::Where(_))) |
+   (CalendarView,None,None,Some(Profile::When(_))) |
+   (TimeView,None,None,None) |
+   (SettingView,None,None,None) |
+   (Blank,_,None,Some(Profile::Why(_))) => true,
+   _ => false
+};
+```

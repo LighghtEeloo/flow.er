@@ -58,7 +58,7 @@ impl Router {
         }
     }
     /// returns all possible routers in a Vec<Router>
-    pub fn vec_router(workspace_mode: WorkSpaceMode) -> Vec<Self> {
+    pub fn vec_router(workspace_mode: &WorkSpaceMode) -> Vec<Self> {
         use WorkSpaceMode::*;
         use Router::*;
         match workspace_mode {
@@ -72,7 +72,7 @@ impl Router {
                 
                 Settings,
             ],
-            Manual(vec) => vec
+            Manual(vec) => vec.clone()
         }
     }
 }
@@ -98,7 +98,7 @@ pub struct Glass {
 impl Default for Glass {
     fn default() -> Self {
         let factory = CubeIdFactory::default();
-        let router_map = Router::vec_router(WorkSpaceMode::default()).iter()
+        let router_map = Router::vec_router(&WorkSpaceMode::default()).iter()
             .map(|&router | {
                 (router, Vec::new())
             }).collect();
@@ -154,25 +154,25 @@ impl Glass {
 /// cube_id-based operations
 impl Glass {
     /// places a cube within a safe idx
-    pub fn place_cube(&mut self, cube: CubeId, meta: CubeMeta) -> Result<(),()> {
+    pub fn place_cube(&mut self, cube_id: CubeId, meta: CubeMeta) -> Result<(),()> {
         let router = meta.router;
         let vec = self.ensured_router(router);
-        vec.retain(|id| id != &cube);
+        vec.retain(|id| id != &cube_id);
         let idx = if meta.idx > vec.len() {
             return Err(())
         } else { meta.idx };
-        vec.insert(idx, cube);
+        vec.insert(idx, cube_id);
         Ok(())
     }
 
-    // pub fn push_cube(&mut self, cube: CubeId, router: Router) -> Result<(),()> {
-    //     let idx = self.ensured_router(router).len();
-    //     let meta = CubeMeta { 
-    //         router,
-    //         idx,
-    //     };
-    //     self.place_cube(cube, meta)
-    // }
+    pub fn push_cube(&mut self, cube_id: CubeId, router: Router) -> Result<(),()> {
+        let idx = self.ensured_router(router).len();
+        let meta = CubeMeta { 
+            router,
+            idx,
+        };
+        self.place_cube(cube_id, meta)
+    }
 
     /// removes a cube within a safe idx
     pub fn remove_cube(&mut self, meta: CubeMeta) -> Result<CubeId,()> {
@@ -193,17 +193,25 @@ impl Glass {
     }
 
     /// ensure and clean all invalid cubes.
-    pub fn refresh(&mut self, flow: &EntityFlow, workspace_mode: WorkSpaceMode) {
+    pub fn refresh(&mut self, flow: &EntityFlow, workspace_mode: &WorkSpaceMode) {
         self.ensure_router(workspace_mode);
+        // Todo: decide whether it stays.
+        // self.purge_router(workspace_mode);
         self.clean(flow);
         self.ensure_fallback()
     }
 
-    fn ensure_router(&mut self, workspace_mode: WorkSpaceMode) {
+    fn ensure_router(&mut self, workspace_mode: &WorkSpaceMode) {
         let router_vec = Router::vec_router(workspace_mode);
         router_vec.into_iter().for_each(|router| {
             self.ensured_router(router);
         });
+    }
+
+    /// removes not_desired router; not generally desired, kept here just in case
+    pub fn purge_router(&mut self, workspace_mode: &WorkSpaceMode) {
+        let router_vec = Router::vec_router(workspace_mode);
+        self.router_map.retain(|id, _| router_vec.contains(id));
     }
 
     /// cleans up all invalid cubes in both router_map and cube_map; assumes done ensure_router().
@@ -211,7 +219,7 @@ impl Glass {
         // first check all cubes are valid
         self.cube_map.retain(|_, cube| {
             cube.ensure(flow);
-            cube.is_valid_obj(flow)
+            cube.is_valid_cube(flow)
         });
 
         // then remove all cube_ids in router_map which doesn't exist
@@ -247,19 +255,72 @@ impl Glass {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use Router::*;
-    fn make_glass() {
+    use flow_arena::{FlowMaid, Node};
 
+    use crate::{CubeType, Entity, EntityIdFactory, Profile};
+
+    use super::*;
+    fn make_glass() -> (EntityFlow, WorkSpaceMode, Glass) {
+        let mut glass = Glass::default();
+        let workspace_mode = WorkSpaceMode::Pure;
+        glass.purge_router(&workspace_mode);
+        
+        let mut flow = EntityFlow::default();
+        let mut factory = EntityIdFactory::default();
+
+        // legal FlowView
+        {
+            let entity = Entity::new_rotate(&mut factory);
+            let obj = entity.id().clone();
+            flow.grow(Node::from_id(obj, entity)).expect("grow failed");
+            let flow_view = Cube::new(CubeType::FlowView).with_obj(obj);
+            let flow_view = glass.add_cube(flow_view);
+            let meta = CubeMeta { router: Router::Workspace, idx: 0 };
+            glass.place_cube(flow_view, meta).expect("place_cube failed");
+        }
+
+        // legal PromisedLand
+        {
+            let promised_land = Cube::new(CubeType::PromisedLand);
+            let promised_land = glass.add_cube(promised_land);
+            let meta = CubeMeta { router: Router::Workspace, idx: 0 };
+            glass.place_cube(promised_land, meta).expect("place_cube failed");
+        }
+
+        // legal PromisedLand, illegal placement
+        {
+            let promised_land = Cube::new(CubeType::PromisedLand);
+            let promised_land = glass.add_cube(promised_land);
+            let meta = CubeMeta { router: Router::Workspace, idx: 3 };
+            glass.place_cube(promised_land, meta).expect_err("place_cube shouldn't succeed");
+        }
+
+        // illegal PromisedLand
+        {
+            let entity = Entity::new_rotate(&mut factory);
+            let obj = entity.id().clone();
+            flow.grow(Node::from_id(obj, entity)).expect("grow failed");
+            let promised_land = Cube::new(CubeType::PromisedLand)
+                .with_obj(obj)
+                .with_profile(Profile::Why("Delibrately using cube illegally.".into()));
+            println!("is_valid_cube: {}", promised_land.is_valid_cube(&flow));
+            let promised_land = glass.add_cube(promised_land);
+            let meta = CubeMeta { router: Router::Workspace, idx: 2 };
+            glass.place_cube(promised_land, meta).expect("place_cube failed");
+        }
+
+        glass.refresh(&flow, &workspace_mode);
+        (flow, workspace_mode, glass)
     }
     #[test]
-    fn glass_insert_delete() {
-
+    fn glass_basic() {
+        println!("{:#?}", make_glass());
     }
     #[test]
     fn glass_refresh() {
-
+        
     }
+    #[test]
     fn glass_fallback() {
 
     }

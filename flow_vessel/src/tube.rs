@@ -30,22 +30,22 @@ pub enum Tube {
         id: EntityId,
         field: EntityField
     },
-    EntityDive {
-        id: EntityId,
-        idx: usize,
-    },
-    EntityEmerge {
-        id: EntityId,
-    },
-    EntityUp {
-        id: EntityId,
-    },
-    EntityDown {
-        id: EntityId,
-    },
     EntityDelete {
         id: EntityId
     },
+    // EntityDive {
+    //     id: EntityId,
+    //     idx: usize,
+    // },
+    // EntityEmerge {
+    //     id: EntityId,
+    // },
+    // EntityUp {
+    //     id: EntityId,
+    // },
+    // EntityDown {
+    //     id: EntityId,
+    // },
 }
 
 /// Echo implies the side-effect after the Tube update.
@@ -69,11 +69,12 @@ impl Vessel {
             }
 
             OpenVM { cube, meta } => {
-                // self.glass.push_cube(cube.clone(), meta.router).ok();
+                let cube = self.glass.add_cube(cube);
+                self.glass.place_cube(cube.clone(), meta).ok();
                 Echo::RebuildVM
             }
             CloseVM { meta } => {
-                // self.glass.remove_cube(meta).ok();
+                self.glass.remove_cube(meta).ok();
                 Echo::RebuildVM
             }
 
@@ -87,26 +88,26 @@ impl Vessel {
                 });
                 Echo::RebuildRef
             }
-            EntityDive { id, idx } => {
-                self.entity_dive(id, idx);
-                Echo::RebuildRef
-            }
-            EntityEmerge { id } => {
-                self.entity_emerge(id);
-                Echo::RebuildRef
-            }
             EntityDelete { id } => {
                 self.entity_remove(&id);
                 Echo::RebuildRef
             }
-            EntityUp { id } => {
-                self.entity_up(id);
-                Echo::RebuildRef
-            }
-            EntityDown { id } => {
-                self.entity_down(id);
-                Echo::RebuildRef
-            }
+            // EntityDive { id, idx } => {
+            //     self.entity_dive(id, idx);
+            //     Echo::RebuildRef
+            // }
+            // EntityEmerge { id } => {
+            //     self.entity_emerge(id);
+            //     Echo::RebuildRef
+            // }
+            // EntityUp { id } => {
+            //     self.entity_up(id);
+            //     Echo::RebuildRef
+            // }
+            // EntityDown { id } => {
+            //     self.entity_down(id);
+            //     Echo::RebuildRef
+            // }
 
         }
     }

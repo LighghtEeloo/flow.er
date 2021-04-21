@@ -96,7 +96,15 @@ impl Cube {
     /// if cube_type doesn't allow, false
     ///
     /// otherwise, true.
-    pub fn is_valid_obj(&self, flow: &EntityFlow) -> bool {
+    pub fn is_valid_cube(&self, flow: &EntityFlow) -> bool {
+        // if obj is Some, perform contain check
+        let is_obj = self.obj.map_or(true, |obj| 
+            flow.contains_node(&obj)
+        );
+        // if current is Some, perform contain check
+        let is_current = self.current.map_or(true, |current| 
+            flow.contains_node(&current)
+        );
         use CubeType::*;
         let legal = match (self.cube_type, self.obj, self.current, self.profile.clone()) {
             (Inkblot,Some(_),_,None) |
@@ -110,14 +118,7 @@ impl Cube {
             (Blank,_,None,Some(Profile::Why(_))) => true,
             _ => false
         };
-        let legal = self.current.map_or(legal, |current| 
-            flow.contains_node(&current)
-        );
-        // if obj is Some, perform contain check
-        let legal = self.obj.map_or(legal, |obj| 
-            flow.contains_node(&obj)
-        );
-        legal
+        is_obj && is_current && legal
     }
     
     /// fix a cube to a legal state if it's not already.
@@ -128,7 +129,7 @@ impl Cube {
         ) { self.clear_current(); }
         // obj = Some(<Not Exist>) -> clean
         // obj = None | Some(<Exist>) -> keep
-        if self.is_valid_obj(flow) {
+        if self.is_valid_cube(flow) {
             Some(self)
         } else {
             None

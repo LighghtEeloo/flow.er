@@ -227,7 +227,7 @@ impl Vessel {
 
 impl Vessel {
     pub fn glass_refresh(&mut self) {
-        self.glass.refresh(&self.flow_arena, self.settings.pure_workspace.clone())
+        self.glass.refresh(&self.flow_arena, &self.settings.pure_workspace)
     }
 }
 
