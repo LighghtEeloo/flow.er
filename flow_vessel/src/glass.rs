@@ -3,6 +3,7 @@ use std::{collections::{HashMap, HashSet}};
 use crate::{EntityFlow, settings::WorkspaceMode};
 
 pub mod cube;
+pub mod silhouette;
 mod ser_de;
 
 use cube::{

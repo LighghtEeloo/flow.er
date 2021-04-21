@@ -195,9 +195,6 @@ impl CubeMeta {
     }
 }
 
-pub mod cubes {
-    pub use crate::*;
-}
 
 #[cfg(test)]
 mod tests {

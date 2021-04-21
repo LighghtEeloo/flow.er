@@ -160,7 +160,7 @@ mod tests {
         let vessel = futures::executor::block_on(f).map_err(|_| "load err").unwrap_or(Vessel::new());
         println!("{:#?}", vessel);
 
-        let vessel = Vessel::new();
+        // let vessel = Vessel::new();
         {
             let mut vessel = vessel.clone();
             {

@@ -9,7 +9,7 @@ pub type EntityFlow = FlowArena<EntityId, Entity>;
 
 #[derive(Default, Clone, Serialize, Deserialize)]
 pub struct Vessel {
-    flow: EntityFlow,
+    pub(crate) flow: EntityFlow,
     factory: EntityIdFactory,
     #[serde(default)]
     pub glass: Glass,
