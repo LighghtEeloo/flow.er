@@ -11,7 +11,7 @@ pub struct Settings {
     #[serde(default)]
     pub view_mode: ViewMode,
     #[serde(default)]
-    pub pure_workspace: WorkSpaceMode,
+    pub workspace_mode: WorkspaceMode,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -60,21 +60,21 @@ impl ViewMode {
 
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub enum WorkSpaceMode {
+pub enum WorkspaceMode {
     Full,
     Pure,
     Manual (Vec<Router>)
 }
 
-impl Default for WorkSpaceMode {
+impl Default for WorkspaceMode {
     fn default() -> Self {
-        WorkSpaceMode::Full
+        WorkspaceMode::Full
     }
 }
 
-impl WorkSpaceMode {
+impl WorkspaceMode {
     pub fn switch(self) -> Self {
-        use WorkSpaceMode::*;
+        use WorkspaceMode::*;
         match self {
             Full => Pure,
             Pure => Full,
@@ -82,7 +82,7 @@ impl WorkSpaceMode {
         }
     }
     pub fn display(&self) -> String {
-        use WorkSpaceMode::*;
+        use WorkspaceMode::*;
         match self {
             Full => format!("Full"),
             Pure => format!("Pure"),

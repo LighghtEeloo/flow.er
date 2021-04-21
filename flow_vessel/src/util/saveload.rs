@@ -152,15 +152,36 @@ impl Vessel {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::*;
 
     #[test]
     fn saveload() -> Result<(), &'static str> {
         let f = Vessel::load();
         let vessel = futures::executor::block_on(f).map_err(|_| "load err").unwrap_or(Vessel::new());
         println!("{:#?}", vessel);
-        // let vessel = Vessel::new();
-        let f = vessel.save();
-        futures::executor::block_on(f).map_err(|_| "save err")
+
+        let vessel = Vessel::new();
+        {
+            let mut vessel = vessel.clone();
+            {
+                let obj = vessel.entity_grow().map_err(|_| "grow err")?;
+                let flow_view = Cube::new(CubeType::FlowView).with_obj(obj);
+                let flow_view = vessel.glass.add_cube(flow_view);
+                let meta = CubeMeta { router: Router::Workspace, idx: 0 };
+                vessel.glass.place_cube(flow_view, meta).expect("place_cube failed");
+            }
+            {
+                let promised_land = Cube::new(CubeType::PromisedLand);
+                let promised_land = vessel.glass.add_cube(promised_land);
+                let meta = CubeMeta { router: Router::Workspace, idx: 1 };
+                vessel.glass.place_cube(promised_land, meta).expect("place_cube failed");
+            }
+            let f = vessel.save();
+            futures::executor::block_on(f).map_err(|_| "save err")?;
+        }
+        
+        // let f = vessel.save();
+        // futures::executor::block_on(f).map_err(|_| "save err")?;
+        Ok(())
     }
 }

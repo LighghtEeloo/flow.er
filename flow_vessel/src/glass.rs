@@ -1,9 +1,8 @@
 use serde::{Serialize, Deserialize};
 use std::{collections::{HashMap, HashSet}};
+use crate::{Cube, CubeId, CubeIdFactory, CubeMeta, EntityFlow, settings::WorkspaceMode};
 
-
-use crate::{Cube, CubeId, CubeIdFactory, CubeMeta, EntityFlow, settings::WorkSpaceMode};
-
+mod ser_de;
 
 /// Describes the app router.
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, Deserialize, Serialize)]
@@ -58,8 +57,8 @@ impl Router {
         }
     }
     /// returns all possible routers in a Vec<Router>
-    pub fn vec_router(workspace_mode: &WorkSpaceMode) -> Vec<Self> {
-        use WorkSpaceMode::*;
+    pub fn vec_router(workspace_mode: &WorkspaceMode) -> Vec<Self> {
+        use WorkspaceMode::*;
         use Router::*;
         match workspace_mode {
             Pure => vec! [ Workspace ],
@@ -90,9 +89,8 @@ impl Router {
 /// (e.g. delete by simply removing from either map)
 /// 
 /// So please call glass.refresh() after flow / glass alteration!
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct Glass {
-    #[serde(default)]
     pub router: Router,
     factory: CubeIdFactory,
     /// each space in `router_map` (a `Vec<CubeId>`) holds no same id within this vec.
@@ -104,7 +102,7 @@ pub struct Glass {
 impl Default for Glass {
     fn default() -> Self {
         let factory = CubeIdFactory::default();
-        let router_map = Router::vec_router(&WorkSpaceMode::default()).iter()
+        let router_map = Router::vec_router(&WorkspaceMode::default()).iter()
             .map(|&router | {
                 (router, Vec::new())
             }).collect();
@@ -199,7 +197,7 @@ impl Glass {
     }
 
     /// ensure and clean all invalid cubes; ensure valid router.
-    pub fn refresh(&mut self, flow: &EntityFlow, workspace_mode: &WorkSpaceMode) {
+    pub fn refresh(&mut self, flow: &EntityFlow, workspace_mode: &WorkspaceMode) {
         self.ensure_router(workspace_mode);
         // Todo: decide whether it stays.
         // self.purge_router(workspace_mode);
@@ -207,7 +205,7 @@ impl Glass {
         self.ensure_fallback()
     }
 
-    fn ensure_router(&mut self, workspace_mode: &WorkSpaceMode) {
+    fn ensure_router(&mut self, workspace_mode: &WorkspaceMode) {
         let router_vec = Router::vec_router(workspace_mode);
         router_vec.iter().for_each(|&router| {
             self.ensured_router(router);
@@ -219,7 +217,7 @@ impl Glass {
     }
 
     /// removes not_desired router; not generally desired, kept here just in case
-    pub fn purge_router(&mut self, workspace_mode: &WorkSpaceMode) {
+    pub fn purge_router(&mut self, workspace_mode: &WorkspaceMode) {
         let router_vec = Router::vec_router(workspace_mode);
         self.router_map.retain(|id, _| router_vec.contains(id));
     }
@@ -270,9 +268,9 @@ mod tests {
     use crate::{CubeType, Entity, EntityIdFactory, Profile};
 
     use super::*;
-    fn make_glass() -> (EntityFlow, WorkSpaceMode, Glass) {
+    fn make_glass() -> (EntityFlow, WorkspaceMode, Glass) {
         let mut glass = Glass::default();
-        let workspace_mode = WorkSpaceMode::Pure;
+        let workspace_mode = WorkspaceMode::Pure;
         glass.purge_router(&workspace_mode);
         
         let mut flow = EntityFlow::default();

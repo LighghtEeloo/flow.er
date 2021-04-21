@@ -146,7 +146,7 @@ impl Vessel {
 /// glass
 impl Vessel {
     pub fn glass_refresh(&mut self) {
-        self.glass.refresh(&self.flow, &self.settings.pure_workspace)
+        self.glass.refresh(&self.flow, &self.settings.workspace_mode)
     }
 }
 
