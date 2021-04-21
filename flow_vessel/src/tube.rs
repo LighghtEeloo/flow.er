@@ -1,3 +1,5 @@
+use flow_arena::{Direction, FlowError};
+
 use super::{Cube, CubeMeta, EntityField, EntityId, Router, Settings, Vessel};
 
 /// Tube is the message operating vessel, similar to EntityField
@@ -33,25 +35,17 @@ pub enum Tube {
     EntityDelete {
         id: EntityId
     },
-    // EntityDive {
-    //     id: EntityId,
-    //     idx: usize,
-    // },
-    // EntityEmerge {
-    //     id: EntityId,
-    // },
-    // EntityUp {
-    //     id: EntityId,
-    // },
-    // EntityDown {
-    //     id: EntityId,
-    // },
+    EntityMigrate {
+        id: EntityId,
+        dir: Direction
+    },
 }
 
 /// Echo implies the side-effect after the Tube update.
 pub enum Echo {
     RebuildVM,
     RebuildRef,
+    FlowError (FlowError),
     Standby
 }
 
@@ -79,8 +73,8 @@ impl Vessel {
             }
 
             EntityAdd { dude, owner, idx } => {
-                self.entity_add(dude, owner, idx);
-                Echo::RebuildRef
+                self.entity_add(dude, owner, idx).err()
+                    .map_or(Echo::RebuildRef, |e| Echo::FlowError (e))
             }
             EntityUpdate { id, field } => {
                 self.entity_mut(&id).map(|entity| {
@@ -89,26 +83,13 @@ impl Vessel {
                 Echo::RebuildRef
             }
             EntityDelete { id } => {
-                self.entity_remove(&id);
-                Echo::RebuildRef
+                self.entity_remove(&id).err()
+                    .map_or(Echo::RebuildRef, |e| Echo::FlowError (e))
             }
-            // EntityDive { id, idx } => {
-            //     self.entity_dive(id, idx);
-            //     Echo::RebuildRef
-            // }
-            // EntityEmerge { id } => {
-            //     self.entity_emerge(id);
-            //     Echo::RebuildRef
-            // }
-            // EntityUp { id } => {
-            //     self.entity_up(id);
-            //     Echo::RebuildRef
-            // }
-            // EntityDown { id } => {
-            //     self.entity_down(id);
-            //     Echo::RebuildRef
-            // }
-
+            EntityMigrate { id, dir } => {
+                self.entity_migrate(&id, dir).err()
+                    .map_or(Echo::RebuildRef, |e| Echo::FlowError (e))
+            }
         }
     }
 }

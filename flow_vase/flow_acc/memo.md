@@ -103,3 +103,12 @@ let legal = match (self.cube_type, self.obj, self.current, self.profile.clone())
    _ => false
 };
 ```
+
+// Todo: decide.
+
+Decision: Update the `Silhouette` with...
+1. `CubeId` on the main update
+2. locally and send global messages...
+   1. with `reform()`
+   2. with `Agent`
+
