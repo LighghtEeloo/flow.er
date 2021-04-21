@@ -1,8 +1,14 @@
 use serde::{Serialize, Deserialize};
 use std::{collections::{HashMap, HashSet}};
-use crate::{Cube, CubeId, CubeIdFactory, CubeMeta, EntityFlow, settings::WorkspaceMode};
+use crate::{EntityFlow, settings::WorkspaceMode};
 
+pub mod cube;
 mod ser_de;
+
+use cube::{
+    identity::{CubeId, CubeIdFactory},
+    {Cube, CubeMeta}
+};
 
 /// Describes the app router.
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, Deserialize, Serialize)]

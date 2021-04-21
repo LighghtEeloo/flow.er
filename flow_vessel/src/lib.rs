@@ -1,6 +1,5 @@
 mod identity;
 mod entity;
-mod cube;
 mod glass;
 mod settings;
 mod vessel;
@@ -16,11 +15,13 @@ pub use self::{
         filter::Filter,
         {Entity, EntityField, Face, Bubble},
     },
-    cube::{
-        identity::{CubeId, CubeIdFactory},
-        {Cube, CubeType, Profile, CubeMeta, cubes}
+    glass::{
+        cube::{
+            identity::{CubeId, CubeIdFactory},
+            {Cube, CubeType, Profile, CubeMeta, cubes}
+        },
+        {Glass, Router}
     },
-    glass::{Glass, Router},
     settings::{Settings, Bridge, ViewMode},
     util::{
         json::{from_json, to_json, export_json},
