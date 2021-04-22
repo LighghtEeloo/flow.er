@@ -176,12 +176,14 @@ mod tests {
                 let meta = CubeMeta { router: Router::Workspace, idx: 1 };
                 vessel.glass.place_cube(promised_land, meta).expect("place_cube failed");
             }
+            println!("{:#?}", vessel);
             let f = vessel.save();
             futures::executor::block_on(f).map_err(|_| "save err")?;
         }
         
-        // let f = vessel.save();
-        // futures::executor::block_on(f).map_err(|_| "save err")?;
+        // remain unchanged
+        let f = vessel.save();
+        futures::executor::block_on(f).map_err(|_| "save err")?;
         Ok(())
     }
 }
