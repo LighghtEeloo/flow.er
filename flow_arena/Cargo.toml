@@ -1,12 +1,14 @@
 [package]
 name = "flow_arena"
-version = "0.3.0"
+version = "0.4.0"
 authors = ["LighghtEeloo <eelooecho@163.com>"]
 edition = "2018"
-description = "A HashMap managed Graph Model with ownership concept"
+description = "A HashMap managed Graph Model with the concept of ownership"
 readme = "README.md"
 repository = "https://github.com/LighghtEeloo/flow.er"
 license-file = "../LICENSE"
+keywords = ["arena", "flow", "tree", "graph", "ownership"]
+categories = ["data-structures", "accessibility"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
