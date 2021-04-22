@@ -1,0 +1,18 @@
+[package]
+name = "flow-ish"
+version = "0.1.0"
+authors = ["LighghtEeloo <eelooecho@163.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# clap = "2.33"
+futures = "0.3"
+
+[dependencies.serde]
+version = "1"
+features = ["derive"]
+
+[dependencies.flow_vessel]
+path = "../../flow_vessel"
