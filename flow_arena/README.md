@@ -4,7 +4,10 @@ A `HashMap` managed graph model with the concept of ownership.
 
 ## Components
 
-The `flow_arena` package consists of `trait Flow` and `struct FlowArena`, along with its node representation `trait Node` and `struct FlowNode`.
+The `flow_arena` package consists of 
+1. a flow data model representation `trait Flow` and `struct FlowArena`
+2. a node representation `trait Node` and `struct FlowNode`
+3. variants like `GraphNode` and `GraphArena`.
 
 ## Motivation
 
