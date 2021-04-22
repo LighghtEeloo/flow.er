@@ -8,3 +8,11 @@ edition = "2018"
 
 [dependencies]
 clap = "2.33"
+futures = "0.3"
+
+[dependencies.serde]
+version = "1"
+features = ["derive"]
+
+[dependencies.flow_vessel]
+path = "../../flow_vessel"

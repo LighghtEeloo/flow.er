@@ -362,6 +362,9 @@ name = "flow_cli"
 version = "0.1.0"
 dependencies = [
  "clap",
+ "flow_vessel",
+ "futures",
+ "serde",
 ]
 
 [[package]]
