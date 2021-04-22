@@ -1,10 +1,10 @@
 use std::{collections::HashSet, fmt::Debug};
 use serde::{Serialize, Deserialize};
-use flow_arena::{Direction, FlowArena, FlowBase, FlowError, FlowMaid, FlowShift, Node};
+use flow_arena::{Direction, FlowArena, FlowBase, FlowError, FlowMaid, FlowShift, FlowNode};
 
 use super::{Entity, EntityId, EntityIdFactory, Glass, Settings};
 
-pub type EntityNode = Node<EntityId, Entity>;
+pub type EntityNode = FlowNode<EntityId, Entity>;
 pub type EntityFlow = FlowArena<EntityId, Entity>;
 
 #[derive(Default, Clone, Serialize, Deserialize)]
@@ -89,7 +89,7 @@ impl Vessel {
     }
     fn entity_flow_grow(&mut self, entity: Entity) -> Result<EntityId, FlowError> {
         let id = entity.id().clone();
-        self.flow.grow(Node::from_id(id.clone(), entity))?;
+        self.flow.grow(FlowNode::from_id(id.clone(), entity))?;
         Ok(id)
     }
     // /// ensures that you can get the required entity; 

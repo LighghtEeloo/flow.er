@@ -23,7 +23,7 @@ mod arena;
 
 pub use self::{
     flow::{
-        FlowNode,
+        Node,
         FlowBase, 
         FlowCheck,
         FlowLink, 
@@ -34,5 +34,5 @@ pub use self::{
         FlowError,
         Flow, 
     },
-    arena::{Node, FlowArena, NodePure, FlowPure},
+    arena::{FlowNode, FlowArena, NodePure, FlowPure},
 };

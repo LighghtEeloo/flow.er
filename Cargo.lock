@@ -370,7 +370,6 @@ dependencies = [
 name = "flow_arena"
 version = "0.3.0"
 dependencies = [
- "indexmap",
  "serde",
  "serde_json",
 ]

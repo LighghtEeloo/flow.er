@@ -12,7 +12,7 @@ use super::*;
 #[derive(Clone, Default)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 #[cfg_attr(debug_assertions, derive(PartialEq))]
-pub struct Node<Id, Entity> {
+pub struct FlowNode<Id, Entity> {
     id: Id,
     pub entity: Entity,
     /// indicates ownership.
@@ -20,11 +20,11 @@ pub struct Node<Id, Entity> {
     pub children: Vec<Id>,
 }
 
-pub type NodePure<Id> = Node<Id, ()>;
+pub type NodePure<Id> = FlowNode<Id, ()>;
 
-impl<Id, Entity> Node<Id, Entity> {
+impl<Id, Entity> FlowNode<Id, Entity> {
     pub fn from_id(id: Id, entity: Entity) -> Self {
-        Node {
+        FlowNode {
             id,
             entity,
             parent: None,
@@ -33,7 +33,7 @@ impl<Id, Entity> Node<Id, Entity> {
     }
 }
 
-impl<Id: Debug + Clone, Entity: Debug> Debug for Node<Id, Entity> {
+impl<Id: Debug + Clone, Entity: Debug> Debug for FlowNode<Id, Entity> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct(format!("{:?}", self.id()).as_str())
             .field("<<", &self.parent.clone().map_or(
@@ -46,7 +46,7 @@ impl<Id: Debug + Clone, Entity: Debug> Debug for Node<Id, Entity> {
     }
 }
 
-impl<Id: Clone, Entity> FlowNode<Id> for Node<Id, Entity> {
+impl<Id: Clone, Entity> Node<Id> for FlowNode<Id, Entity> {
     fn id(&self) -> &Id {
         &self.id
     }
@@ -76,7 +76,7 @@ impl<Id: Clone, Entity> FlowNode<Id> for Node<Id, Entity> {
 #[derive(Clone)]
 #[cfg_attr(debug_assertions, derive(PartialEq, Debug))]
 pub struct FlowArena<Id: Hash + Eq + Clone, Entity: Clone> {
-    pub(crate) node_map: HashMap<Id, Node<Id, Entity>>,
+    pub(crate) node_map: HashMap<Id, FlowNode<Id, Entity>>,
 }
 
 pub type FlowPure<Id> = FlowArena<Id, ()>;
@@ -100,7 +100,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug + Clone {
 impl<Id, Entity> FlowBase for FlowArena<Id, Entity> 
 where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug + Clone {
     type Id = Id;
-    type Node = Node<Id, Entity>;
+    type Node = FlowNode<Id, Entity>;
 
     fn orphan(&self) -> Vec<Self::Id> {
         self.node_map.iter().filter_map(|(id, node)|
@@ -305,7 +305,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug + Clone {
 
 #[derive(Clone)]
 pub struct Entities<'a, Id: 'a, Entity: 'a> {
-    iter: std::collections::hash_map::Values<'a, Id, Node<Id, Entity>>
+    iter: std::collections::hash_map::Values<'a, Id, FlowNode<Id, Entity>>
 }
 
 impl<'a, Id, Entity> Iterator for Entities<'a, Id, Entity> {
@@ -317,7 +317,7 @@ impl<'a, Id, Entity> Iterator for Entities<'a, Id, Entity> {
     }
 }
 pub struct EntitiesMut<'a, Id: 'a, Entity: 'a> {
-    iter: std::collections::hash_map::ValuesMut<'a, Id, Node<Id, Entity>>
+    iter: std::collections::hash_map::ValuesMut<'a, Id, FlowNode<Id, Entity>>
 }
 
 impl<'a, Id, Entity> Iterator for EntitiesMut<'a, Id, Entity> {
@@ -349,7 +349,7 @@ where Id: Clone + Hash + Eq + Default + Debug, Entity: Default + Debug + Clone {
 mod tests {
     use super::*;
     type FlowEntity = FlowPure<EntityId>;
-    type NodeEntity = Node<EntityId, ()>;
+    type NodeEntity = FlowNode<EntityId, ()>;
     #[derive(Clone, Copy, Default, Hash, PartialEq, Eq)]
     #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
     struct EntityId {
@@ -399,7 +399,7 @@ mod tests {
     fn make_flow(aloud: bool) -> (FlowEntity, Vec<EntityId>) {
         let mut flow: FlowEntity = FlowArena::new();
         let obj_vec: Vec<NodeEntity> = (0..21).map(|x| 
-            Node::from_id(x.clone().into(), ())
+            FlowNode::from_id(x.clone().into(), ())
         ).collect();
         wrapper("Grow", flow.grow(obj_vec[0].clone()), &flow, aloud);
         wrapper("Grow", flow.grow(obj_vec[1].clone()), &flow, aloud);
@@ -534,7 +534,7 @@ mod tests {
         };
         let id: EntityId = 1.into();
         print_wrapper(&serde_json::to_string(&id).unwrap(), false);
-        let node: NodeEntity = Node::from_id(1.into(), ());
+        let node: NodeEntity = FlowNode::from_id(1.into(), ());
         print_wrapper(&serde_json::to_string(&node).unwrap(), false);
         let (flow, _) = make_flow(false);
         let str = serde_json::to_string(&flow).unwrap();

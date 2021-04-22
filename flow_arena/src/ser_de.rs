@@ -1,5 +1,5 @@
 use std::{fmt, hash::Hash};
-use super::{Node, FlowNode, FlowArena};
+use super::{FlowNode, Node, FlowArena};
 
 #[cfg(feature = "serde1")]
 use serde::ser::{Serialize, Serializer, SerializeStruct};
@@ -9,7 +9,7 @@ where Id: Serialize + Hash + Eq + Clone, Entity: Serialize + Clone {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         let mut flow = 
             serializer.serialize_struct("Flow", 2)?;
-        let seq: Vec<&Node<Id, Entity>> = self.node_map.values().collect();
+        let seq: Vec<&FlowNode<Id, Entity>> = self.node_map.values().collect();
         flow.serialize_field("node_map", &seq)?;
         flow.end()
     }
@@ -65,7 +65,7 @@ where Id: Deserialize<'de> + Clone + Hash + Eq, Entity: Deserialize<'de> + Clone
             where
                 V: SeqAccess<'de>,
             {
-                let node_vec: Vec<Node<Id, Entity>> = seq.next_element()?
+                let node_vec: Vec<FlowNode<Id, Entity>> = seq.next_element()?
                     .ok_or_else(|| de::Error::invalid_length(1, &self))?;
                 let node_map = node_vec.into_iter().map(|node| (node.id().clone(), node)).collect();
                 Ok(Self::Value { node_map })
@@ -82,7 +82,7 @@ where Id: Deserialize<'de> + Clone + Hash + Eq, Entity: Deserialize<'de> + Clone
                             if node_map.is_some() {
                                 return Err(de::Error::duplicate_field("node_map"));
                             }
-                            let node_vec: Vec<Node<Id, Entity>> = map.next_value()?;
+                            let node_vec: Vec<FlowNode<Id, Entity>> = map.next_value()?;
                             node_map = Some(node_vec.into_iter().map(|node| (node.id().clone(), node)).collect());
                         }
                     }

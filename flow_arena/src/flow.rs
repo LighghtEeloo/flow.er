@@ -1,6 +1,6 @@
 use std::{collections::HashSet, hash::Hash};
 
-pub trait FlowNode<Id> {
+pub trait Node<Id> {
     fn id(&self) -> &Id;
     fn parent(&self) -> Option<Id>;
     fn parent_set(&mut self, id: Id);
@@ -12,7 +12,7 @@ pub trait FlowNode<Id> {
 /// no check in FlowBase
 pub trait FlowBase {
     type Id: Default + Clone + Hash + Eq;
-    type Node: Default + Clone + FlowNode<Self::Id>;
+    type Node: Default + Clone + Node<Self::Id>;
     /// ensures root and returns it
     fn orphan(&self) -> Vec<Self::Id>;
     fn contains_node(&self, obj: &Self::Id) -> bool {

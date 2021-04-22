@@ -270,7 +270,7 @@ impl Glass {
 
 #[cfg(test)]
 mod tests {
-    use flow_arena::{FlowMaid, Node};
+    use flow_arena::{FlowMaid, FlowNode};
 
     use crate::{CubeType, Entity, EntityIdFactory, Profile};
 
@@ -287,7 +287,7 @@ mod tests {
         {
             let entity = Entity::new_rotate(&mut factory);
             let obj = entity.id().clone();
-            flow.grow(Node::from_id(obj, entity)).expect("grow failed");
+            flow.grow(FlowNode::from_id(obj, entity)).expect("grow failed");
             let flow_view = Cube::new(CubeType::FlowView).with_obj(obj);
             let flow_view = glass.add_cube(flow_view);
             let meta = CubeMeta { router: Router::Workspace, idx: 0 };
@@ -314,7 +314,7 @@ mod tests {
         {
             let entity = Entity::new_rotate(&mut factory);
             let obj = entity.id().clone();
-            flow.grow(Node::from_id(obj, entity)).expect("grow failed");
+            flow.grow(FlowNode::from_id(obj, entity)).expect("grow failed");
             let promised_land = Cube::new(CubeType::PromisedLand)
                 .with_obj(obj)
                 .with_profile(Profile::Why("Delibrately using cube illegally.".into()));
