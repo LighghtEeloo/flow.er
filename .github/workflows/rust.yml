@@ -3,8 +3,8 @@ name: Rust
 on:
   push:
     branches: [ dev, dev-Acc ]
-  pull_request:
-    branches: [ dev ]
+  # pull_request:
+  #   branches: [ dev ]
 
 env:
   CARGO_TERM_COLOR: always
@@ -31,4 +31,4 @@ jobs:
     # - name: Run tests
     #   run: cargo test --verbose
     - name: Full Test
-      run: cargo test --all --verbose
+      run: cargo test --all --verbose --locked
