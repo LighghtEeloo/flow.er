@@ -1,3 +1,3 @@
 fn main() {
-    flow_cli::main()
+    flow_cli::main().ok();
 }
