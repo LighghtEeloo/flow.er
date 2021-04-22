@@ -57,6 +57,18 @@ pub trait FlowBase {
         }).collect()
     }
 
+    /// judge whether the obj is owned by the owner
+    fn is_owned(&self, obj: &Self::Id, owner: &Self::Id) -> bool {
+        self.parent(obj).map_or(false, |id| &id == owner)
+        && self.children(owner).contains(obj)
+    }
+
+    /// judge whether the obj is *purely* linked from the owner
+    fn is_linked(&self, obj: &Self::Id, owner: &Self::Id) -> bool {
+        self.parent(obj).map_or(true, |id| &id != owner)
+        && self.children(owner).contains(obj)
+    }
+
     /// returns all the offspring of a node, not including itself
     fn node_offspring_set(&self, obj: &Self::Id) -> HashSet<Self::Id> {
         let mut visit_set = HashSet::new();
