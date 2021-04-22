@@ -4,7 +4,10 @@
 //! 
 //! ## Components
 //! 
-//! The `flow_arena` package consists of `trait Flow` and `struct FlowArena`, along with its node representation `trait Node` and `struct FlowNode`.
+//! The `flow_arena` package consists of 
+//! 1. a flow data model representation `trait Flow` and `struct FlowArena`
+//! 2. a node representation `trait Node` and `struct FlowNode`
+//! 3. variants like `GraphNode` and `GraphArena`.
 //! 
 //! ## Motivation
 //! 
@@ -18,7 +21,7 @@
 //! 
 //! ### Arena
 //! 
-//! When it comes to relation driven data models, it's easy to make Rustaceans headache - just try and write a safe doublely-linked list. The concept of `Arena`, therefore, is raised to implement a simple and memory-safe representation of such models. [^1]
+//! When it comes to relation driven data models, it's easy to make Rustaceans headache - just try and write a safe doubly-linked list. The concept of `Arena`, therefore, is raised to implement a simple and memory-safe representation of such models. [^1]
 //! 
 //! Consider a tree model. Basically it's a group of nodes where each node can point to some other nodes. How do we denote this relation? Well, we give every node a unique mark which claims its reference. We used to use pointers to cleverly mark this *uniqueness* with the help of memory addresses; but due to Rust's ownership rule, this approach is verbose to implement. So, why not mark this uniqueness by ourselves, with indices or ids? 
 //! 
@@ -69,8 +72,8 @@
 //! The `FlowArena` is serving as the underlying data model of [flow.er](https://github.com/LighghtEeloo/flow.er), a notebook, mindmap, todo-list and agenda app. 
 //! 
 //! 
-//! 
 //! [^1]: [no-more-tears-no-more-knots-arena-allocated-trees-in-rust](https://dev.to/deciduously/no-more-tears-no-more-knots-arena-allocated-trees-in-rust-44k6)
+//! 
 //! 
 
 mod flow;
