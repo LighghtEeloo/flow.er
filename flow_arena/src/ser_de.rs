@@ -1,5 +1,5 @@
-use super::{Node, FlowNode, FlowArena};
 use std::{fmt, hash::Hash};
+use super::{Node, FlowNode, FlowArena};
 
 #[cfg(feature = "serde1")]
 use serde::ser::{Serialize, Serializer, SerializeStruct};
