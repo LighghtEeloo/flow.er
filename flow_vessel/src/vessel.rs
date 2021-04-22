@@ -1,11 +1,11 @@
 use std::{collections::HashSet, fmt::Debug};
 use serde::{Serialize, Deserialize};
-use flow_arena::{Direction, FlowArena, FlowBase, FlowError, FlowMaid, FlowShift, FlowNode};
+use flow_arena::{Direction, FlowArena, FlowBase, FlowError, FlowMaid, FlowNode, FlowShift, Node};
 
 use super::{Entity, EntityId, EntityIdFactory, Glass, Settings};
 
 pub type EntityNode = FlowNode<EntityId, Entity>;
-pub type EntityFlow = FlowArena<EntityId, Entity>;
+pub type EntityFlow = FlowArena<EntityId, FlowNode<EntityId, Entity>>;
 
 #[derive(Default, Clone, Serialize, Deserialize)]
 pub struct Vessel {
@@ -52,7 +52,7 @@ impl Vessel {
     }
     /// get all entity_ids under id directly
     pub fn entity_id_direct(&self, obj: &EntityId) -> Vec<EntityId> {
-        self.flow.node(obj).map_or(Vec::new(), |x| x.children.clone())
+        self.flow.node(obj).map_or(Vec::new(), |x| x.children())
     }
     /// get all entity_ids under id recrusively
     pub fn entity_offspring(&self, obj: &EntityId) -> HashSet<EntityId> {
@@ -173,7 +173,7 @@ fn concise_debug_impl(obj: EntityId, vessel: &Vessel, prefix: usize) -> String {
     let children = vessel.node(&obj).map_or(
         Vec::new(), 
         |node| {
-            node.children.clone()
+            node.children()
         });
     let children_debug = children.iter().map(|x|
         concise_debug_impl(x.clone(), vessel, prefix+1)

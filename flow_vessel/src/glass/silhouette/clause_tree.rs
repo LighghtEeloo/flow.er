@@ -56,7 +56,7 @@ impl ClauseTreeCore {
         FnArgs: Clone + Fn(Args) -> Args 
     {
         let args = f_args(args);
-        self.node(&id).children.iter().map(|id| {
+        self.node(&id).children().iter().map(|id| {
             combinator (
                 f(self.node(id), args.clone()),
                 self.node_view_impl(id.clone(), f.clone(), combinator.clone(), args.clone(), f_args.clone())

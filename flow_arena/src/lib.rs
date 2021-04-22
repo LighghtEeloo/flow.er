@@ -18,8 +18,9 @@
 //! 
 
 mod flow;
-mod ser_de;
 mod arena;
+mod variants;
+mod ser_de;
 
 pub use self::{
     flow::{
@@ -34,5 +35,13 @@ pub use self::{
         FlowError,
         Flow, 
     },
-    arena::{FlowNode, FlowArena, NodePure, FlowPure},
+    arena::{FlowNode, FlowArena},
+    variants::{NodePure, FlowPure, GraphNode, GraphArena}
 };
+
+pub mod prelude {
+    pub use crate::{
+        flow::*,
+        arena::*
+    };
+}
