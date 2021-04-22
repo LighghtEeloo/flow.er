@@ -1,5 +1,5 @@
 [package]
-name = "flow_acc"
+name = "flow-acc"
 version = "0.1.0"
 authors = ["LighghtEeloo <eelooecho@163.com>"]
 edition = "2018"

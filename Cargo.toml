@@ -1,5 +1,5 @@
 [package]
-name = "flow_er"
+name = "flow-er"
 version = "0.4.0"
 authors = ["LighghtEeloo <eelooecho@163.com>"]
 edition = "2018"
@@ -7,10 +7,11 @@ readme = "readme.md"
 repository = "https://github.com/LighghtEeloo/flow.er"
 
 [features]
-cli = ["flow_cli"]
-iced = []
-# yew = ["flow_yew"]
-acc = ["flow_acc"]
+default = ["cli"]
+cli = ["flow-cli"]
+# iced = ["flow-iced"]
+# yew = ["flow-yew"]
+acc = ["flow-acc"]
 
 [workspace]
 members = [
@@ -22,14 +23,14 @@ members = [
 	"flow_vase/flow_acc",
 ]
 
-[dependencies.flow_cli]
+[dependencies.flow-cli]
 path = "flow_vase/flow_cli"
 optional = true
 
-# [dependencies.flow_yew]
+# [dependencies.flow-yew]
 # path = "flow_vase/flow_yew"
 # optional = true
 
-[dependencies.flow_acc]
+[dependencies.flow-acc]
 path = "flow_vase/flow_acc"
 optional = true

@@ -333,7 +333,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "flow_acc"
+name = "flow-acc"
 version = "0.1.0"
 dependencies = [
  "chrono",
@@ -349,16 +349,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "flow_arena"
-version = "0.3.0"
-dependencies = [
- "indexmap",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "flow_cli"
+name = "flow-cli"
 version = "0.1.0"
 dependencies = [
  "clap",
@@ -368,11 +359,20 @@ dependencies = [
 ]
 
 [[package]]
-name = "flow_er"
+name = "flow-er"
 version = "0.4.0"
 dependencies = [
- "flow_acc",
- "flow_cli",
+ "flow-acc",
+ "flow-cli",
+]
+
+[[package]]
+name = "flow_arena"
+version = "0.3.0"
+dependencies = [
+ "indexmap",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
