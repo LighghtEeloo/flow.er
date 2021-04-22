@@ -345,7 +345,6 @@ dependencies = [
  "serde_json",
  "wasm-logger",
  "yew",
- "yew-services",
 ]
 
 [[package]]
@@ -1294,22 +1293,4 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "yew-services"
-version = "0.1.0"
-source = "git+https://github.com/yewstack/yew.git?rev=3740140#37401402a1e370a749e9cf5f1451252bb0b47366"
-dependencies = [
- "anyhow",
- "gloo",
- "http",
- "js-sys",
- "serde",
- "serde_json",
- "thiserror",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "web-sys",
- "yew",
 ]

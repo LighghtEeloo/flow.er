@@ -20,20 +20,6 @@ $ cargo install --locked trunk
 $ cargo install wasm-bindgen-cli
 ```
 
-Maybe you will fail to compile on your first run with some error messages like:
-```bash
-[INFO]: Checking for the Wasm target...
-Error: wasm32-unknown-unknown target not found!
-```
-
-Don't panic. Simply add
-```bash
-rustup target add wasm32-unknown-unknown
-```
-and everything will be fine.
-
-Feel free to fire an issue if anything troubles you (❁´◡`❁)
-
 ### Dev Serve
 
 After following intructions above, you'll be able to serve the app locally.
@@ -48,6 +34,21 @@ $ git clone https://github.com/LighghtEeloo/flow.er.git && cd flow.er/flow_vase/
 $ trunk serve
 ```
 And then visit `127.0.0.1:9720` via your browser.
+
+Maybe you will fail to compile on your first run with some error messages like:
+```bash
+[INFO]: Checking for the Wasm target...
+Error: wasm32-unknown-unknown target not found!
+```
+
+Don't panic. Simply add
+```bash
+rustup target add wasm32-unknown-unknown
+```
+and everything will be fine.
+
+Feel free to fire an issue if anything troubles you (❁´◡`❁)
+
 
 ## Supported Browsers
 
@@ -66,7 +67,7 @@ For now, this software isn't data-safe. Use at your own risk. This may get bette
 See [todo.md](./todo.md).
 
 
-## Version
+## Vision
 
 The final goal of this project is to create a *notebook* and *mind-map* app with is integrated with *todo-list* and *calendar* views. 
 
@@ -81,9 +82,11 @@ The * directories are important ones.
 .
 ├── flow_arena          * -- an implementation of "flow" data-structure
 ├── flow_vase           * -- user interface part
-│   ├── flow_cli          -- (not implemented) a cli fallback 
+│   ├── flow_cli          -- (in progress) a cli flow app
+│   ├── flow_ish          -- (not implemented) a responsive terminal flow app
 │   ├── flow_iced         -- (deprecated) trying `iced`
-│   └── flow_yew        * -- a `yew` GUI implementation
+│   ├── flow_acc        * -- a `yew` GUI with modern html+scss features
+│   └── flow_yew          -- (deprecated) a `yew` GUI attempt
 ├── flow_vessel         * -- the "flow_core" part, with all the non-UI logic
 └── src                   -- (not implemented) the skeleton of this package
 ```
@@ -98,29 +101,9 @@ On hearing mindmaps, the intuitive representation would be "tree", or even bette
 
 A specific example would be: "I have a tree-like mindmap, good, but what if this node should belong to two parents?"
 
-That's where "flow" jumps in. It features "arena" style storage and flexible relationship representation. The concept of "arena" was [mentioned](https://dev.to/deciduously/no-more-tears-no-more-knots-arena-allocated-trees-in-rust-44k6) when the rust folks were torturing by the unsafe and difficult implementations. 
+If you are interested in this problem, please find the details on `Flow` [here](./flow_arena/README.md).
 
-A typical arena contains:
-1. A map / vec to store the data.
-2. A relationship recorder which only plays with the keys / indices.
-
-In this way, the arena style basically replaces the annoying pointers with keys, which could be, for example, `usize`.Now all the operations are cheap and safe. The only trouble, however, is you have to generate the key by hand. 
-
-Flow's relationship model is then simple to understand: 
-1. Each node has an id, a parent_id and a Vec of children_id.
-2. All the nodes are stored in a HashMap as (id, node).
-3. Nodes can be visited via id.
-4. A root node ensures that all the nodes are recrusively traceable. 
-
-And certain properties are defined:
-1. All ids presented must be valid.
-2. The root has no parent, while other nodes must have.
-3. A node's parent must have the node as a child.
-4. A node just memorizes the most recent parent.
-
-We can see that flow is even capable of representing a graph; however, I think it's unnecessary to use it here.
-
-Flow is implemented in flow_arena, as `FlowArena`.
+`Flow` is implemented in flow_arena, as `FlowArena`.
 
 ---
 
@@ -149,16 +132,13 @@ As for `Entity`, it's the content of every node. Every entity has a (hopefully) 
 `Vase` implements the GUI part. In the yew version, `Vase` impls `yew::Component`. Unfortunately it's currently the only `Component` becuase I still have trouble handle the global data access and update, which are all over my code. In the short future, I'll try the functional approach.
 
 
-### Cube and CubeVM / CubeView
+### Cube, CubeViewCore and CubeVM
 
 The `Cube` is a piece of UI session data stored by `Glass`; while `CubeVM` is the runtime UI session data created on-site. Though keeping them identical and updated is hard, it's even trickier how to abstract them to store and show polymorphism.
 
 The data storage of, say, a bunch of differently typed structs which share the same trait, is always a headache. Two different approaches are adopted at the vessel and vase side, separately.
 
-The vase side is straight forward: just use an `enum CubeView` to store the different parts, and together with it, store the common info in `CubeVM` (CubeViewModel / VirualMachine, whatever). This results in heavy glue codes, to manually map the different inputs to the enum patterns. However, it's still relatively easy to implement; and in fact, I think it's already the cheapest way to do without the help of macros.
-
-As for vessel side, `struct Cube` is used; however, it's merely a struct containing a truck of `Option<T>`s and a TypeEnum, and can be turned into the corresponding Type. Each subtype just impls from and into, and the flexible convertion is done. However, if more fields are added in the future, the convertions must be updated.
-
+// Todo..
 
 ### At Last, About Storage
 

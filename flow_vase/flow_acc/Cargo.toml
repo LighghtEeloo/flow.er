@@ -20,10 +20,10 @@ git = "https://github.com/yewstack/yew.git"
 rev = "3740140"
 package = "yew"
 
-[dependencies.yew-services]
-git = "https://github.com/yewstack/yew.git"
-rev = "3740140"
-package = "yew-services"
+# [dependencies.yew-services]
+# git = "https://github.com/yewstack/yew.git"
+# rev = "3740140"
+# package = "yew-services"
 
 # [dependencies.flow_arena]
 # path = "../../flow_arena"

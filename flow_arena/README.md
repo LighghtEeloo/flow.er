@@ -28,32 +28,41 @@ The idea of the `Arena` is simple: use a `Vec<Node>` or a `HashMap<Id, Node<Id>>
 
 `FlowArena` represents a directed graph with the idea of `Arena`. More than that, it's also able to represent the "flow model".
 
+Flow model is different from graph or tree model alone because it provides both ownership (tree-ish) and linkage (graph-ish) features.
+Suppose you are removing a node from a tree, the children of it will automatically be removed, which is an implication of the "ownership" of a node to its children. In contrast, a graph node's removal will not cause the surrounding nodes to be removed.
 
+Using the concept of ownership in the current graph-ish model, we yield a new kind of data model that can freely switch its behaviour between the two modes. We call such a data model a "flow model", which clearly indicates the functionality of `FlowArena`.
 
-<!--
-Flow's relationship model is then simple to understand: 
-1. Each node has an id, a parent_id and a Vec of children_id.
-2. All the nodes are stored in a HashMap as (id, node).
-3. Nodes can be visited via id.
-4. A root node ensures that all the nodes are recrusively traceable. 
+**Important**: there are some extra concepts in `FlowArena` compared to `Arena`:
 
-And certain properties are defined:
-1. All ids presented must be valid.
-2. The root has no parent, while other nodes must have.
-3. A node's parent must have the node as a child.
-4. A node just memorizes the most recent parent.
--->
+1. nodes have not only children(`Vec<Id>`), but also a optional parent (`Option<Id>`)
+   1. from tree-ish prospective, parent implies ownership, `None` means root; and children is only extra notation for possible ownership
+   2. from graph-ish prospective, children implies one-way edge
+   3. note that a "pure link" means linkage without ownership
+   4. however, **"ownership" implies "linkage"**: if A has parent B, then B must have A as one of its children
+2. any node can have its sub tree or sub graph, given that no external linkage exist 
+   1. all the nodes owned recursively by the node are called "sub-nodes" of the node
+   2. the node is called "tree node" or "graph node", respectively
+3. the nodes with no parent are called `orphan`s which is similar to a group of "root" nodes.
 
-We call such a data model a "flow model", which clearly indicates the functionality of `FlowArena`.
 
 ## Usage
 
 1. directly use `struct FlowNode<Id>` and the `struct FlowArena<Id, Entity>` to represent a flow model
-2. impl `trait Node<Id>` and `trait Flow` - see [Implementation](#implementation) for reference
+2. impl `trait Node<Id>` and `trait Flow` - see [Trait Implementation](#triat-implementation) for reference
+3. when called upon, `use` the corresponding trait
 
-## Implementation
+## Triat Implementation
 
-// Todo: Introduce a series of Flow traits.
+1. `FlowBase`: provides basic node-reflection abiliy; no check
+2. `FlowCheck`: checks the Flow's properties and see whether they hold
+3. `FlowMap`: provides hashmap functionality
+4. `FlowLink`: provides ability to link nodes; graph-ish
+5. `FlowDevote`: provides ability to devote / own nodes; tree-ish
+6. `FlowDock`: provides ability to cut (undock) and copy (snap) a flow from a node and paste it to another node (dock)
+7. `FlowShift`: provides ability to move around in flow with `Direction`
+8. `Flow`: checks all the traits are implemented
+
 
 ## Related App
 
@@ -62,4 +71,4 @@ The `FlowArena` is serving as the underlying data model of [flow.er](https://git
 
 
 
-[^1]: https://dev.to/deciduously/no-more-tears-no-more-knots-arena-allocated-trees-in-rust-44k6
+[^1]: [no-more-tears-no-more-knots-arena-allocated-trees-in-rust](https://dev.to/deciduously/no-more-tears-no-more-knots-arena-allocated-trees-in-rust-44k6)
