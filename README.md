@@ -69,7 +69,7 @@ See [todo.md](./todo.md).
 
 ## Vision
 
-The final goal of this project is to create a *notebook* and *mind-map* app with is integrated with *todo-list* and *calendar* views. 
+The final goal of this project is to create a *notebook* and *mind-map* app with is integrated with *todo-list* and *agenda* views. 
 
 It will be supporting patches to incrementally save your previous work, denoted by *time-capsule* function.
 
@@ -119,7 +119,7 @@ As for `Entity`, it's the content of every node. Every entity has a (hopefully) 
    2. A todo-list entry.
    3. Plain.
 4. tags: a tag system.
-5. time-notes: whether it's calendar-visible, as a duration.
+5. time-notes: whether it's agenda-visible, as a duration.
 
 `Entity` is implemented in flow_vessel.
 

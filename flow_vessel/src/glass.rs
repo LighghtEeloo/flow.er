@@ -17,7 +17,7 @@ pub enum Router {
     Birdsight,
     Workspace,
     Promised,
-    Calendar,
+    Agenda,
     TimeAnchor,
 
     Settings,
@@ -36,7 +36,7 @@ impl Router {
             Birdsight => "birdsight",
             Workspace => "workspace",
             Promised => "promised",
-            Calendar => "calendar",
+            Agenda => "agenda",
             TimeAnchor => "time-capsule",
             Settings => "settings",
         }
@@ -47,7 +47,7 @@ impl Router {
             Birdsight => "Birdsight",
             Workspace => "Workspace",
             Promised => "Promised",
-            Calendar => "Calendar",
+            Agenda => "Agenda",
             TimeAnchor => "TimeAnchor",
             Settings => "Settings",
         }
@@ -58,7 +58,7 @@ impl Router {
             Birdsight => "static/icons/branch.svg",
             Workspace => "static/icons/hexagons.svg",
             Promised => "static/icons/calendar.svg",
-            Calendar => "static/icons/calendar.svg",
+            Agenda => "static/icons/calendar.svg",
             TimeAnchor => "static/icons/history.svg",
             Settings => "static/icons/settings.svg",
         }
@@ -73,7 +73,7 @@ impl Router {
                 // BirdView,
                 Workspace,
                 Promised,
-                // Calendar,
+                // Agenda,
                 // TimeAnchor,
                 
                 Settings,

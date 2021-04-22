@@ -54,8 +54,8 @@ let legal = match (self.cube_type, self.obj, self.current, self.profile.clone())
    (ClauseTree,Some(_),_,None) |
    (PromisedLand,_,_,None) |
    (FlowView,Some(_),_,None) |
-   (CalendarView,None,None,Some(Profile::Where(_))) |
-   (CalendarView,None,None,Some(Profile::When(_))) |
+   (AgendaView,None,None,Some(Profile::Where(_))) |
+   (AgendaView,None,None,Some(Profile::When(_))) |
    (TimeView,None,None,None) |
    (SettingView,None,None,None) |
    (Blank,_,None,Some(Profile::Why(_))) => true,

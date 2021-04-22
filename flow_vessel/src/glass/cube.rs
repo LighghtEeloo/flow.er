@@ -16,8 +16,8 @@ pub enum CubeType {
     PromisedLand,
     /// A flow view from a point. Uses obj & ?current.
     FlowView,
-    /// A calendar with agenda. Uses profile.
-    CalendarView,
+    /// A agenda with agenda. Uses profile.
+    AgendaView,
     /// A version control panel.
     TimeView,
     /// A setting panel.
@@ -39,7 +39,7 @@ impl CubeType {
             CubeType::ClauseTree => "clause-tree",
             CubeType::PromisedLand => "promised-land",
             CubeType::FlowView => "flow-view",
-            CubeType::CalendarView => "calendar-view",
+            CubeType::AgendaView => "agenda-view",
             CubeType::TimeView => "time-view",
             CubeType::SettingView => "setting-view",
             CubeType::Blank => "blank",
@@ -82,7 +82,7 @@ impl Cube {
             Router::Birdsight => Cube::new(FlowView),
             Router::Workspace => Cube::new(ClauseTree),
             Router::Promised => Cube::new(PromisedLand),
-            Router::Calendar => Cube::new(CalendarView),
+            Router::Agenda => Cube::new(AgendaView),
             Router::TimeAnchor => Cube::new(TimeView),
             Router::Settings => Cube::new(SettingView),
         }
@@ -111,8 +111,8 @@ impl Cube {
             (ClauseTree,Some(_),_,None) |
             (PromisedLand,_,_,None) |
             (FlowView,Some(_),_,None) |
-            (CalendarView,None,None,Some(Profile::Where(_))) |
-            (CalendarView,None,None,Some(Profile::When(_))) |
+            (AgendaView,None,None,Some(Profile::Where(_))) |
+            (AgendaView,None,None,Some(Profile::When(_))) |
             (TimeView,None,None,None) |
             (SettingView,None,None,None) |
             (Blank,_,None,Some(Profile::Why(_))) => true,
