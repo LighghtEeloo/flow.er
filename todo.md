@@ -1,33 +1,18 @@
+# todo
+
 ## flow_arena
-- [x] (abort) merge_flow
-- [x] !! Fix decay.
-- [x] !! Fix cycle devote ([[a]] -> [[a]]).
-- [x] ! More unit testings required.
-- [x] !! Get the logic of flow clear.
-- [x] ! Relation Compiler.
-- [x] decay - erase
+Clear!
 
 ## flow_vessel
-- [ ] ! Tree Checker.
-- [x] Settings
-  - [x] Saving Options.
-- [x] formatted ClauseTree
-  - [x] ! Entity view-block
-  - [x] auto indent
-  - [x] symbol system
-    - [x] lint display
-- [x] (abort) no more is_empty
+- [ ] ! Tree Core.
+- [ ] SaveLoad.
 - [ ] Markdown-like Bubble + node -> Bubble util.
   - [ ] Dry
-- [x] more gui logic in vessel
-  - [x] update & Msg
 
-## flow_yew
-- [ ] hidable buttons
-- [x] add vm
-- [ ] swap vms
-- [x] ! mobile-view single vm (show the last one)
-- [x] completely replace and remove legacy version
+## flow-acc
+- [ ] Hidable buttons
+- [ ] More VM operations (swap)
 
-## flow_cli
-- [x] cli interface design
+## flow-cli & flow-ish
+- [ ] Cli interface design
+- [ ] Logic binding

@@ -131,7 +131,6 @@ impl Vessel {
 }
 
 /// indent & move
-// Todo: unuse purge.
 impl Vessel {
     pub fn entity_shuttle(&mut self, obj: &EntityId, dir: Direction) -> Result<EntityId, FlowError> {
         self.flow.shuttle(obj, dir)

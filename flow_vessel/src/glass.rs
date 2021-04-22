@@ -331,14 +331,4 @@ mod tests {
     fn glass_all() {
         println!("{:#?}", make_glass());
     }
-    #[test]
-    fn glass_refresh() {
-        // Todo: test glass.
-        let (_flow, _mode, _glass) = make_glass();
-    }
-    #[test]
-    fn glass_fallback() {
-        // Todo: test glass.
-        let (_flow, _mode, _glass) = make_glass();
-    }
 }
