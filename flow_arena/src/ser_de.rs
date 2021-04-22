@@ -1,9 +1,9 @@
 use std::{fmt, hash::Hash};
 use super::{FlowNode, Node, FlowArena};
 
-#[cfg(feature = "serde1")]
+#[cfg(feature = "serde_impl")]
 use serde::ser::{Serialize, Serializer, SerializeStruct};
-#[cfg(feature = "serde1")]
+#[cfg(feature = "serde_impl")]
 impl<Id, Entity> Serialize for FlowArena<Id, FlowNode<Id, Entity>> 
 where Id: Serialize + Hash + Eq + Clone, Entity: Serialize + Clone {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
@@ -15,11 +15,11 @@ where Id: Serialize + Hash + Eq + Clone, Entity: Serialize + Clone {
     }
 }
 
-#[cfg(feature = "serde1")]
+#[cfg(feature = "serde_impl")]
 use serde::de::{self, Deserialize, Deserializer, Visitor, SeqAccess, MapAccess};
-#[cfg(feature = "serde1")]
+#[cfg(feature = "serde_impl")]
 use std::marker::PhantomData;
-#[cfg(feature = "serde1")]
+#[cfg(feature = "serde_impl")]
 impl<'de, Id, Entity> Deserialize<'de> for FlowArena<Id, FlowNode<Id, Entity>> 
 where Id: Deserialize<'de> + Clone + Hash + Eq, Entity: Deserialize<'de> + Clone {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {

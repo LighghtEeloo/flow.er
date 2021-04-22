@@ -1,4 +1,4 @@
-#[cfg(feature = "serde1")]
+#[cfg(feature = "serde_impl")]
 use serde::{Serialize, Deserialize};
 
 use std::{
@@ -10,7 +10,7 @@ use std::{
 use super::*;
 
 #[derive(Clone, Default)]
-#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde_impl", derive(Serialize, Deserialize))]
 #[cfg_attr(debug_assertions, derive(PartialEq))]
 pub struct FlowNode<Id, Entity> {
     id: Id,
@@ -353,7 +353,7 @@ mod tests {
     type FlowEntity = FlowPure<EntityId>;
     type NodeEntity = FlowNode<EntityId, ()>;
     #[derive(Clone, Copy, Default, Hash, PartialEq, Eq)]
-    #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
+    #[cfg_attr(feature = "serde_impl", derive(Serialize, Deserialize))]
     struct EntityId {
         idx: u64,
     }
