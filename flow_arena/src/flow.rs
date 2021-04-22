@@ -9,7 +9,7 @@ pub trait Node<Id> {
     fn children_ref_mut(&mut self) -> &mut Vec<Id>;
 }
 
-/// no check in FlowBase
+/// provides basic node-reflection abiliy; no check
 pub trait FlowBase {
     type Id: Default + Clone + Hash + Eq;
     type Node: Default + Clone + Node<Self::Id>;
@@ -122,6 +122,7 @@ pub trait FlowBase {
     }
 }
 
+/// checks the Flow's properties and see whether they hold
 pub trait FlowCheck {
 
     fn check(&self) -> Result<(), (FlowError, String)>;
@@ -135,6 +136,16 @@ pub trait FlowCheck {
     } 
 }
 
+/// provides hashmap functionality
+pub trait FlowMap: FlowBase + FlowCheck {
+    /// inserts a node; returns err if id exists.
+    fn grow(&mut self, obj: Self::Node) -> Result<Self::Id, FlowError>;
+
+    /// removes a node; returns err if id not found under root
+    fn erase(&mut self, obj: &Self::Id) -> Result<(), FlowError>;
+}
+
+/// provides ability to link nodes; graph-ish
 pub trait FlowLink: FlowBase + FlowCheck {
     /// randomly ensures the link of a node to another
     fn link(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), FlowError> {
@@ -178,10 +189,8 @@ pub trait FlowLink: FlowBase + FlowCheck {
     }
 }
 
-pub trait FlowMaid: FlowBase + FlowLink + FlowCheck {
-    /// inserts a node; returns err if id exists.
-    fn grow(&mut self, obj: Self::Node) -> Result<Self::Id, FlowError>;
-
+/// provides ability to devote / own nodes; tree-ish
+pub trait FlowDevote: FlowBase + FlowLink + FlowCheck {
     /// appoints and ensures an owner; also links to owner
     fn devote(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), FlowError> {
         let res = self.link(obj, owner, nth).and_then(|_| {
@@ -248,12 +257,10 @@ pub trait FlowMaid: FlowBase + FlowLink + FlowCheck {
         self.decay(&obj)?;
         self.devote_push(&obj, &owner)
     }
-
-    /// removes a node; returns err if id not found under root
-    fn erase(&mut self, obj: &Self::Id) -> Result<(), FlowError>;
 }
 
-pub trait FlowDock: FlowMaid + FlowCheck + Sized {
+/// provides ability to cut (undock) and copy (snap) a flow from a node and paste it to another node (dock)
+pub trait FlowDock: FlowDevote + FlowCheck + Sized {
     /// adds all the nodes in another flow to self and mounts all orphan nodes to the designated node
     ///
     /// Err if:
@@ -319,7 +326,8 @@ impl Direction {
     }
 }
 
-pub trait FlowShift: FlowBase + FlowMaid {
+/// provides ability to move around in flow
+pub trait FlowShift: FlowBase + FlowDevote {
     /// returns the obj in the corresponding relative position
     fn shuttle(&self, obj: &Self::Id, dir: Direction) -> Result<Self::Id, FlowError> {
         use Direction::*;
@@ -437,4 +445,4 @@ pub enum FlowError {
     AbandonedChild,
 }
 
-pub trait Flow: FlowBase + FlowLink + FlowMaid + FlowDock + FlowShift {}
+pub trait Flow: FlowBase + FlowCheck + FlowMap + FlowLink + FlowDevote + FlowDock + FlowShift {}

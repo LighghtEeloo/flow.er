@@ -1,6 +1,6 @@
 use std::{collections::HashSet, fmt::Debug};
 use serde::{Serialize, Deserialize};
-use flow_arena::{Direction, FlowArena, FlowBase, FlowError, FlowMaid, FlowNode, FlowShift, Node};
+use flow_arena::{Direction, FlowArena, FlowBase, FlowError, FlowDevote, FlowMap, FlowNode, FlowShift, Node};
 
 use super::{Entity, EntityId, EntityIdFactory, Glass, Settings};
 

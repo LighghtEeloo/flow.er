@@ -270,7 +270,7 @@ impl Glass {
 
 #[cfg(test)]
 mod tests {
-    use flow_arena::{FlowMaid, FlowNode};
+    use flow_arena::{FlowMap, FlowNode};
 
     use crate::{CubeType, Entity, EntityIdFactory, Profile};
 

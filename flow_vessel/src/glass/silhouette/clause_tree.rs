@@ -1,4 +1,4 @@
-use flow_arena::{FlowBase, FlowDock, FlowMaid, Node};
+use flow_arena::{FlowBase, FlowDock, FlowMap, Node};
 
 use crate::{Cube, CubeId, CubeMeta, EntityFlow, EntityId, EntityNode, Vessel};
 

@@ -151,11 +151,7 @@ where Id: Clone + Hash + Eq + Default + Debug, FlowNode: Node<Id> + Default + De
     }
 }
 
-impl<Id, FlowNode> FlowLink for FlowArena<Id, FlowNode> 
-where Id: Clone + Hash + Eq + Default + Debug, FlowNode: Node<Id> + Default + Debug + Clone {}
-
-
-impl<Id, FlowNode> FlowMaid for FlowArena<Id, FlowNode> 
+impl<Id, FlowNode> FlowMap for FlowArena<Id, FlowNode> 
 where Id: Clone + Hash + Eq + Default + Debug, FlowNode: Node<Id> + Default + Debug + Clone {
     fn grow(&mut self, obj: Self::Node) -> Result<Self::Id, FlowError> {
         let res = if self.contains_node(obj.id()) {
@@ -185,7 +181,15 @@ where Id: Clone + Hash + Eq + Default + Debug, FlowNode: Node<Id> + Default + De
         self.check_assert();
         Ok(())
     }
-}
+} 
+
+impl<Id, FlowNode> FlowLink for FlowArena<Id, FlowNode> 
+where Id: Clone + Hash + Eq + Default + Debug, FlowNode: Node<Id> + Default + Debug + Clone {}
+
+
+impl<Id, FlowNode> FlowDevote for FlowArena<Id, FlowNode> 
+where Id: Clone + Hash + Eq + Default + Debug, FlowNode: Node<Id> + Default + Debug + Clone {}
+
 
 impl<Id, FlowNode> FlowDock for FlowArena <Id, FlowNode>
 where Id: Clone + Hash + Eq + Default + Debug, FlowNode: Node<Id> + Default + Debug + Clone {
