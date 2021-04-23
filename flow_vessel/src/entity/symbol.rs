@@ -32,7 +32,7 @@ impl Symbol {
             _ => None
         }
     }
-    
+
     fn vague_mapping(attempt: &str) -> String {
         let possibilities = [
             "New",
@@ -218,5 +218,23 @@ mod tests {
                 Lint::Dash.display(idx),
             );
         }
+    }
+    #[test]
+    fn symbol_parse() {
+        assert_eq!(Symbol::parse_vague("new"), Some(Symbol::Processing(Process::New)));
+        assert_eq!(Symbol::parse_vague("pl"), Some(Symbol::Processing(Process::Planning)));
+        assert_eq!(Symbol::parse_vague("Pen"), Some(Symbol::Processing(Process::Pending)));
+        assert_eq!(Symbol::parse_vague("mar"), Some(Symbol::Processing(Process::Marching)));
+        assert_eq!(Symbol::parse_vague("Done"), Some(Symbol::Processing(Process::Done)));
+        assert_eq!(Symbol::parse_vague("num"), Some(Symbol::Linted(Lint::Numberic)));
+        assert_eq!(Symbol::parse_vague("pr"), Some(Symbol::Linted(Lint::Programmatic)));
+        assert_eq!(Symbol::parse_vague("up"), Some(Symbol::Linted(Lint::Upper)));
+        assert_eq!(Symbol::parse_vague("Lower"), Some(Symbol::Linted(Lint::Lower)));
+        assert_eq!(Symbol::parse_vague("gr"), Some(Symbol::Linted(Lint::Greek)));
+        assert_eq!(Symbol::parse_vague("ci"), Some(Symbol::Linted(Lint::Circle)));
+        assert_eq!(Symbol::parse_vague("s"), Some(Symbol::Linted(Lint::Square)));
+        assert_eq!(Symbol::parse_vague("Dash"), Some(Symbol::Linted(Lint::Dash)));
+        assert_eq!(Symbol::parse_vague("Dashy"), None);
+        assert_eq!(Symbol::parse_vague("p"), None);
     }
 }
