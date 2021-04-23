@@ -12,12 +12,12 @@ pub use self::{
         identity::{EntityId, EntityIdFactory},
         symbol::{Symbol, Process, Lint, AlphaBet, Babel, BABEL},
         tag::{Tag, TagSet, TagSetField},
-        filter::Filter,
         {Entity, EntityField, Face, Bubble},
     },
     glass::{
         cube::{
             identity::{CubeId, CubeIdFactory},
+            filter::Filter,
             {Cube, CubeType, Profile, CubeMeta}
         },
         silhouette::*,

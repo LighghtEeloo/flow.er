@@ -1,6 +1,6 @@
 use serde::{Serialize, Deserialize};
-use super::symbol::*;
-use super::tag::*;
+
+use crate::{Symbol, Tag};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum Filter {

@@ -1,9 +1,12 @@
 use serde::{Serialize, Deserialize};
 use std::time::SystemTime;
 use flow_arena::FlowBase;
-use crate::{EntityFlow, EntityId, Filter, Router};
+use crate::{EntityFlow, EntityId, Router};
 
 pub mod identity;
+pub mod filter;
+
+use filter::Filter;
 
 /// The basic unit of view, containing minimum info for rendering. Note that all use cases are strict.
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
