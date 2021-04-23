@@ -5,8 +5,8 @@ use serde::{Serialize, Deserialize};
 use crate::{TimeRep, now};
 
 pub trait Identity: Default + Debug + Clone + Hash + PartialEq + Eq {
-    type Id: Clone;
-    fn parse(candidates: &Vec<Self::Id>, attempt: &str) -> Option<Self::Id>;
+    fn parse_match(&self, attempt: &str) -> bool;
+    fn parse_filter(candidates: &Vec<Self>, attempt: &str) -> Option<Self>;
 }
 
 const LEN: usize = 5;
@@ -49,13 +49,14 @@ impl Debug for TimeUnique {
 }
 
 impl Identity for TimeUnique {
-    type Id = TimeUnique;
+    fn parse_match(&self, attempt: &str) -> bool {
+        format!("{:x}", self.unique).starts_with(attempt)
+    }
 
-    fn parse(candidates: &Vec<Self::Id>, attempt: &str) -> Option<Self::Id> {
-        let mut candidates: Vec<Self::Id> = candidates.iter()
-            .map(|id| (id, format!("{:x}", id.unique)))
-            .filter_map(|(id, id_str)| {
-                if id_str.starts_with(attempt) {
+    fn parse_filter(candidates: &Vec<Self>, attempt: &str) -> Option<Self> {
+        let mut candidates: Vec<Self> = candidates.iter()
+            .filter_map(|id| {
+                if id.parse_match(attempt) {
                     Some(id.clone())
                 } else { None }
             })

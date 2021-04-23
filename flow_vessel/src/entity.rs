@@ -1,6 +1,6 @@
 use serde::{Serialize, Deserialize};
 
-use crate::{Filter, TimeNote};
+use crate::{Filter, Identity, TimeNote};
 use identity::*;
 use symbol::*;
 use tag::*;
@@ -58,6 +58,8 @@ impl Entity {
     pub fn pick_by(&self, filters: Vec<Filter>) -> bool {
         filters.into_iter().fold(true, |is, filter| {
             let matching = match filter {
+                Filter::Identity(id) => self.id().parse_match(&id),
+                Filter::Face(face) => self.face.contains(&face),
                 Filter::Symbol(s) => self.symbol == s,
                 Filter::Tag(t) => self.tags.contains(&t),
                 Filter::All => true
@@ -68,11 +70,13 @@ impl Entity {
 
     /// false if any filter matches
     pub fn filter_out(&self, filters: Vec<Filter>) -> bool {
-        filters.into_iter().fold(false, |is, filter| {
+        ! filters.into_iter().fold(false, |is, filter| {
             let matching = match filter {
+                Filter::Identity(id) => self.id().parse_match(&id),
+                Filter::Face(face) => self.face.contains(&face),
                 Filter::Symbol(s) => self.symbol == s,
                 Filter::Tag(t) => self.tags.contains(&t),
-                Filter::All => false
+                Filter::All => true
             };
             is || matching
         })
