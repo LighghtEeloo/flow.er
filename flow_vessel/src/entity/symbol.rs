@@ -2,7 +2,7 @@ use serde::{Serialize, Deserialize};
 
 #[derive(Clone, Copy, PartialEq, Debug, Serialize, Deserialize)]
 pub enum Symbol {
-    ProcessTracker(Process),
+    Processing(Process),
     Linted(Lint),
     // Innocent
 }
@@ -10,6 +10,58 @@ pub enum Symbol {
 impl Default for Symbol {
     fn default() -> Self {
         Symbol::Linted(Lint::default())
+    }
+}
+
+impl Symbol {
+    pub fn parse(attempt: String) -> Option<Self> {
+        match attempt.as_str() {
+            "New" => Some(Symbol::Processing(Process::New)),
+            "Planning" => Some(Symbol::Processing(Process::Planning)),
+            "Pending" => Some(Symbol::Processing(Process::Pending)),
+            "Marching" => Some(Symbol::Processing(Process::Marching)),
+            "Done" => Some(Symbol::Processing(Process::Done)),
+            "Numberic" => Some(Symbol::Linted(Lint::Numberic)),
+            "Programmatic" => Some(Symbol::Linted(Lint::Programmatic)),
+            "Upper" => Some(Symbol::Linted(Lint::Upper)),
+            "Lower" => Some(Symbol::Linted(Lint::Lower)),
+            "Greek" => Some(Symbol::Linted(Lint::Greek)),
+            "Circle" => Some(Symbol::Linted(Lint::Circle)),
+            "Square" => Some(Symbol::Linted(Lint::Square)),
+            "Dash" => Some(Symbol::Linted(Lint::Dash)),
+            _ => None
+        }
+    }
+    
+    fn vague_mapping(attempt: &str) -> String {
+        let possibilities = [
+            "New",
+            "Planning",
+            "Pending",
+            "Marching",
+            "Done",
+            "Numberic",
+            "Programmatic",
+            "Upper",
+            "Lower",
+            "Greek",
+            "Circle",
+            "Square",
+            "Dash",
+        ];
+        let candidates: Vec<String> = possibilities.iter()
+            .filter(|x| 
+                x.to_lowercase().starts_with(attempt.to_lowercase().as_str())
+            ).map(|x| format!("{}", x) ).collect();
+        if candidates.len() == 1 {
+            candidates[0].clone()
+        } else {
+            format!("")
+        }
+    }
+
+    pub fn parse_vague(attempt: &str) -> Option<Self> {
+        Self::parse(Self::vague_mapping(attempt))
     }
 }
 
