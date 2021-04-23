@@ -2,6 +2,8 @@ use std::{collections::HashSet, fmt::Debug};
 use serde::{Serialize, Deserialize};
 use flow_arena::{Direction, FlowArena, FlowBase, FlowError, FlowDevote, FlowMap, FlowNode, FlowShift, Node};
 
+use crate::Filter;
+
 use super::{Entity, EntityId, EntityIdFactory, Glass, Settings};
 
 pub type EntityNode = FlowNode<EntityId, Entity>;
@@ -61,11 +63,17 @@ impl Vessel {
     pub fn entity_ownership(&self, obj: &EntityId) -> HashSet<EntityId> {
         self.flow.node_ownership_set(obj)
     }
-    /// match all entities for vague "face" match
-    pub fn entity_face_match(&self, face: String) -> Vec<EntityId> {
-        self.flow.entities().filter_map(|x| {
-            if x.face.contains(&face) { Some(x.id().clone()) } else { None }
-        }).collect()
+    /// pick all entities with filters
+    pub fn entity_pick_by(&self, filters: &Vec<Filter>) -> Vec<EntityId> {
+        self.flow.entities().filter(|x| {
+            x.pick_by(filters)
+        }).map(|x| x.id().clone() ).collect()
+    }
+    /// filter out all entities with filters
+    pub fn entity_filter_out(&self, filters: &Vec<Filter>) -> Vec<EntityId> {
+        self.flow.entities().filter(|x| {
+            x.filter_out(filters)
+        }).map(|x| x.id().clone() ).collect()
     }
     pub fn entity(&self, id: &EntityId) -> Option<&Entity> {
         self.flow.node(id).map(|x| &x.entity)

@@ -55,12 +55,12 @@ impl Entity {
     }
 
     /// true if all filter matches
-    pub fn pick_by(&self, filters: Vec<Filter>) -> bool {
+    pub fn pick_by(&self, filters: &Vec<Filter>) -> bool {
         filters.into_iter().fold(true, |is, filter| {
             let matching = match filter {
                 Filter::Identity(id) => self.id().parse_match(&id),
-                Filter::Face(face) => self.face.contains(&face),
-                Filter::Symbol(s) => self.symbol == s,
+                Filter::Face(face) => self.face.contains(face),
+                Filter::Symbol(s) => &self.symbol == s,
                 Filter::Tag(t) => self.tags.contains(&t),
                 Filter::All => true
             };
@@ -69,12 +69,12 @@ impl Entity {
     }
 
     /// false if any filter matches
-    pub fn filter_out(&self, filters: Vec<Filter>) -> bool {
+    pub fn filter_out(&self, filters: &Vec<Filter>) -> bool {
         ! filters.into_iter().fold(false, |is, filter| {
             let matching = match filter {
                 Filter::Identity(id) => self.id().parse_match(&id),
-                Filter::Face(face) => self.face.contains(&face),
-                Filter::Symbol(s) => self.symbol == s,
+                Filter::Face(face) => self.face.contains(face),
+                Filter::Symbol(s) => &self.symbol == s,
                 Filter::Tag(t) => self.tags.contains(&t),
                 Filter::All => true
             };
