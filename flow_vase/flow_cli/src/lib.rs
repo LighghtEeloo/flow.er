@@ -8,7 +8,6 @@ pub mod matches;
 pub fn main() -> Result<(), &'static str> {
     // println!("Welcome to flow.er!");
     let matches = app::make_flow_app().get_matches();
-    // println!("{:#?}", matches.args);
     println!("{:#?}", matches.subcommand());
 
     
@@ -16,13 +15,14 @@ pub fn main() -> Result<(), &'static str> {
     let mut vessel = 
     futures::executor::block_on(f)
     .map_err(|_| "load err")?
-    // .unwrap_or(Vessel::new())
     ;
-    println!("{:#?}", vessel);
+    // println!("===> {:#?} ===>", vessel);
     
     let flower_msg = flower_arg_match(&vessel, &matches);
+    println!("Updating with: {:#?}", flower_msg);
     let mirror = flower_vessel(&mut vessel, flower_msg);
-
+    
+    // println!("<=== {:#?} <===", vessel);
     match mirror {
         Mirror::Write => {
             let f = vessel.save();
@@ -35,6 +35,7 @@ pub fn main() -> Result<(), &'static str> {
 }
 
 
+#[derive(Debug)]
 pub enum FlowerMsg {
     Tube (Tube),
     Cube {
@@ -50,6 +51,7 @@ pub enum Level {
     All, 
     Certain (usize),
     Unique,
+    NonRecursive,
 }
 
 pub enum Mirror {

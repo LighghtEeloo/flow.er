@@ -63,10 +63,18 @@ impl Vessel {
     pub fn entity_ownership(&self, obj: &EntityId) -> HashSet<EntityId> {
         self.flow.node_ownership_set(obj)
     }
-    /// pick all entities with filters
+    /// pick entities with all filters satisfied
     pub fn entity_pick_by(&self, filters: &Vec<Filter>) -> Vec<EntityId> {
         self.flow.entities().filter(|x| {
             x.pick_by(filters)
+        }).map(|x| x.id().clone() ).collect()
+    }
+    /// take entities with any filter satisfied
+    pub fn entity_match_by(&self, filters: &Vec<Filter>) -> Vec<EntityId> {
+        self.flow.entities().filter(|x| {
+            filters.iter().fold(true, |is, fil|
+                is || x.pick_by(&vec![fil.clone()])
+            )
         }).map(|x| x.id().clone() ).collect()
     }
     /// filter out all entities with filters
@@ -111,7 +119,7 @@ impl Vessel {
     fn entity_devote(&mut self, obj: EntityId, owner: EntityId, idx: usize) -> Result<(), FlowError> {
         self.flow.devote(&obj, &owner, idx)
     }
-    fn entity_grow_devote(&mut self, owner: EntityId, idx: usize) -> Result<EntityId, FlowError> {
+    pub fn entity_grow_devote(&mut self, owner: EntityId, idx: usize) -> Result<EntityId, FlowError> {
         let obj = self.entity_grow()?;
         self.entity_devote(obj, owner, idx)?;
         Ok(obj)
@@ -124,10 +132,10 @@ impl Vessel {
     }
     /// final product function: entity_add, duplicates its dude 
     /// and devotes to its owner.
-    pub fn entity_add(&mut self, dude: EntityId , owner: EntityId, idx: usize) -> Result<(), FlowError> {
+    pub fn entity_add(&mut self, dude: EntityId , owner: EntityId, idx: usize) -> Result<EntityId, FlowError> {
         let obj = self.entity_grow_devote(owner, idx)?;
         self.entity_duplicate(obj, dude);
-        Ok(())
+        Ok(obj)
     }
     /// removes entity from a flow_arena
     pub fn entity_remove(&mut self, obj: &EntityId) -> Result<(), FlowError> {

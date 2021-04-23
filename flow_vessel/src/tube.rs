@@ -24,7 +24,7 @@ pub enum Tube {
 
     // entity level
     EntityAdd {
-        dude: EntityId,
+        dude: Option<EntityId>,
         owner: EntityId,
         idx: usize
     },
@@ -73,8 +73,12 @@ impl Vessel {
             }
 
             EntityAdd { dude, owner, idx } => {
-                self.entity_add(dude, owner, idx).err()
-                    .map_or(Echo::RebuildRef, |e| Echo::FlowError (e))
+                dude.map_or(
+                    self.entity_grow_devote(owner, idx),
+                    |dude| self.entity_add(dude, owner, idx)
+                )
+                .err()
+                .map_or(Echo::RebuildRef, |e| Echo::FlowError (e))
             }
             EntityUpdate { id, field } => {
                 self.entity_mut(&id).map(|entity| {

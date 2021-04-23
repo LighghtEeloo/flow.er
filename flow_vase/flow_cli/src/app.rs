@@ -34,16 +34,65 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
             .visible_alias("exact")
             .help("The entity that you focus on")
             .takes_value(true),
-    
-            Arg::with_name("face")
-            .value_name("EntityFace")
-            .short("n")
-            .long("name")
-            .visible_alias("face")
-            .help("Set the face of entity")
-            .takes_value(true),
         ])
-        // Todo: subcommand entity.
+        .subcommands(vec! [
+            SubCommand::with_name("face")
+            .about("Update face")
+            .alias("fa")
+            .alias("f")
+            .arg(
+                Arg::with_name("face")
+                .value_name("EntityFace")
+                .index(1)
+                .help("Set the face of entity")
+                .takes_value(true),
+            ),
+            SubCommand::with_name("bubble")
+            .about("Update bubble")
+            .alias("bu")
+            .alias("b")
+            .arg(
+                Arg::with_name("bubble")
+                .value_name("EntityBubble")
+                .index(1)
+                .help("Set the bubble of entity")
+                .takes_value(true),
+            ),
+            SubCommand::with_name("symbol")
+            .about("Update symbol")
+            .alias("sy")
+            .alias("s")
+            .arg(
+                Arg::with_name("symbol")
+                .value_name("EntitySymbol")
+                .index(1)
+                .help("Set the symbol of entity")
+                .takes_value(true),
+            ),
+            SubCommand::with_name("tag")
+            .about("Update tag")
+            .alias("ta")
+            .alias("t")
+            .args(&[
+                Arg::with_name("tag")
+                .value_name("EntityTag")
+                .index(1)
+                .help("Set a tag to entity")
+                .takes_value(true),
+                Arg::with_name("add")
+                .short("a")
+                .long("add")
+                .help("Add the tag of entity"),
+                Arg::with_name("del")
+                .short("d")
+                .long("del")
+                .help("Del the tag from entity"),
+                Arg::with_name("clear")
+                .short("c")
+                .long("clear")
+                .help("Del the tag from entity"),
+            ]),
+        ])
     )
     
 
