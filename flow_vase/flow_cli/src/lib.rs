@@ -11,7 +11,6 @@ pub fn main() -> Result<(), &'static str> {
     // println!("{:#?}", matches.args);
     println!("{:#?}", matches.subcommand());
 
-    let flower_msg = flower_arg_match(&matches);
     
     let f = Vessel::load();
     let mut vessel = 
@@ -20,7 +19,8 @@ pub fn main() -> Result<(), &'static str> {
     // .unwrap_or(Vessel::new())
     ;
     println!("{:#?}", vessel);
-
+    
+    let flower_msg = flower_arg_match(&vessel, &matches);
     let mirror = flower_vessel(&mut vessel, flower_msg);
 
     match mirror {
@@ -37,8 +37,19 @@ pub fn main() -> Result<(), &'static str> {
 
 pub enum FlowerMsg {
     Tube (Tube),
-    Cube (Cube),
+    Cube {
+        cube: Cube,
+        detailed: bool,
+        level: Level,
+    },
     Noop
+}
+
+#[derive(Debug)]
+pub enum Level {
+    All, 
+    Certain (usize),
+    Unique,
 }
 
 pub enum Mirror {
@@ -53,8 +64,10 @@ fn flower_vessel(vessel: &mut Vessel, flower_msg: FlowerMsg) -> Mirror {
             vessel.update_tube(tube);
             mirror = Mirror::Write;
         }
-        FlowerMsg::Cube(cube) => {
+        FlowerMsg::Cube{ cube, detailed, level } => {
             println!("{:#?}", cube);
+            println!("{:?}", detailed);
+            println!("{:?}", level);
         }
         FlowerMsg::Noop => {
             println!("Noop.")

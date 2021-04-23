@@ -152,7 +152,9 @@ fn list_args<'a, 'b>() -> Vec<Arg<'a, 'b>> {
     vec! [
         Arg::with_name("obj")
         .value_name("EntityMatch")
-        .index(1)
+        .short("o")
+        .long("obj")
+        .visible_alias("exact")
         .help("The entity that you focus on")
         .takes_value(true),
     
@@ -162,22 +164,22 @@ fn list_args<'a, 'b>() -> Vec<Arg<'a, 'b>> {
         .long("detail")
         .help("Show all info"), 
 
-        Arg::with_name("unique")
-        .short("u")
-        .long("unique")
-        .requires("obj")
-        .help("Only show the exact obj"), 
-    
 
         Arg::with_name("recursive")
         .short("r")
         .long("recursive")
-        .help("Show all entities recursively"), 
+        .help("Show all entities recursively; priority 1"), 
 
+        Arg::with_name("unique")
+        .short("u")
+        .long("unique")
+        .requires("obj")
+        .help("Only show the exact obj; priority 2"), 
+    
         Arg::with_name("level")
         .short("l")
         .long("level")
-        .help("Show within a given depth / all if not given")
+        .help("Show within a given depth / 1 by default; priority 3")
         .takes_value(true)
         .value_name("LEVEL"),
 

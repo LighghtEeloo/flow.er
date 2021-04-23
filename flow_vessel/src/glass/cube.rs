@@ -13,7 +13,9 @@ use filter::Filter;
 pub enum CubeType {
     /// A single entity's notebook. Uses obj & ?current.
     Inkblot,
-    /// A single entity view. Uses obj & ?current.
+    /// A single entity view. Uses obj.
+    NodeView,
+    /// A recursive entity view. Uses obj & ?current.
     ClauseTree,
     /// A todo-oriented pool view. Uses ?obj and ?current.
     PromisedLand,
@@ -39,6 +41,7 @@ impl CubeType {
     pub fn type_str(&self) -> &'static str {
         match self {
             CubeType::Inkblot => "inkblot",
+            CubeType::NodeView => "node-view",
             CubeType::ClauseTree => "clause-tree",
             CubeType::PromisedLand => "promised-land",
             CubeType::FlowView => "flow-view",
@@ -111,6 +114,7 @@ impl Cube {
         use CubeType::*;
         let legal = match (self.cube_type, self.obj, self.current, self.profile.clone()) {
             (Inkblot,Some(_),_,None) |
+            (NodeView,_,None,None) |
             (ClauseTree,Some(_),_,None) |
             (PromisedLand,_,_,None) |
             (FlowView,Some(_),_,None) |
