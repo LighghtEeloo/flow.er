@@ -72,7 +72,7 @@ impl Vessel {
     /// take entities with any filter satisfied
     pub fn entity_match_by(&self, filters: &Vec<Filter>) -> Vec<EntityId> {
         self.flow.entities().filter(|x| {
-            filters.iter().fold(true, |is, fil|
+            filters.iter().fold(false, |is, fil|
                 is || x.pick_by(&vec![fil.clone()])
             )
         }).map(|x| x.id().clone() ).collect()
