@@ -14,27 +14,8 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
         .about("Operates entities")
         .alias("en")
         .alias("e")
-        .args(&[
-            Arg::with_name("filter")
-            .value_name("Filter")
-            .index(1)
-            // .required_unless("obj")
-            .short("p")
-            .long("filter")
-            .visible_alias("search")
-            .visible_alias("pattern")
-            .help("The entity that you are interested in")
-            .takes_value(true),
-    
-            Arg::with_name("obj")
-            .value_name("EntityMatch")
-            // .required_unless("filter")
-            .short("o")
-            .long("obj")
-            .visible_alias("exact")
-            .help("The entity that you focus on")
-            .takes_value(true),
-        ])
+        .args(&match_args())
+
         .subcommands(vec! [
             SubCommand::with_name("face")
             .about("Update face")
@@ -94,7 +75,25 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
             ]),
         ])
     )
-    
+    .subcommand(
+        SubCommand::with_name("node")
+        .about("Operates nodes")
+        .alias("no")
+        .alias("n")
+        .args(&match_args())
+        .subcommands(vec! [
+            SubCommand::with_name("devote")
+            .about("Devote node")
+            .alias("de")
+            .arg(
+                Arg::with_name("owner")
+                .value_name("EntityMatch")
+                .index(1)
+                .help("Set the owner of this devote")
+                .takes_value(true),
+            ),
+        ])
+    )
 
     // Todo: subcommand node.
 
@@ -243,3 +242,25 @@ fn list_args<'a, 'b>() -> Vec<Arg<'a, 'b>> {
     ]
 }
 
+fn match_args<'a, 'b>() -> Vec<Arg<'a, 'b>> {
+    vec![
+        Arg::with_name("obj")
+        .value_name("EntityMatch")
+        // .required_unless("filter")
+        .short("o")
+        .long("obj")
+        .visible_alias("exact")
+        .help("The entity that you focus on")
+        .takes_value(true),
+
+        Arg::with_name("filter")
+        .value_name("Filter")
+        // .required_unless("obj")
+        .short("p")
+        .long("filter")
+        .visible_alias("search")
+        .visible_alias("pattern")
+        .help("The entity that you are interested in")
+        .takes_value(true),
+    ]
+}
