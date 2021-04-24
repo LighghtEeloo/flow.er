@@ -72,6 +72,6 @@ Using the concept of ownership in the current graph-ish model, we yield a new ki
 The `FlowArena` is serving as the underlying data model of [flow.er](https://github.com/LighghtEeloo/flow.er), a notebook, mindmap, todo-list and agenda app. 
 
 
-
-
 [^1]: [no-more-tears-no-more-knots-arena-allocated-trees-in-rust](https://dev.to/deciduously/no-more-tears-no-more-knots-arena-allocated-trees-in-rust-44k6)
+
+

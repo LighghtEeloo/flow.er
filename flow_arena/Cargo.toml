@@ -7,6 +7,7 @@ description = "A HashMap managed Graph Model with the concept of ownership"
 readme = "README.md"
 repository = "https://github.com/LighghtEeloo/flow.er"
 license-file = "../LICENSE"
+exclude = ["./doc_sync.py"]
 keywords = ["arena", "flow", "tree", "graph", "ownership"]
 categories = ["data-structures", "accessibility"]
 
