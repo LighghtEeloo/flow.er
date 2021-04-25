@@ -4,7 +4,7 @@ use flow_vessel::{Cube, CubeType, EntityField, EntityId, Filter, Identity, Symbo
 use crate::{FlowerMsg, Level};
 
 
-pub fn flower_arg_match(vessel: &Vessel, matches: &ArgMatches) -> FlowerMsg {
+pub fn flower_sub_match(vessel: &Vessel, matches: &ArgMatches) -> FlowerMsg {
     match matches.subcommand() {
         ("entity", Some(sub_m)) => {
             entity_arg_match(vessel, sub_m)
@@ -60,7 +60,10 @@ pub fn flower_arg_match(vessel: &Vessel, matches: &ArgMatches) -> FlowerMsg {
     }
 }
 
-fn entity_arg_match(vessel: &Vessel, matches: &ArgMatches) -> FlowerMsg {
+fn entity_arg_match(
+    vessel: &Vessel, 
+    matches: &ArgMatches
+) -> FlowerMsg {
     let obj = matches.value_of("obj").map(|obj| {
         Identity::parse_filter(&vessel.entity_id_all(), obj)
     }).flatten();
@@ -92,7 +95,7 @@ fn entity_arg_match(vessel: &Vessel, matches: &ArgMatches) -> FlowerMsg {
         let obj = vague_obj.get(0)
             .cloned().or(obj);
         if let Some(obj) = obj {
-            entity_sub_arg_match(obj, matches.subcommand())
+            entity_sub_match(obj, matches.subcommand())
         } else {
             println!("No match found.");
             FlowerMsg::Noop
@@ -100,7 +103,10 @@ fn entity_arg_match(vessel: &Vessel, matches: &ArgMatches) -> FlowerMsg {
     }
 }
 
-fn entity_sub_arg_match(obj: EntityId, subcommand: (&str, Option<&ArgMatches>)) -> FlowerMsg {
+fn entity_sub_match(
+    obj: EntityId, 
+    subcommand: (&str, Option<&ArgMatches>)
+) -> FlowerMsg {
     let just_cube = FlowerMsg::Cube {
         cube: Cube::new(CubeType::NodeView).with_obj(obj),
         detailed: true,
@@ -176,6 +182,10 @@ fn entity_sub_arg_match(obj: EntityId, subcommand: (&str, Option<&ArgMatches>)) 
         _ => ()
     }
     just_cube
+}
+
+fn node_sub_match() {
+    
 }
 
 fn cube_arg_match(

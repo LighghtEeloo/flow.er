@@ -5,7 +5,7 @@ pub mod app;
 pub mod matches;
 pub mod view;
 
-use matches::flower_arg_match;
+use matches::flower_sub_match;
 use view::{flower_router_view, flower_view};
 
 pub fn main() -> Result<(), &'static str> {
@@ -21,7 +21,7 @@ pub fn main() -> Result<(), &'static str> {
     ;
     // println!("===> {:#?} ===>", vessel);
     
-    let flower_msg = flower_arg_match(&vessel, &matches);
+    let flower_msg = flower_sub_match(&vessel, &matches);
     // println!("Updating with: {:#?}", flower_msg);
     let mirror = flower_vessel(&mut vessel, flower_msg);
     // println!("Mirror: {:#?}", mirror);

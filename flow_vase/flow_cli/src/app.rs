@@ -103,7 +103,7 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
             ]),
             SubCommand::with_name("devote")
             .about("Devote node")
-            .alias("de")
+            .alias("dev")
             .args(&[
                 Arg::with_name("owner")
                 .value_name("EntityMatch")
