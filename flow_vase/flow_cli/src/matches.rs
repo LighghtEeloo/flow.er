@@ -191,6 +191,11 @@ fn node_sub_match(
     vessel: &Vessel, 
     subcommand: (&str, Option<&ArgMatches>)
 ) -> FlowerMsg {
+    let just_cube = FlowerMsg::Cube {
+        cube: Cube::new(CubeType::NodeView).with_obj(obj),
+        detailed: true,
+        level: Level::Unique
+    };
     match subcommand {
         ("link", Some(sub_m)) => {
             let owner = obj_arg_match("owner", vessel, sub_m);
@@ -225,8 +230,7 @@ fn node_sub_match(
             }
         }
         _ => {
-            println!("No match found.");
-            FlowerMsg::Noop
+            just_cube
         }
     }
 }

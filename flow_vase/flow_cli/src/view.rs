@@ -52,14 +52,11 @@ impl CubeView for NodeViewCore {
         let to_display = |obj: &EntityId, indent: usize| -> String {
             self.entity_map.get(obj).map_or(String::new(), |(own, en)| {
                 let indent = " ".repeat(4 * indent);
-                format!("{}{:?} {}", 
+                format!("{}{}{:?} {}", 
                     indent, 
+                    if let Own::No = own { "* " } else { "" },
                     obj, 
-                    if let Own::Yes = own { 
-                        en.face.clone() 
-                    } else { 
-                        format!("({})", en.face) 
-                    } 
+                    en.face.clone() 
                 )
             })
         };

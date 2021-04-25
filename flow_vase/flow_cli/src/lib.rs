@@ -37,7 +37,7 @@ pub fn main() -> Result<(), &'static str> {
                 flower_router_view(&vessel)?
             }
         };
-    println!("{}.", output);
+    println!("{}", output);
     
     // println!("<=== {:#?} <===", vessel);
     match mirror {
