@@ -96,7 +96,7 @@ fn entity_sub_match(
     match subcommand {
         ("face", Some(sub_m)) => {
             if let Some(face) = sub_m.value_of("face") {
-                return FlowerMsg::Tube(
+                return FlowerMsg::Tube (
                     Tube::EntityUpdate {
                         id: obj,
                         field: EntityField::Face(face.into())
@@ -106,7 +106,7 @@ fn entity_sub_match(
         }
         ("bubble", Some(sub_m)) => {
             if let Some(bubble) = sub_m.value_of("bubble") {
-                return FlowerMsg::Tube(
+                return FlowerMsg::Tube (
                     Tube::EntityUpdate {
                         id: obj,
                         field: EntityField::Bubble(bubble.into())
@@ -117,7 +117,7 @@ fn entity_sub_match(
         ("symbol", Some(sub_m)) => {
             if let Some(symbol) = sub_m.value_of("symbol") {
                 if let Some(symbol) = Symbol::parse_vague(symbol) {
-                    return FlowerMsg::Tube(
+                    return FlowerMsg::Tube (
                         Tube::EntityUpdate {
                             id: obj,
                             field: EntityField::Symbol(symbol)
@@ -129,7 +129,7 @@ fn entity_sub_match(
         ("tag", Some(sub_m)) => {
             if let Some(tag) = sub_m.value_of("tag") {
                 if sub_m.is_present("add") {
-                    return FlowerMsg::Tube(
+                    return FlowerMsg::Tube (
                         Tube::EntityUpdate {
                             id: obj,
                             field: EntityField::TagSet(
@@ -139,7 +139,7 @@ fn entity_sub_match(
                     ) 
                 } else 
                 if sub_m.is_present("del") {
-                    return FlowerMsg::Tube(
+                    return FlowerMsg::Tube (
                         Tube::EntityUpdate {
                             id: obj,
                             field: EntityField::TagSet(
@@ -149,7 +149,7 @@ fn entity_sub_match(
                     ) 
                 } else
                 if sub_m.is_present("clear") {
-                    return FlowerMsg::Tube(
+                    return FlowerMsg::Tube (
                         Tube::EntityUpdate {
                             id: obj,
                             field: EntityField::TagSet(
@@ -176,7 +176,7 @@ fn node_arg_match(
     } else {
         match matches.subcommand() {
             ("grow", _) => {
-                FlowerMsg::Tube(Tube::EntityGrow)
+                FlowerMsg::Tube (Tube::EntityGrow)
             }
             _ => {
                 println!("No match found.");
@@ -196,8 +196,24 @@ fn node_sub_match(
             let owner = obj_arg_match("owner", vessel, sub_m);
             let nth = sub_m.value_of("nth").map(|s| s.parse().unwrap_or_default()).unwrap_or_default();
             if let Some(owner) = owner {
-                FlowerMsg::Tube(
+                FlowerMsg::Tube (
                     Tube::EntityLink {
+                        obj,
+                        owner,
+                        nth,
+                    }
+                )
+            } else {
+                println!("No match found.");
+                FlowerMsg::Noop
+            }
+        }
+        ("devote", Some(sub_m)) => {
+            let owner = obj_arg_match("owner", vessel, sub_m);
+            let nth = sub_m.value_of("nth").map(|s| s.parse().unwrap_or_default()).unwrap_or_default();
+            if let Some(owner) = owner {
+                FlowerMsg::Tube (
+                    Tube::EntityDevote {
                         obj,
                         owner,
                         nth,
