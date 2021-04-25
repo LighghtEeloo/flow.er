@@ -14,7 +14,7 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
         .about("Operates entities")
         .alias("en")
         .alias("e")
-        .args(&entity_match_args())
+        .args(&entity_match_arg())
 
         .subcommands(vec! [
             SubCommand::with_name("face")
@@ -73,6 +73,28 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
                 .long("clear")
                 .help("Del the tag from entity"),
             ]),
+            SubCommand::with_name("filter")
+            .about("Sift the entities by filters")
+            .alias("f")
+            .visible_alias("search")
+            .visible_alias("pattern")
+            .args(&[
+                Arg::with_name("arbitary")
+                .index(1)
+                .help("Arbitary filter options"),
+                Arg::with_name("identity")
+                .short("i")
+                .help("Identity filter option"),
+                Arg::with_name("face")
+                .short("f")
+                .help("Face filter option"),
+                Arg::with_name("symbol")
+                .short("s")
+                .help("Symbol filter option"),
+                Arg::with_name("tag")
+                .short("t")
+                .help("Tag filter option"),
+            ]),
         ])
     )
 
@@ -81,7 +103,7 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
         .about("Operates nodes")
         .alias("no")
         .alias("n")
-        .args(&entity_match_args())
+        .args(&entity_match_arg())
         .subcommands(vec! [
             SubCommand::with_name("grow")
             .about("Grow node")
@@ -232,6 +254,8 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
         ])
     )
 
+    // Todo: cube subcommands.
+
     .subcommand(
         SubCommand::with_name("config")
         .about("Capture the exact moment of flow")
@@ -280,37 +304,16 @@ fn list_args<'a, 'b>() -> Vec<Arg<'a, 'b>> {
         .help("Show within a given depth / 1 by default; priority 3")
         .takes_value(true)
         .value_name("LEVEL"),
-
-
-        Arg::with_name("filter")
-        .short("f")
-        .long("filter")
-        .visible_alias("search")
-        .visible_alias("pattern")
-        .takes_value(true)
-        .help("Sift the entities by filters"),
     ]
 }
 
-fn entity_match_args<'a, 'b>() -> Vec<Arg<'a, 'b>> {
+fn entity_match_arg<'a, 'b>() -> Vec<Arg<'a, 'b>> {
     vec![
         Arg::with_name("obj")
         .value_name("EntityMatch")
-        // .required_unless("filter")
-        .short("o")
-        .long("obj")
+        .index(1)
         .visible_alias("exact")
         .help("The entity that you focus on")
-        .takes_value(true),
-
-        Arg::with_name("filter")
-        .value_name("Filter")
-        // .required_unless("obj")
-        .short("p")
-        .long("filter")
-        .visible_alias("search")
-        .visible_alias("pattern")
-        .help("The entity that you are interested in")
         .takes_value(true),
     ]
 }

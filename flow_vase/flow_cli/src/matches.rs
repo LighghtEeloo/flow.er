@@ -9,8 +9,8 @@ pub fn flower_sub_match(vessel: &Vessel, matches: &ArgMatches) -> FlowerMsg {
         ("entity", Some(sub_m)) => {
             entity_arg_match(vessel, sub_m)
         }
-        ("node", Some(_)) => {
-            FlowerMsg::Noop
+        ("node", Some(sub_m)) => {
+            node_arg_match(vessel, sub_m)
         }
         ("list", Some(sub_m)) => {
             cube_arg_match(
@@ -60,46 +60,27 @@ pub fn flower_sub_match(vessel: &Vessel, matches: &ArgMatches) -> FlowerMsg {
     }
 }
 
+fn obj_arg_match(
+    name: &str,
+    vessel: &Vessel, 
+    matches: &ArgMatches
+) -> Option<EntityId> {
+    matches.value_of(name).map(|obj| {
+        Identity::parse_filter(&vessel.entity_id_all(), obj)
+    }).flatten()
+}
+
 fn entity_arg_match(
     vessel: &Vessel, 
     matches: &ArgMatches
 ) -> FlowerMsg {
-    let obj = matches.value_of("obj").map(|obj| {
-        Identity::parse_filter(&vessel.entity_id_all(), obj)
-    }).flatten();
-    let mut filters = Vec::new();
-    let vague_obj = if obj.is_none() {
-        if let Some(fil) = matches.value_of("filter") {
-            filters.push(Filter::Identity(fil.into()));
-            filters.push(Filter::Face(fil.into()));
-            if let Some(symbol) = Symbol::parse_vague(fil) {
-                filters.push(Filter::Symbol(symbol));
-            }
-            filters.push(Filter::Tag(fil.into()));
-        }
-        vessel.entity_match_by(&filters)
-    } else {
-        Vec::new()
-    };
+    let obj = obj_arg_match("obj", vessel, matches);
 
-    if vague_obj.len() > 1 {
-        println!("Multiple matches found:");
-        let mut cube = Cube::new(CubeType::NodeView);
-        cube.filters = filters;
-        FlowerMsg::Cube {
-            cube,
-            detailed: false,
-            level: Level::All
-        }
+    if let Some(obj) = obj {
+        entity_sub_match(obj, matches.subcommand())
     } else {
-        let obj = vague_obj.get(0)
-            .cloned().or(obj);
-        if let Some(obj) = obj {
-            entity_sub_match(obj, matches.subcommand())
-        } else {
-            println!("No match found.");
-            FlowerMsg::Noop
-        }
+        println!("No match found.");
+        FlowerMsg::Noop
     }
 }
 
@@ -184,8 +165,54 @@ fn entity_sub_match(
     just_cube
 }
 
-fn node_sub_match() {
-    
+fn node_arg_match(
+    vessel: &Vessel, 
+    matches: &ArgMatches
+) -> FlowerMsg {
+    let obj = obj_arg_match("obj", vessel, matches);
+
+    if let Some(obj) = obj {
+        node_sub_match(obj, vessel, matches.subcommand())
+    } else {
+        match matches.subcommand() {
+            ("grow", _) => {
+                FlowerMsg::Tube(Tube::EntityGrow)
+            }
+            _ => {
+                println!("No match found.");
+                FlowerMsg::Noop
+            }
+        }
+    }
+}
+
+fn node_sub_match(
+    obj: EntityId, 
+    vessel: &Vessel, 
+    subcommand: (&str, Option<&ArgMatches>)
+) -> FlowerMsg {
+    match subcommand {
+        ("link", Some(sub_m)) => {
+            let owner = obj_arg_match("owner", vessel, sub_m);
+            let nth = sub_m.value_of("nth").map(|s| s.parse().unwrap_or_default()).unwrap_or_default();
+            if let Some(owner) = owner {
+                FlowerMsg::Tube(
+                    Tube::EntityLink {
+                        obj,
+                        owner,
+                        nth,
+                    }
+                )
+            } else {
+                println!("No match found.");
+                FlowerMsg::Noop
+            }
+        }
+        _ => {
+            println!("No match found.");
+            FlowerMsg::Noop
+        }
+    }
 }
 
 fn cube_arg_match(

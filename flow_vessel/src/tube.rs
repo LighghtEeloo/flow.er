@@ -39,6 +39,24 @@ pub enum Tube {
         id: EntityId,
         dir: Direction
     },
+    // detailed
+    EntityGrow,
+    EntityLink {
+        obj: EntityId,
+        owner: EntityId,
+        nth: usize
+    },
+    EntityDevote {
+        obj: EntityId,
+        owner: EntityId,
+        nth: usize
+    },
+    EntityDecay {
+        obj: EntityId,
+    },
+    EntityErase {
+        obj: EntityId,
+    },
 }
 
 /// Echo implies the side-effect after the Tube update.
@@ -46,6 +64,7 @@ pub enum Echo {
     RebuildVM,
     RebuildRef,
     FlowError (FlowError),
+    SendObj (EntityId),
     Standby
 }
 
@@ -87,12 +106,53 @@ impl Vessel {
                 Echo::RebuildRef
             }
             EntityDelete { id } => {
-                self.entity_remove(&id).err()
-                    .map_or(Echo::RebuildRef, |e| Echo::FlowError (e))
+                self.entity_remove(id)
+                .map_or_else(
+                    |e| Echo::FlowError (e),
+                    |_| { Echo::RebuildRef }
+                )
             }
             EntityMigrate { id, dir } => {
-                self.entity_migrate(&id, dir).err()
-                    .map_or(Echo::RebuildRef, |e| Echo::FlowError (e))
+                self.entity_migrate(&id, dir)
+                .map_or_else(
+                    |e| Echo::FlowError (e),
+                    |_| { Echo::RebuildRef }
+                )
+            }
+            EntityGrow => {
+                let obj = self.entity_grow();
+                obj.map_or_else( 
+                    |e| Echo::FlowError (e), 
+                    |id| Echo::SendObj (id)
+                )
+            }
+            EntityLink { obj, owner, nth } => {
+                let obj = self.entity_link(obj, owner, nth);
+                obj.map_or_else( 
+                    |e| Echo::FlowError (e), 
+                    |_| Echo::RebuildRef
+                )
+            }
+            EntityDevote { obj, owner, nth } => {
+                let obj = self.entity_devote(obj, owner, nth);
+                obj.map_or_else( 
+                    |e| Echo::FlowError (e), 
+                    |_| Echo::RebuildRef
+                )
+            }
+            EntityDecay { obj } => {
+                let obj = self.entity_decay(obj);
+                obj.map_or_else( 
+                    |e| Echo::FlowError (e), 
+                    |_| Echo::RebuildRef
+                )
+            }
+            EntityErase { obj } => {
+                let obj = self.entity_erase(obj);
+                obj.map_or_else( 
+                    |e| Echo::FlowError (e), 
+                    |_| Echo::RebuildRef
+                )
             }
         }
     }

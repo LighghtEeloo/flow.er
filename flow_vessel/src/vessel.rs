@@ -1,6 +1,6 @@
 use std::{collections::HashSet, fmt::Debug};
 use serde::{Serialize, Deserialize};
-use flow_arena::{Direction, FlowArena, FlowBase, FlowError, FlowDevote, FlowMap, FlowNode, FlowShift, Node};
+use flow_arena::{Direction, FlowArena, FlowBase, FlowDevote, FlowError, FlowLink, FlowMap, FlowNode, FlowShift, Node};
 
 use crate::Filter;
 
@@ -116,7 +116,10 @@ impl Vessel {
     //     }
     //     self.entity_mut(id).expect("contains key")
     // }
-    fn entity_devote(&mut self, obj: EntityId, owner: EntityId, idx: usize) -> Result<(), FlowError> {
+    pub fn entity_link(&mut self, obj: EntityId, owner: EntityId, idx: usize) -> Result<(), FlowError> {
+        self.flow.link(&obj, &owner, idx)
+    }
+    pub fn entity_devote(&mut self, obj: EntityId, owner: EntityId, idx: usize) -> Result<(), FlowError> {
         self.flow.devote(&obj, &owner, idx)
     }
     pub fn entity_grow_devote(&mut self, owner: EntityId, idx: usize) -> Result<EntityId, FlowError> {
@@ -137,10 +140,18 @@ impl Vessel {
         self.entity_duplicate(obj, dude);
         Ok(obj)
     }
-    /// removes entity from a flow_arena
-    pub fn entity_remove(&mut self, obj: &EntityId) -> Result<(), FlowError> {
+    pub fn entity_decay(&mut self, obj: EntityId) -> Result<(), FlowError> {
         self.flow.decay(&obj)?;
-        self.flow.erase(obj)?;
+        Ok(())
+    }
+    pub fn entity_erase(&mut self, obj: EntityId) -> Result<(), FlowError> {
+        self.flow.erase(&obj)?;
+        Ok(())
+    }
+    /// removes entity from a flow_arena
+    pub fn entity_remove(&mut self, obj: EntityId) -> Result<(), FlowError> {
+        self.flow.decay(&obj)?;
+        self.flow.erase(&obj)?;
         self.glass_refresh();
         Ok(())
     }
@@ -254,7 +265,7 @@ mod tests {
         //          `-------`-> id4
         vessel.entity_mut(&id[0]).map(|entity| entity.face = format!("Aloha!"));
         vessel.entity_mut(&id[1]).map(|entity| entity.face = format!("Bobi."));
-        vessel.entity_remove(&id[0])?;
+        vessel.entity_remove(id[0])?;
         println!("{:#?}", vessel);
         Ok(())
     }
@@ -344,7 +355,7 @@ mod tests {
                 match obj {
                     Some(obj) => {
                         println!("Erase. {:?} ", obj);
-                        vessel.entity_remove(&obj)?;
+                        vessel.entity_remove(obj)?;
                         id.remove(idx.unwrap());
                     }
                     _ => ()
