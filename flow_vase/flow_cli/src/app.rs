@@ -165,6 +165,7 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
     .subcommand(
         SubCommand::with_name("list")
         .about("Briefly show the orphan entities")
+        .alias("peek")
         .alias("li")
         .alias("l")
         .args(&list_args())
@@ -274,8 +275,7 @@ fn list_args<'a, 'b>() -> Vec<Arg<'a, 'b>> {
     vec! [
         Arg::with_name("obj")
         .value_name("EntityMatch")
-        .short("o")
-        .long("obj")
+        .index(1)
         .visible_alias("exact")
         .help("The entity that you focus on")
         .takes_value(true),
