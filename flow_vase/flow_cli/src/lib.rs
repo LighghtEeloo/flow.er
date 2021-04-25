@@ -1,5 +1,5 @@
 use flow_vessel::{Vessel};
-use flow_vessel::{Cube, Tube, CubeMeta, CubeId};
+use flow_vessel::{Cube, CubeType, CubeMeta, CubeId, Tube};
 
 pub mod app;
 pub mod matches;
@@ -34,7 +34,8 @@ pub fn main() -> Result<(), &'static str> {
                 )
             }
             _ => {
-                flower_router_view(&vessel)?
+                // flower_router_view(&vessel)?
+                format!("")
             }
         };
     println!("{}", output);
@@ -101,7 +102,12 @@ fn flower_vessel(vessel: &mut Vessel, flower_msg: FlowerMsg) -> Mirror {
         }
         FlowerMsg::Noop => {
             println!("Noop.");
-            Mirror::DisplayAll
+            // Mirror::DisplayAll
+            Mirror::Display {
+                cube: Cube::new(CubeType::NodeView),
+                detailed: false,
+                level: Level::Certain(1),
+            }
         }
     }
 }
