@@ -125,33 +125,44 @@ impl Default for Glass {
 
 /// cube-based operations
 impl Glass {
-    fn locate_cube_id(&self, meta: CubeMeta) -> Option<CubeId> {
+    pub fn get_cube(&self, id: CubeId) -> Option<Cube> {
+        self.cube_map.get(&id).cloned()
+    }
+    pub fn locate_cube_meta(&self, id: CubeId) -> Vec<CubeMeta> {
+        self.router_map.iter().filter_map(|(&router, vec)| {
+            vec.iter().position(|x| x == &id)
+            .map(|idx| CubeMeta {
+                router,
+                idx
+            })
+        }).collect()
+    }
+    fn visit_for_cube_id(&self, meta: CubeMeta) -> Option<CubeId> {
         self.router_map.get(&meta.router)
         .map(|vec| vec.get(meta.idx))
         .flatten().cloned()
     }
-    pub fn locate_cube(&self, meta: CubeMeta) -> Option<Cube> {
-        let id = self.locate_cube_id(meta);
+    pub fn visit_for_cube(&self, meta: CubeMeta) -> Option<Cube> {
+        let id = self.visit_for_cube_id(meta);
         id.map(|id| 
             self.cube_map.get(&id)
         ).flatten().cloned()
     }
-    pub fn get_cube(&self, id: CubeId) -> Option<Cube> {
-        self.cube_map.get(&id).cloned()
-    }
     pub fn show_router_cubes(&self) -> Vec<(CubeMeta, CubeId, Cube)> {
+        self.show_cubes(self.router)
+    }
+    pub fn show_cubes(&self, router: Router) -> Vec<(CubeMeta, CubeId, Cube)> {
         let vec = 
             self.router_map
-            .get(&self.router).cloned()
+            .get(&router).cloned()
             .unwrap_or_default();
         vec.into_iter()
         .filter_map(|id| 
             self.cube_map.get(&id).cloned().map(|c| (id, c))
         ).enumerate().map(|(idx, (id, cube))| 
-            (CubeMeta { router: self.router, idx }, id , cube)
+            (CubeMeta { router: router, idx }, id , cube)
         ).collect()
     }
-
     pub fn add_cube(&mut self, cube: Cube) -> CubeId {
         let id = self.factory.rotate_id();
         self.cube_map.insert(id, cube);

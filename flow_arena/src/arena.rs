@@ -9,9 +9,8 @@ use std::{
 
 use super::*;
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, PartialEq)]
 #[cfg_attr(feature = "serde_impl", derive(Serialize, Deserialize))]
-#[cfg_attr(debug_assertions, derive(PartialEq))]
 pub struct FlowNode<Id, Entity> {
     id: Id,
     pub entity: Entity,
@@ -73,8 +72,7 @@ where Id: Clone {
 }
 
 
-#[derive(Clone)]
-#[cfg_attr(debug_assertions, derive(PartialEq, Debug))]
+#[derive(Clone, PartialEq, Debug)]
 pub struct FlowArena<Id: Hash + Eq + Clone, FlowNode: Node<Id> + Clone> {
     pub(crate) node_map: HashMap<Id, FlowNode>,
 }

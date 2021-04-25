@@ -187,7 +187,7 @@ impl Cube {
 
 
 /// generated on site; isn't contained in a Vec<Cube>
-#[derive(Debug, Clone, Copy)]
+#[derive(Default, Debug, Clone, Copy)]
 pub struct CubeMeta {
     pub router: Router,
     pub idx: usize,
@@ -218,4 +218,6 @@ mod tests {
         cube.set_obj(entitys[2].id().clone());
         println!("{:#?}", cube.obj);
     }
+
+
 }

@@ -5,14 +5,13 @@ use crate::{Cube, CubeId, CubeMeta, EntityFlow, EntityId, EntityNode, Vessel};
 #[derive(Clone)]
 pub struct ClauseTreeCore {
     pub cube_id: CubeId,
-    pub meta: CubeMeta,
     pub head: EntityId,
     pub current: Option<EntityId>,
     pub flow: EntityFlow,
 }
 
 impl ClauseTreeCore {
-    pub fn from_router_cube(vessel: &Vessel, (meta, cube_id, cube): (CubeMeta, CubeId, Cube)) -> Option<Self> {
+    pub fn from_router_cube(vessel: &Vessel, (_, cube_id, cube): (CubeMeta, CubeId, Cube)) -> Option<Self> {
         let head = cube.obj?;
         let current = cube.current;
         let (mut flow, vec) = vessel.flow.snap_owned(&head).ok()?;
@@ -21,7 +20,6 @@ impl ClauseTreeCore {
         flow.grow(node).ok()?;
         Some ( Self {
             cube_id,
-            meta,
             head,
             current,
             flow,

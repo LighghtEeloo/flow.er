@@ -176,6 +176,12 @@ mod tests {
                 let meta = CubeMeta { router: Router::Workspace, idx: 1 };
                 vessel.glass.place_cube(promised_land, meta).expect("place_cube failed");
             }
+            {
+                let node_view = Cube::new(CubeType::NodeView);
+                let node_view = vessel.glass.add_cube(node_view);
+                let meta = CubeMeta { router: Router::Workspace, idx: 2 };
+                vessel.glass.place_cube(node_view, meta).expect("place_cube failed");
+            }
             println!("{:#?}", vessel);
             let f = vessel.save();
             futures::executor::block_on(f).map_err(|_| "save err")?;

@@ -1,14 +1,17 @@
 use flow_vessel::{Vessel};
-use flow_vessel::{Cube, Tube};
-use matches::flower_arg_match;
+use flow_vessel::{Cube, Tube, CubeMeta, CubeId};
 
 pub mod app;
 pub mod matches;
+pub mod view;
+
+use matches::flower_arg_match;
+use view::{flower_router_view, flower_view};
 
 pub fn main() -> Result<(), &'static str> {
     // println!("Welcome to flow.er!");
     let matches = app::make_flow_app().get_matches();
-    println!("{:#?}", matches.subcommand());
+    // println!("SubCommand: {:#?}", matches.subcommand());
 
     
     let f = Vessel::load();
@@ -19,8 +22,22 @@ pub fn main() -> Result<(), &'static str> {
     // println!("===> {:#?} ===>", vessel);
     
     let flower_msg = flower_arg_match(&vessel, &matches);
-    println!("Updating with: {:#?}", flower_msg);
+    // println!("Updating with: {:#?}", flower_msg);
     let mirror = flower_vessel(&mut vessel, flower_msg);
+    // println!("Mirror: {:#?}", mirror);
+    let output = 
+        match mirror.clone() {
+            Mirror::Display { cube, .. } => {
+                format!(
+                    "=======\n\n{}\n\n=======",
+                    flower_view(cube, CubeMeta::default(), CubeId::default(), &vessel)?
+                )
+            }
+            _ => {
+                flower_router_view(&vessel)?
+            }
+        };
+    println!("{}.", output);
     
     // println!("<=== {:#?} <===", vessel);
     match mirror {
@@ -46,7 +63,7 @@ pub enum FlowerMsg {
     Noop
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Level {
     All, 
     Certain (usize),
@@ -54,28 +71,39 @@ pub enum Level {
     NonRecursive,
 }
 
+#[derive(Debug, Clone)]
 pub enum Mirror {
+    Display {
+        cube: Cube,
+        detailed: bool,
+        level: Level
+    },
+    DisplayAll,
     Write,
     Stay
 }
 
 fn flower_vessel(vessel: &mut Vessel, flower_msg: FlowerMsg) -> Mirror {
-    let mut mirror = Mirror::Stay;
     match flower_msg {
         FlowerMsg::Tube(tube) => {
             vessel.update_tube(tube);
-            mirror = Mirror::Write;
+            Mirror::Write
         }
         FlowerMsg::Cube{ cube, detailed, level } => {
-            println!("{:#?}", cube);
-            println!("{:?}", detailed);
-            println!("{:?}", level);
+            // println!("{:#?}", cube);
+            // println!("{:?}", detailed);
+            // println!("{:?}", level);
+            Mirror::Display {
+                cube, 
+                detailed, 
+                level
+            }
         }
         FlowerMsg::Noop => {
-            println!("Noop.")
+            println!("Noop.");
+            Mirror::DisplayAll
         }
     }
-    mirror
 }
 
 #[cfg(test)]
