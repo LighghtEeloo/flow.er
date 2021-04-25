@@ -63,6 +63,14 @@ impl Identity for TimeUnique {
             .collect();
         if candidates.len() == 1 {
             candidates.pop()
+        } else 
+        if let Some(id) 
+            = candidates.iter()
+            .find(|id| { 
+                format!("{:x}", id.unique).eq(attempt) 
+            })
+        {
+            Some(id.clone())
         } else {
             None
         }
