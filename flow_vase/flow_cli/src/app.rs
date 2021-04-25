@@ -1,4 +1,4 @@
-use clap::{App, AppSettings, Arg, SubCommand};
+use clap::{App, Arg, SubCommand};
 
 pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
     let app = App::new("~~ flow.er ~~")
@@ -6,7 +6,7 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
     .about("\n~~ drifting in the flow ~~\n")
     // .author("<LighghtEeloo>")
     .settings(&[
-        AppSettings::ArgRequiredElseHelp
+        // clap::AppSettings::ArgRequiredElseHelp
     ])
 
     .subcommand(
@@ -14,7 +14,7 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
         .about("Operates entities")
         .alias("en")
         .alias("e")
-        .args(&match_args())
+        .args(&entity_match_args())
 
         .subcommands(vec! [
             SubCommand::with_name("face")
@@ -75,27 +75,70 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
             ]),
         ])
     )
+
     .subcommand(
         SubCommand::with_name("node")
         .about("Operates nodes")
         .alias("no")
         .alias("n")
-        .args(&match_args())
+        .args(&entity_match_args())
         .subcommands(vec! [
+            SubCommand::with_name("grow")
+            .about("Grow node")
+            .alias("gr"),
+            SubCommand::with_name("link")
+            .about("Link node")
+            .alias("li")
+            .args(&[
+                Arg::with_name("owner")
+                .value_name("EntityMatch")
+                .index(1)
+                .help("Set the owner of this link")
+                .takes_value(true),
+                Arg::with_name("nth")
+                .value_name("Index")
+                .index(2)
+                .help("Set the owner index of this link")
+                .takes_value(true),
+            ]),
             SubCommand::with_name("devote")
             .about("Devote node")
             .alias("de")
-            .arg(
+            .args(&[
                 Arg::with_name("owner")
                 .value_name("EntityMatch")
                 .index(1)
                 .help("Set the owner of this devote")
                 .takes_value(true),
-            ),
+                Arg::with_name("nth")
+                .value_name("Index")
+                .index(2)
+                .help("Set the owner index of this link")
+                .takes_value(true),
+            ]),
+            SubCommand::with_name("decay")
+            .about("Decay node")
+            .alias("dec")
+            .args(&[
+                Arg::with_name("obj")
+                .value_name("EntityMatch")
+                .index(1)
+                .help("Set the obj to be decayed")
+                .takes_value(true),
+            ]),
+            SubCommand::with_name("erase")
+            .about("Erase node")
+            .alias("er")
+            .args(&[
+                Arg::with_name("obj")
+                .value_name("EntityMatch")
+                .index(1)
+                .help("Set the obj to be erased")
+                .takes_value(true),
+            ]),
+            // Todo: subcommand node: add & del.
         ])
     )
-
-    // Todo: subcommand node.
 
     .subcommand(
         SubCommand::with_name("list")
@@ -104,6 +147,7 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
         .alias("l")
         .args(&list_args())
     )
+
     .subcommand(
         SubCommand::with_name("flow")
         .about("Show the entities in flow")
@@ -116,6 +160,7 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
             .help("List node relationship without graphically expanding"),
         ])
     )
+
     .subcommand(
         SubCommand::with_name("clause")
         .about("Show the entities in clause tree")
@@ -128,6 +173,7 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
             .help("Flatten all indentions"),
         ])
     )
+
     .subcommand(
         SubCommand::with_name("promised")
         .about("Show the entities in promised land")
@@ -142,6 +188,7 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
             .help("Flatten all indentions"),
         ])
     )
+
     .subcommand(
         SubCommand::with_name("agenda")
         .about("Show the entities in agenda")
@@ -156,6 +203,7 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
             .help("Focus on a date"),
         ])
     )
+
     .subcommand(
         SubCommand::with_name("capture")
         .about("Capture the exact moment of flow")
@@ -163,6 +211,7 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
         .visible_alias("snap")
         .alias("sn")
     )
+
     .subcommand(
         SubCommand::with_name("revert")
         .about("Travel back and reverts your current flow")
@@ -182,6 +231,7 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
             .help("Revert to a version"),
         ])
     )
+
     .subcommand(
         SubCommand::with_name("config")
         .about("Capture the exact moment of flow")
@@ -192,8 +242,8 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
             // Todo: Settings.
         ])
     )
-    ;
-    app
+
+    ; app
 }
 
 fn list_args<'a, 'b>() -> Vec<Arg<'a, 'b>> {
@@ -242,7 +292,7 @@ fn list_args<'a, 'b>() -> Vec<Arg<'a, 'b>> {
     ]
 }
 
-fn match_args<'a, 'b>() -> Vec<Arg<'a, 'b>> {
+fn entity_match_args<'a, 'b>() -> Vec<Arg<'a, 'b>> {
     vec![
         Arg::with_name("obj")
         .value_name("EntityMatch")
