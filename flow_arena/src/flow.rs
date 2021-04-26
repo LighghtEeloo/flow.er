@@ -345,6 +345,12 @@ pub trait FlowDock: FlowDevote + FlowCheck + Sized {
     ) -> Result<(Self, Vec<Self::Id>), FlowError>;
 }
 
+/// Direction under FlowView:
+///
+/// - Forward - Down
+/// - Backward - Up
+/// - Ascend - Left
+/// - Descend - Right
 #[derive(Debug, Copy, Clone)]
 pub enum Direction {
     Forward,
@@ -354,6 +360,7 @@ pub enum Direction {
 }
 
 impl Direction {
+    /// shift isize according to dir
     fn shift(&self) -> isize {
         use Direction::*;
         match self {
@@ -412,6 +419,8 @@ pub trait FlowShift: FlowBase + FlowDevote {
             }
         }
     }
+
+    /// iteratively shuttles within the flow
     fn shuttle_iter(
         &self,
         obj: &Self::Id,
@@ -488,6 +497,7 @@ pub trait FlowShift: FlowBase + FlowDevote {
     }
 }
 
+/// Represents all possible Errors in Flow Operations
 #[derive(Debug)]
 pub enum FlowError {
     NotExistObj,
@@ -510,6 +520,7 @@ pub enum FlowError {
     AbandonedChild,
 }
 
+/// The overall `Flow` trait, checking whether anything is missing.
 pub trait Flow:
     FlowBase + FlowCheck + FlowMap + FlowLink + FlowDevote + FlowDock + FlowShift
 {
