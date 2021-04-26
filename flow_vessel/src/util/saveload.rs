@@ -81,7 +81,8 @@ impl Vessel {
         }
 
         // This is a simple way to save at most once every couple seconds
-        async_std::task::sleep(std::time::Duration::from_secs(2)).await;
+        // Todo: But it's annoying >_<.
+        // async_std::task::sleep(std::time::Duration::from_secs(2)).await;
 
         Ok(())
     }

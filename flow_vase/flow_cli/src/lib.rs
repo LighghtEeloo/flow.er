@@ -6,7 +6,8 @@ pub mod matches;
 pub mod view;
 
 use matches::flower_sub_match;
-use view::{flower_router_view, flower_view};
+use view::{flower_view};
+// use view::flower_router_view;
 
 pub fn main() -> Result<(), &'static str> {
     // println!("Welcome to flow.er!");
