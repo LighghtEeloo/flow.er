@@ -27,7 +27,7 @@ impl NodeViewCore {
     ) -> Option<Self> {
         let mut entity_map = HashMap::new();
         let obj = cube.obj;
-        let children: Vec<EntityId>;
+        let mut children: Vec<EntityId>;
         if let Some(obj) = obj {
             entity_map.insert(
                 obj,
@@ -47,6 +47,7 @@ impl NodeViewCore {
             }
         } else {
             children = vessel.flow.orphan();
+            children.sort_by_key(|i| i.clone());
             for c in children.iter() {
                 let own = Own::Yes;
                 entity_map.insert(

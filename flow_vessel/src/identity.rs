@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::time::{SystemTime, UNIX_EPOCH};
-use std::{fmt::Debug, hash::Hash};
+use std::{cmp::Ordering, time::{SystemTime, UNIX_EPOCH}, fmt::Debug, hash::Hash};
 
 use crate::{now, TimeRep};
 
@@ -11,10 +10,23 @@ pub trait Identity: Default + Debug + Clone + Hash + PartialEq + Eq {
 
 const LEN: usize = 5;
 
-#[derive(Clone, Copy, Hash, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Hash, PartialEq, Eq, Ord, Serialize, Deserialize)]
 pub struct TimeUnique {
     time: SystemTime,
     unique: u64,
+}
+
+impl PartialOrd for TimeUnique {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        let time_cmp = self.time.partial_cmp(&other.time);
+        let unique_cmp = self.unique.partial_cmp(&other.unique);
+        match (time_cmp, unique_cmp) {
+            (Some(Ordering::Equal), Some(Ordering::Equal)) => Some(Ordering::Equal),
+            (Some(Ordering::Equal), _) => None,
+            (Some(_), _) => time_cmp,
+            _ => None
+        }
+    }
 }
 
 impl Default for TimeUnique {

@@ -21,6 +21,11 @@ impl TimeNote {
         self.notes.push((end, Tag::default()));
         self
     }
+    pub fn add_sorted_with_tag(&mut self, time: SystemTime, tag: Tag) -> &mut Self {
+        self.notes.push((time, tag));
+        self.notes.sort_by_key(|(t, _)| t.clone());
+        self
+    }
     pub fn start_t(&self) -> Option<&SystemTime> {
         self.notes.first().map(|note| &note.0)
     }
