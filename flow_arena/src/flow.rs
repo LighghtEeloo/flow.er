@@ -139,7 +139,7 @@ pub trait FlowMap: FlowBase + FlowCheck {
     fn grow(&mut self, obj: Self::Node) -> Result<Self::Id, FlowError>;
 
     /// removes a node; returns err if id not found under root
-    fn erase(&mut self, obj: &Self::Id) -> Result<(), FlowError>;
+    fn erase(&mut self, obj: &Self::Id) -> Result<Self::Node, FlowError>;
 }
 
 /// provides ability to link nodes; graph-ish

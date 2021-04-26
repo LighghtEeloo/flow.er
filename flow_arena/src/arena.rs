@@ -195,10 +195,8 @@ where
         res
     }
 
-    fn erase(&mut self, obj: &Self::Id) -> Result<(), FlowError> {
-        if !self.contains_node(obj) {
-            return Err(FlowError::NotExistObj);
-        }
+    fn erase(&mut self, obj: &Self::Id) -> Result<Self::Node, FlowError> {
+        let node = self.node(obj).cloned().ok_or(FlowError::NotExistObj)?;
         let kill_set = self.node_ownership_set(obj);
         self.node_map.retain(|id, _| !kill_set.contains(id));
         let () = self
@@ -209,7 +207,7 @@ where
             })
             .collect();
         self.check_assert();
-        Ok(())
+        Ok(node)
     }
 }
 
