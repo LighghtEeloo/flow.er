@@ -2,7 +2,10 @@ use super::*;
 
 use serde::ser::{Serialize, SerializeStruct, Serializer};
 impl Serialize for Glass {
-    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+    fn serialize<S: Serializer>(
+        &self,
+        serializer: S,
+    ) -> Result<S::Ok, S::Error> {
         let mut flow = serializer.serialize_struct("Flow", 2)?;
         let seq: Vec<(&CubeId, &Cube)> = self.cube_map.iter().collect();
         flow.serialize_field("router", &self.router)?;
@@ -16,7 +19,9 @@ impl Serialize for Glass {
 use serde::de::{self, Deserialize, Deserializer, MapAccess, Visitor};
 use std::marker::PhantomData;
 impl<'de> Deserialize<'de> for Glass {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+    fn deserialize<D: Deserializer<'de>>(
+        deserializer: D,
+    ) -> Result<Self, D::Error> {
         enum Field {
             Router,
             Factory,
@@ -25,13 +30,18 @@ impl<'de> Deserialize<'de> for Glass {
         }
         use std::fmt;
         impl<'de> Deserialize<'de> for Field {
-            fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Field, D::Error> {
+            fn deserialize<D: Deserializer<'de>>(
+                deserializer: D,
+            ) -> Result<Field, D::Error> {
                 struct FieldVisitor;
 
                 impl<'de> Visitor<'de> for FieldVisitor {
                     type Value = Field;
 
-                    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                    fn expecting(
+                        &self,
+                        formatter: &mut fmt::Formatter,
+                    ) -> fmt::Result {
                         formatter.write_str("`cube_map`")
                     }
 
@@ -86,36 +96,47 @@ impl<'de> Deserialize<'de> for Glass {
                     match key {
                         Field::Router => {
                             if router.is_some() {
-                                return Err(de::Error::duplicate_field("router"));
+                                return Err(de::Error::duplicate_field(
+                                    "router",
+                                ));
                             }
                             router = map.next_value()?;
                         }
                         Field::Factory => {
                             if factory.is_some() {
-                                return Err(de::Error::duplicate_field("factory"));
+                                return Err(de::Error::duplicate_field(
+                                    "factory",
+                                ));
                             }
                             factory = map.next_value()?;
                         }
                         Field::RouterMap => {
                             if router_map.is_some() {
-                                return Err(de::Error::duplicate_field("router_map"));
+                                return Err(de::Error::duplicate_field(
+                                    "router_map",
+                                ));
                             }
                             router_map = map.next_value()?;
                         }
                         Field::CubeMap => {
                             if cube_map.is_some() {
-                                return Err(de::Error::duplicate_field("cube_map"));
+                                return Err(de::Error::duplicate_field(
+                                    "cube_map",
+                                ));
                             }
-                            let cube_vec: Vec<(CubeId, Cube)> = map.next_value()?;
+                            let cube_vec: Vec<(CubeId, Cube)> =
+                                map.next_value()?;
                             cube_map = Some(cube_vec.into_iter().collect());
                         }
                     }
                 }
                 let router = router.unwrap_or_default();
-                let factory = factory.ok_or_else(|| de::Error::missing_field("factory"))?;
-                let router_map =
-                    router_map.ok_or_else(|| de::Error::missing_field("router_map"))?;
-                let cube_map = cube_map.ok_or_else(|| de::Error::missing_field("cube_map"))?;
+                let factory = factory
+                    .ok_or_else(|| de::Error::missing_field("factory"))?;
+                let router_map = router_map
+                    .ok_or_else(|| de::Error::missing_field("router_map"))?;
+                let cube_map = cube_map
+                    .ok_or_else(|| de::Error::missing_field("cube_map"))?;
                 Ok(Self::Value {
                     router,
                     factory,
@@ -125,7 +146,8 @@ impl<'de> Deserialize<'de> for Glass {
             }
         }
 
-        const FIELDS: &'static [&'static str] = &["router", "factory", "router_map", "cube_map"];
+        const FIELDS: &'static [&'static str] =
+            &["router", "factory", "router_map", "cube_map"];
         deserializer.deserialize_struct(
             "Glass",
             FIELDS,

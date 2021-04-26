@@ -108,7 +108,12 @@ impl Cube {
             .current
             .map_or(true, |current| flow.contains_node(&current));
         use CubeType::*;
-        let legal = match (self.cube_type, self.obj, self.current, self.profile.clone()) {
+        let legal = match (
+            self.cube_type,
+            self.obj,
+            self.current,
+            self.profile.clone(),
+        ) {
             (Inkblot, Some(_), _, None)
             | (NodeView, _, None, None)
             | (ClauseTree, Some(_), _, None)
@@ -211,7 +216,8 @@ mod tests {
             "{:?}",
             entitys.iter().map(|x| x.id()).collect::<Vec<&EntityId>>()
         );
-        let mut cube = Cube::new_router(Router::Workspace).with_obj(entitys[0].id().clone());
+        let mut cube = Cube::new_router(Router::Workspace)
+            .with_obj(entitys[0].id().clone());
         println!("{:#?}", cube.obj);
         cube.set_obj(entitys[2].id().clone());
         println!("{:#?}", cube.obj);

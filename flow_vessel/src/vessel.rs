@@ -1,6 +1,6 @@
 use flow_arena::{
-    Direction, FlowArena, FlowBase, FlowDevote, FlowError, FlowLink, FlowMap, FlowNode, FlowShift,
-    Node,
+    Direction, FlowArena, FlowBase, FlowDevote, FlowError, FlowLink, FlowMap,
+    FlowNode, FlowShift, Node,
 };
 use serde::{Deserialize, Serialize};
 use std::{collections::HashSet, fmt::Debug};
@@ -114,7 +114,10 @@ impl Vessel {
         let entity = Entity::new_rotate(&mut self.factory);
         self.entity_flow_grow(entity)
     }
-    fn entity_flow_grow(&mut self, entity: Entity) -> Result<EntityId, FlowError> {
+    fn entity_flow_grow(
+        &mut self,
+        entity: Entity,
+    ) -> Result<EntityId, FlowError> {
         let id = entity.id().clone();
         self.flow.grow(FlowNode::from_id(id.clone(), entity))?;
         Ok(id)
@@ -196,7 +199,11 @@ impl Vessel {
     }
 
     /// using flow.migrate_iter
-    pub fn entity_migrate(&mut self, obj: &EntityId, dir: Direction) -> Result<(), FlowError> {
+    pub fn entity_migrate(
+        &mut self,
+        obj: &EntityId,
+        dir: Direction,
+    ) -> Result<(), FlowError> {
         self.flow.migrate_iter(obj, dir)
     }
 }
@@ -340,9 +347,11 @@ mod tests {
         vessel
             .entity_mut(&id[1])
             .map(|entity| entity.face = format!("Bobi."));
-        let str = serde_json::to_string(&vessel).expect("failed to serialize vessel");
+        let str =
+            serde_json::to_string(&vessel).expect("failed to serialize vessel");
         println!("Serialize: {}", str);
-        let vessel: Vessel = serde_json::from_str(&str).expect("failed to deserialize");
+        let vessel: Vessel =
+            serde_json::from_str(&str).expect("failed to deserialize");
         println!("{:#?}", vessel);
     }
 

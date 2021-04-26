@@ -29,7 +29,10 @@ impl NodeViewCore {
         let obj = cube.obj;
         let children: Vec<EntityId>;
         if let Some(obj) = obj {
-            entity_map.insert(obj, (Own::Obj, vessel.flow.node(&obj)?.entity.clone()));
+            entity_map.insert(
+                obj,
+                (Own::Obj, vessel.flow.node(&obj)?.entity.clone()),
+            );
             children = vessel.flow.children(&obj);
             for c in children.iter() {
                 let own = if vessel.flow.is_owned(c, &obj) {
@@ -37,13 +40,19 @@ impl NodeViewCore {
                 } else {
                     Own::No
                 };
-                entity_map.insert(c.clone(), (own, vessel.flow.node(c)?.entity.clone()));
+                entity_map.insert(
+                    c.clone(),
+                    (own, vessel.flow.node(c)?.entity.clone()),
+                );
             }
         } else {
             children = vessel.flow.orphan();
             for c in children.iter() {
                 let own = Own::Yes;
-                entity_map.insert(c.clone(), (own, vessel.flow.node(c)?.entity.clone()));
+                entity_map.insert(
+                    c.clone(),
+                    (own, vessel.flow.node(c)?.entity.clone()),
+                );
             }
         }
         Some(Self {

@@ -84,8 +84,8 @@ mod variants;
 pub use self::{
     arena::{FlowArena, FlowNode},
     flow::{
-        Direction, Flow, FlowBase, FlowCheck, FlowDevote, FlowDock, FlowError, FlowLink, FlowMap,
-        FlowShift, Node,
+        Direction, Flow, FlowBase, FlowCheck, FlowDevote, FlowDock, FlowError,
+        FlowLink, FlowMap, FlowShift, Node,
     },
     variants::{FlowPure, GraphArena, GraphNode, NodePure},
 };

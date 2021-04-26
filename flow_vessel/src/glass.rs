@@ -179,7 +179,11 @@ impl Glass {
 /// cube_id-based operations
 impl Glass {
     /// places a cube within a safe idx
-    pub fn place_cube(&mut self, cube_id: CubeId, meta: CubeMeta) -> Result<(), ()> {
+    pub fn place_cube(
+        &mut self,
+        cube_id: CubeId,
+        meta: CubeMeta,
+    ) -> Result<(), ()> {
         let router = meta.router;
         let vec = self.ensured_router(router);
         vec.retain(|id| id != &cube_id);
@@ -192,7 +196,11 @@ impl Glass {
         Ok(())
     }
 
-    pub fn push_cube(&mut self, cube_id: CubeId, router: Router) -> Result<(), ()> {
+    pub fn push_cube(
+        &mut self,
+        cube_id: CubeId,
+        router: Router,
+    ) -> Result<(), ()> {
         let idx = self.ensured_router(router).len();
         let meta = CubeMeta { router, idx };
         self.place_cube(cube_id, meta)
@@ -219,7 +227,11 @@ impl Glass {
     }
 
     /// ensure and clean all invalid cubes; ensure valid router.
-    pub fn refresh(&mut self, flow: &EntityFlow, workspace_mode: &WorkspaceMode) {
+    pub fn refresh(
+        &mut self,
+        flow: &EntityFlow,
+        workspace_mode: &WorkspaceMode,
+    ) {
         self.ensure_router(workspace_mode);
         // Todo: decide whether it stays.
         // self.purge_router(workspace_mode);
@@ -351,7 +363,9 @@ mod tests {
                 .expect("grow failed");
             let promised_land = Cube::new(CubeType::PromisedLand)
                 .with_obj(obj)
-                .with_profile(Profile::Why("Delibrately using cube illegally.".into()));
+                .with_profile(Profile::Why(
+                    "Delibrately using cube illegally.".into(),
+                ));
             println!("is_valid_cube: {}", promised_land.is_valid_cube(&flow));
             let promised_land = glass.add_cube(promised_land);
             let meta = CubeMeta {

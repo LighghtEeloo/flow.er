@@ -1,21 +1,23 @@
 use chrono::{DateTime, Local, Utc};
-use serde::{Deserialize, Serialize};
+use std::time::SystemTime;
 #[cfg(target_arch = "wasm32")]
 use std::time::UNIX_EPOCH;
-use std::{
-    fmt::Debug,
-    time::{Duration, SystemTime},
-};
 
 pub trait TimeRep {
-    fn human_local_detail(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result;
+    fn human_local_detail(
+        &self,
+        f: &mut std::fmt::Formatter<'_>,
+    ) -> std::fmt::Result;
     fn human_local(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result;
     fn clock_local(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result;
     fn human_utc(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result;
 }
 
 impl TimeRep for SystemTime {
-    fn human_local_detail(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn human_local_detail(
+        &self,
+        f: &mut std::fmt::Formatter<'_>,
+    ) -> std::fmt::Result {
         let dt: DateTime<Local> = self.clone().into();
         write!(
             f,
@@ -48,79 +50,6 @@ pub fn now() -> SystemTime {
 #[cfg(not(target_arch = "wasm32"))]
 pub fn now() -> SystemTime {
     SystemTime::now()
-}
-
-#[derive(Default, Clone, Serialize, Deserialize)]
-pub struct TimeNote {
-    start: Option<SystemTime>,
-    end: Option<SystemTime>,
-}
-
-impl TimeNote {
-    pub fn new() -> TimeNote {
-        TimeNote::default()
-    }
-    pub fn set_start(&mut self, start: SystemTime) -> &mut Self {
-        self.start = Some(start);
-        self
-    }
-    pub fn set_end(&mut self, end: SystemTime) -> &mut Self {
-        self.end = Some(end);
-        self
-    }
-    pub fn length(&self) -> Duration {
-        match (self.start, self.end) {
-            (Some(s), Some(e)) => e.duration_since(s).unwrap_or(Duration::new(0, 0)),
-            _ => Duration::new(0, 0),
-        }
-    }
-}
-
-impl TimeRep for TimeNote {
-    fn human_local_detail(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "[:")?;
-        self.start.map(|t: SystemTime| t.human_local_detail(f));
-        write!(f, " ~ ")?;
-        self.end.map(|t: SystemTime| t.human_local_detail(f));
-        write!(f, ":]")?;
-        write!(f, "")
-    }
-
-    fn human_local(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "[:")?;
-        self.start.map(|t: SystemTime| t.human_local(f));
-        write!(f, " ~ ")?;
-        self.end.map(|t: SystemTime| t.human_local(f));
-        write!(f, ":]")?;
-        write!(f, "")
-    }
-    fn clock_local(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if let Some(time) = None.or(self.start).or(self.end) {
-            let dt: DateTime<Local> = time.into();
-            write!(f, "{}", dt.format("%H:%M:%S").to_string())
-        } else {
-            write!(f, "len_0")
-        }
-    }
-
-    fn human_utc(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "[:")?;
-        self.start.map(|t: SystemTime| t.human_utc(f));
-        write!(f, " ~ ")?;
-        self.end.map(|t: SystemTime| t.human_utc(f));
-        write!(f, ":]")?;
-        write!(f, "")
-    }
-}
-
-impl Debug for TimeNote {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if f.alternate() {
-            self.human_local_detail(f)
-        } else {
-            self.human_local(f)
-        }
-    }
 }
 
 pub mod display {
@@ -167,23 +96,5 @@ pub mod display {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             self.0.human_utc(f)
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use std::thread::sleep;
-    #[test]
-    fn time_log() {
-        let u_dur = 200;
-        let mut time = TimeNote::new();
-        time.set_start(SystemTime::now());
-        sleep(Duration::from_millis(u_dur));
-        time.set_end(SystemTime::now());
-        let dur = time.length();
-        println!("{:?}", dur);
-        assert!(dur > Duration::from_millis(u_dur));
-        println!("{:?}", time)
     }
 }

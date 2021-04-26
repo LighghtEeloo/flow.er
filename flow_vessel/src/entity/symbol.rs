@@ -249,17 +249,26 @@ mod tests {
             Symbol::parse_vague("pr"),
             Some(Symbol::Linted(Lint::Programmatic))
         );
-        assert_eq!(Symbol::parse_vague("up"), Some(Symbol::Linted(Lint::Upper)));
+        assert_eq!(
+            Symbol::parse_vague("up"),
+            Some(Symbol::Linted(Lint::Upper))
+        );
         assert_eq!(
             Symbol::parse_vague("Lower"),
             Some(Symbol::Linted(Lint::Lower))
         );
-        assert_eq!(Symbol::parse_vague("gr"), Some(Symbol::Linted(Lint::Greek)));
+        assert_eq!(
+            Symbol::parse_vague("gr"),
+            Some(Symbol::Linted(Lint::Greek))
+        );
         assert_eq!(
             Symbol::parse_vague("ci"),
             Some(Symbol::Linted(Lint::Circle))
         );
-        assert_eq!(Symbol::parse_vague("s"), Some(Symbol::Linted(Lint::Square)));
+        assert_eq!(
+            Symbol::parse_vague("s"),
+            Some(Symbol::Linted(Lint::Square))
+        );
         assert_eq!(
             Symbol::parse_vague("Dash"),
             Some(Symbol::Linted(Lint::Dash))

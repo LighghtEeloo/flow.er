@@ -7,7 +7,10 @@ impl Component for Vase {
 
     type Properties = ();
 
-    fn create(_props: Self::Properties, _link: yew::ComponentLink<Self>) -> Self {
+    fn create(
+        _props: Self::Properties,
+        _link: yew::ComponentLink<Self>,
+    ) -> Self {
         todo!()
     }
 

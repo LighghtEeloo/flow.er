@@ -26,7 +26,12 @@ pub fn main() -> Result<(), &'static str> {
         Mirror::Display { cube, .. } => {
             format!(
                 "=======\n\n{}\n\n=======",
-                flower_view(cube, CubeMeta::default(), CubeId::default(), &vessel)?
+                flower_view(
+                    cube,
+                    CubeMeta::default(),
+                    CubeId::default(),
+                    &vessel
+                )?
             )
         }
         _ => {

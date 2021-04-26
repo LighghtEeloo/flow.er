@@ -9,7 +9,10 @@ where
     Id: Serialize + Hash + Eq + Clone,
     Entity: Serialize + Clone,
 {
-    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+    fn serialize<S: Serializer>(
+        &self,
+        serializer: S,
+    ) -> Result<S::Ok, S::Error> {
         let mut flow = serializer.serialize_struct("Flow", 2)?;
         let seq: Vec<&FlowNode<Id, Entity>> = self.node_map.values().collect();
         flow.serialize_field("node_map", &seq)?;
@@ -18,7 +21,9 @@ where
 }
 
 #[cfg(feature = "serde_impl")]
-use serde::de::{self, Deserialize, Deserializer, MapAccess, SeqAccess, Visitor};
+use serde::de::{
+    self, Deserialize, Deserializer, MapAccess, SeqAccess, Visitor,
+};
 #[cfg(feature = "serde_impl")]
 use std::marker::PhantomData;
 #[cfg(feature = "serde_impl")]
@@ -27,18 +32,25 @@ where
     Id: Deserialize<'de> + Clone + Hash + Eq,
     Entity: Deserialize<'de> + Clone,
 {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+    fn deserialize<D: Deserializer<'de>>(
+        deserializer: D,
+    ) -> Result<Self, D::Error> {
         enum Field {
             NodeMap,
         }
         impl<'de> Deserialize<'de> for Field {
-            fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Field, D::Error> {
+            fn deserialize<D: Deserializer<'de>>(
+                deserializer: D,
+            ) -> Result<Field, D::Error> {
                 struct FieldVisitor;
 
                 impl<'de> Visitor<'de> for FieldVisitor {
                     type Value = Field;
 
-                    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                    fn expecting(
+                        &self,
+                        formatter: &mut fmt::Formatter,
+                    ) -> fmt::Result {
                         formatter.write_str("`node_map`")
                     }
 
@@ -61,8 +73,11 @@ where
             marker: PhantomData<fn() -> FlowArena<Id, FlowNode<Id, Entity>>>,
         }
 
-        impl<'de, Id: Deserialize<'de> + Clone + Hash + Eq, Entity: Deserialize<'de> + Clone>
-            Visitor<'de> for FlowVisitor<Id, Entity>
+        impl<
+                'de,
+                Id: Deserialize<'de> + Clone + Hash + Eq,
+                Entity: Deserialize<'de> + Clone,
+            > Visitor<'de> for FlowVisitor<Id, Entity>
         {
             type Value = FlowArena<Id, FlowNode<Id, Entity>>;
 
@@ -74,9 +89,9 @@ where
             where
                 V: SeqAccess<'de>,
             {
-                let node_vec: Vec<FlowNode<Id, Entity>> = seq
-                    .next_element()?
-                    .ok_or_else(|| de::Error::invalid_length(1, &self))?;
+                let node_vec: Vec<FlowNode<Id, Entity>> =
+                    seq.next_element()?
+                        .ok_or_else(|| de::Error::invalid_length(1, &self))?;
                 let node_map = node_vec
                     .into_iter()
                     .map(|node| (node.id().clone(), node))
@@ -93,9 +108,12 @@ where
                     match key {
                         Field::NodeMap => {
                             if node_map.is_some() {
-                                return Err(de::Error::duplicate_field("node_map"));
+                                return Err(de::Error::duplicate_field(
+                                    "node_map",
+                                ));
                             }
-                            let node_vec: Vec<FlowNode<Id, Entity>> = map.next_value()?;
+                            let node_vec: Vec<FlowNode<Id, Entity>> =
+                                map.next_value()?;
                             node_map = Some(
                                 node_vec
                                     .into_iter()
@@ -105,7 +123,8 @@ where
                         }
                     }
                 }
-                let node_map = node_map.ok_or_else(|| de::Error::missing_field("node_map"))?;
+                let node_map = node_map
+                    .ok_or_else(|| de::Error::missing_field("node_map"))?;
                 Ok(Self::Value { node_map })
             }
         }

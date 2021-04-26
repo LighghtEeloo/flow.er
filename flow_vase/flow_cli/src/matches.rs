@@ -1,6 +1,7 @@
 use clap::ArgMatches;
 use flow_vessel::{
-    Cube, CubeType, EntityField, EntityId, Filter, Identity, Symbol, TagSetField, Tube, Vessel,
+    Cube, CubeType, EntityField, EntityId, Filter, Identity, Symbol,
+    TagSetField, Tube, Vessel,
 };
 
 use crate::{FlowerMsg, Level};
@@ -9,13 +10,21 @@ pub fn flower_sub_match(vessel: &Vessel, matches: &ArgMatches) -> FlowerMsg {
     match matches.subcommand() {
         ("entity", Some(sub_m)) => entity_arg_match(vessel, sub_m),
         ("node", Some(sub_m)) => node_arg_match(vessel, sub_m),
-        ("list", Some(sub_m)) => cube_arg_match(Cube::new(CubeType::NodeView), vessel, sub_m),
-        ("flow", Some(sub_m)) => cube_arg_match(Cube::new(CubeType::FlowView), vessel, sub_m),
-        ("clause", Some(sub_m)) => cube_arg_match(Cube::new(CubeType::ClauseTree), vessel, sub_m),
+        ("list", Some(sub_m)) => {
+            cube_arg_match(Cube::new(CubeType::NodeView), vessel, sub_m)
+        }
+        ("flow", Some(sub_m)) => {
+            cube_arg_match(Cube::new(CubeType::FlowView), vessel, sub_m)
+        }
+        ("clause", Some(sub_m)) => {
+            cube_arg_match(Cube::new(CubeType::ClauseTree), vessel, sub_m)
+        }
         ("promised", Some(sub_m)) => {
             cube_arg_match(Cube::new(CubeType::PromisedLand), vessel, sub_m)
         }
-        ("agenda", Some(sub_m)) => cube_arg_match(Cube::new(CubeType::AgendaView), vessel, sub_m),
+        ("agenda", Some(sub_m)) => {
+            cube_arg_match(Cube::new(CubeType::AgendaView), vessel, sub_m)
+        }
         ("capture", Some(_)) => FlowerMsg::Noop,
         ("revert", Some(_)) => FlowerMsg::Noop,
         ("config", Some(_)) => FlowerMsg::Noop,
@@ -23,7 +32,11 @@ pub fn flower_sub_match(vessel: &Vessel, matches: &ArgMatches) -> FlowerMsg {
     }
 }
 
-fn obj_arg_match(name: &str, vessel: &Vessel, matches: &ArgMatches) -> Option<EntityId> {
+fn obj_arg_match(
+    name: &str,
+    vessel: &Vessel,
+    matches: &ArgMatches,
+) -> Option<EntityId> {
     matches
         .value_of(name)
         .map(|obj| Identity::parse_filter(&vessel.entity_id_all(), obj))
@@ -41,7 +54,10 @@ fn entity_arg_match(vessel: &Vessel, matches: &ArgMatches) -> FlowerMsg {
     }
 }
 
-fn entity_sub_match(obj: EntityId, subcommand: (&str, Option<&ArgMatches>)) -> FlowerMsg {
+fn entity_sub_match(
+    obj: EntityId,
+    subcommand: (&str, Option<&ArgMatches>),
+) -> FlowerMsg {
     let just_cube = FlowerMsg::Cube {
         cube: Cube::new(CubeType::NodeView).with_obj(obj),
         detailed: true,
@@ -79,12 +95,16 @@ fn entity_sub_match(obj: EntityId, subcommand: (&str, Option<&ArgMatches>)) -> F
                 if sub_m.is_present("add") {
                     return FlowerMsg::Tube(Tube::EntityUpdate {
                         id: obj,
-                        field: EntityField::TagSet(TagSetField::AddTag(tag.into())),
+                        field: EntityField::TagSet(TagSetField::AddTag(
+                            tag.into(),
+                        )),
                     });
                 } else if sub_m.is_present("del") {
                     return FlowerMsg::Tube(Tube::EntityUpdate {
                         id: obj,
-                        field: EntityField::TagSet(TagSetField::DelTag(tag.into())),
+                        field: EntityField::TagSet(TagSetField::DelTag(
+                            tag.into(),
+                        )),
                     });
                 } else if sub_m.is_present("clear") {
                     return FlowerMsg::Tube(Tube::EntityUpdate {
@@ -156,7 +176,11 @@ fn node_sub_match(
     }
 }
 
-fn cube_arg_match(mut cube: Cube, vessel: &Vessel, matches: &ArgMatches) -> FlowerMsg {
+fn cube_arg_match(
+    mut cube: Cube,
+    vessel: &Vessel,
+    matches: &ArgMatches,
+) -> FlowerMsg {
     if let Some(obj) = matches.value_of("obj") {
         let obj = Identity::parse_filter(&vessel.entity_id_all(), obj);
         if let Some(obj) = obj {

@@ -12,8 +12,8 @@ pub fn flower_view(
     let string = match cube.cube_type {
         // CubeType::Inkblot => {}
         CubeType::NodeView => {
-            let core =
-                NodeViewCore::from_router_cube(vessel, (meta, id, cube)).ok_or("view_core err")?;
+            let core = NodeViewCore::from_router_cube(vessel, (meta, id, cube))
+                .ok_or("view_core err")?;
             core.view()
         }
         // CubeType::ClauseTree => {}

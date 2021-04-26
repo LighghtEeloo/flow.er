@@ -145,7 +145,8 @@ where
 {
     fn check(&self) -> Result<(), (FlowError, String)> {
         for (id, node) in self.node_map.iter() {
-            let current_str = format!(", current: \nid: {:?}, \nnode: {:#?}", id, node);
+            let current_str =
+                format!(", current: \nid: {:?}, \nnode: {:#?}", id, node);
             if id != node.id() {
                 return Err((FlowError::NodeIdNotMatch, current_str));
             }
@@ -162,7 +163,12 @@ where
                     return Err((FlowError::NotExistParent, current_str));
                 }
                 if let Some(node) = maybe {
-                    if node.children().iter().find(|x| x.clone() == id).is_none() {
+                    if node
+                        .children()
+                        .iter()
+                        .find(|x| x.clone() == id)
+                        .is_none()
+                    {
                         return Err((FlowError::AbandonedChild, current_str));
                     }
                 }
@@ -198,7 +204,9 @@ where
         let () = self
             .node_map
             .values_mut()
-            .map(|obj| obj.children_ref_mut().retain(|id| !kill_set.contains(id)))
+            .map(|obj| {
+                obj.children_ref_mut().retain(|id| !kill_set.contains(id))
+            })
             .collect();
         self.check_assert();
         Ok(())
@@ -284,7 +292,8 @@ where
                 // node means current nodes excluding set_to_remove hereafter
                 .filter_map(|node| {
                     // println!("set_id:{:?}, node_children:{:?}", id, node.children());
-                    let ch_ft = node.children().iter().find(|&x| x == id).map(|_| ());
+                    let ch_ft =
+                        node.children().iter().find(|&x| x == id).map(|_| ());
                     let pa_ft = node
                         .parent()
                         .map(|x| if &x == id { Some(()) } else { None })
@@ -316,7 +325,10 @@ where
             .filter_map(|id| self.node_map.get(&id).cloned())
             .map(|mut node| {
                 if Some(obj.clone()) == node.parent()
-                    || node.parent().clone().map_or(false, |id| !set.contains(&id))
+                    || node
+                        .parent()
+                        .clone()
+                        .map_or(false, |id| !set.contains(&id))
                 {
                     node.parent_set_none()
                 }
@@ -328,7 +340,10 @@ where
         Ok((flow, vec))
     }
 
-    fn snap_owned(&self, obj: &Self::Id) -> Result<(Self, Vec<Self::Id>), FlowError> {
+    fn snap_owned(
+        &self,
+        obj: &Self::Id,
+    ) -> Result<(Self, Vec<Self::Id>), FlowError> {
         if !self.contains_node(obj) {
             return Err(FlowError::NotExistObj);
         }
@@ -343,7 +358,10 @@ where
             .filter_map(|id| self.node_map.get(&id).cloned())
             .map(|mut node| {
                 if Some(obj.clone()) == node.parent()
-                    || node.parent().clone().map_or(false, |id| !set.contains(&id))
+                    || node
+                        .parent()
+                        .clone()
+                        .map_or(false, |id| !set.contains(&id))
                 {
                     node.parent_set_none()
                 }
@@ -436,7 +454,12 @@ mod tests {
         }
     }
 
-    fn wrapper<T>(name: &str, res: Result<T, FlowError>, flow: &FlowEntity, aloud: bool) {
+    fn wrapper<T>(
+        name: &str,
+        res: Result<T, FlowError>,
+        flow: &FlowEntity,
+        aloud: bool,
+    ) {
         if aloud {
             let is_ok = res.is_ok();
             println!(
@@ -612,7 +635,8 @@ mod tests {
         let ownership_impl = flow.node_ownership_set(&obj_vec[0]);
         println!("offspring[0]: {:?}", offspring_impl);
         println!("ownership[0]: {:?}", ownership_impl);
-        let offspring: HashSet<EntityId> = [obj_vec[2], obj_vec[4]].iter().cloned().collect();
+        let offspring: HashSet<EntityId> =
+            [obj_vec[2], obj_vec[4]].iter().cloned().collect();
         let ownership: HashSet<EntityId> = [obj_vec[0], obj_vec[2], obj_vec[4]]
             .iter()
             .cloned()
@@ -634,10 +658,11 @@ mod tests {
         .iter()
         .cloned()
         .collect();
-        let ownership: HashSet<EntityId> = [obj_vec[6], obj_vec[10], obj_vec[11], obj_vec[12]]
-            .iter()
-            .cloned()
-            .collect();
+        let ownership: HashSet<EntityId> =
+            [obj_vec[6], obj_vec[10], obj_vec[11], obj_vec[12]]
+                .iter()
+                .cloned()
+                .collect();
         assert_eq!(offspring, offspring_impl);
         assert_eq!(ownership, ownership_impl);
     }
@@ -660,7 +685,8 @@ mod tests {
         let (sub_, vec_) = flow.snap(&obj_vec[0]).expect("snap error");
         println!("sub_flow[0]: {:#?}", sub_);
         println!("sub_vec[0]: {:?}", vec_);
-        let (sub, vec) = flow.undock_impl(&obj_vec[0], false).expect("undock error");
+        let (sub, vec) =
+            flow.undock_impl(&obj_vec[0], false).expect("undock error");
         assert_eq!(sub, sub_);
         assert_eq!(vec, vec_);
         flow.dock(&obj_vec[0], vec, sub).expect("dock error");

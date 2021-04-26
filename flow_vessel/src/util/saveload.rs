@@ -44,7 +44,8 @@ impl Vessel {
             .await
             .map_err(|_| LoadError::FileError)?;
 
-        let vessel: Vessel = serde_json::from_str(&contents).map_err(|_| LoadError::FormatError)?;
+        let vessel: Vessel = serde_json::from_str(&contents)
+            .map_err(|_| LoadError::FormatError)?;
 
         if let Bridge::Linked { .. } = vessel.settings.bridge {
             // Todo: link and save.
@@ -56,7 +57,8 @@ impl Vessel {
     pub async fn save(self) -> Result<(), SaveError> {
         use async_std::prelude::*;
 
-        let json = serde_json::to_string_pretty(&self).map_err(|_| SaveError::FormatError)?;
+        let json = serde_json::to_string_pretty(&self)
+            .map_err(|_| SaveError::FormatError)?;
 
         let path = Self::path();
 
@@ -114,13 +116,14 @@ impl Vessel {
     }
 
     pub async fn load() -> Result<Vessel, LoadError> {
-        let vessel: Vessel = Self::load_local().await.or_else(|load_error| {
-            if let LoadError::FileError = load_error {
-                Ok(Vessel::default())
-            } else {
-                Err(load_error)
-            }
-        })?;
+        let vessel: Vessel =
+            Self::load_local().await.or_else(|load_error| {
+                if let LoadError::FileError = load_error {
+                    Ok(Vessel::default())
+                } else {
+                    Err(load_error)
+                }
+            })?;
 
         let bridge = vessel.settings.bridge.clone();
 
@@ -143,7 +146,8 @@ impl Vessel {
         log::debug!("saving...");
         let storage = Self::storage().ok_or(SaveError::FileError)?;
 
-        let json = serde_json::to_string_pretty(&self).map_err(|_| SaveError::FormatError)?;
+        let json = serde_json::to_string_pretty(&self)
+            .map_err(|_| SaveError::FormatError)?;
 
         storage
             .set_item("flow.er.vessel", &json)

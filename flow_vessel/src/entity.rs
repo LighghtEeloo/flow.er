@@ -1,13 +1,16 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{Filter, Identity, TimeNote};
-use identity::*;
-use symbol::*;
-use tag::*;
+use crate::{Filter, Identity};
 
 pub mod identity;
 pub mod symbol;
 pub mod tag;
+pub mod timenote;
+
+use identity::*;
+use symbol::*;
+use tag::*;
+use timenote::*;
 
 // Entity Area
 

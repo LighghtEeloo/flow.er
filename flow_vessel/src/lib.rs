@@ -11,6 +11,7 @@ pub use self::{
         identity::{EntityId, EntityIdFactory},
         symbol::{AlphaBet, Babel, Lint, Process, Symbol, BABEL},
         tag::{Tag, TagSet, TagSetField},
+        timenote::TimeNote,
         {Bubble, Entity, EntityField, Face},
     },
     glass::{
@@ -27,7 +28,7 @@ pub use self::{
     tube::{Echo, Tube},
     util::{
         json::{export_json, from_json, to_json},
-        time::{display, now, TimeNote, TimeRep},
+        time::{display, now, TimeRep},
     },
     vessel::{EntityFlow, EntityNode, Vessel},
 };

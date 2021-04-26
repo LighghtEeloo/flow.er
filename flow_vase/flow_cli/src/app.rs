@@ -83,11 +83,15 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
                             Arg::with_name("identity")
                                 .short("i")
                                 .help("Identity filter option"),
-                            Arg::with_name("face").short("f").help("Face filter option"),
+                            Arg::with_name("face")
+                                .short("f")
+                                .help("Face filter option"),
                             Arg::with_name("symbol")
                                 .short("s")
                                 .help("Symbol filter option"),
-                            Arg::with_name("tag").short("t").help("Tag filter option"),
+                            Arg::with_name("tag")
+                                .short("t")
+                                .help("Tag filter option"),
                         ]),
                 ]),
         )
@@ -98,7 +102,9 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
                 .alias("n")
                 .args(&entity_match_arg())
                 .subcommands(vec![
-                    SubCommand::with_name("grow").about("Grow node").alias("gr"),
+                    SubCommand::with_name("grow")
+                        .about("Grow node")
+                        .alias("gr"),
                     SubCommand::with_name("link")
                         .about("Link node")
                         .alias("li")
@@ -164,7 +170,9 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
                 .args(&[Arg::with_name("non-node")
                     .short("n")
                     .long("non-node")
-                    .help("List node relationship without graphically expanding")]),
+                    .help(
+                        "List node relationship without graphically expanding",
+                    )]),
         )
         .subcommand(
             SubCommand::with_name("clause")
