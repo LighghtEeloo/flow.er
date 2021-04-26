@@ -67,10 +67,10 @@ impl Vessel {
         self.flow.node_ownership_set(obj)
     }
     /// pick entities with all filters satisfied
-    pub fn entity_pick_by(&self, filters: &Vec<Filter>) -> Vec<EntityId> {
+    pub fn entity_matched_all(&self, filters: &Vec<Filter>) -> Vec<EntityId> {
         self.flow
             .entities()
-            .filter(|x| x.pick_by(filters))
+            .filter(|x| x.matched_all(filters))
             .map(|x| x.id().clone())
             .collect()
     }
@@ -81,16 +81,16 @@ impl Vessel {
             .filter(|x| {
                 filters
                     .iter()
-                    .fold(false, |is, fil| is || x.pick_by(&vec![fil.clone()]))
+                    .fold(false, |is, fil| is || x.matched(fil))
             })
             .map(|x| x.id().clone())
             .collect()
     }
     /// filter out all entities with filters
-    pub fn entity_filter_out(&self, filters: &Vec<Filter>) -> Vec<EntityId> {
+    pub fn entity_matched_none(&self, filters: &Vec<Filter>) -> Vec<EntityId> {
         self.flow
             .entities()
-            .filter(|x| x.filter_out(filters))
+            .filter(|x| x.matched_none(filters))
             .map(|x| x.id().clone())
             .collect()
     }
