@@ -123,6 +123,7 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
                     SubCommand::with_name("devote")
                         .about("Devote node")
                         .alias("dev")
+                        .alias("de")
                         .args(&[
                             Arg::with_name("owner")
                                 .value_name("EntityMatch")
@@ -137,20 +138,10 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
                         ]),
                     SubCommand::with_name("decay")
                         .about("Decay node")
-                        .alias("dec")
-                        .args(&[Arg::with_name("obj")
-                            .value_name("EntityMatch")
-                            .index(1)
-                            .help("Set the obj to be decayed")
-                            .takes_value(true)]),
+                        .alias("dec"),
                     SubCommand::with_name("erase")
                         .about("Erase node")
-                        .alias("er")
-                        .args(&[Arg::with_name("obj")
-                            .value_name("EntityMatch")
-                            .index(1)
-                            .help("Set the obj to be erased")
-                            .takes_value(true)]),
+                        .alias("er"),
                     // Todo: subcommand node: add & del.
                 ]),
         )

@@ -22,6 +22,7 @@ pub fn main() -> Result<(), &'static str> {
     // println!("Updating with: {:#?}", flower_msg);
     let mirror = flower_vessel(&mut vessel, flower_msg);
     // println!("Mirror: {:#?}", mirror);
+    vessel.glass_refresh();
     let output = match mirror.clone() {
         Mirror::Display { cube, .. } => {
             format!("=======\n\n{}\n\n=======", flower_view(cube, &vessel)?)

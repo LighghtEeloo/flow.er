@@ -125,7 +125,7 @@ impl Vessel {
                 obj.map_or_else(|e| Echo::FlowError(e), |_| Echo::RebuildRef)
             }
             EntityErase { obj } => {
-                let obj = self.entity_erase(obj);
+                let obj = self.entity_decay(obj).and_then(|_| self.entity_erase(obj));
                 obj.map_or_else(|e| Echo::FlowError(e), |_| Echo::RebuildRef)
             }
         }

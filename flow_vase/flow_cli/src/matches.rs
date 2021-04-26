@@ -172,6 +172,12 @@ fn node_sub_match(
                 FlowerMsg::Noop
             }
         }
+        ("decay", _) => {
+            FlowerMsg::Tube(Tube::EntityDecay { obj })
+        }
+        ("erase", _) => {
+            FlowerMsg::Tube(Tube::EntityErase { obj })
+        }
         _ => just_cube,
     }
 }
