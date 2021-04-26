@@ -158,7 +158,8 @@ pub trait FlowLink: FlowBase + FlowCheck {
             .node_mut(owner)
             .map(|owner| {
                 if owner.children().contains(obj) {
-                    return Ok(());
+                    // return Ok(());
+                    owner.children_ref_mut().retain(|id| id != obj)
                 }
                 if nth > owner.children().len() {
                     Err(FlowError::InvalidLen)?
