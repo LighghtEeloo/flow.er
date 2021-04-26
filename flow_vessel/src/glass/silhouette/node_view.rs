@@ -25,6 +25,13 @@ impl NodeViewCore {
         vessel: &Vessel,
         (_, cube_id, cube): (CubeMeta, CubeId, Cube),
     ) -> Option<Self> {
+        Self::from_cube(vessel, cube_id, cube)
+    }
+    pub fn from_cube(
+        vessel: &Vessel,
+        cube_id: CubeId,
+        cube: Cube,
+    ) -> Option<Self> {
         let mut entity_map = HashMap::new();
         let obj = cube.obj;
         let mut children: Vec<EntityId>;

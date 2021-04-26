@@ -1,6 +1,9 @@
 use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
-use std::{fmt::{self, Debug}, time::{Duration, SystemTime}};
+use std::{
+    fmt::{self, Debug},
+    time::{Duration, SystemTime},
+};
 
 use crate::{Tag, TimeRep};
 
@@ -21,7 +24,11 @@ impl TimeNote {
         self.notes.push((end, Tag::default()));
         self
     }
-    pub fn add_sorted_with_tag(&mut self, time: SystemTime, tag: Tag) -> &mut Self {
+    pub fn add_sorted_with_tag(
+        &mut self,
+        time: SystemTime,
+        tag: Tag,
+    ) -> &mut Self {
         self.notes.push((time, tag));
         self.notes.sort_by_key(|(t, _)| t.clone());
         self
@@ -47,10 +54,7 @@ impl TimeNote {
 }
 
 impl TimeRep for TimeNote {
-    fn human_local_detail(
-        &self,
-        f: &mut fmt::Formatter<'_>,
-    ) -> fmt::Result {
+    fn human_local_detail(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "[:")?;
         self.start_t().map(|t| t.human_local_detail(f));
         write!(f, " ~ ")?;

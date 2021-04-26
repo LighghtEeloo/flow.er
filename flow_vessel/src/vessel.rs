@@ -79,9 +79,7 @@ impl Vessel {
         self.flow
             .entities()
             .filter(|x| {
-                filters
-                    .iter()
-                    .fold(false, |is, fil| is || x.matched(fil))
+                filters.iter().fold(false, |is, fil| is || x.matched(fil))
             })
             .map(|x| x.id().clone())
             .collect()

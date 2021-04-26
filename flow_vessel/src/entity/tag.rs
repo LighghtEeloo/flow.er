@@ -25,14 +25,22 @@ impl TagSet {
         if inserting {
             self.data.insert(index, tag);
         }
-        if inserting { Ok(()) } else { Err(()) }
+        if inserting {
+            Ok(())
+        } else {
+            Err(())
+        }
     }
     pub fn push(&mut self, tag: Tag) -> Result<(), ()> {
         let inserting = !self.contains(&tag);
         if inserting {
             self.data.push(tag);
         }
-        if inserting { Ok(()) } else { Err(()) }
+        if inserting {
+            Ok(())
+        } else {
+            Err(())
+        }
     }
     pub fn remove(&mut self, tag: Tag) -> Result<Tag, ()> {
         let position = self.position(&tag);

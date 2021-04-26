@@ -15,6 +15,13 @@ impl ClauseTreeCore {
         vessel: &Vessel,
         (_, cube_id, cube): (CubeMeta, CubeId, Cube),
     ) -> Option<Self> {
+        Self::from_cube(vessel, cube_id, cube)
+    }
+    pub fn from_cube(
+        vessel: &Vessel,
+        cube_id: CubeId,
+        cube: Cube,
+    ) -> Option<Self> {
         let head = cube.obj?;
         let current = cube.current;
         let (mut flow, vec) = vessel.flow.snap_owned(&head).ok()?;

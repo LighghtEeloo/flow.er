@@ -1,18 +1,16 @@
 use flow_vessel::{
     node_view::{NodeViewCore, Own},
-    Cube, CubeId, CubeMeta, CubeType, EntityId, Router, Vessel,
+    Cube, CubeId, CubeType, EntityId, Router, Vessel,
 };
 
 pub fn flower_view(
     cube: Cube,
-    meta: CubeMeta,
-    id: CubeId,
     vessel: &Vessel,
 ) -> Result<String, &'static str> {
     let string = match cube.cube_type {
         // CubeType::Inkblot => {}
         CubeType::NodeView => {
-            let core = NodeViewCore::from_router_cube(vessel, (meta, id, cube))
+            let core = NodeViewCore::from_cube(vessel, CubeId::default(), cube)
                 .ok_or("view_core err")?;
             core.view()
         }
@@ -29,10 +27,14 @@ pub fn flower_view(
 }
 
 pub fn flower_router_view(vessel: &Vessel) -> Result<String, &'static str> {
-    let vec_cube = vessel.glass.show_cubes(Router::Workspace);
+    let vec_cube = vessel
+        .glass
+        .show_cubes(Router::Workspace)
+        .into_iter()
+        .map(|x| x.2);
     let mut vec_string = Vec::new();
-    for (meta, cube_id, cube) in vec_cube {
-        let string = flower_view(cube, meta, cube_id, vessel)?;
+    for cube in vec_cube {
+        let string = flower_view(cube, vessel)?;
         vec_string.push(string);
     }
     let display = vec_string

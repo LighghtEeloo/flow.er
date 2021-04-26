@@ -1,5 +1,10 @@
 use serde::{Deserialize, Serialize};
-use std::{cmp::Ordering, time::{SystemTime, UNIX_EPOCH}, fmt::Debug, hash::Hash};
+use std::{
+    cmp::Ordering,
+    fmt::Debug,
+    hash::Hash,
+    time::{SystemTime, UNIX_EPOCH},
+};
 
 use crate::{now, TimeRep};
 
@@ -21,10 +26,12 @@ impl PartialOrd for TimeUnique {
         let time_cmp = self.time.partial_cmp(&other.time);
         let unique_cmp = self.unique.partial_cmp(&other.unique);
         match (time_cmp, unique_cmp) {
-            (Some(Ordering::Equal), Some(Ordering::Equal)) => Some(Ordering::Equal),
+            (Some(Ordering::Equal), Some(Ordering::Equal)) => {
+                Some(Ordering::Equal)
+            }
             (Some(Ordering::Equal), _) => None,
             (Some(_), _) => time_cmp,
-            _ => None
+            _ => None,
         }
     }
 }

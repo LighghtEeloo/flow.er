@@ -1,5 +1,5 @@
 use flow_vessel::Vessel;
-use flow_vessel::{Cube, CubeId, CubeMeta, CubeType, Tube};
+use flow_vessel::{Cube, CubeType, Tube};
 
 pub mod app;
 pub mod matches;
@@ -24,15 +24,7 @@ pub fn main() -> Result<(), &'static str> {
     // println!("Mirror: {:#?}", mirror);
     let output = match mirror.clone() {
         Mirror::Display { cube, .. } => {
-            format!(
-                "=======\n\n{}\n\n=======",
-                flower_view(
-                    cube,
-                    CubeMeta::default(),
-                    CubeId::default(),
-                    &vessel
-                )?
-            )
+            format!("=======\n\n{}\n\n=======", flower_view(cube, &vessel)?)
         }
         _ => {
             // flower_router_view(&vessel)?
