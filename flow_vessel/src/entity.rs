@@ -82,7 +82,7 @@ impl Entity {
             is || matching
         })
     }
-    
+
     pub fn update_entity(&mut self, field: EntityField) {
         use EntityField::*;
         match field {
@@ -93,7 +93,9 @@ impl Entity {
                 self.symbol_toggle = false;
                 self.symbol = s
             }
-            TagSet(tf) => self.tags.update_tagset(tf),
+            TagSet(tf) => {
+                self.tags.update_tagset(tf).ok();
+            }
             Blocked => {
                 self.blocked = !self.blocked;
             }

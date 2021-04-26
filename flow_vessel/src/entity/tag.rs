@@ -20,41 +20,42 @@ impl TagSet {
     pub fn contains(&self, tag: &Tag) -> bool {
         self.position(&tag).is_some()
     }
-    pub fn insert(&mut self, index: usize, tag: Tag) -> bool {
+    pub fn insert(&mut self, index: usize, tag: Tag) -> Result<(), ()> {
         let inserting = !self.contains(&tag) && index <= self.data.len();
         if inserting {
             self.data.insert(index, tag);
         }
-        inserting
+        if inserting { Ok(()) } else { Err(()) }
     }
-    pub fn push(&mut self, tag: Tag) -> bool {
+    pub fn push(&mut self, tag: Tag) -> Result<(), ()> {
         let inserting = !self.contains(&tag);
         if inserting {
             self.data.push(tag);
         }
-        inserting
+        if inserting { Ok(()) } else { Err(()) }
     }
-    pub fn remove(&mut self, tag: Tag) -> bool {
+    pub fn remove(&mut self, tag: Tag) -> Result<Tag, ()> {
         let position = self.position(&tag);
-        let removing = position.is_some();
+        let removing = position.map(|i| self.data[i].clone());
         if let Some(i) = position {
             self.data.remove(i);
         }
-        removing
+        removing.ok_or(())
     }
-    pub fn update_tagset(&mut self, field: TagSetField) {
+    pub fn update_tagset(&mut self, field: TagSetField) -> Result<(), ()> {
         use TagSetField::*;
         match field {
             AddTag(t) => {
-                self.push(t);
+                self.push(t)?;
             }
             DelTag(t) => {
-                self.remove(t);
+                self.remove(t)?;
             }
             ClearTag => {
                 self.data.clear();
             }
         }
+        Ok(())
     }
 }
 
