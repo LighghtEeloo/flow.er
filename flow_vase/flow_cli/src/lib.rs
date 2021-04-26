@@ -1,12 +1,12 @@
-use flow_vessel::{Vessel};
-use flow_vessel::{Cube, CubeType, CubeMeta, CubeId, Tube};
+use flow_vessel::Vessel;
+use flow_vessel::{Cube, CubeId, CubeMeta, CubeType, Tube};
 
 pub mod app;
 pub mod matches;
 pub mod view;
 
 use matches::flower_sub_match;
-use view::{flower_view};
+use view::flower_view;
 // use view::flower_router_view;
 
 pub fn main() -> Result<(), &'static str> {
@@ -14,61 +14,53 @@ pub fn main() -> Result<(), &'static str> {
     let matches = app::make_flow_app().get_matches();
     // println!("SubCommand: {:#?}", matches.subcommand());
 
-    
     let f = Vessel::load();
-    let mut vessel = 
-    futures::executor::block_on(f)
-    .map_err(|_| "load err")?
-    ;
+    let mut vessel = futures::executor::block_on(f).map_err(|_| "load err")?;
     // println!("===> {:#?} ===>", vessel);
-    
+
     let flower_msg = flower_sub_match(&vessel, &matches);
     // println!("Updating with: {:#?}", flower_msg);
     let mirror = flower_vessel(&mut vessel, flower_msg);
     // println!("Mirror: {:#?}", mirror);
-    let output = 
-        match mirror.clone() {
-            Mirror::Display { cube, .. } => {
-                format!(
-                    "=======\n\n{}\n\n=======",
-                    flower_view(cube, CubeMeta::default(), CubeId::default(), &vessel)?
-                )
-            }
-            _ => {
-                // flower_router_view(&vessel)?
-                format!("")
-            }
-        };
+    let output = match mirror.clone() {
+        Mirror::Display { cube, .. } => {
+            format!(
+                "=======\n\n{}\n\n=======",
+                flower_view(cube, CubeMeta::default(), CubeId::default(), &vessel)?
+            )
+        }
+        _ => {
+            // flower_router_view(&vessel)?
+            format!("")
+        }
+    };
     println!("{}", output);
-    
+
     // println!("<=== {:#?} <===", vessel);
     match mirror {
         Mirror::Write => {
             let f = vessel.save();
-            futures::executor::block_on(f)
-            .map_err(|_| "save err")
+            futures::executor::block_on(f).map_err(|_| "save err")
         }
-        _ => 
-            Ok(())
+        _ => Ok(()),
     }
 }
 
-
 #[derive(Debug)]
 pub enum FlowerMsg {
-    Tube (Tube),
+    Tube(Tube),
     Cube {
         cube: Cube,
         detailed: bool,
         level: Level,
     },
-    Noop
+    Noop,
 }
 
 #[derive(Debug, Clone)]
 pub enum Level {
-    All, 
-    Certain (usize),
+    All,
+    Certain(usize),
     Unique,
     NonRecursive,
 }
@@ -78,11 +70,11 @@ pub enum Mirror {
     Display {
         cube: Cube,
         detailed: bool,
-        level: Level
+        level: Level,
     },
     DisplayAll,
     Write,
-    Stay
+    Stay,
 }
 
 fn flower_vessel(vessel: &mut Vessel, flower_msg: FlowerMsg) -> Mirror {
@@ -91,14 +83,18 @@ fn flower_vessel(vessel: &mut Vessel, flower_msg: FlowerMsg) -> Mirror {
             vessel.update_tube(tube);
             Mirror::Write
         }
-        FlowerMsg::Cube{ cube, detailed, level } => {
+        FlowerMsg::Cube {
+            cube,
+            detailed,
+            level,
+        } => {
             // println!("{:#?}", cube);
             // println!("{:?}", detailed);
             // println!("{:?}", level);
             Mirror::Display {
-                cube, 
-                detailed, 
-                level
+                cube,
+                detailed,
+                level,
             }
         }
         FlowerMsg::Noop => {

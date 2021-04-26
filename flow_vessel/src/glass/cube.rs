@@ -1,10 +1,10 @@
-use serde::{Serialize, Deserialize};
-use std::time::SystemTime;
-use flow_arena::FlowBase;
 use crate::{EntityFlow, EntityId, Router};
+use flow_arena::FlowBase;
+use serde::{Deserialize, Serialize};
+use std::time::SystemTime;
 
-pub mod identity;
 pub mod filter;
+pub mod identity;
 
 use filter::Filter;
 
@@ -28,12 +28,12 @@ pub enum CubeType {
     /// A setting panel.
     SettingView,
     /// Blank Page with simple notes. Uses ?obj & profile.
-    Blank
+    Blank,
 }
 
 impl Default for CubeType {
     fn default() -> Self {
-        CubeType::Blank 
+        CubeType::Blank
     }
 }
 
@@ -55,9 +55,9 @@ impl CubeType {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Profile {
-    Where (Option<EntityId>),
-    When (SystemTime),
-    Why (String),
+    Where(Option<EntityId>),
+    When(SystemTime),
+    Why(String),
 }
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
@@ -65,16 +65,14 @@ pub struct Cube {
     pub cube_type: CubeType,
     pub obj: Option<EntityId>,
     pub current: Option<EntityId>,
-    /// obj & current are first used if requirements are already satisfied; 
+    /// obj & current are first used if requirements are already satisfied;
     /// if more info is needed, profile is then used.
     pub profile: Option<Profile>,
     pub filters: Vec<Filter>,
 }
 
-
 /// new Cube
 impl Cube {
-
     pub fn new(cube_type: CubeType) -> Self {
         Self {
             cube_type,
@@ -104,36 +102,34 @@ impl Cube {
     /// otherwise, true.
     pub fn is_valid_cube(&self, flow: &EntityFlow) -> bool {
         // if obj is Some, perform contain check
-        let is_obj = self.obj.map_or(true, |obj| 
-            flow.contains_node(&obj)
-        );
+        let is_obj = self.obj.map_or(true, |obj| flow.contains_node(&obj));
         // if current is Some, perform contain check
-        let is_current = self.current.map_or(true, |current| 
-            flow.contains_node(&current)
-        );
+        let is_current = self
+            .current
+            .map_or(true, |current| flow.contains_node(&current));
         use CubeType::*;
         let legal = match (self.cube_type, self.obj, self.current, self.profile.clone()) {
-            (Inkblot,Some(_),_,None) |
-            (NodeView,_,None,None) |
-            (ClauseTree,Some(_),_,None) |
-            (PromisedLand,_,_,None) |
-            (FlowView,Some(_),_,None) |
-            (AgendaView,None,None,Some(Profile::Where(_))) |
-            (AgendaView,None,None,Some(Profile::When(_))) |
-            (TimeView,None,None,None) |
-            (SettingView,None,None,None) |
-            (Blank,_,None,Some(Profile::Why(_))) => true,
-            _ => false
+            (Inkblot, Some(_), _, None)
+            | (NodeView, _, None, None)
+            | (ClauseTree, Some(_), _, None)
+            | (PromisedLand, _, _, None)
+            | (FlowView, Some(_), _, None)
+            | (AgendaView, None, None, Some(Profile::Where(_)))
+            | (AgendaView, None, None, Some(Profile::When(_)))
+            | (TimeView, None, None, None)
+            | (SettingView, None, None, None)
+            | (Blank, _, None, Some(Profile::Why(_))) => true,
+            _ => false,
         };
         is_obj && is_current && legal
     }
-    
+
     /// fix a cube to a legal state if it's not already.
     pub fn ensure(&mut self, flow: &EntityFlow) -> Option<&mut Self> {
         // current -> Some(<Exist>) | None
-        if ! self.current.map_or(false, |cur| 
-            flow.contains_node(&cur)
-        ) { self.clear_current(); }
+        if !self.current.map_or(false, |cur| flow.contains_node(&cur)) {
+            self.clear_current();
+        }
         // obj = Some(<Not Exist>) -> clean
         // obj = None | Some(<Exist>) -> keep
         if self.is_valid_cube(flow) {
@@ -143,7 +139,6 @@ impl Cube {
         }
     }
 }
-
 
 /// obj, current & profile
 impl Cube {
@@ -185,7 +180,6 @@ impl Cube {
     }
 }
 
-
 /// generated on site; isn't contained in a Vec<Cube>
 #[derive(Default, Debug, Clone, Copy)]
 pub struct CubeMeta {
@@ -202,22 +196,24 @@ impl CubeMeta {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
-    use crate::{Entity, EntityIdFactory};
     use super::*;
+    use crate::{Entity, EntityIdFactory};
 
     #[test]
     fn cube_create() {
         let mut entity_factory = EntityIdFactory::default();
-        let entitys: Vec<Entity> = (0..20).map(|_| Entity::new_rotate(&mut entity_factory)).collect();
-        println!("{:?}", entitys.iter().map(|x| x.id()).collect::<Vec<&EntityId>>());
+        let entitys: Vec<Entity> = (0..20)
+            .map(|_| Entity::new_rotate(&mut entity_factory))
+            .collect();
+        println!(
+            "{:?}",
+            entitys.iter().map(|x| x.id()).collect::<Vec<&EntityId>>()
+        );
         let mut cube = Cube::new_router(Router::Workspace).with_obj(entitys[0].id().clone());
         println!("{:#?}", cube.obj);
         cube.set_obj(entitys[2].id().clone());
         println!("{:#?}", cube.obj);
     }
-
-
 }

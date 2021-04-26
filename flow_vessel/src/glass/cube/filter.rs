@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::{Symbol, Tag};
 
@@ -8,7 +8,7 @@ pub enum Filter {
     Face(String),
     Symbol(Symbol),
     Tag(Tag),
-    All
+    All,
 }
 
 impl Default for Filter {

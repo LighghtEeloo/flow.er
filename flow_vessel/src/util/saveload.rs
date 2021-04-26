@@ -1,4 +1,4 @@
-use crate::{Vessel, Bridge};
+use crate::{Bridge, Vessel};
 
 #[derive(Debug, Clone)]
 pub enum LoadError {
@@ -46,7 +46,7 @@ impl Vessel {
 
         let vessel: Vessel = serde_json::from_str(&contents).map_err(|_| LoadError::FormatError)?;
 
-        if let Bridge::Linked{..} = vessel.settings.bridge {
+        if let Bridge::Linked { .. } = vessel.settings.bridge {
             // Todo: link and save.
         }
 
@@ -76,7 +76,7 @@ impl Vessel {
                 .map_err(|_| SaveError::WriteError)?;
         }
 
-        if let Bridge::Linked{..} = self.settings.bridge {
+        if let Bridge::Linked { .. } = self.settings.bridge {
             // Todo: link and save.
         }
 
@@ -106,7 +106,7 @@ impl Vessel {
             .ok_or(LoadError::FileError)?;
 
         serde_json::from_str(&contents).map_err(|_| LoadError::FormatError)
-    } 
+    }
 
     async fn load_linked(addr: String, port: u16) -> Result<Vessel, LoadError> {
         log::debug!("loading linked: {}:{}", addr, port);
@@ -117,20 +117,24 @@ impl Vessel {
         let vessel: Vessel = Self::load_local().await.or_else(|load_error| {
             if let LoadError::FileError = load_error {
                 Ok(Vessel::default())
-            } else { Err(load_error) }
+            } else {
+                Err(load_error)
+            }
         })?;
 
         let bridge = vessel.settings.bridge.clone();
 
         let vessel = if let Bridge::Linked { addr, port } = bridge {
-            Self::load_linked(addr, port).await.or_else(|load_error|
+            Self::load_linked(addr, port).await.or_else(|load_error| {
                 if let LoadError::WebError = load_error {
                     Ok(vessel)
                 } else {
                     Err(load_error)
                 }
-            )?
-        } else { vessel };
+            })?
+        } else {
+            vessel
+        };
 
         Ok(vessel)
     }
@@ -158,7 +162,9 @@ mod tests {
     #[test]
     fn saveload() -> Result<(), &'static str> {
         let f = Vessel::load();
-        let vessel = futures::executor::block_on(f).map_err(|_| "load err").unwrap_or(Vessel::new());
+        let vessel = futures::executor::block_on(f)
+            .map_err(|_| "load err")
+            .unwrap_or(Vessel::new());
         println!("{:#?}", vessel);
 
         // let vessel = Vessel::new();
@@ -168,26 +174,44 @@ mod tests {
                 let obj = vessel.entity_grow().map_err(|_| "grow err")?;
                 let flow_view = Cube::new(CubeType::FlowView).with_obj(obj);
                 let flow_view = vessel.glass.add_cube(flow_view);
-                let meta = CubeMeta { router: Router::Workspace, idx: 0 };
-                vessel.glass.place_cube(flow_view, meta).expect("place_cube failed");
+                let meta = CubeMeta {
+                    router: Router::Workspace,
+                    idx: 0,
+                };
+                vessel
+                    .glass
+                    .place_cube(flow_view, meta)
+                    .expect("place_cube failed");
             }
             {
                 let promised_land = Cube::new(CubeType::PromisedLand);
                 let promised_land = vessel.glass.add_cube(promised_land);
-                let meta = CubeMeta { router: Router::Workspace, idx: 1 };
-                vessel.glass.place_cube(promised_land, meta).expect("place_cube failed");
+                let meta = CubeMeta {
+                    router: Router::Workspace,
+                    idx: 1,
+                };
+                vessel
+                    .glass
+                    .place_cube(promised_land, meta)
+                    .expect("place_cube failed");
             }
             {
                 let node_view = Cube::new(CubeType::NodeView);
                 let node_view = vessel.glass.add_cube(node_view);
-                let meta = CubeMeta { router: Router::Workspace, idx: 2 };
-                vessel.glass.place_cube(node_view, meta).expect("place_cube failed");
+                let meta = CubeMeta {
+                    router: Router::Workspace,
+                    idx: 2,
+                };
+                vessel
+                    .glass
+                    .place_cube(node_view, meta)
+                    .expect("place_cube failed");
             }
             println!("{:#?}", vessel);
             let f = vessel.save();
             futures::executor::block_on(f).map_err(|_| "save err")?;
         }
-        
+
         // remain unchanged
         let f = vessel.save();
         futures::executor::block_on(f).map_err(|_| "save err")?;

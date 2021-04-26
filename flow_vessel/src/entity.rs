@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::{Filter, Identity, TimeNote};
 use identity::*;
@@ -62,7 +62,7 @@ impl Entity {
                 Filter::Face(face) => self.face.contains(face),
                 Filter::Symbol(s) => &self.symbol == s,
                 Filter::Tag(t) => self.tags.contains(&t),
-                Filter::All => true
+                Filter::All => true,
             };
             is && matching
         })
@@ -70,13 +70,13 @@ impl Entity {
 
     /// false if any filter matches
     pub fn filter_out(&self, filters: &Vec<Filter>) -> bool {
-        ! filters.into_iter().fold(false, |is, filter| {
+        !filters.into_iter().fold(false, |is, filter| {
             let matching = match filter {
                 Filter::Identity(id) => self.id().parse_match(&id),
                 Filter::Face(face) => self.face.contains(face),
                 Filter::Symbol(s) => &self.symbol == s,
                 Filter::Tag(t) => self.tags.contains(&t),
-                Filter::All => true
+                Filter::All => true,
             };
             is || matching
         })
@@ -84,16 +84,14 @@ impl Entity {
     pub fn update_entity(&mut self, field: EntityField) {
         use EntityField::*;
         match field {
-            TimeNote(t) => { self.time_note = Some(t) }
-            Face(f) => { self.face = f }
-            Bubble(b) => { self.bubble = b }
-            Symbol(s) => { 
+            TimeNote(t) => self.time_note = Some(t),
+            Face(f) => self.face = f,
+            Bubble(b) => self.bubble = b,
+            Symbol(s) => {
                 self.symbol_toggle = false;
                 self.symbol = s
             }
-            TagSet(tf) => { 
-                self.tags.update_tagset(tf)
-            }
+            TagSet(tf) => self.tags.update_tagset(tf),
             Blocked => {
                 self.blocked = !self.blocked;
             }
@@ -105,11 +103,10 @@ impl Entity {
 }
 
 impl Default for Entity {
-    fn default() -> Self { 
+    fn default() -> Self {
         Self::new_id(&EntityId::default())
     }
 }
-
 
 pub type Face = String;
 pub type Bubble = String;

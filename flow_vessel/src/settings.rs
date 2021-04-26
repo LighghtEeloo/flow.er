@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::Router;
 
@@ -17,10 +17,7 @@ pub struct Settings {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Bridge {
     Local,
-    Linked {
-        addr: String,
-        port: u16
-    }
+    Linked { addr: String, port: u16 },
 }
 
 impl Default for Bridge {
@@ -32,7 +29,7 @@ impl Default for Bridge {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum ViewMode {
     Desktop,
-    Mobile
+    Mobile,
 }
 
 impl Default for ViewMode {
@@ -46,24 +43,23 @@ impl ViewMode {
         use ViewMode::*;
         match self {
             Desktop => Mobile,
-            Mobile => Desktop
+            Mobile => Desktop,
         }
     }
     pub fn display(&self) -> &str {
         use ViewMode::*;
         match self {
             Desktop => "Desktop",
-            Mobile => "Mobile"
+            Mobile => "Mobile",
         }
     }
 }
-
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum WorkspaceMode {
     Full,
     Pure,
-    Manual (Vec<Router>)
+    Manual(Vec<Router>),
 }
 
 impl Default for WorkspaceMode {
@@ -78,7 +74,7 @@ impl WorkspaceMode {
         match self {
             Full => Pure,
             Pure => Full,
-            _ => Full
+            _ => Full,
         }
     }
     pub fn display(&self) -> String {
@@ -86,7 +82,7 @@ impl WorkspaceMode {
         match self {
             Full => format!("Full"),
             Pure => format!("Pure"),
-            Manual (vec) => format!("Maunal: {:?}", vec)
+            Manual(vec) => format!("Maunal: {:?}", vec),
         }
     }
 }

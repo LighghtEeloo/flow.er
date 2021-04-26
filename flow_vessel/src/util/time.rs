@@ -1,8 +1,11 @@
-use std::{fmt::Debug, time::{SystemTime, Duration}};
+use chrono::{DateTime, Local, Utc};
+use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use std::time::UNIX_EPOCH;
-use chrono::{DateTime, Local, Utc};
-use serde::{Serialize, Deserialize};
+use std::{
+    fmt::Debug,
+    time::{Duration, SystemTime},
+};
 
 pub trait TimeRep {
     fn human_local_detail(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result;
@@ -14,7 +17,11 @@ pub trait TimeRep {
 impl TimeRep for SystemTime {
     fn human_local_detail(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let dt: DateTime<Local> = self.clone().into();
-        write!(f, "{} (Local)", dt.format("%Y-%m-%d %a %H:%M:%S").to_string())
+        write!(
+            f,
+            "{} (Local)",
+            dt.format("%Y-%m-%d %a %H:%M:%S").to_string()
+        )
     }
     fn human_local(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let dt: DateTime<Local> = self.clone().into();
@@ -43,11 +50,10 @@ pub fn now() -> SystemTime {
     SystemTime::now()
 }
 
-#[derive(Default)]
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Default, Clone, Serialize, Deserialize)]
 pub struct TimeNote {
     start: Option<SystemTime>,
-    end: Option<SystemTime>
+    end: Option<SystemTime>,
 }
 
 impl TimeNote {
@@ -65,7 +71,7 @@ impl TimeNote {
     pub fn length(&self) -> Duration {
         match (self.start, self.end) {
             (Some(s), Some(e)) => e.duration_since(s).unwrap_or(Duration::new(0, 0)),
-            _ => Duration::new(0, 0)
+            _ => Duration::new(0, 0),
         }
     }
 }
@@ -117,16 +123,15 @@ impl Debug for TimeNote {
     }
 }
 
-
 pub mod display {
+    use super::TimeRep;
     use std::fmt::Display;
-    use super::TimeRep;    
 
-    pub struct TimeClockLocal<T> (T);
+    pub struct TimeClockLocal<T>(T);
 
     impl<T: Sized> From<T> for TimeClockLocal<T> {
         fn from(t: T) -> Self {
-            Self (t)
+            Self(t)
         }
     }
 
@@ -136,11 +141,11 @@ pub mod display {
         }
     }
 
-    pub struct TimeHumanLocal<T> (T);
+    pub struct TimeHumanLocal<T>(T);
 
     impl<T: Sized> From<T> for TimeHumanLocal<T> {
         fn from(t: T) -> Self {
-            Self (t)
+            Self(t)
         }
     }
 
@@ -150,11 +155,11 @@ pub mod display {
         }
     }
 
-    pub struct TimeHumanUTC<T> (T);
+    pub struct TimeHumanUTC<T>(T);
 
     impl<T: Sized> From<T> for TimeHumanUTC<T> {
         fn from(t: T) -> Self {
-            Self (t)
+            Self(t)
         }
     }
 

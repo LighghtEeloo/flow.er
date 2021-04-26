@@ -1,8 +1,6 @@
 use yew::Component;
 
-pub struct Vase {
-
-}
+pub struct Vase {}
 
 impl Component for Vase {
     type Message = ();

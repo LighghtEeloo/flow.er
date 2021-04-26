@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use flow_arena::{FlowBase};
+use flow_arena::FlowBase;
 
 use crate::{Cube, CubeId, CubeMeta, Entity, EntityId, Vessel};
 
@@ -17,11 +17,14 @@ pub struct NodeViewCore {
 pub enum Own {
     Obj,
     Yes,
-    No
+    No,
 }
 
 impl NodeViewCore {
-    pub fn from_router_cube(vessel: &Vessel, (_, cube_id, cube): (CubeMeta, CubeId, Cube)) -> Option<Self> {
+    pub fn from_router_cube(
+        vessel: &Vessel,
+        (_, cube_id, cube): (CubeMeta, CubeId, Cube),
+    ) -> Option<Self> {
         let mut entity_map = HashMap::new();
         let obj = cube.obj;
         let children: Vec<EntityId>;
@@ -29,7 +32,11 @@ impl NodeViewCore {
             entity_map.insert(obj, (Own::Obj, vessel.flow.node(&obj)?.entity.clone()));
             children = vessel.flow.children(&obj);
             for c in children.iter() {
-                let own = if vessel.flow.is_owned(c, &obj) { Own::Yes } else { Own::No };
+                let own = if vessel.flow.is_owned(c, &obj) {
+                    Own::Yes
+                } else {
+                    Own::No
+                };
                 entity_map.insert(c.clone(), (own, vessel.flow.node(c)?.entity.clone()));
             }
         } else {
@@ -39,13 +46,12 @@ impl NodeViewCore {
                 entity_map.insert(c.clone(), (own, vessel.flow.node(c)?.entity.clone()));
             }
         }
-        Some( Self {
+        Some(Self {
             cube_id,
             obj,
             children,
             current: None,
-            entity_map
+            entity_map,
         })
     }
-
 }

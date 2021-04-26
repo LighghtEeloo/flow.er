@@ -1,8 +1,8 @@
-use std::{fmt::Debug, hash::Hash};
+use serde::{Deserialize, Serialize};
 use std::time::{SystemTime, UNIX_EPOCH};
-use serde::{Serialize, Deserialize};
+use std::{fmt::Debug, hash::Hash};
 
-use crate::{TimeRep, now};
+use crate::{now, TimeRep};
 
 pub trait Identity: Default + Debug + Clone + Hash + PartialEq + Eq {
     fn parse_match(&self, attempt: &str) -> bool;
@@ -11,18 +11,17 @@ pub trait Identity: Default + Debug + Clone + Hash + PartialEq + Eq {
 
 const LEN: usize = 5;
 
-
 #[derive(Clone, Copy, Hash, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TimeUnique {
     time: SystemTime,
-    unique: u64
+    unique: u64,
 }
 
 impl Default for TimeUnique {
     fn default() -> Self {
         Self {
             time: UNIX_EPOCH,
-            unique: 0
+            unique: 0,
         }
     }
 }
@@ -38,11 +37,19 @@ impl Debug for TimeUnique {
                 self.time.human_local(f)?;
             }
             write!(f, "]]")?;
-            let hash: String = format!("{:x}", self.unique).as_str().chars().take(LEN).collect();
+            let hash: String = format!("{:x}", self.unique)
+                .as_str()
+                .chars()
+                .take(LEN)
+                .collect();
             write!(f, "(({}))", hash)
         } else {
             // raw
-            let hash: String = format!("{:x}", self.unique).as_str().chars().take(LEN).collect();
+            let hash: String = format!("{:x}", self.unique)
+                .as_str()
+                .chars()
+                .take(LEN)
+                .collect();
             write!(f, "[[{}]]", hash)
         }
     }
@@ -54,21 +61,21 @@ impl Identity for TimeUnique {
     }
 
     fn parse_filter(candidates: &Vec<Self>, attempt: &str) -> Option<Self> {
-        let mut candidates: Vec<Self> = candidates.iter()
+        let mut candidates: Vec<Self> = candidates
+            .iter()
             .filter_map(|id| {
                 if id.parse_match(attempt) {
                     Some(id.clone())
-                } else { None }
+                } else {
+                    None
+                }
             })
             .collect();
         if candidates.len() == 1 {
             candidates.pop()
-        } else 
-        if let Some(id) 
-            = candidates.iter()
-            .find(|id| { 
-                format!("{:x}", id.unique).eq(attempt) 
-            })
+        } else if let Some(id) = candidates
+            .iter()
+            .find(|id| format!("{:x}", id.unique).eq(attempt))
         {
             Some(id.clone())
         } else {
@@ -79,7 +86,7 @@ impl Identity for TimeUnique {
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct IdFactory {
-    cnt: u64
+    cnt: u64,
 }
 
 impl IdFactory {
@@ -88,20 +95,20 @@ impl IdFactory {
         Self::rotate_add(&mut self.cnt);
         TimeUnique {
             time: UNIX_EPOCH,
-            unique: self.cnt
+            unique: self.cnt,
         }
     }
     pub fn time_id(&self) -> TimeUnique {
         TimeUnique {
             time: now(),
-            unique: rand::random()
+            unique: rand::random(),
         }
     }
     pub fn rotate_id(&mut self) -> TimeUnique {
         Self::rotate_add(&mut self.cnt);
         TimeUnique {
             time: now(),
-            unique: self.cnt
+            unique: self.cnt,
         }
     }
     fn rotate_add(cnt: &mut u64) {
@@ -122,9 +129,27 @@ mod tests {
     #[test]
     fn factory_incr() {
         let mut id_factory = IdFactory::default();
-        assert_eq!(id_factory.incr_id(), TimeUnique { time: UNIX_EPOCH, unique: 1 });
-        assert_eq!(id_factory.incr_id(), TimeUnique { time: UNIX_EPOCH, unique: 2 });
-        assert_eq!(id_factory.incr_id(), TimeUnique { time: UNIX_EPOCH, unique: 3 });
+        assert_eq!(
+            id_factory.incr_id(),
+            TimeUnique {
+                time: UNIX_EPOCH,
+                unique: 1
+            }
+        );
+        assert_eq!(
+            id_factory.incr_id(),
+            TimeUnique {
+                time: UNIX_EPOCH,
+                unique: 2
+            }
+        );
+        assert_eq!(
+            id_factory.incr_id(),
+            TimeUnique {
+                time: UNIX_EPOCH,
+                unique: 3
+            }
+        );
     }
     #[test]
     fn factory_time() {

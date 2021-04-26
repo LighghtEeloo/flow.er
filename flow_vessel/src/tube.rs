@@ -7,49 +7,49 @@ use super::{Cube, CubeMeta, EntityField, EntityId, Router, Settings, Vessel};
 pub enum Tube {
     // router level
     SwitchRouter {
-        router: Router
+        router: Router,
     },
     SettingUpdate {
-        settings: Settings
+        settings: Settings,
     },
 
     // vm level
     OpenVM {
         cube: Cube,
-        meta: CubeMeta
+        meta: CubeMeta,
     },
     CloseVM {
-        meta: CubeMeta
+        meta: CubeMeta,
     },
 
     // entity level
     EntityAdd {
         dude: Option<EntityId>,
         owner: EntityId,
-        idx: usize
+        idx: usize,
     },
     EntityUpdate {
         id: EntityId,
-        field: EntityField
+        field: EntityField,
     },
     EntityDelete {
-        id: EntityId
+        id: EntityId,
     },
     EntityMigrate {
         id: EntityId,
-        dir: Direction
+        dir: Direction,
     },
     // detailed
     EntityGrow,
     EntityLink {
         obj: EntityId,
         owner: EntityId,
-        nth: usize
+        nth: usize,
     },
     EntityDevote {
         obj: EntityId,
         owner: EntityId,
-        nth: usize
+        nth: usize,
     },
     EntityDecay {
         obj: EntityId,
@@ -63,19 +63,19 @@ pub enum Tube {
 pub enum Echo {
     RebuildVM,
     RebuildRef,
-    FlowError (FlowError),
-    SendObj (EntityId),
-    Standby
+    FlowError(FlowError),
+    SendObj(EntityId),
+    Standby,
 }
 
 impl Vessel {
     pub fn update_tube(&mut self, tube: Tube) -> Echo {
         use Tube::*;
         match tube {
-            SwitchRouter{ router} => {
+            SwitchRouter { router } => {
                 self.glass.router = router;
                 Echo::RebuildVM
-            },
+            }
             SettingUpdate { settings } => {
                 self.settings = settings;
                 Echo::Standby
@@ -91,68 +91,42 @@ impl Vessel {
                 Echo::RebuildVM
             }
 
-            EntityAdd { dude, owner, idx } => {
-                dude.map_or(
-                    self.entity_grow_devote(owner, idx),
-                    |dude| self.entity_add(dude, owner, idx)
-                )
+            EntityAdd { dude, owner, idx } => dude
+                .map_or(self.entity_grow_devote(owner, idx), |dude| {
+                    self.entity_add(dude, owner, idx)
+                })
                 .err()
-                .map_or(Echo::RebuildRef, |e| Echo::FlowError (e))
-            }
+                .map_or(Echo::RebuildRef, |e| Echo::FlowError(e)),
             EntityUpdate { id, field } => {
-                self.entity_mut(&id).map(|entity| {
-                    entity.update_entity(field)
-                });
+                self.entity_mut(&id)
+                    .map(|entity| entity.update_entity(field));
                 Echo::RebuildRef
             }
-            EntityDelete { id } => {
-                self.entity_remove(id)
-                .map_or_else(
-                    |e| Echo::FlowError (e),
-                    |_| { Echo::RebuildRef }
-                )
-            }
-            EntityMigrate { id, dir } => {
-                self.entity_migrate(&id, dir)
-                .map_or_else(
-                    |e| Echo::FlowError (e),
-                    |_| { Echo::RebuildRef }
-                )
-            }
+            EntityDelete { id } => self
+                .entity_remove(id)
+                .map_or_else(|e| Echo::FlowError(e), |_| Echo::RebuildRef),
+            EntityMigrate { id, dir } => self
+                .entity_migrate(&id, dir)
+                .map_or_else(|e| Echo::FlowError(e), |_| Echo::RebuildRef),
             EntityGrow => {
                 let obj = self.entity_grow();
-                obj.map_or_else( 
-                    |e| Echo::FlowError (e), 
-                    |id| Echo::SendObj (id)
-                )
+                obj.map_or_else(|e| Echo::FlowError(e), |id| Echo::SendObj(id))
             }
             EntityLink { obj, owner, nth } => {
                 let obj = self.entity_link(obj, owner, nth);
-                obj.map_or_else( 
-                    |e| Echo::FlowError (e), 
-                    |_| Echo::RebuildRef
-                )
+                obj.map_or_else(|e| Echo::FlowError(e), |_| Echo::RebuildRef)
             }
             EntityDevote { obj, owner, nth } => {
                 let obj = self.entity_devote(obj, owner, nth);
-                obj.map_or_else( 
-                    |e| Echo::FlowError (e), 
-                    |_| Echo::RebuildRef
-                )
+                obj.map_or_else(|e| Echo::FlowError(e), |_| Echo::RebuildRef)
             }
             EntityDecay { obj } => {
                 let obj = self.entity_decay(obj);
-                obj.map_or_else( 
-                    |e| Echo::FlowError (e), 
-                    |_| Echo::RebuildRef
-                )
+                obj.map_or_else(|e| Echo::FlowError(e), |_| Echo::RebuildRef)
             }
             EntityErase { obj } => {
                 let obj = self.entity_erase(obj);
-                obj.map_or_else( 
-                    |e| Echo::FlowError (e), 
-                    |_| Echo::RebuildRef
-                )
+                obj.map_or_else(|e| Echo::FlowError(e), |_| Echo::RebuildRef)
             }
         }
     }

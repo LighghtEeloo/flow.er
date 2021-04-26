@@ -1,13 +1,19 @@
-use flow_vessel::{Cube, CubeId, CubeType, CubeMeta, EntityId, Vessel, Router, node_view::{NodeViewCore, Own}};
+use flow_vessel::{
+    node_view::{NodeViewCore, Own},
+    Cube, CubeId, CubeMeta, CubeType, EntityId, Router, Vessel,
+};
 
-pub fn flower_view(cube: Cube, meta: CubeMeta, id: CubeId, vessel: &Vessel) ->  Result<String, &'static str> {
+pub fn flower_view(
+    cube: Cube,
+    meta: CubeMeta,
+    id: CubeId,
+    vessel: &Vessel,
+) -> Result<String, &'static str> {
     let string = match cube.cube_type {
         // CubeType::Inkblot => {}
         CubeType::NodeView => {
-            let core = NodeViewCore::from_router_cube(
-                vessel, 
-                (meta, id, cube)
-            ).ok_or("view_core err")?;
+            let core =
+                NodeViewCore::from_router_cube(vessel, (meta, id, cube)).ok_or("view_core err")?;
             core.view()
         }
         // CubeType::ClauseTree => {}
@@ -17,7 +23,7 @@ pub fn flower_view(cube: Cube, meta: CubeMeta, id: CubeId, vessel: &Vessel) ->  
         // CubeType::TimeView => {}
         // CubeType::SettingView => {}
         // CubeType::Blank => {}
-        _ => format!("**Can't render.**")
+        _ => format!("**Can't render.**"),
     };
     Ok(string)
 }
@@ -29,12 +35,12 @@ pub fn flower_router_view(vessel: &Vessel) -> Result<String, &'static str> {
         let string = flower_view(cube, meta, cube_id, vessel)?;
         vec_string.push(string);
     }
-    let display = vec_string.into_iter().enumerate().fold(
-        format!("========"), 
-        |display, (idx, s)| {
+    let display = vec_string
+        .into_iter()
+        .enumerate()
+        .fold(format!("========"), |display, (idx, s)| {
             format!("{}\n\n{}\n\n<<<<<<<< {}", display, s, idx)
-        }
-    );
+        });
     Ok(display)
 }
 
@@ -52,11 +58,12 @@ impl CubeView for NodeViewCore {
         let to_display = |obj: &EntityId, indent: usize| -> String {
             self.entity_map.get(obj).map_or(String::new(), |(own, en)| {
                 let indent = " ".repeat(4 * indent);
-                format!("{}{}{:?} {}", 
-                    indent, 
+                format!(
+                    "{}{}{:?} {}",
+                    indent,
                     if let Own::No = own { "* " } else { "" },
-                    obj, 
-                    en.face.clone() 
+                    obj,
+                    en.face.clone()
                 )
             })
         };
@@ -66,7 +73,7 @@ impl CubeView for NodeViewCore {
         } else {
             display = format!("<root> /");
         }
-        
+
         indent += 1;
         for id in self.children.iter() {
             display = format!("{}\n{}", display, to_display(id, indent));
@@ -75,5 +82,3 @@ impl CubeView for NodeViewCore {
         display
     }
 }
-
-

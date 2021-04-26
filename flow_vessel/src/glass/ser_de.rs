@@ -1,10 +1,9 @@
 use super::*;
 
-use serde::ser::{Serialize, Serializer, SerializeStruct};
+use serde::ser::{Serialize, SerializeStruct, Serializer};
 impl Serialize for Glass {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-        let mut flow = 
-            serializer.serialize_struct("Flow", 2)?;
+        let mut flow = serializer.serialize_struct("Flow", 2)?;
         let seq: Vec<(&CubeId, &Cube)> = self.cube_map.iter().collect();
         flow.serialize_field("router", &self.router)?;
         flow.serialize_field("factory", &self.factory)?;
@@ -14,11 +13,16 @@ impl Serialize for Glass {
     }
 }
 
-use serde::de::{self, Deserialize, Deserializer, Visitor, MapAccess};
+use serde::de::{self, Deserialize, Deserializer, MapAccess, Visitor};
 use std::marker::PhantomData;
 impl<'de> Deserialize<'de> for Glass {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        enum Field { Router, Factory, RouterMap, CubeMap }
+        enum Field {
+            Router,
+            Factory,
+            RouterMap,
+            CubeMap,
+        }
         use std::fmt;
         impl<'de> Deserialize<'de> for Field {
             fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Field, D::Error> {
@@ -50,7 +54,7 @@ impl<'de> Deserialize<'de> for Glass {
         }
 
         struct GlassVisitor {
-            marker: PhantomData<fn() -> Glass>
+            marker: PhantomData<fn() -> Glass>,
         }
 
         impl<'de> Visitor<'de> for GlassVisitor {
@@ -109,13 +113,25 @@ impl<'de> Deserialize<'de> for Glass {
                 }
                 let router = router.unwrap_or_default();
                 let factory = factory.ok_or_else(|| de::Error::missing_field("factory"))?;
-                let router_map = router_map.ok_or_else(|| de::Error::missing_field("router_map"))?;
+                let router_map =
+                    router_map.ok_or_else(|| de::Error::missing_field("router_map"))?;
                 let cube_map = cube_map.ok_or_else(|| de::Error::missing_field("cube_map"))?;
-                Ok(Self::Value { router, factory, router_map, cube_map })
+                Ok(Self::Value {
+                    router,
+                    factory,
+                    router_map,
+                    cube_map,
+                })
             }
         }
 
         const FIELDS: &'static [&'static str] = &["router", "factory", "router_map", "cube_map"];
-        deserializer.deserialize_struct("Glass", FIELDS, GlassVisitor { marker: PhantomData })
+        deserializer.deserialize_struct(
+            "Glass",
+            FIELDS,
+            GlassVisitor {
+                marker: PhantomData,
+            },
+        )
     }
 }

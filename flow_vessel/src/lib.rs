@@ -1,33 +1,33 @@
-mod identity;
 mod entity;
 mod glass;
+mod identity;
 mod settings;
-mod vessel;
 mod tube;
 mod util;
+mod vessel;
 
 pub use self::{
-    identity::{Identity, TimeUnique, IdFactory},
     entity::{
         identity::{EntityId, EntityIdFactory},
-        symbol::{Symbol, Process, Lint, AlphaBet, Babel, BABEL},
+        symbol::{AlphaBet, Babel, Lint, Process, Symbol, BABEL},
         tag::{Tag, TagSet, TagSetField},
-        {Entity, EntityField, Face, Bubble},
+        {Bubble, Entity, EntityField, Face},
     },
     glass::{
         cube::{
-            identity::{CubeId, CubeIdFactory},
             filter::Filter,
-            {Cube, CubeType, Profile, CubeMeta}
+            identity::{CubeId, CubeIdFactory},
+            {Cube, CubeMeta, CubeType, Profile},
         },
         silhouette::*,
-        {Glass, Router}
+        {Glass, Router},
     },
-    settings::{Settings, Bridge, ViewMode},
+    identity::{IdFactory, Identity, TimeUnique},
+    settings::{Bridge, Settings, ViewMode},
+    tube::{Echo, Tube},
     util::{
-        json::{from_json, to_json, export_json},
-        time::{TimeNote, TimeRep, display, now}
+        json::{export_json, from_json, to_json},
+        time::{display, now, TimeNote, TimeRep},
     },
-    vessel::{Vessel, EntityNode, EntityFlow},
-    tube::{Tube, Echo},
+    vessel::{EntityFlow, EntityNode, Vessel},
 };

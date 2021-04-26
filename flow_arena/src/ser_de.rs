@@ -1,14 +1,16 @@
+use super::{FlowArena, FlowNode, Node};
 use std::{fmt, hash::Hash};
-use super::{FlowNode, Node, FlowArena};
 
 #[cfg(feature = "serde_impl")]
-use serde::ser::{Serialize, Serializer, SerializeStruct};
+use serde::ser::{Serialize, SerializeStruct, Serializer};
 #[cfg(feature = "serde_impl")]
-impl<Id, Entity> Serialize for FlowArena<Id, FlowNode<Id, Entity>> 
-where Id: Serialize + Hash + Eq + Clone, Entity: Serialize + Clone {
+impl<Id, Entity> Serialize for FlowArena<Id, FlowNode<Id, Entity>>
+where
+    Id: Serialize + Hash + Eq + Clone,
+    Entity: Serialize + Clone,
+{
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-        let mut flow = 
-            serializer.serialize_struct("Flow", 2)?;
+        let mut flow = serializer.serialize_struct("Flow", 2)?;
         let seq: Vec<&FlowNode<Id, Entity>> = self.node_map.values().collect();
         flow.serialize_field("node_map", &seq)?;
         flow.end()
@@ -16,14 +18,19 @@ where Id: Serialize + Hash + Eq + Clone, Entity: Serialize + Clone {
 }
 
 #[cfg(feature = "serde_impl")]
-use serde::de::{self, Deserialize, Deserializer, Visitor, SeqAccess, MapAccess};
+use serde::de::{self, Deserialize, Deserializer, MapAccess, SeqAccess, Visitor};
 #[cfg(feature = "serde_impl")]
 use std::marker::PhantomData;
 #[cfg(feature = "serde_impl")]
-impl<'de, Id, Entity> Deserialize<'de> for FlowArena<Id, FlowNode<Id, Entity>> 
-where Id: Deserialize<'de> + Clone + Hash + Eq, Entity: Deserialize<'de> + Clone {
+impl<'de, Id, Entity> Deserialize<'de> for FlowArena<Id, FlowNode<Id, Entity>>
+where
+    Id: Deserialize<'de> + Clone + Hash + Eq,
+    Entity: Deserialize<'de> + Clone,
+{
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        enum Field { NodeMap }
+        enum Field {
+            NodeMap,
+        }
         impl<'de> Deserialize<'de> for Field {
             fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Field, D::Error> {
                 struct FieldVisitor;
@@ -51,10 +58,12 @@ where Id: Deserialize<'de> + Clone + Hash + Eq, Entity: Deserialize<'de> + Clone
         }
 
         struct FlowVisitor<Id: Hash + Eq + Clone, Entity: Clone> {
-            marker: PhantomData<fn() -> FlowArena<Id, FlowNode<Id, Entity>>>
+            marker: PhantomData<fn() -> FlowArena<Id, FlowNode<Id, Entity>>>,
         }
 
-        impl<'de, Id: Deserialize<'de> + Clone + Hash + Eq, Entity: Deserialize<'de> + Clone> Visitor<'de> for FlowVisitor<Id, Entity> {
+        impl<'de, Id: Deserialize<'de> + Clone + Hash + Eq, Entity: Deserialize<'de> + Clone>
+            Visitor<'de> for FlowVisitor<Id, Entity>
+        {
             type Value = FlowArena<Id, FlowNode<Id, Entity>>;
 
             fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
@@ -65,9 +74,13 @@ where Id: Deserialize<'de> + Clone + Hash + Eq, Entity: Deserialize<'de> + Clone
             where
                 V: SeqAccess<'de>,
             {
-                let node_vec: Vec<FlowNode<Id, Entity>> = seq.next_element()?
+                let node_vec: Vec<FlowNode<Id, Entity>> = seq
+                    .next_element()?
                     .ok_or_else(|| de::Error::invalid_length(1, &self))?;
-                let node_map = node_vec.into_iter().map(|node| (node.id().clone(), node)).collect();
+                let node_map = node_vec
+                    .into_iter()
+                    .map(|node| (node.id().clone(), node))
+                    .collect();
                 Ok(Self::Value { node_map })
             }
 
@@ -83,7 +96,12 @@ where Id: Deserialize<'de> + Clone + Hash + Eq, Entity: Deserialize<'de> + Clone
                                 return Err(de::Error::duplicate_field("node_map"));
                             }
                             let node_vec: Vec<FlowNode<Id, Entity>> = map.next_value()?;
-                            node_map = Some(node_vec.into_iter().map(|node| (node.id().clone(), node)).collect());
+                            node_map = Some(
+                                node_vec
+                                    .into_iter()
+                                    .map(|node| (node.id().clone(), node))
+                                    .collect(),
+                            );
                         }
                     }
                 }
@@ -93,6 +111,12 @@ where Id: Deserialize<'de> + Clone + Hash + Eq, Entity: Deserialize<'de> + Clone
         }
 
         const FIELDS: &'static [&'static str] = &["node_map"];
-        deserializer.deserialize_struct("Flow", FIELDS, FlowVisitor { marker: PhantomData })
+        deserializer.deserialize_struct(
+            "Flow",
+            FIELDS,
+            FlowVisitor {
+                marker: PhantomData,
+            },
+        )
     }
 }

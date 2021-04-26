@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 pub type Tag = String;
 
@@ -45,9 +45,15 @@ impl TagSet {
     pub fn update_tagset(&mut self, field: TagSetField) {
         use TagSetField::*;
         match field {
-            AddTag(t) => { self.push(t); }
-            DelTag(t) => { self.remove(t); }
-            ClearTag => { self.data.clear(); }
+            AddTag(t) => {
+                self.push(t);
+            }
+            DelTag(t) => {
+                self.remove(t);
+            }
+            ClearTag => {
+                self.data.clear();
+            }
         }
     }
 }

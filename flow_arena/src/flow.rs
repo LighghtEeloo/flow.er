@@ -21,52 +21,45 @@ pub trait FlowBase {
     fn node(&self, obj: &Self::Id) -> Option<&Self::Node>;
     fn node_mut(&mut self, obj: &Self::Id) -> Option<&mut Self::Node>;
     fn parent(&self, obj: &Self::Id) -> Option<Self::Id> {
-        self.node(obj).map_or(None, 
-        |node| {
-            node.parent()
-        })
+        self.node(obj).map_or(None, |node| node.parent())
     }
     fn children(&self, obj: &Self::Id) -> Vec<Self::Id> {
-        self.node(obj).map_or(Vec::new(), 
-        |node| {
-            node.children()
-        })
+        self.node(obj).map_or(Vec::new(), |node| node.children())
     }
 
     /// returns parent's children
     fn friends(&self, obj: &Self::Id) -> Vec<Self::Id> {
-        self.parent(obj).map_or(Vec::new(), |obj| {
-            self.children(&obj)
-        })
+        self.parent(obj)
+            .map_or(Vec::new(), |obj| self.children(&obj))
     }
 
     /// returns nth position in friends; None if not found in either way
     fn nth_friend(&self, obj: &Self::Id) -> Option<usize> {
-        self.friends(obj).into_iter()
-        .position(|id| &id == obj)
+        self.friends(obj).into_iter().position(|id| &id == obj)
     }
 
     /// returns owned children
     fn children_owned(&self, obj: &Self::Id) -> Vec<Self::Id> {
-        self.children(obj).into_iter().filter_map(|id| {
-            if self.parent(&id) == Some(obj.clone()) {
-                Some(id)
-            } else {
-                None
-            }
-        }).collect()
+        self.children(obj)
+            .into_iter()
+            .filter_map(|id| {
+                if self.parent(&id) == Some(obj.clone()) {
+                    Some(id)
+                } else {
+                    None
+                }
+            })
+            .collect()
     }
 
     /// judge whether the obj is owned by the owner
     fn is_owned(&self, obj: &Self::Id, owner: &Self::Id) -> bool {
-        self.parent(obj).map_or(false, |id| &id == owner)
-        && self.children(owner).contains(obj)
+        self.parent(obj).map_or(false, |id| &id == owner) && self.children(owner).contains(obj)
     }
 
     /// judge whether the obj is *purely* linked from the owner
     fn is_linked(&self, obj: &Self::Id, owner: &Self::Id) -> bool {
-        self.parent(obj).map_or(true, |id| &id != owner)
-        && self.children(owner).contains(obj)
+        self.parent(obj).map_or(true, |id| &id != owner) && self.children(owner).contains(obj)
     }
 
     /// returns all the offspring of a node, not including itself
@@ -77,9 +70,7 @@ pub trait FlowBase {
         while !visit_set.is_empty() {
             let mut wait_set = HashSet::new();
             for obj in visit_set.iter() {
-                let children = self.node(&obj)
-                    .map(|x| x.children() )
-                    .unwrap_or_default();
+                let children = self.node(&obj).map(|x| x.children()).unwrap_or_default();
                 wait_set.extend(children);
             }
             final_set.extend(wait_set.iter().cloned());
@@ -100,18 +91,21 @@ pub trait FlowBase {
         while !visit_set.is_empty() {
             let mut wait_set = HashSet::new();
             for obj in visit_set.iter() {
-                let children = self.node(&obj)
-                    .map(|x|  x.children())
-                    .unwrap_or_default();
-                let set: Vec<Self::Id> = children.into_iter().filter_map(|id| {
-                    self.node(&id).map(|node| {
-                        if node.parent() == Some(obj.clone()) {
-                            Some(id)
-                        } else {
-                            None
-                        }
-                    }).flatten()
-                }).collect();
+                let children = self.node(&obj).map(|x| x.children()).unwrap_or_default();
+                let set: Vec<Self::Id> = children
+                    .into_iter()
+                    .filter_map(|id| {
+                        self.node(&id)
+                            .map(|node| {
+                                if node.parent() == Some(obj.clone()) {
+                                    Some(id)
+                                } else {
+                                    None
+                                }
+                            })
+                            .flatten()
+                    })
+                    .collect();
                 wait_set.extend(set);
             }
             final_set.extend(wait_set.iter().cloned());
@@ -124,16 +118,15 @@ pub trait FlowBase {
 
 /// checks the Flow's properties and see whether they hold
 pub trait FlowCheck {
-
     fn check(&self) -> Result<(), (FlowError, String)>;
-        /// panics if anything went wrong. Iff in debug state.
+    /// panics if anything went wrong. Iff in debug state.
     fn check_assert(&self) {
         if cfg!(debug_assertions) {
             if let Err((err, current)) = self.check() {
                 panic!("{:?}{}", err, current)
-            }   
-        } 
-    } 
+            }
+        }
+    }
 }
 
 /// provides hashmap functionality
@@ -149,19 +142,22 @@ pub trait FlowMap: FlowBase + FlowCheck {
 pub trait FlowLink: FlowBase + FlowCheck {
     /// randomly ensures the link of a node to another
     fn link(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), FlowError> {
-        if ! self.contains_node(obj) {
+        if !self.contains_node(obj) {
             Err(FlowError::NotExistObj)?
-        } 
-        let res = self.node_mut(owner).map(|owner| {
-            if owner.children().contains(obj) {
-                return Ok(())
-            } 
-            if nth > owner.children().len() {
-                Err(FlowError::InvalidLen)?
-            } 
-            owner.children_ref_mut().insert(nth, obj.clone());
-            Ok(())
-        }).unwrap_or(Err(FlowError::NotExistOwner));
+        }
+        let res = self
+            .node_mut(owner)
+            .map(|owner| {
+                if owner.children().contains(obj) {
+                    return Ok(());
+                }
+                if nth > owner.children().len() {
+                    Err(FlowError::InvalidLen)?
+                }
+                owner.children_ref_mut().insert(nth, obj.clone());
+                Ok(())
+            })
+            .unwrap_or(Err(FlowError::NotExistOwner));
         self.check_assert();
         res
     }
@@ -174,16 +170,19 @@ pub trait FlowLink: FlowBase + FlowCheck {
     }
     /// detaches a node from a non-owner link
     fn detach(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError> {
-        if ! self.contains_node(obj) {
+        if !self.contains_node(obj) {
             Err(FlowError::NotExistObj)?
-        } 
-        let res = self.node_mut(owner).map(|owner| {
-            if ! owner.children().contains(obj) {
-                Err(FlowError::AbandonedChild)?
-            }
-            owner.children_ref_mut().retain(|x| x != obj);
-            Ok(())
-        }).unwrap_or(Err(FlowError::NotExistOwner));
+        }
+        let res = self
+            .node_mut(owner)
+            .map(|owner| {
+                if !owner.children().contains(obj) {
+                    Err(FlowError::AbandonedChild)?
+                }
+                owner.children_ref_mut().retain(|x| x != obj);
+                Ok(())
+            })
+            .unwrap_or(Err(FlowError::NotExistOwner));
         self.check_assert();
         res
     }
@@ -194,10 +193,12 @@ pub trait FlowDevote: FlowBase + FlowLink + FlowCheck {
     /// appoints and ensures an owner; also links to owner
     fn devote(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), FlowError> {
         let res = self.link(obj, owner, nth).and_then(|_| {
-            self.node_mut(obj).map(|obj| {
-                obj.parent_set(owner.clone());
-                Ok(())
-            }).unwrap_or(Err(FlowError::NotExistObj))
+            self.node_mut(obj)
+                .map(|obj| {
+                    obj.parent_set(owner.clone());
+                    Ok(())
+                })
+                .unwrap_or(Err(FlowError::NotExistObj))
         });
         self.check_assert();
         res
@@ -205,13 +206,11 @@ pub trait FlowDevote: FlowBase + FlowLink + FlowCheck {
 
     fn devote_push(&mut self, obj: &Self::Id, owner: &Self::Id) -> Result<(), FlowError> {
         let res = self.link_push(obj, owner).and_then(|_| {
-            self.node_mut(obj).map_or(
-                Err(FlowError::NotExistObj), 
-                |obj| {
+            self.node_mut(obj)
+                .map_or(Err(FlowError::NotExistObj), |obj| {
                     obj.parent_set(owner.clone());
                     Ok(())
-                }
-            )
+                })
         });
         self.check_assert();
         res
@@ -219,35 +218,34 @@ pub trait FlowDevote: FlowBase + FlowLink + FlowCheck {
 
     /// removes ownership; also detaches
     fn decay(&mut self, obj: &Self::Id) -> Result<(), FlowError> {
-        let owner = self.node(obj)
-            .map(|x| {
-                x.parent() 
-            });
+        let owner = self.node(obj).map(|x| x.parent());
         // Not owned by anyone
         if let Some(None) = owner {
-            return Ok(())
+            return Ok(());
         }
         let owner = owner.flatten();
-        let res = self.node_mut(obj).map_or(
-            Err(FlowError::NotExistObj),
-            |obj| {
+        let res = self
+            .node_mut(obj)
+            .map_or(Err(FlowError::NotExistObj), |obj| {
                 obj.parent_set_none();
                 Ok(())
-            }
-        ).and_then(|_| {
-            owner.map_or(
-                Err(FlowError::NotExistOwner), 
-                |owner| {
+            })
+            .and_then(|_| {
+                owner.map_or(Err(FlowError::NotExistOwner), |owner| {
                     self.detach(obj, &owner)
-                }
-            )
-        });
+                })
+            });
         self.check_assert();
         res
     }
 
     /// decay before devote
-    fn devote_loyal(&mut self, obj: &Self::Id, owner: &Self::Id, nth: usize) -> Result<(), FlowError> {
+    fn devote_loyal(
+        &mut self,
+        obj: &Self::Id,
+        owner: &Self::Id,
+        nth: usize,
+    ) -> Result<(), FlowError> {
         self.decay(&obj)?;
         self.devote(&obj, &owner, nth)
     }
@@ -271,11 +269,15 @@ pub trait FlowDock: FlowDevote + FlowCheck + Sized {
     }
     fn dock(&mut self, owner: &Self::Id, vec: Vec<Self::Id>, flow: Self) -> Result<(), FlowError>;
     /// moves all the nodes under the designated node out of the current flow and unmounts them
-    /// 
+    ///
     /// Err if:
     /// 1. Obj not found.
     /// 2. Node linked by other nodes.
-    fn undock_impl(&mut self, obj: &Self::Id, owned: bool) -> Result<(Self, Vec<Self::Id>), FlowError>;
+    fn undock_impl(
+        &mut self,
+        obj: &Self::Id,
+        owned: bool,
+    ) -> Result<(Self, Vec<Self::Id>), FlowError>;
     fn undock(&mut self, obj: &Self::Id) -> Result<(Self, Vec<Self::Id>), FlowError> {
         self.undock_impl(obj, false)
     }
@@ -283,12 +285,12 @@ pub trait FlowDock: FlowDevote + FlowCheck + Sized {
         self.undock_impl(obj, true)
     }
     /// clones all the nodes linked under the designated node and unmounts the clone
-    /// 
+    ///
     /// Err if:
     /// 1. Obj not found.
     fn snap(&self, obj: &Self::Id) -> Result<(Self, Vec<Self::Id>), FlowError>;
     /// clones all the nodes owned under the designated node and unmounts the clone
-    /// 
+    ///
     /// Err if:
     /// 1. Obj not found.
     fn snap_owned(&self, obj: &Self::Id) -> Result<(Self, Vec<Self::Id>), FlowError>;
@@ -308,12 +310,12 @@ impl Direction {
         match self {
             Forward => 1,
             Backward => -1,
-            _ => 0
+            _ => 0,
         }
     }
 
     /// bounded in [0, len)
-    fn walk(&self, nth: usize, len: usize) -> Result<usize,()> {
+    fn walk(&self, nth: usize, len: usize) -> Result<usize, ()> {
         let pos = nth as isize + self.shift();
         if pos < 0 {
             Err(())
@@ -322,7 +324,6 @@ impl Direction {
         } else {
             Err(())
         }
-        
     }
 }
 
@@ -334,30 +335,23 @@ pub trait FlowShift: FlowBase + FlowDevote {
         match dir {
             Forward | Backward => {
                 let friends = self.friends(obj);
-                let nth = if let Some(nth) = friends.iter()
-                    .position(|id| {
-                        id == obj
-                    }) 
-                { nth } else { Err(FlowError::AbandonedChild)? };
+                let nth = if let Some(nth) = friends.iter().position(|id| id == obj) {
+                    nth
+                } else {
+                    Err(FlowError::AbandonedChild)?
+                };
                 let len = friends.len();
-                let walk = dir.walk(nth, len)
-                    .map_err(|_| FlowError::InvalidLen)?;
+                let walk = dir.walk(nth, len).map_err(|_| FlowError::InvalidLen)?;
                 Ok(friends[walk].clone())
             }
             Ascend => {
                 let candidate = self.parent(obj);
-                let res = candidate
-                    .map_or(obj.clone(), |id| {
-                        id
-                    });
+                let res = candidate.map_or(obj.clone(), |id| id);
                 Ok(res)
             }
             Descend => {
                 let candidate = self.children(obj).get(0).cloned();
-                let res = candidate
-                    .map_or(obj.clone(), |id| {
-                        id
-                    });
+                let res = candidate.map_or(obj.clone(), |id| id);
                 Ok(res)
             }
         }
@@ -365,14 +359,9 @@ pub trait FlowShift: FlowBase + FlowDevote {
     fn shuttle_iter(&self, obj: &Self::Id, dir: Direction) -> Result<Self::Id, FlowError> {
         use Direction::*;
         match dir {
-            Forward | Backward => {
-                self.shuttle(obj, dir).map_or_else(
-                    |_| {
-                        Ok(self.parent(obj).unwrap_or(obj.clone()))
-                    }, 
-                    |id| Ok(id)
-                )
-            }
+            Forward | Backward => self
+                .shuttle(obj, dir)
+                .map_or_else(|_| Ok(self.parent(obj).unwrap_or(obj.clone())), |id| Ok(id)),
             Ascend | Descend => self.shuttle(obj, dir),
         }
     }
@@ -380,25 +369,26 @@ pub trait FlowShift: FlowBase + FlowDevote {
     /// alters the node position by the corresponding relative position, within a single node
     fn migrate(&mut self, obj: &Self::Id, dir: Direction) -> Result<(), FlowError> {
         use Direction::*;
-        if ! self.contains_node(obj) { Err(FlowError::NotExistObj)? }
+        if !self.contains_node(obj) {
+            Err(FlowError::NotExistObj)?
+        }
         match dir {
             Forward | Backward => {
                 let owner = self.parent(obj).ok_or(FlowError::NotExistObj)?;
                 let nth = self.nth_friend(obj).ok_or(FlowError::AbandonedChild)?;
                 let len = self.friends(&owner).len();
-                let walk = dir.walk(nth, len)
-                    .map_err(|_| FlowError::InvalidLen)?;
+                let walk = dir.walk(nth, len).map_err(|_| FlowError::InvalidLen)?;
                 self.decay(obj)?;
                 self.devote(obj, &owner, walk)?
             }
-            Ascend => { 
+            Ascend => {
                 let parent = self.parent(obj).ok_or(FlowError::NotExistObj)?;
                 let owner = self.parent(&parent).ok_or(FlowError::IsOrphaned)?;
                 let nth = self.nth_friend(&parent).ok_or(FlowError::AbandonedChild)? + 1;
                 self.decay(obj)?;
                 self.devote(obj, &owner, nth)?
             }
-            Descend => { Err(FlowError::InvalidDir)? }
+            Descend => Err(FlowError::InvalidDir)?,
         }
         self.check_assert();
         Ok(())
@@ -408,17 +398,17 @@ pub trait FlowShift: FlowBase + FlowDevote {
     fn migrate_iter(&mut self, obj: &Self::Id, dir: Direction) -> Result<(), FlowError> {
         use Direction::*;
         match dir {
-            Forward | Backward => {
-                self.migrate(obj, dir).map_or_else(
-                    |e| {
-                        if let FlowError::InvalidLen = e {
-                            self.migrate(obj, Ascend)
-                        } else { Err(e) }
-                    }, 
-                    |v| Ok(v)
-                )
-            }
-            Ascend | Descend => self.migrate(obj, dir)
+            Forward | Backward => self.migrate(obj, dir).map_or_else(
+                |e| {
+                    if let FlowError::InvalidLen = e {
+                        self.migrate(obj, Ascend)
+                    } else {
+                        Err(e)
+                    }
+                },
+                |v| Ok(v),
+            ),
+            Ascend | Descend => self.migrate(obj, dir),
         }
     }
 }
@@ -437,7 +427,7 @@ pub enum FlowError {
     NotOrphaned,
     /// certain operations requires node to be unorphaned
     IsOrphaned,
-    
+
     NodeIdNotMatch,
     NotExistParent,
     NotExistChild,
@@ -445,4 +435,7 @@ pub enum FlowError {
     AbandonedChild,
 }
 
-pub trait Flow: FlowBase + FlowCheck + FlowMap + FlowLink + FlowDevote + FlowDock + FlowShift {}
+pub trait Flow:
+    FlowBase + FlowCheck + FlowMap + FlowLink + FlowDevote + FlowDock + FlowShift
+{
+}

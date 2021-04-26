@@ -1,14 +1,14 @@
-use serde::{Serialize, Deserialize};
-use std::{collections::{HashMap, HashSet}};
-use crate::{EntityFlow, settings::WorkspaceMode};
+use crate::{settings::WorkspaceMode, EntityFlow};
+use serde::{Deserialize, Serialize};
+use std::collections::{HashMap, HashSet};
 
 pub mod cube;
-pub mod silhouette;
 mod ser_de;
+pub mod silhouette;
 
 use cube::{
     identity::{CubeId, CubeIdFactory},
-    {Cube, CubeMeta}
+    {Cube, CubeMeta},
 };
 
 /// Describes the app router.
@@ -65,22 +65,19 @@ impl Router {
     }
     /// returns all possible routers in a Vec<Router>
     pub fn vec_router(workspace_mode: &WorkspaceMode) -> Vec<Self> {
-        use WorkspaceMode::*;
         use Router::*;
+        use WorkspaceMode::*;
         match workspace_mode {
-            Pure => vec! [ Workspace ],
-            Full => vec! [
+            Pure => vec![Workspace],
+            Full => vec![
                 // BirdView,
-                Workspace,
-                Promised,
-                // Agenda,
+                Workspace, Promised, // Agenda,
                 // TimeAnchor,
-                
                 Settings,
             ],
             Manual(vec) => {
                 if vec.is_empty() {
-                    vec! [ Router::default() ]
+                    vec![Router::default()]
                 } else {
                     vec.clone()
                 }
@@ -90,11 +87,11 @@ impl Router {
 }
 
 /// A overall layer of routers and cubes.
-/// 
+///
 /// Heavily relies refresh() to keep the router_map and cube_map in correct state.
-/// 
+///
 /// (e.g. delete by simply removing from either map)
-/// 
+///
 /// So please call glass.refresh() after flow / glass alteration!
 #[derive(Debug, Clone)]
 pub struct Glass {
@@ -109,16 +106,16 @@ pub struct Glass {
 impl Default for Glass {
     fn default() -> Self {
         let factory = CubeIdFactory::default();
-        let router_map = Router::vec_router(&WorkspaceMode::default()).iter()
-            .map(|&router | {
-                (router, Vec::new())
-            }).collect();
+        let router_map = Router::vec_router(&WorkspaceMode::default())
+            .iter()
+            .map(|&router| (router, Vec::new()))
+            .collect();
         let cube_map = HashMap::default();
         Self {
             router: Router::default(),
             factory,
             router_map,
-            cube_map
+            cube_map,
         }
     }
 }
@@ -129,39 +126,45 @@ impl Glass {
         self.cube_map.get(&id).cloned()
     }
     pub fn locate_cube_meta(&self, id: CubeId) -> Vec<CubeMeta> {
-        self.router_map.iter().filter_map(|(&router, vec)| {
-            vec.iter().position(|x| x == &id)
-            .map(|idx| CubeMeta {
-                router,
-                idx
+        self.router_map
+            .iter()
+            .filter_map(|(&router, vec)| {
+                vec.iter()
+                    .position(|x| x == &id)
+                    .map(|idx| CubeMeta { router, idx })
             })
-        }).collect()
+            .collect()
     }
     fn visit_for_cube_id(&self, meta: CubeMeta) -> Option<CubeId> {
-        self.router_map.get(&meta.router)
-        .map(|vec| vec.get(meta.idx))
-        .flatten().cloned()
+        self.router_map
+            .get(&meta.router)
+            .map(|vec| vec.get(meta.idx))
+            .flatten()
+            .cloned()
     }
     pub fn visit_for_cube(&self, meta: CubeMeta) -> Option<Cube> {
         let id = self.visit_for_cube_id(meta);
-        id.map(|id| 
-            self.cube_map.get(&id)
-        ).flatten().cloned()
+        id.map(|id| self.cube_map.get(&id)).flatten().cloned()
     }
     pub fn show_router_cubes(&self) -> Vec<(CubeMeta, CubeId, Cube)> {
         self.show_cubes(self.router)
     }
     pub fn show_cubes(&self, router: Router) -> Vec<(CubeMeta, CubeId, Cube)> {
-        let vec = 
-            self.router_map
-            .get(&router).cloned()
-            .unwrap_or_default();
+        let vec = self.router_map.get(&router).cloned().unwrap_or_default();
         vec.into_iter()
-        .filter_map(|id| 
-            self.cube_map.get(&id).cloned().map(|c| (id, c))
-        ).enumerate().map(|(idx, (id, cube))| 
-            (CubeMeta { router: router, idx }, id , cube)
-        ).collect()
+            .filter_map(|id| self.cube_map.get(&id).cloned().map(|c| (id, c)))
+            .enumerate()
+            .map(|(idx, (id, cube))| {
+                (
+                    CubeMeta {
+                        router: router,
+                        idx,
+                    },
+                    id,
+                    cube,
+                )
+            })
+            .collect()
     }
     pub fn add_cube(&mut self, cube: Cube) -> CubeId {
         let id = self.factory.rotate_id();
@@ -176,33 +179,34 @@ impl Glass {
 /// cube_id-based operations
 impl Glass {
     /// places a cube within a safe idx
-    pub fn place_cube(&mut self, cube_id: CubeId, meta: CubeMeta) -> Result<(),()> {
+    pub fn place_cube(&mut self, cube_id: CubeId, meta: CubeMeta) -> Result<(), ()> {
         let router = meta.router;
         let vec = self.ensured_router(router);
         vec.retain(|id| id != &cube_id);
         let idx = if meta.idx > vec.len() {
-            return Err(())
-        } else { meta.idx };
+            return Err(());
+        } else {
+            meta.idx
+        };
         vec.insert(idx, cube_id);
         Ok(())
     }
 
-    pub fn push_cube(&mut self, cube_id: CubeId, router: Router) -> Result<(),()> {
+    pub fn push_cube(&mut self, cube_id: CubeId, router: Router) -> Result<(), ()> {
         let idx = self.ensured_router(router).len();
-        let meta = CubeMeta { 
-            router,
-            idx,
-        };
+        let meta = CubeMeta { router, idx };
         self.place_cube(cube_id, meta)
     }
 
     /// removes a cube within a safe idx
-    pub fn remove_cube(&mut self, meta: CubeMeta) -> Result<CubeId,()> {
+    pub fn remove_cube(&mut self, meta: CubeMeta) -> Result<CubeId, ()> {
         let router = meta.router;
         let vec = self.ensured_router(router);
         let idx = if meta.idx >= vec.len() {
-            return Err(())
-        } else { meta.idx };
+            return Err(());
+        } else {
+            meta.idx
+        };
         Ok(vec.remove(idx))
     }
 }
@@ -228,8 +232,10 @@ impl Glass {
         router_vec.iter().for_each(|&router| {
             self.ensured_router(router);
         });
-        if ! (router_vec.contains(&self.router)) {
-            self.router = router_vec.get(0).cloned()
+        if !(router_vec.contains(&self.router)) {
+            self.router = router_vec
+                .get(0)
+                .cloned()
                 .expect("At least one router should be shown.");
         }
     }
@@ -290,7 +296,7 @@ mod tests {
         let mut glass = Glass::default();
         let workspace_mode = WorkspaceMode::Pure;
         glass.purge_router(&workspace_mode);
-        
+
         let mut flow = EntityFlow::default();
         let mut factory = EntityIdFactory::default();
 
@@ -298,41 +304,63 @@ mod tests {
         {
             let entity = Entity::new_rotate(&mut factory);
             let obj = entity.id().clone();
-            flow.grow(FlowNode::from_id(obj, entity)).expect("grow failed");
+            flow.grow(FlowNode::from_id(obj, entity))
+                .expect("grow failed");
             let flow_view = Cube::new(CubeType::FlowView).with_obj(obj);
             let flow_view = glass.add_cube(flow_view);
-            let meta = CubeMeta { router: Router::Workspace, idx: 0 };
-            glass.place_cube(flow_view, meta).expect("place_cube failed");
+            let meta = CubeMeta {
+                router: Router::Workspace,
+                idx: 0,
+            };
+            glass
+                .place_cube(flow_view, meta)
+                .expect("place_cube failed");
         }
 
         // legal PromisedLand
         {
             let promised_land = Cube::new(CubeType::PromisedLand);
             let promised_land = glass.add_cube(promised_land);
-            let meta = CubeMeta { router: Router::Workspace, idx: 0 };
-            glass.place_cube(promised_land, meta).expect("place_cube failed");
+            let meta = CubeMeta {
+                router: Router::Workspace,
+                idx: 0,
+            };
+            glass
+                .place_cube(promised_land, meta)
+                .expect("place_cube failed");
         }
 
         // legal PromisedLand, illegal placement
         {
             let promised_land = Cube::new(CubeType::PromisedLand);
             let promised_land = glass.add_cube(promised_land);
-            let meta = CubeMeta { router: Router::Workspace, idx: 3 };
-            glass.place_cube(promised_land, meta).expect_err("place_cube shouldn't succeed");
+            let meta = CubeMeta {
+                router: Router::Workspace,
+                idx: 3,
+            };
+            glass
+                .place_cube(promised_land, meta)
+                .expect_err("place_cube shouldn't succeed");
         }
 
         // illegal PromisedLand
         {
             let entity = Entity::new_rotate(&mut factory);
             let obj = entity.id().clone();
-            flow.grow(FlowNode::from_id(obj, entity)).expect("grow failed");
+            flow.grow(FlowNode::from_id(obj, entity))
+                .expect("grow failed");
             let promised_land = Cube::new(CubeType::PromisedLand)
                 .with_obj(obj)
                 .with_profile(Profile::Why("Delibrately using cube illegally.".into()));
             println!("is_valid_cube: {}", promised_land.is_valid_cube(&flow));
             let promised_land = glass.add_cube(promised_land);
-            let meta = CubeMeta { router: Router::Workspace, idx: 2 };
-            glass.place_cube(promised_land, meta).expect("place_cube failed");
+            let meta = CubeMeta {
+                router: Router::Workspace,
+                idx: 2,
+            };
+            glass
+                .place_cube(promised_land, meta)
+                .expect("place_cube failed");
         }
 
         glass.refresh(&flow, &workspace_mode);

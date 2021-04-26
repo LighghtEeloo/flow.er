@@ -1,6 +1,9 @@
+use flow_arena::{
+    Direction, FlowArena, FlowBase, FlowDevote, FlowError, FlowLink, FlowMap, FlowNode, FlowShift,
+    Node,
+};
+use serde::{Deserialize, Serialize};
 use std::{collections::HashSet, fmt::Debug};
-use serde::{Serialize, Deserialize};
-use flow_arena::{Direction, FlowArena, FlowBase, FlowDevote, FlowError, FlowLink, FlowMap, FlowNode, FlowShift, Node};
 
 use crate::Filter;
 
@@ -16,7 +19,7 @@ pub struct Vessel {
     #[serde(default)]
     pub glass: Glass,
     #[serde(default)]
-    pub settings: Settings
+    pub settings: Settings,
 }
 
 impl Vessel {
@@ -25,7 +28,7 @@ impl Vessel {
             flow: FlowArena::new(),
             factory: EntityIdFactory::default(),
             glass: Glass::default(),
-            settings: Settings::default()
+            settings: Settings::default(),
         }
     }
 }
@@ -33,10 +36,10 @@ impl Vessel {
 impl Debug for Vessel {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Vessel")
-         .field("glass", &self.glass)
-         .field("id_factory", &self.factory)
-         .field("flow_arena", &self.flow)
-         .finish()
+            .field("glass", &self.glass)
+            .field("id_factory", &self.factory)
+            .field("flow_arena", &self.flow)
+            .finish()
     }
 }
 
@@ -50,7 +53,7 @@ impl Vessel {
     }
     /// get all entity_ids
     pub fn entity_id_all(&self) -> Vec<EntityId> {
-        self.flow.entities().map(|x|x.id().clone()).collect()
+        self.flow.entities().map(|x| x.id().clone()).collect()
     }
     /// get all entity_ids under id directly
     pub fn entity_id_direct(&self, obj: &EntityId) -> Vec<EntityId> {
@@ -65,23 +68,31 @@ impl Vessel {
     }
     /// pick entities with all filters satisfied
     pub fn entity_pick_by(&self, filters: &Vec<Filter>) -> Vec<EntityId> {
-        self.flow.entities().filter(|x| {
-            x.pick_by(filters)
-        }).map(|x| x.id().clone() ).collect()
+        self.flow
+            .entities()
+            .filter(|x| x.pick_by(filters))
+            .map(|x| x.id().clone())
+            .collect()
     }
     /// take entities with any filter satisfied
     pub fn entity_match_by(&self, filters: &Vec<Filter>) -> Vec<EntityId> {
-        self.flow.entities().filter(|x| {
-            filters.iter().fold(false, |is, fil|
-                is || x.pick_by(&vec![fil.clone()])
-            )
-        }).map(|x| x.id().clone() ).collect()
+        self.flow
+            .entities()
+            .filter(|x| {
+                filters
+                    .iter()
+                    .fold(false, |is, fil| is || x.pick_by(&vec![fil.clone()]))
+            })
+            .map(|x| x.id().clone())
+            .collect()
     }
     /// filter out all entities with filters
     pub fn entity_filter_out(&self, filters: &Vec<Filter>) -> Vec<EntityId> {
-        self.flow.entities().filter(|x| {
-            x.filter_out(filters)
-        }).map(|x| x.id().clone() ).collect()
+        self.flow
+            .entities()
+            .filter(|x| x.filter_out(filters))
+            .map(|x| x.id().clone())
+            .collect()
     }
     pub fn entity(&self, id: &EntityId) -> Option<&Entity> {
         self.flow.node(id).map(|x| &x.entity)
@@ -108,34 +119,51 @@ impl Vessel {
         self.flow.grow(FlowNode::from_id(id.clone(), entity))?;
         Ok(id)
     }
-    // /// ensures that you can get the required entity; 
-    // /// inserts if not in place. 
+    // /// ensures that you can get the required entity;
+    // /// inserts if not in place.
     // pub fn entity_ensure(&mut self, id: &EntityId) -> &mut Entity {
     //     if self.flow.node(id).is_none() {
     //         self.entity_insert(Entity::new_id(id));
     //     }
     //     self.entity_mut(id).expect("contains key")
     // }
-    pub fn entity_link(&mut self, obj: EntityId, owner: EntityId, idx: usize) -> Result<(), FlowError> {
+    pub fn entity_link(
+        &mut self,
+        obj: EntityId,
+        owner: EntityId,
+        idx: usize,
+    ) -> Result<(), FlowError> {
         self.flow.link(&obj, &owner, idx)
     }
-    pub fn entity_devote(&mut self, obj: EntityId, owner: EntityId, idx: usize) -> Result<(), FlowError> {
+    pub fn entity_devote(
+        &mut self,
+        obj: EntityId,
+        owner: EntityId,
+        idx: usize,
+    ) -> Result<(), FlowError> {
         self.flow.devote(&obj, &owner, idx)
     }
-    pub fn entity_grow_devote(&mut self, owner: EntityId, idx: usize) -> Result<EntityId, FlowError> {
+    pub fn entity_grow_devote(
+        &mut self,
+        owner: EntityId,
+        idx: usize,
+    ) -> Result<EntityId, FlowError> {
         let obj = self.entity_grow()?;
         self.entity_devote(obj, owner, idx)?;
         Ok(obj)
     }
     fn entity_duplicate(&mut self, obj: EntityId, dude: EntityId) {
         let dude = self.entity(&dude).cloned().unwrap_or_default();
-        self.entity_mut(&obj).map(|obj| {
-            obj.duplicate_from(&dude)
-        });
+        self.entity_mut(&obj).map(|obj| obj.duplicate_from(&dude));
     }
-    /// final product function: entity_add, duplicates its dude 
+    /// final product function: entity_add, duplicates its dude
     /// and devotes to its owner.
-    pub fn entity_add(&mut self, dude: EntityId , owner: EntityId, idx: usize) -> Result<EntityId, FlowError> {
+    pub fn entity_add(
+        &mut self,
+        dude: EntityId,
+        owner: EntityId,
+        idx: usize,
+    ) -> Result<EntityId, FlowError> {
         let obj = self.entity_grow_devote(owner, idx)?;
         self.entity_duplicate(obj, dude);
         Ok(obj)
@@ -159,7 +187,11 @@ impl Vessel {
 
 /// indent & move
 impl Vessel {
-    pub fn entity_shuttle(&mut self, obj: &EntityId, dir: Direction) -> Result<EntityId, FlowError> {
+    pub fn entity_shuttle(
+        &mut self,
+        obj: &EntityId,
+        dir: Direction,
+    ) -> Result<EntityId, FlowError> {
         self.flow.shuttle(obj, dir)
     }
 
@@ -172,7 +204,8 @@ impl Vessel {
 /// glass
 impl Vessel {
     pub fn glass_refresh(&mut self) {
-        self.glass.refresh(&self.flow, &self.settings.workspace_mode)
+        self.glass
+            .refresh(&self.flow, &self.settings.workspace_mode)
     }
 }
 
@@ -190,25 +223,17 @@ impl Vessel {
 }
 
 fn concise_debug_impl(obj: EntityId, vessel: &Vessel, prefix: usize) -> String {
-    let id_debug = vessel.entity(&obj).map_or(
-        "".into(), 
-        |x|{
-            format!("{:?}: {:?}", x.id(), x.face)
-        }
-    );
-    let children = vessel.node(&obj).map_or(
-        Vec::new(), 
-        |node| {
-            node.children()
-        });
-    let children_debug = children.iter().map(|x|
-        concise_debug_impl(x.clone(), vessel, prefix+1)
-    ).fold(String::new(), |x, y| {
-        format!("{}\n{}", x, y)
-    });
-    let mut prefix_debug = " ".repeat(prefix*2);
+    let id_debug = vessel
+        .entity(&obj)
+        .map_or("".into(), |x| format!("{:?}: {:?}", x.id(), x.face));
+    let children = vessel.node(&obj).map_or(Vec::new(), |node| node.children());
+    let children_debug = children
+        .iter()
+        .map(|x| concise_debug_impl(x.clone(), vessel, prefix + 1))
+        .fold(String::new(), |x, y| format!("{}\n{}", x, y));
+    let mut prefix_debug = " ".repeat(prefix * 2);
     prefix_debug.push_str("|--");
-    format!{"{}{}{}", prefix_debug, id_debug, children_debug}
+    format! {"{}{}{}", prefix_debug, id_debug, children_debug}
 }
 
 #[cfg(test)]
@@ -238,9 +263,7 @@ mod tests {
     // }
     fn make_vessel(num: usize) -> (Vec<EntityId>, Vessel) {
         let mut vessel = Vessel::new();
-        let id = (0..num).filter_map(|_|
-            vessel.entity_grow().ok()
-        ).collect();
+        let id = (0..num).filter_map(|_| vessel.entity_grow().ok()).collect();
         (id, vessel)
     }
     fn has_err(place: &str, fe: Option<FlowError>) {
@@ -252,10 +275,22 @@ mod tests {
     #[test]
     fn entity_remove() -> Result<(), FlowError> {
         let (id, mut vessel) = make_vessel(5);
-        has_err("devote 1 -> 0", vessel.flow.devote_push(&id[1], &id[0]).err());
-        has_err("devote 2 -> 0", vessel.flow.devote_push(&id[2], &id[0]).err());
-        has_err("devote 3 -> 0", vessel.flow.devote_push(&id[3], &id[0]).err());
-        has_err("devote 4 -> 0", vessel.flow.devote_push(&id[4], &id[0]).err());
+        has_err(
+            "devote 1 -> 0",
+            vessel.flow.devote_push(&id[1], &id[0]).err(),
+        );
+        has_err(
+            "devote 2 -> 0",
+            vessel.flow.devote_push(&id[2], &id[0]).err(),
+        );
+        has_err(
+            "devote 3 -> 0",
+            vessel.flow.devote_push(&id[3], &id[0]).err(),
+        );
+        has_err(
+            "devote 4 -> 0",
+            vessel.flow.devote_push(&id[4], &id[0]).err(),
+        );
         has_err("decay 4", vessel.flow.decay(&id[4]).err());
         vessel.concise_debug();
         println!("{:#?}", vessel);
@@ -263,8 +298,12 @@ mod tests {
         has_err("link 4 -> 0", vessel.flow.link_push(&id[4], &id[0]).err());
         // 0_0 --> id --> [id1, id2, id3]
         //          `-------`-> id4
-        vessel.entity_mut(&id[0]).map(|entity| entity.face = format!("Aloha!"));
-        vessel.entity_mut(&id[1]).map(|entity| entity.face = format!("Bobi."));
+        vessel
+            .entity_mut(&id[0])
+            .map(|entity| entity.face = format!("Aloha!"));
+        vessel
+            .entity_mut(&id[1])
+            .map(|entity| entity.face = format!("Bobi."));
         vessel.entity_remove(id[0])?;
         println!("{:#?}", vessel);
         Ok(())
@@ -295,8 +334,12 @@ mod tests {
         vessel.flow.devote_push(&id[4], &id[1]).ok();
         // 0_0 --> id --> [id1, id2, id3]
         //          `-------`-> id4
-        vessel.entity_mut(&id[0]).map(|entity| entity.face = format!("Aloha!"));
-        vessel.entity_mut(&id[1]).map(|entity| entity.face = format!("Bobi."));
+        vessel
+            .entity_mut(&id[0])
+            .map(|entity| entity.face = format!("Aloha!"));
+        vessel
+            .entity_mut(&id[1])
+            .map(|entity| entity.face = format!("Bobi."));
         let str = serde_json::to_string(&vessel).expect("failed to serialize vessel");
         println!("Serialize: {}", str);
         let vessel: Vessel = serde_json::from_str(&str).expect("failed to deserialize");
@@ -316,14 +359,16 @@ mod tests {
         loop {
             match (retrive_random(id), retrive_random(id)) {
                 (Some(a), Some(b)) => {
-                    if a != b { return Some((a, b)) }
+                    if a != b {
+                        return Some((a, b));
+                    }
                 }
                 (None, None) => return None,
-                _ => panic!("What?")
+                _ => panic!("What?"),
             }
         }
     }
-    #[test] 
+    #[test]
     fn random_demon_tests() -> Result<(), FlowError> {
         let length = 4096;
         let quiet = true;
@@ -337,14 +382,14 @@ mod tests {
                 Ok(())
             },
             // devote
-            |(id, vessel): (&mut Vec<EntityId>, &mut Vessel)|  -> Result<(), FlowError>{
-                let obj_owner = retrive_random_2(&id).map(|(i, j)| (id[i],id[j]));
+            |(id, vessel): (&mut Vec<EntityId>, &mut Vessel)| -> Result<(), FlowError> {
+                let obj_owner = retrive_random_2(&id).map(|(i, j)| (id[i], id[j]));
                 match obj_owner {
                     Some((obj, owner)) => {
                         println!("Devote. {:?} -> {:?}", obj, owner);
                         vessel.entity_devote(obj, owner, 0)?;
                     }
-                    _ => ()
+                    _ => (),
                 }
                 Ok(())
             },
@@ -358,26 +403,30 @@ mod tests {
                         vessel.entity_remove(obj)?;
                         id.remove(idx.unwrap());
                     }
-                    _ => ()
+                    _ => (),
                 }
                 Ok(())
             },
         ];
         let mut id = Vec::new();
         let mut vessel = Vessel::new();
-        let mut seq: Vec<usize> = vec! [0;10];
-        seq.extend((0..length).map(|_| {
-            let mut i: usize = rand::random();
-            i %= func_set.len();
-            i
-        }).collect::<Vec<usize>>());
+        let mut seq: Vec<usize> = vec![0; 10];
+        seq.extend(
+            (0..length)
+                .map(|_| {
+                    let mut i: usize = rand::random();
+                    i %= func_set.len();
+                    i
+                })
+                .collect::<Vec<usize>>(),
+        );
         for (i, op) in seq.into_iter().enumerate() {
             print!("#{} ", i);
             let res = func_set[op]((&mut id, &mut vessel)).err();
-            res.map(|e| 
-                println!("{:?}", e)
-            );
-            if !quiet { vessel.concise_debug(); }
+            res.map(|e| println!("{:?}", e));
+            if !quiet {
+                vessel.concise_debug();
+            }
         }
         vessel.concise_debug();
         Ok(())
