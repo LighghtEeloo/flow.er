@@ -104,10 +104,12 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
                 .subcommands(vec![
                     SubCommand::with_name("grow")
                         .about("Grow node")
-                        .alias("gr"),
+                        .alias("gr")
+                        .alias("g"),
                     SubCommand::with_name("link")
                         .about("Link node")
                         .alias("li")
+                        .alias("l")
                         .args(&[
                             Arg::with_name("owner")
                                 .value_name("EntityMatch")
@@ -124,6 +126,7 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
                         .about("Devote node")
                         .alias("dev")
                         .alias("de")
+                        .alias("d")
                         .args(&[
                             Arg::with_name("owner")
                                 .value_name("EntityMatch")
@@ -138,17 +141,37 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
                         ]),
                     SubCommand::with_name("decay")
                         .about("Decay node")
-                        .alias("dec"),
+                        .alias("dec")
+                        .alias("dc"),
                     SubCommand::with_name("erase")
                         .about("Erase node")
                         .alias("er"),
-                    // Todo: subcommand node: add & del.
+                    SubCommand::with_name("add")
+                        .about("Add node")
+                        .alias("a")
+                        .args(&[
+                            Arg::with_name("owner")
+                                .value_name("EntityMatch")
+                                .index(1)
+                                .help("Set the owner of this devote")
+                                .takes_value(true),
+                            Arg::with_name("nth")
+                                .value_name("Index")
+                                .index(2)
+                                .help("Set the owner index of this link")
+                                .takes_value(true),
+                        ]),
+                    SubCommand::with_name("delete")
+                        .about("Delete node, directly and completely")
+                        .alias("del"),
                 ]),
         )
         .subcommand(
             SubCommand::with_name("list")
                 .about("Briefly show the orphan entities")
                 .alias("peek")
+                .alias("pk")
+                .alias("see")
                 .alias("li")
                 .alias("l")
                 .args(&list_args()),
