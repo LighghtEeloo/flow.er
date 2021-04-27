@@ -103,9 +103,17 @@ impl Identity for TimeUnique {
     }
 }
 
-#[derive(Default, Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IdFactory {
     cnt: u64,
+}
+
+impl Default for IdFactory {
+    fn default() -> Self {
+        Self {
+            cnt: 15
+        }
+    }
 }
 
 impl IdFactory {
