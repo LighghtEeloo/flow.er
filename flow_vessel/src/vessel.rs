@@ -354,6 +354,8 @@ mod tests {
     }
 
     fn retrive_random(id: &Vec<EntityId>) -> Option<usize> {
+        // let mut idx: usize;
+        // getrandom::getrandom(&mut idx);
         let mut idx: usize = rand::random();
         if id.is_empty() {
             None
