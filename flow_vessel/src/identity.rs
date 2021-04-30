@@ -111,7 +111,7 @@ pub struct IdFactory {
 impl Default for IdFactory {
     fn default() -> Self {
         Self {
-            cnt: 15
+            cnt: 0
         }
     }
 }
