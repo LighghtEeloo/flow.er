@@ -1,6 +1,6 @@
 [package]
 name = "flow_arena"
-version = "0.4.3"
+version = "0.4.4"
 authors = ["LighghtEeloo <eelooecho@163.com>"]
 edition = "2018"
 description = "A HashMap managed Graph Model with the concept of ownership"
