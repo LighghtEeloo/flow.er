@@ -144,7 +144,7 @@ pub trait FlowMap: FlowBase + FlowCheck {
 
 /// provides ability to link nodes; graph-ish
 pub trait FlowLink: FlowBase + FlowCheck {
-    /// randomly ensures the link of a node to another
+    /// randomly ensures the link of a node to another; won't change if aleady has the node as child
     fn link(
         &mut self,
         obj: &Self::Id,
@@ -158,8 +158,8 @@ pub trait FlowLink: FlowBase + FlowCheck {
             .node_mut(owner)
             .map(|owner| {
                 if owner.children().contains(obj) {
-                    // return Ok(());
-                    owner.children_ref_mut().retain(|id| id != obj)
+                    return Ok(());
+                    // owner.children_ref_mut().retain(|id| id != obj)
                 }
                 if nth > owner.children().len() {
                     Err(FlowError::InvalidLen)?
@@ -208,7 +208,7 @@ pub trait FlowLink: FlowBase + FlowCheck {
 
 /// provides ability to devote / own nodes; tree-ish
 pub trait FlowDevote: FlowBase + FlowLink + FlowCheck {
-    /// appoints and ensures an owner; also links to owner
+    /// appoints and ensures an owner; also links to owner; won't do anything if aleady has the node as child
     fn devote(
         &mut self,
         obj: &Self::Id,
