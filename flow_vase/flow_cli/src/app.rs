@@ -125,8 +125,7 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
                     SubCommand::with_name("devote")
                         .about("Devote node")
                         .alias("dev")
-                        .alias("de")
-                        .alias("d")
+                        .alias("dv")
                         .args(&[
                             Arg::with_name("owner")
                                 .value_name("EntityMatch")
@@ -148,7 +147,6 @@ pub fn make_flow_app<'a, 'b>() -> App<'a, 'b> {
                         .alias("er"),
                     SubCommand::with_name("add")
                         .about("Add node")
-                        .alias("a")
                         .args(&[
                             Arg::with_name("owner")
                                 .value_name("EntityMatch")
