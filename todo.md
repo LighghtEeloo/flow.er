@@ -4,10 +4,10 @@
 Clear!
 
 ## flow_vessel
-- [ ] ! Tree Core.
 - [ ] SaveLoad.
 - [ ] Markdown-like Bubble + node -> Bubble util.
   - [ ] Dry
+- [ ] Bubble = Link | Text | Nodes
 
 ## flow-acc
 - [ ] Hidable buttons
