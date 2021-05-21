@@ -1,28 +1,45 @@
-use yew::Component;
+use flow_vessel::{Entity, TimeUnique};
+use yew::{html, Component, ComponentLink};
 
-pub struct Vase {}
+use crate::components::block::EntityBlock;
+
+pub struct Vase {
+    entity: Entity,
+    link: ComponentLink<Self>,
+}
+
+pub enum Msg {
+    Entity(Entity),
+}
 
 impl Component for Vase {
-    type Message = ();
+    type Message = Msg;
 
     type Properties = ();
 
     fn create(
         _props: Self::Properties,
-        _link: yew::ComponentLink<Self>,
+        link: yew::ComponentLink<Self>,
     ) -> Self {
-        todo!()
+        let id = TimeUnique::default();
+        let entity = Entity::new_id(&id);
+        Self { entity, link }
     }
 
-    fn update(&mut self, _msg: Self::Message) -> yew::ShouldRender {
-        todo!()
+    fn update(&mut self, msg: Self::Message) -> yew::ShouldRender {
+        match msg {
+            Msg::Entity(entity) => self.entity = entity,
+        }
+        true
     }
 
     fn change(&mut self, _props: Self::Properties) -> yew::ShouldRender {
-        todo!()
+        true
     }
 
     fn view(&self) -> yew::Html {
-        todo!()
+        html! {
+            <EntityBlock entity=self.entity.clone() entity_update=self.link.callback(move |entity| Msg::Entity(entity))/>
+        }
     }
 }

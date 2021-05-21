@@ -7,7 +7,7 @@ use std::{
 
 use crate::{Tag, TimeRep};
 
-#[derive(Default, Clone, Serialize, Deserialize)]
+#[derive(Default, Clone, Serialize, Deserialize, PartialEq)]
 pub struct TimeNote {
     notes: Vec<(SystemTime, Tag)>,
 }

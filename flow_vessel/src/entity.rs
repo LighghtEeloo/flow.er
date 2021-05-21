@@ -14,7 +14,7 @@ use timenote::*;
 
 // Entity Area
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct Entity {
     id: EntityId,
     pub time_note: Option<TimeNote>,

@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 pub type Tag = String;
 
-#[derive(Default, Clone, Debug, Deserialize, Serialize)]
+#[derive(Default, Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct TagSet {
     data: Vec<Tag>,
 }
