@@ -6,6 +6,12 @@ Project *flow.er* is a Rust WASM app running in browser. Taking advantage of Yew
 
 ***Notice: this repo is under heavy development, and is currently not usable. To see the demo version, you can try `flower-yew-lock` branch, which is the last version of this software and is already usable, and follow the instructions below.***
 
+## Screenshots
+
+![](./docs/Screenshot_1.png)
+
+![](./docs/Screenshot_2.png)
+
 ## Try It!
 
 ### Dev Install
