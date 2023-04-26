@@ -18,7 +18,6 @@ members = [
 	"flow_arena",
 	"flow_vessel",
 	"flow_vase/flow_cli",
-	# "flow_vase/flow_iced",
 	# "flow_vase/flow_yew",
 	"flow_vase/flow_acc",
 ]
