@@ -2,4 +2,5 @@
 members = [
 	"flow_arena",
 	"flow_vessel",
+	"flow"
 ]

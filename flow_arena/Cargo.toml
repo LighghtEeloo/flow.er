@@ -11,14 +11,9 @@ exclude = ["./doc_sync.py"]
 keywords = ["arena", "flow", "tree", "graph"]
 categories = ["data-structures", "accessibility"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [features]
 default = ["serde_impl"]
 serde_impl = ["serde"]
-
-[dependencies]
-# indexmap = "1.6"
 
 [dependencies.serde]
 version = "1"

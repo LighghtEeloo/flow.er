@@ -1,8 +1,8 @@
 [package]
 name = "flow_vessel"
 version = "0.1.2"
-authors = ["LighghtEeloo <eelooecho@163.com>"]
-edition = "2018"
+authors = ["LighghtEeloo <litiaeeloo@gmail.com>"]
+edition = "2021"
 repository = "https://github.com/LighghtEeloo/flow.er"
 
 [dependencies]
@@ -11,9 +11,6 @@ serde_json = "1"
 futures = "0.3"
 log = "0.4.6"
 wasm-logger = "0.2.0"
-# strum = "0.20"
-# strum_macros = "0.20"
-# indexmap = "1.6"
 
 [dependencies.rand]
 version = "0.8"

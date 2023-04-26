@@ -1,0 +1,8 @@
+[package]
+name = "flow"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+dioxus = "0.3.2"
+dioxus-web = "0.3.1"
