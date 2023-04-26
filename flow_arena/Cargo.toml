@@ -1,14 +1,14 @@
 [package]
 name = "flow_arena"
 version = "0.4.4"
-authors = ["LighghtEeloo <eelooecho@163.com>"]
-edition = "2018"
+authors = ["LighghtEeloo <litiaeeloo@gmail.com>"]
+edition = "2021"
 description = "A HashMap managed Graph Model with the concept of ownership"
 readme = "README.md"
 repository = "https://github.com/LighghtEeloo/flow.er"
 license-file = "../LICENSE"
 exclude = ["./doc_sync.py"]
-keywords = ["arena", "flow", "tree", "graph", "ownership"]
+keywords = ["arena", "flow", "tree", "graph"]
 categories = ["data-structures", "accessibility"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

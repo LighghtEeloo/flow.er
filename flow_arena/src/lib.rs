@@ -78,7 +78,7 @@
 
 mod arena;
 mod flow;
-mod ser_de;
+mod serde_impl;
 mod variants;
 
 pub use self::{
