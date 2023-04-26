@@ -7,7 +7,7 @@ The old lines will be printed, in case you accidentally overwrite anything impor
 """
 
 proj_path = os.path.dirname(os.path.abspath(__file__))
-readme_path = "README.md"
+readme_path = "Readme.md"
 lib_path = "src/lib.rs"
 
 os.chdir(proj_path)

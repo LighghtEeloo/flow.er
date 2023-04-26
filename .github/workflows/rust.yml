@@ -2,9 +2,7 @@ name: Rust
 
 on:
   push:
-    branches: [ dev, dev-Acc ]
-  # pull_request:
-  #   branches: [ dev ]
+    branches: [ main ]
 
 env:
   CARGO_TERM_COLOR: always
@@ -18,17 +16,5 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build
       run: cargo build --verbose
-    # - name: Run flow_arena tests
-    #   run: cargo test --package flow_arena
-    # - name: Run flow_vessel tests
-    #   run: cargo test --package flow_vessel
-    # - name: Run flow_acc tests
-    #   run: cargo test --package flow-acc
-    # - name: Run flow_cli tests
-    #   run: cargo test --package flow-cli
-    # - name: Run flow_ish tests
-    #   run: cargo test --package flow-ish
-    # - name: Run tests
-    #   run: cargo test --verbose
     - name: Full Test
       run: cargo test --all --verbose --locked

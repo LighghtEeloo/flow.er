@@ -1,5 +1,9 @@
+# builds
 **/target
 **/dist
-/.idea
-/.vscode
-_*.txt
+
+# editors
+.vscode/
+
+# personal
+_*/

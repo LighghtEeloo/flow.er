@@ -1,4 +1,4 @@
-# Flow.er ChangeLog
+# Flow.er Changelog
 
 ## Ver 0.4.0
 - fix!! new flow_arena with clearer effects.

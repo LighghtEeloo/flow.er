@@ -1,1 +1,17 @@
-max_width = 80
+max_width = 100
+use_try_shorthand = true
+use_field_init_shorthand = true
+use_small_heuristics = "Max"
+
+# fn_single_line = true
+fn_args_layout = "Compressed"
+# where_single_line = true
+# brace_style = "PreferSameLine"
+
+# group_imports = "StdExternalCrate"
+# imports_granularity = "Crate"
+reorder_modules = false
+
+# match_arm_leading_pipes = "Never"
+# wrap_comments = true
+# overflow_delimited_expr = true
