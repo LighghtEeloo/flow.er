@@ -1,5 +1,13 @@
 # Flow.er
 
+## After 2 years of silence...
+
+I've grown and learnt a lot from my experience with programming and software development, and most importantly, how to make a notebook app meaningful. The ecosystem has dramtically evolved, and I'm glad to see that. I'm planning to rewrite the project in my free time.
+
+Below is the corpus of what was done 2 years ago, when I was still young.
+
+---
+
 A *notebook* app integrated with *todo-list* utility.
 
 Project *flow.er* is a Rust WASM app running in browser. Taking advantage of Yew and Trunk, it provides good development experience.
