@@ -19,7 +19,7 @@ pub enum SaveError {
 impl Vessel {
     fn path() -> std::path::PathBuf {
         let mut path = if let Some(project_dirs) =
-            directories_next::ProjectDirs::from("rs", "LighghtEeloo", "flow.er")
+            directories_next::ProjectDirs::from("", "LighghtEeloo", "flow.er")
         {
             project_dirs.data_dir().into()
         } else {

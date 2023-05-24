@@ -1,4 +1,4 @@
-use dioxus::prelude::*;
+use dioxus::{html::input_data::keyboard_types::Key, prelude::*};
 
 fn main() {
     // launch the web app
@@ -9,12 +9,29 @@ struct App;
 
 impl App {
     fn run(cx: Scope) -> Element {
-        let mut count = use_state(cx, || 0);
+        let link = use_state(cx, || "".to_string());
+        let dbg_text = use_state(cx, || format!(""));
+
+        let links = use_ref(cx, || im::Vector::new());
+
+        let inputbox = rsx!(input {
+            value: "{link}",
+            oninput: move |evt| {
+                dbg_text.set(evt.inner().value.clone());
+                link.set(evt.value.clone())
+            },
+            onkeydown: move |evt| {
+                if evt.inner().key() == Key::Enter {
+                    let mut links = links.write();
+                    links.push_back(link.get().clone());
+                    link.set("".to_string());
+                }
+            }
+        });
 
         cx.render(rsx!(
-            h1 { "High-Five counter: {count}" }
-            button { onclick: move |_| count += 1, "Up high!" }
-            button { onclick: move |_| count -= 1, "Down low!" }
+            div { "{dbg_text}" }
+            inputbox
         ))
     }
 }
